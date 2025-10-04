@@ -45,52 +45,53 @@ export default function HomePage() {
 
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--google-bg-secondary)' }}>
       <Navigation user={user} />
 
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
+        className="pt-16 sm:pt-20"
       >
         <HeroSection>
           <div className="text-center">
-            <div className="flex justify-center mb-6">
-              <div className="bg-white bg-opacity-20 rounded-full p-4">
-                <Globe className="h-12 w-12 text-white" />
+            <div className="flex justify-center mb-4 sm:mb-6">
+              <div className="bg-white bg-opacity-20 rounded-full p-3 sm:p-4">
+                <Globe className="h-8 w-8 sm:h-10 sm:w-10 lg:h-12 lg:w-12 text-white" />
               </div>
             </div>
-            <h2 className="text-4xl md:text-6xl font-bold mb-6">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
               Professional Domain Management
             </h2>
-            <p className="text-xl md:text-2xl mb-8 text-primary-100">
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 sm:mb-8 text-primary-100 px-4" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
               Excel Technologies - Your trusted partner for domain solutions and digital excellence
             </p>
 
             {/* Domain Search Feature */}
-            <DomainSearch className="mb-8" />
+            <DomainSearch className="mb-6 sm:mb-8" />
 
           </div>
         </HeroSection>
 
 
         <Section background="white">
-          <div className="text-center mb-16">
-            <div className="flex justify-center mb-6">
-              <div className="bg-primary-100 rounded-full p-3">
-                <Star className="h-8 w-8 text-primary-600" />
+          <div className="text-center mb-12 sm:mb-16">
+            <div className="flex justify-center mb-4 sm:mb-6">
+              <div className="bg-primary-100 rounded-full p-2 sm:p-3">
+                <Star className="h-6 w-6 sm:h-8 sm:w-8 text-primary-600" />
               </div>
             </div>
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
               Why Choose Excel Technologies?
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-3xl mx-auto px-4" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
               We provide comprehensive domain management solutions with cutting-edge technology
               and exceptional customer support.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             <FeatureCard
               icon={<Search className="h-8 w-8" />}
               title="Domain Search"

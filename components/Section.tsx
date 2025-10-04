@@ -23,10 +23,10 @@ export default function Section({
   };
 
   const paddingClasses = {
-    sm: 'py-8',
-    md: 'py-12',
-    lg: 'py-16',
-    xl: 'py-20'
+    sm: 'py-6 sm:py-8',
+    md: 'py-8 sm:py-12',
+    lg: 'py-12 sm:py-16',
+    xl: 'py-16 sm:py-20'
   };
 
   return (

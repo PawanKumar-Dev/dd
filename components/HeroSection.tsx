@@ -30,9 +30,9 @@ export default function HeroSection({
   };
 
   return (
-    <section className={`${backgroundClasses[background]} text-white relative overflow-hidden pt-20 ${className}`}>
+    <section className={`${backgroundClasses[background]} text-white relative overflow-hidden pt-16 sm:pt-20 ${className}`}>
       <div className="absolute inset-0 bg-black opacity-10"></div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24 relative">
         {children}
       </div>
     </section>

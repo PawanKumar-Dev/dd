@@ -22,6 +22,13 @@ export interface IOrder extends Document {
   }[];
   successfulDomains: string[];
   failedDomains: string[];
+  paymentVerification?: {
+    verifiedAt: Date;
+    paymentStatus: string;
+    paymentAmount: number;
+    paymentCurrency: string;
+    razorpayOrderId: string;
+  };
   createdAt: Date;
   updatedAt: Date;
   invoiceNumber?: string;
@@ -101,6 +108,28 @@ const OrderSchema = new Schema<IOrder>(
     ],
     successfulDomains: [String],
     failedDomains: [String],
+    paymentVerification: {
+      verifiedAt: {
+        type: Date,
+        required: true,
+      },
+      paymentStatus: {
+        type: String,
+        required: true,
+      },
+      paymentAmount: {
+        type: Number,
+        required: true,
+      },
+      paymentCurrency: {
+        type: String,
+        required: true,
+      },
+      razorpayOrderId: {
+        type: String,
+        required: true,
+      },
+    },
     invoiceNumber: {
       type: String,
       unique: true,

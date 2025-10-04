@@ -146,7 +146,7 @@ export default function Navigation({
   }
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-200">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md shadow-lg border-b border-[var(--google-border-light)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           <Logo size="md" href="/" />
@@ -156,35 +156,35 @@ export default function Navigation({
             <Link
               href="/"
               className={`font-medium transition-colors duration-200 relative group ${isActive('/')
-                ? 'text-primary-600'
-                : 'text-gray-700 hover:text-primary-600'
+                ? 'text-[var(--google-blue)]'
+                : 'text-[var(--google-text-primary)] hover:text-[var(--google-blue)]'
                 }`}
+              style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}
             >
               Home
-              <span className={`absolute -bottom-1 left-0 h-0.5 bg-primary-600 transition-all duration-200 ${isActive('/') ? 'w-full' : 'w-0 group-hover:w-full'
-                }`}></span>
+              <span className={`absolute -bottom-1 left-0 h-0.5 transition-all duration-200 ${isActive('/') ? 'w-full' : 'w-0 group-hover:w-full'}`} style={{ backgroundColor: 'var(--google-blue)' }}></span>
             </Link>
             <Link
               href="/about"
               className={`font-medium transition-colors duration-200 relative group ${isActive('/about')
-                ? 'text-primary-600'
-                : 'text-gray-700 hover:text-primary-600'
+                ? 'text-[var(--google-blue)]'
+                : 'text-[var(--google-text-primary)] hover:text-[var(--google-blue)]'
                 }`}
+              style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}
             >
               About Us
-              <span className={`absolute -bottom-1 left-0 h-0.5 bg-primary-600 transition-all duration-200 ${isActive('/about') ? 'w-full' : 'w-0 group-hover:w-full'
-                }`}></span>
+              <span className={`absolute -bottom-1 left-0 h-0.5 transition-all duration-200 ${isActive('/about') ? 'w-full' : 'w-0 group-hover:w-full'}`} style={{ backgroundColor: 'var(--google-blue)' }}></span>
             </Link>
             <Link
               href="/contact"
               className={`font-medium transition-colors duration-200 relative group ${isActive('/contact')
-                ? 'text-primary-600'
-                : 'text-gray-700 hover:text-primary-600'
+                ? 'text-[var(--google-blue)]'
+                : 'text-[var(--google-text-primary)] hover:text-[var(--google-blue)]'
                 }`}
+              style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}
             >
               Contact Us
-              <span className={`absolute -bottom-1 left-0 h-0.5 bg-primary-600 transition-all duration-200 ${isActive('/contact') ? 'w-full' : 'w-0 group-hover:w-full'
-                }`}></span>
+              <span className={`absolute -bottom-1 left-0 h-0.5 transition-all duration-200 ${isActive('/contact') ? 'w-full' : 'w-0 group-hover:w-full'}`} style={{ backgroundColor: 'var(--google-blue)' }}></span>
             </Link>
           </nav>
 
@@ -193,12 +193,12 @@ export default function Navigation({
             {/* Cart Icon */}
             <Link
               href="/cart"
-              className="relative p-2 text-gray-600 hover:text-primary-600 transition-colors duration-200"
+              className="relative p-2 text-[var(--google-text-secondary)] hover:text-[var(--google-blue)] transition-colors duration-200"
               title="Shopping Cart"
             >
               <ShoppingCart className="h-6 w-6" />
               {isMounted && cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-primary-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                <span className="absolute -top-1 -right-1 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium" style={{ backgroundColor: 'var(--google-blue)' }}>
                   {cartCount}
                 </span>
               )}
@@ -207,18 +207,23 @@ export default function Navigation({
             {isLoggedIn ? (
               <Link
                 href="/dashboard"
-                className="flex items-center space-x-2 p-2 text-gray-600 hover:text-primary-600 transition-colors duration-200 group"
+                className="flex items-center space-x-2 p-2 text-[var(--google-text-secondary)] hover:text-[var(--google-blue)] transition-colors duration-200 group"
                 title="Go to Dashboard"
               >
                 <User className="h-6 w-6" />
-                <span className="hidden lg:block font-medium text-sm group-hover:text-primary-600 transition-colors duration-200">
+                <span className="hidden lg:block font-medium text-sm group-hover:text-[var(--google-blue)] transition-colors duration-200" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
                   {isMounted && currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : ''}
                 </span>
               </Link>
             ) : (
               <Link
                 href="/login"
-                className="btn btn-primary hover:bg-primary-700 transition-colors duration-200 shadow-lg hover:shadow-xl"
+                className="px-4 py-2 rounded-lg font-medium text-white transition-all duration-200 shadow-sm hover:shadow-md"
+                style={{
+                  backgroundColor: 'var(--google-blue)',
+                  borderColor: 'var(--google-blue)',
+                  fontFamily: 'Google Sans, system-ui, sans-serif'
+                }}
               >
                 Login
               </Link>
@@ -227,7 +232,7 @@ export default function Navigation({
             {/* Mobile menu button */}
             <button
               onClick={toggleMobileMenu}
-              className="md:hidden p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200"
+              className="md:hidden p-2 rounded-lg text-[var(--google-text-secondary)] hover:text-[var(--google-text-primary)] hover:bg-[var(--google-bg-secondary)] transition-colors duration-200"
               aria-label="Toggle mobile menu"
             >
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -247,14 +252,15 @@ export default function Navigation({
           ? 'max-h-96 opacity-100 pb-4'
           : 'max-h-0 opacity-0 overflow-hidden'
           }`}>
-          <nav className="flex flex-col space-y-2 pt-4 border-t border-gray-200">
+          <nav className="flex flex-col space-y-2 pt-4 border-t border-[var(--google-border-light)]">
             <Link
               href="/"
               onClick={closeMobileMenu}
               className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${isActive('/')
-                ? 'text-primary-600 bg-primary-50'
-                : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
+                ? 'text-[var(--google-blue)] bg-[var(--google-blue-light)]'
+                : 'text-[var(--google-text-primary)] hover:text-[var(--google-blue)] hover:bg-[var(--google-bg-secondary)]'
                 }`}
+              style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}
             >
               Home
             </Link>
@@ -262,9 +268,10 @@ export default function Navigation({
               href="/about"
               onClick={closeMobileMenu}
               className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${isActive('/about')
-                ? 'text-primary-600 bg-primary-50'
-                : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
+                ? 'text-[var(--google-blue)] bg-[var(--google-blue-light)]'
+                : 'text-[var(--google-text-primary)] hover:text-[var(--google-blue)] hover:bg-[var(--google-bg-secondary)]'
                 }`}
+              style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}
             >
               About Us
             </Link>
@@ -272,17 +279,19 @@ export default function Navigation({
               href="/contact"
               onClick={closeMobileMenu}
               className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${isActive('/contact')
-                ? 'text-primary-600 bg-primary-50'
-                : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
+                ? 'text-[var(--google-blue)] bg-[var(--google-blue-light)]'
+                : 'text-[var(--google-text-primary)] hover:text-[var(--google-blue)] hover:bg-[var(--google-bg-secondary)]'
                 }`}
+              style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}
             >
               Contact Us
             </Link>
-            <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200">
+            <div className="flex flex-col space-y-2 pt-4 border-t border-[var(--google-border-light)]">
               <Link
                 href="/cart"
                 onClick={closeMobileMenu}
-                className="flex items-center justify-center px-4 py-2 rounded-lg font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 transition-colors duration-200"
+                className="flex items-center justify-center px-4 py-2 rounded-lg font-medium text-[var(--google-text-primary)] hover:text-[var(--google-blue)] hover:bg-[var(--google-bg-secondary)] transition-colors duration-200"
+                style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}
               >
                 <ShoppingCart className="h-5 w-5 mr-2" />
                 Cart {isMounted && cartCount > 0 && `(${cartCount})`}
@@ -291,12 +300,13 @@ export default function Navigation({
                 <Link
                   href="/dashboard"
                   onClick={closeMobileMenu}
-                  className="flex items-center justify-center px-4 py-2 rounded-lg font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 transition-colors duration-200"
+                  className="flex items-center justify-center px-4 py-2 rounded-lg font-medium text-[var(--google-text-primary)] hover:text-[var(--google-blue)] hover:bg-[var(--google-bg-secondary)] transition-colors duration-200"
+                  style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}
                 >
                   <User className="h-5 w-5 mr-2" />
                   <div className="flex flex-col items-start">
                     <span>Dashboard</span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-[var(--google-text-secondary)]">
                       {isMounted && currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : ''}
                     </span>
                   </div>
@@ -305,7 +315,12 @@ export default function Navigation({
                 <Link
                   href="/login"
                   onClick={closeMobileMenu}
-                  className="btn btn-primary text-center"
+                  className="px-4 py-2 rounded-lg font-medium text-white transition-all duration-200 shadow-sm hover:shadow-md text-center"
+                  style={{
+                    backgroundColor: 'var(--google-blue)',
+                    borderColor: 'var(--google-blue)',
+                    fontFamily: 'Google Sans, system-ui, sans-serif'
+                  }}
                 >
                   Login
                 </Link>
