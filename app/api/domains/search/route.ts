@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ResellerClubWrapper } from "@/lib/resellerclub-wrapper";
-import { PricingDebug } from "@/lib/pricing-debug";
 import { InputValidator } from "@/lib/validation";
 
 export async function POST(request: NextRequest) {
@@ -87,13 +86,6 @@ export async function POST(request: NextRequest) {
     console.log(
       `🎯 [API-${requestId}] Mode: ${testingMode ? "Testing" : "Production"}`
     );
-
-    // Debug pricing for .eu TLD if it's being searched
-    if (searchTlds.includes("eu")) {
-      console.log(`🔍 [API-${requestId}] Debugging .eu pricing...`);
-      await PricingDebug.debugTLDPricing("eu");
-      await PricingDebug.comparePricing(domainValidation.sanitized, "eu");
-    }
 
     // Search domain using ResellerClub API with base domain and selected TLDs
     console.log(
