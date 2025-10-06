@@ -1,0 +1,172 @@
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Roboto', system-ui, sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Google Sans', system-ui, sans-serif;
+  }
+
+  /* Google Workspace Color Variables */
+  :root {
+    /* Primary Colors */
+    --google-blue: #1A73E8;
+    --google-blue-hover: #1557B0;
+    --google-blue-light: #E8F0FE;
+
+    /* Text Colors */
+    --google-text-primary: #202124;
+    --google-text-secondary: #5F6368;
+    --google-text-tertiary: #9AA0A6;
+
+    /* Background Colors */
+    --google-bg-primary: #FFFFFF;
+    --google-bg-secondary: #F8F9FA;
+    --google-bg-tertiary: #F1F3F4;
+
+    /* Border Colors */
+    --google-border: #DADCE0;
+    --google-border-light: #E8EAED;
+
+    /* Google App Colors */
+    --google-red: #EA4335;
+    --google-yellow: #FBBC04;
+    --google-green: #34A853;
+    --google-purple: #9C27B0;
+    --google-orange: #FF9800;
+
+    /* Status Colors */
+    --google-success: #34A853;
+    --google-warning: #FBBC04;
+    --google-error: #EA4335;
+    --google-info: #1A73E8;
+  }
+}
+
+@layer components {
+
+  /* Google Workspace Button Styles */
+  .btn {
+    @apply px-3 py-1.5 rounded-lg font-medium transition-all duration-200 font-['Google_Sans'];
+  }
+
+  .btn-primary {
+    @apply text-white focus:ring-2 focus:ring-offset-2;
+    background-color: var(--google-blue);
+    border: 1px solid var(--google-blue);
+  }
+
+  .btn-primary:hover {
+    background-color: var(--google-blue-hover);
+    border-color: var(--google-blue-hover);
+  }
+
+  .btn-primary:focus {
+    --tw-ring-color: var(--google-blue);
+  }
+
+  .btn-secondary {
+    @apply text-[var(--google-text-primary)] focus:ring-2 focus:ring-offset-2;
+    background-color: var(--google-bg-primary);
+    border: 1px solid var(--google-border);
+  }
+
+  .btn-secondary:hover {
+    background-color: var(--google-bg-secondary);
+  }
+
+  .btn-secondary:focus {
+    --tw-ring-color: var(--google-blue);
+  }
+
+  .btn-danger {
+    @apply text-white focus:ring-2 focus:ring-offset-2;
+    background-color: var(--google-error);
+    border: 1px solid var(--google-error);
+  }
+
+  .btn-danger:hover {
+    background-color: #D33B2C;
+  }
+
+  .btn-danger:focus {
+    --tw-ring-color: var(--google-error);
+  }
+
+  /* Google Workspace Input Styles */
+  .input {
+    @apply w-full px-3 py-2 rounded-lg focus:ring-2 focus:ring-offset-0 transition-all duration-200;
+    background-color: var(--google-bg-primary);
+    border: 1px solid var(--google-border);
+    color: var(--google-text-primary);
+  }
+
+  .input:focus {
+    border-color: var(--google-blue);
+    --tw-ring-color: var(--google-blue);
+  }
+
+  .input::placeholder {
+    color: var(--google-text-tertiary);
+  }
+
+  /* Google Workspace Card Styles */
+  .card {
+    @apply rounded-lg shadow-sm;
+    background-color: var(--google-bg-primary);
+    border: 1px solid var(--google-border-light);
+  }
+
+  .card-header {
+    @apply px-4 py-3;
+    border-bottom: 1px solid var(--google-border-light);
+  }
+
+  .card-body {
+    @apply px-4 py-3;
+  }
+
+  /* Google Workspace Text Styles */
+  .text-primary {
+    color: var(--google-text-primary);
+  }
+
+  .text-secondary {
+    color: var(--google-text-secondary);
+  }
+
+  .text-tertiary {
+    color: var(--google-text-tertiary);
+  }
+
+  .bg-primary {
+    background-color: var(--google-bg-primary);
+  }
+
+  .bg-secondary {
+    background-color: var(--google-bg-secondary);
+  }
+
+  .bg-tertiary {
+    background-color: var(--google-bg-tertiary);
+  }
+
+  .border-google {
+    border-color: var(--google-border);
+  }
+
+  .border-google-light {
+    border-color: var(--google-border-light);
+  }
+}

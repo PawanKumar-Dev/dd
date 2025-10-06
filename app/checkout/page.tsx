@@ -1,0 +1,376 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { ArrowLeft, CreditCard, Shield } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { useCartStore } from '@/store/cartStore';
+import { useTestingStore } from '@/store/testingStore';
+import ClientOnly from '@/components/ClientOnly';
+import Navigation from '@/components/Navigation';
+import Footer from '@/components/Footer';
+
+interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+}
+
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
+
+export default function CheckoutPage() {
+  const [user, setUser] = useState<User | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const router = useRouter();
+  const { items: cartItems, getTotalPrice, clearCart, syncWithServer, isLoading } = useCartStore();
+  const { isTestingMode } = useTestingStore();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+
+    if (!token || !userData) {
+      router.push('/login');
+      return;
+    }
+
+    const userObj = JSON.parse(userData);
+
+    // Redirect admin users to admin dashboard
+    if (userObj.role === 'admin') {
+      router.push('/admin/dashboard');
+      return;
+    }
+
+    setUser(userObj);
+
+    // Sync cart with server
+    syncWithServer();
+
+    // Load Razorpay script
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, [router, syncWithServer]);
+
+  const handlePayment = async () => {
+    if (cartItems.length === 0) {
+      toast.error('Cart is empty');
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      const token = localStorage.getItem('token');
+
+      // Create payment order
+      const response = await fetch('/api/payments/create-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          cartItems: cartItems,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create payment order');
+      }
+
+      // Configure Razorpay options
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: data.amount * 100, // Convert to paise
+        currency: data.currency,
+        name: 'Domain Management System',
+        description: `Payment for ${cartItems.length} domain(s)`,
+        order_id: data.razorpayOrderId,
+        handler: async function (response: any) {
+          try {
+            // Verify payment
+            const verifyResponse = await fetch('/api/payments/verify', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                'x-testing-mode': isTestingMode.toString(),
+              },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                cartItems: cartItems,
+              }),
+            });
+
+            const verifyData = await verifyResponse.json();
+
+            if (verifyResponse.ok) {
+              const { successfulDomains, failedDomains, orderId, invoiceNumber } = verifyData;
+
+              clearCart();
+
+              // Store payment result in session storage for cleaner URL
+              const paymentResult = {
+                status: 'success',
+                orderId: orderId || '',
+                invoiceNumber: invoiceNumber || '',
+                successfulDomains: successfulDomains || [],
+                failedDomains: failedDomains || [],
+                amount: getTotalPrice(),
+                currency: 'INR',
+                timestamp: Date.now()
+              };
+
+              sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
+              router.push('/payment-success');
+            } else {
+              // Store payment result in session storage for cleaner URL
+              const paymentResult = {
+                status: 'failed',
+                errorMessage: verifyData.error || 'Payment verification failed',
+                amount: getTotalPrice(),
+                currency: 'INR',
+                timestamp: Date.now()
+              };
+
+              sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
+              router.push('/payment-success');
+            }
+          } catch (error) {
+            console.error('Payment verification error:', error);
+
+            // Store payment result in session storage for cleaner URL
+            const paymentResult = {
+              status: 'failed',
+              errorMessage: 'Payment verification failed due to a technical error',
+              amount: getTotalPrice(),
+              currency: 'INR',
+              timestamp: Date.now()
+            };
+
+            sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
+            router.push('/payment-success');
+          }
+        },
+        prefill: {
+          name: user ? `${user.firstName} ${user.lastName}` : '',
+          email: user?.email || '',
+        },
+        theme: {
+          color: '#3b82f6',
+        },
+        modal: {
+          ondismiss: function () {
+            setIsProcessing(false);
+            // Payment was cancelled by user
+            const paymentResult = {
+              status: 'failed',
+              errorMessage: 'Payment was cancelled by user',
+              amount: getTotalPrice(),
+              currency: 'INR',
+              timestamp: Date.now()
+            };
+
+            sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
+            router.push('/payment-success');
+          },
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+
+      rzp.on('payment.failed', function (response: any) {
+        setIsProcessing(false);
+        // Payment failed
+        const paymentResult = {
+          status: 'failed',
+          errorMessage: response.error.description || 'Payment failed',
+          amount: getTotalPrice(),
+          currency: 'INR',
+          timestamp: Date.now()
+        };
+
+        sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
+        router.push('/payment-success');
+      });
+
+      rzp.open();
+    } catch (error) {
+      console.error('Payment error:', error);
+      setIsProcessing(false);
+
+      // Store payment result in session storage for cleaner URL
+      const paymentResult = {
+        status: 'failed',
+        errorMessage: 'Payment initialization failed. Please try again.',
+        amount: getTotalPrice(),
+        currency: 'INR',
+        timestamp: Date.now()
+      };
+
+      sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
+      router.push('/payment-success');
+    }
+  };
+
+  if (!user || isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading checkout...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (cartItems.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 max-w-md">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Cart is Empty</h2>
+            <p className="text-gray-600 mb-6">Add some domains to your cart before proceeding to checkout.</p>
+            <button
+              onClick={() => router.push('/')}
+              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+            >
+              Browse Domains
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Navigation user={user} />
+
+      {/* Header */}
+      <header className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center py-4 pt-24">
+            <button
+              onClick={() => router.back()}
+              className="flex items-center text-gray-600 hover:text-gray-900 mr-4"
+            >
+              <ArrowLeft className="h-5 w-5 mr-1" />
+              Back to Cart
+            </button>
+            <h1 className="text-2xl font-bold text-gray-900">Checkout</h1>
+          </div>
+        </div>
+      </header>
+
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Order Summary */}
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900 mb-6">Order Summary</h2>
+            <div className="space-y-4">
+              {cartItems.map((item, index) => (
+                <div key={index} className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className="font-medium text-gray-900">{item.domainName}</h3>
+                      <p className="text-sm text-gray-600">
+                        {item.registrationPeriod || 1} year(s) registration
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold text-gray-900">
+                        ₹{(item.price * item.registrationPeriod).toFixed(2)}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        ₹{item.price} per year
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-semibold text-gray-900">Total:</span>
+                  <span className="text-2xl font-bold text-blue-600">
+                    ₹{getTotalPrice().toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Payment Section */}
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900 mb-6">Payment</h2>
+            <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+              <div className="text-center mb-6">
+                <CreditCard className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  Secure Payment
+                </h3>
+                <p className="text-gray-600">
+                  Powered by Razorpay - Your payment information is secure
+                </p>
+              </div>
+
+              <div className="space-y-3 mb-6">
+                <div className="flex items-center text-sm text-gray-600">
+                  <Shield className="h-4 w-4 mr-2 text-green-600" />
+                  <span>SSL Encrypted</span>
+                </div>
+                <div className="flex items-center text-sm text-gray-600">
+                  <Shield className="h-4 w-4 mr-2 text-green-600" />
+                  <span>PCI DSS Compliant</span>
+                </div>
+                <div className="flex items-center text-sm text-gray-600">
+                  <Shield className="h-4 w-4 mr-2 text-green-600" />
+                  <span>256-bit Encryption</span>
+                </div>
+              </div>
+
+              <button
+                onClick={handlePayment}
+                disabled={isProcessing || cartItems.length === 0}
+                className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors flex items-center justify-center"
+              >
+                {isProcessing ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                    Processing...
+                  </>
+                ) : (
+                  `Pay ₹${getTotalPrice().toFixed(2)}`
+                )}
+              </button>
+
+              <p className="text-xs text-gray-500 text-center mt-4">
+                By proceeding, you agree to our{' '}
+                <a href="/terms-and-conditions" className="text-blue-600 hover:underline">terms and conditions</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <Footer />
+    </div>
+  );
+}
