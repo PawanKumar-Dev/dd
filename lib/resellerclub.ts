@@ -313,7 +313,7 @@ export class ResellerClubAPI {
         for (const [domain, data] of Object.entries(response.data)) {
           if (typeof data === "object" && data !== null) {
             const domainData = data as any;
-            const isAvailable = domainData.status === "available";
+            let isAvailable = domainData.status === "available";
 
             // Try to get live pricing first
             let price = 0;
@@ -669,7 +669,7 @@ export class ResellerClubAPI {
           }
           if (typeof data === "object" && data !== null) {
             const domainData = data as any;
-            const isAvailable = domainData.status === "available";
+            let isAvailable = domainData.status === "available";
             // Try to get live pricing first
             let price = 0;
             let currency = "INR";
