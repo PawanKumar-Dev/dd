@@ -119,6 +119,9 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
         console.error('Failed to load saved search state:', error);
       }
     }
+
+    // Ensure component is not stuck in loading state
+    setIsSearching(false);
   }, []);
 
   // Save search state when it changes
@@ -340,13 +343,13 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
     localStorage.removeItem('domainSearchState');
   };
 
+
   return (
     <div className={`w-full max-w-5xl mx-auto ${className}`}>
-      {/* Google Workspace Style Search Form */}
-      <div className="bg-white rounded-lg shadow-sm border border-[var(--google-border-light)] p-3 sm:p-4 lg:p-6 mb-4 sm:mb-6">
+      {/* Google Workspace Style Search Form - Always Visible */}
+      <div className="bg-white rounded-xl shadow-lg border-2 border-gray-200 p-4 sm:p-6 lg:p-8 mb-4 sm:mb-6">
         <div className="text-center mb-4 sm:mb-6">
-          <h2 className="text-xl sm:text-2xl font-bold text-[var(--google-text-primary)] mb-1" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>Find Your Perfect Domain</h2>
-          <p className="text-[var(--google-text-secondary)] text-sm sm:text-base" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>Search from thousands of available domains with live pricing</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>Find Your Perfect Domain</h2>
         </div>
 
         <form onSubmit={handleSearch} className="space-y-4">
@@ -354,14 +357,14 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
               <div className="relative group">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-[var(--google-text-tertiary)] group-focus-within:text-[var(--google-blue)] transition-colors" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
                 <Input
                   id="domain-input"
                   type="text"
                   value={searchTerm}
                   onChange={handleInputChange}
                   placeholder="Enter domain name (e.g., example or example.com)"
-                  className="pl-12 pr-4 py-2 sm:py-3 text-sm sm:text-base border-2 border-[var(--google-border)] focus:border-[var(--google-blue)] focus:ring-4 focus:ring-[var(--google-blue-light)] rounded-lg transition-all duration-200 hover:border-[var(--google-border)] bg-white"
+                  className="pl-12 pr-4 py-3 sm:py-4 text-base sm:text-lg border-2 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 rounded-xl transition-all duration-200 hover:border-gray-400 bg-white text-gray-900 placeholder-gray-500"
                   disabled={isSearching}
                   style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}
                 />
@@ -373,10 +376,8 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
                 variant="primary"
                 size="lg"
                 disabled={isSearching || !searchTerm.trim()}
-                className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200"
+                className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 bg-blue-600 hover:bg-blue-700 text-white border-0"
                 style={{
-                  backgroundColor: 'var(--google-blue)',
-                  borderColor: 'var(--google-blue)',
                   fontFamily: 'Google Sans, system-ui, sans-serif'
                 }}
               >
@@ -397,16 +398,16 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
 
 
           {searchMode === 'multiple' && showTldSuggestions && baseDomain && (
-            <div className="space-y-4 sm:space-y-6 bg-[var(--google-bg-secondary)] rounded-lg p-4 sm:p-6 border border-[var(--google-border-light)]">
+            <div className="space-y-4 sm:space-y-6 bg-gray-50 rounded-xl p-4 sm:p-6 border-2 border-gray-200">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="flex items-center gap-3 text-sm text-[var(--google-text-primary)] bg-[var(--google-blue-light)] px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
-                  <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
-                  <span className="text-xs sm:text-sm">Select domain extensions below to search multiple TLDs</span>
+                <div className="flex items-center gap-3 text-sm text-gray-800 bg-blue-100 px-4 py-3 rounded-lg font-medium" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
+                  <TrendingUp className="h-5 w-5 flex-shrink-0 text-blue-600" />
+                  <span className="text-sm">Select domain extensions below to search multiple TLDs</span>
                 </div>
                 <button
                   type="button"
                   onClick={clearTldSelection}
-                  className="text-sm text-[var(--google-blue)] hover:text-[var(--google-blue-hover)] font-medium px-3 py-1 rounded-lg hover:bg-[var(--google-blue-light)] transition-colors self-start sm:self-auto"
+                  className="text-sm text-blue-600 hover:text-blue-700 font-medium px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors self-start sm:self-auto"
                   style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}
                 >
                   Clear all
@@ -423,21 +424,21 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
                   if (categoryTlds.length === 0) return null;
 
                   return (
-                    <div key={category.name} className="bg-white rounded-lg p-3 sm:p-4 shadow-sm border border-[var(--google-border-light)]">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 gap-3">
+                    <div key={category.name} className="bg-white rounded-xl p-4 sm:p-5 shadow-md border-2 border-gray-200">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
                         <div className="flex items-center gap-3">
-                          <div className="p-2 bg-[var(--google-blue-light)] rounded-lg flex-shrink-0">
-                            <category.icon className="h-4 w-4 sm:h-5 sm:w-5 text-[var(--google-blue)]" />
+                          <div className="p-3 bg-blue-100 rounded-xl flex-shrink-0">
+                            <category.icon className="h-5 w-5 text-blue-600" />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <h3 className="font-semibold text-[var(--google-text-primary)] text-base sm:text-lg" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>{category.name}</h3>
-                            <p className="text-xs sm:text-sm text-[var(--google-text-secondary)]" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>{category.description}</p>
+                            <h3 className="font-semibold text-gray-900 text-lg sm:text-xl" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>{category.name}</h3>
+                            <p className="text-sm text-gray-600" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>{category.description}</p>
                           </div>
                         </div>
                         <button
                           type="button"
                           onClick={() => selectAllTlds(categoryTlds)}
-                          className="text-sm text-[var(--google-blue)] hover:text-[var(--google-blue-hover)] font-medium px-3 py-1 rounded-lg hover:bg-[var(--google-blue-light)] transition-colors self-start sm:self-auto"
+                          className="text-sm text-blue-600 hover:text-blue-700 font-medium px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors self-start sm:self-auto"
                           style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}
                         >
                           Select all
@@ -449,12 +450,11 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
                             key={tld}
                             type="button"
                             onClick={() => toggleTldSelection(tld)}
-                            className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 ${selectedTlds.includes(tld)
-                              ? 'text-white shadow-sm'
-                              : 'bg-[var(--google-bg-tertiary)] text-[var(--google-text-primary)] hover:bg-[var(--google-bg-secondary)] hover:shadow-sm'
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${selectedTlds.includes(tld)
+                              ? 'bg-blue-600 text-white shadow-md hover:bg-blue-700'
+                              : 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:shadow-sm'
                               }`}
                             style={{
-                              backgroundColor: selectedTlds.includes(tld) ? 'var(--google-blue)' : undefined,
                               fontFamily: 'Google Sans, system-ui, sans-serif'
                             }}
                           >
@@ -469,28 +469,28 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
 
               {/* Selected TLDs Summary */}
               {selectedTlds.length > 0 && (
-                <div className="bg-[var(--google-blue)] p-4 sm:p-6 rounded-lg text-white">
-                  <div className="flex items-center gap-3 mb-3 sm:mb-4">
-                    <div className="p-2 bg-white bg-opacity-20 rounded-lg flex-shrink-0">
-                      <Globe className="h-4 w-4 sm:h-5 sm:w-5" />
+                <div className="bg-blue-600 p-6 sm:p-8 rounded-xl text-white shadow-lg">
+                  <div className="flex items-center gap-4 mb-4 sm:mb-6">
+                    <div className="p-3 bg-white bg-opacity-20 rounded-xl flex-shrink-0">
+                      <Globe className="h-6 w-6" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h4 className="font-semibold text-base sm:text-lg" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>Selected Extensions</h4>
-                      <p className="text-blue-100 text-xs sm:text-sm" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>{selectedTlds.length} TLD{selectedTlds.length !== 1 ? 's' : ''} selected</p>
+                      <h4 className="font-semibold text-lg sm:text-xl" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>Selected Extensions</h4>
+                      <p className="text-blue-100 text-sm sm:text-base" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>{selectedTlds.length} TLD{selectedTlds.length !== 1 ? 's' : ''} selected</p>
                     </div>
                   </div>
-                  <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                  <div className="flex flex-wrap gap-2 sm:gap-3">
                     {selectedTlds.slice(0, 5).map((tld) => (
                       <span
                         key={tld}
-                        className="px-3 sm:px-4 py-1.5 sm:py-2 bg-white bg-opacity-20 text-white text-xs sm:text-sm rounded-lg font-medium"
+                        className="px-4 py-2 bg-white bg-opacity-25 text-white text-sm rounded-lg font-medium"
                         style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}
                       >
                         {tld}
                       </span>
                     ))}
                     {selectedTlds.length > 5 && (
-                      <span className="px-3 sm:px-4 py-1.5 sm:py-2 bg-white bg-opacity-10 text-white text-xs sm:text-sm rounded-lg font-medium" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
+                      <span className="px-4 py-2 bg-white bg-opacity-15 text-white text-sm rounded-lg font-medium" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
                         +{selectedTlds.length - 5} more
                       </span>
                     )}
@@ -501,6 +501,24 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
           )}
         </form>
       </div>
+
+      {/* Enhanced Loading State */}
+      {isSearching && (
+        <div className="bg-white rounded-xl shadow-lg border-2 border-gray-200 p-8 mb-4 sm:mb-6">
+          <div className="flex items-center justify-center py-20">
+            <div className="text-center">
+              <div className="relative">
+                <div className="w-20 h-20 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-8"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Search className="h-8 w-8 text-blue-600 animate-pulse" />
+                </div>
+              </div>
+              <h3 className="text-2xl font-semibold text-gray-900 mb-3" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>Searching for domains...</h3>
+              <p className="text-gray-600 text-lg" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>Please wait while we check availability and pricing</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Enhanced Results Section */}
       {hasSearched && (
@@ -535,21 +553,6 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
             </div>
           </div>
 
-          {/* Enhanced Loading State */}
-          {isSearching && (
-            <div className="flex items-center justify-center py-16">
-              <div className="text-center">
-                <div className="relative">
-                  <div className="w-16 h-16 border-4 border-[var(--google-border)] border-t-[var(--google-blue)] rounded-full animate-spin mx-auto mb-6"></div>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Search className="h-6 w-6 text-[var(--google-blue)] animate-pulse" />
-                  </div>
-                </div>
-                <h3 className="text-xl font-semibold text-[var(--google-text-primary)] mb-2" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>Searching for domains...</h3>
-                <p className="text-[var(--google-text-secondary)]" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>Please wait while we check availability and pricing</p>
-              </div>
-            </div>
-          )}
 
           {/* Enhanced Error State */}
           {error && (
