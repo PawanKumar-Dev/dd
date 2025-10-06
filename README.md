@@ -681,7 +681,6 @@ Admin interface for managing TLD pricing with:
 
 - Live pricing display with real-time updates
 - Search and filter functionality
-- Export capabilities (CSV/JSON)
 - Statistics dashboard with pricing trends
 - Testing mode toggle
 - Fallback pricing management
