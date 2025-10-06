@@ -17,19 +17,16 @@ This domain management system is designed to provide a complete solution for dom
 ## 🚀 Features
 
 ### Core Functionality
-- **Live Domain Pricing**: Real-time pricing from ResellerClub API with both customer and reseller pricing
-- **Smart Domain Search**: Intelligent domain search with TLD suggestions and availability checking
-- **Pricing Comparison**: Customer vs reseller pricing with margin analysis
-- **User Management**: Complete user registration, authentication, and profile management
-- **Admin Panel**: Comprehensive admin dashboard with pricing management and analytics
-- **TLD Pricing Management**: Admin interface to view, compare, and analyze TLD pricing
-- **Payment Integration**: Razorpay payment gateway integration with webhook support
-- **Email Notifications**: Automated email notifications for orders and payments
-- **DNS Management**: Complete domain DNS record management with CRUD operations
-- **Domain Renewal**: Domain renewal and transfer functionality
-- **Invoice Generation**: PDF invoice generation for orders using HTML2Canvas + jsPDF
+
+- **Live Domain Search**: Real-time availability with ResellerClub API + promotional pricing
+- **Secure Payments**: Multi-layer Razorpay verification before domain registration
+- **DNS Management**: Complete DNS record management with ResellerClub integration
+- **User Dashboard**: Domain management and account control
+- **Admin Panel**: User, order, payment, and pricing management
+- **Responsive Design**: Google Workspace theme with mobile-first approach
 
 ### Advanced Features
+
 - **Testing Mode**: Complete testing environment with mock ResellerClub API responses
 - **Cart Management**: Persistent shopping cart with server synchronization
 - **Real-time Pricing**: Live pricing updates with comprehensive error handling
@@ -41,14 +38,14 @@ This domain management system is designed to provide a complete solution for dom
 - **Performance Optimization**: Caching, code splitting, and lazy loading
 - **Multi-page Support**: Homepage, about, contact, privacy, terms, and more
 
-### Recent Updates (v2.0.0)
-- **Enhanced Pricing System**: Complete overhaul of pricing system with customer and reseller pricing
-- **Improved Admin Interface**: New admin TLD pricing page with margin analysis
-- **Better Error Handling**: Comprehensive error handling and logging throughout the system
-- **Code Cleanup**: Removed old/unused files and improved code organization
-- **Enhanced Documentation**: Added comprehensive comments and documentation
-- **Pricing Accuracy**: Removed fallback pricing, now uses only live pricing from ResellerClub API
-- **Better Logging**: Improved console logging with detailed pricing information
+### Recent Updates (v2.1.0)
+
+- **Promotional Pricing**: Real-time ResellerClub promotional pricing integration
+- **URL Restructuring**: User-friendly URLs (`/domain-management`, `/terms-and-conditions`, etc.)
+- **Payment Security**: Multi-layer Razorpay verification before domain registration
+- **Live Pricing Only**: Removed static pricing, only live ResellerClub API pricing
+- **Code Cleanup**: Removed all debug/test files and deprecated code
+- **Enhanced UI**: Google Workspace theme with compact, responsive design
 
 ## 📁 Project Structure
 
@@ -56,20 +53,27 @@ This domain management system is designed to provide a complete solution for dom
 dd/
 ├── app/                          # Next.js App Router pages
 │   ├── admin/                    # Admin panel pages
-│   │   ├── tld-pricing/         # TLD pricing management
+│   │   ├── pricing-management/  # TLD pricing management
+│   │   ├── user-management/     # User management
+│   │   ├── order-management/    # Order management
+│   │   ├── payment-management/  # Payment management
+│   │   ├── system-settings/     # System settings
 │   │   └── dashboard/           # Admin dashboard
 │   ├── api/                     # API routes
 │   │   ├── admin/               # Admin API endpoints
 │   │   ├── domains/             # Domain search API
-│   │   └── auth/                # Authentication API
-│   └── (pages)/                 # Public pages
+│   │   ├── auth/                # Authentication API
+│   │   ├── cart/                # Cart management
+│   │   ├── contact/             # Contact form
+│   │   ├── orders/              # Order endpoints
+│   │   └── payments/            # Payment endpoints
 ├── components/                   # React components
 │   ├── admin/                   # Admin-specific components
 │   ├── forms/                   # Form components
 │   └── ui/                      # Reusable UI components
 ├── lib/                         # Utility libraries
 │   ├── resellerclub.ts         # ResellerClub API integration
-│   ├── pricing-service.ts      # Pricing service with caching
+│   ├── pricing-service.ts      # Pricing service with promotional pricing
 │   ├── resellerclub-wrapper.ts # API wrapper with error handling
 │   └── mock-resellerclub.ts    # Mock API for testing
 ├── store/                       # Zustand state management
@@ -79,16 +83,17 @@ dd/
 
 ### Key Files
 
-- **`lib/resellerclub.ts`**: Main ResellerClub API integration with comprehensive error handling
-- **`lib/pricing-service.ts`**: Pricing service with intelligent caching and TLD management
-- **`components/DomainSearch.tsx`**: Smart domain search component with TLD suggestions
-- **`app/admin/tld-pricing/page.tsx`**: Admin TLD pricing management interface
+- **`lib/resellerclub.ts`**: ResellerClub API integration with promotional pricing
+- **`lib/pricing-service.ts`**: Live pricing service with promotional pricing support
+- **`components/DomainSearch.tsx`**: Domain search with Google Workspace UI
+- **`app/domain-management/page.tsx`**: DNS management interface
 - **`app/api/domains/search/route.ts`**: Domain search API endpoint
-- **`app/api/admin/tld-pricing/route.ts`**: Admin TLD pricing API endpoint
+- **`app/api/payments/verify/route.ts`**: Secure payment verification
 
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - **Framework**: Next.js 14 with App Router
 - **Language**: TypeScript 5.3.3
 - **Styling**: Tailwind CSS 3.3.6
@@ -99,6 +104,7 @@ dd/
 - **Notifications**: React Hot Toast
 
 ### Backend
+
 - **Runtime**: Node.js 18+
 - **API**: Next.js API Routes
 - **Database**: MongoDB Atlas with Mongoose 8.0.3
@@ -107,6 +113,7 @@ dd/
 - **Validation**: Validator 13.15.15
 
 ### Integrations
+
 - **Payment Gateway**: Razorpay 2.9.2
 - **Email Service**: Nodemailer 6.9.7
 - **PDF Generation**: HTML2Canvas 1.4.1 + jsPDF 3.0.3
@@ -114,6 +121,7 @@ dd/
 - **HTTP Client**: Axios 1.6.2
 
 ### Development Tools
+
 - **Linting**: ESLint 8.56.0
 - **Package Manager**: npm
 - **Environment**: dotenv 16.3.1
@@ -182,7 +190,7 @@ TESTING_MODE=false
    ```bash
    npm run setup
    ```
-   
+
    This interactive script will guide you through configuring all environment variables.
 
 4. **Initialize database**
@@ -207,11 +215,13 @@ TESTING_MODE=false
 If you prefer manual configuration:
 
 1. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 2. **Create environment file**
+
    ```bash
    cp .env.example .env.local
    # Edit .env.local with your actual values
@@ -227,7 +237,7 @@ If you prefer manual configuration:
 ```bash
 npm run build
 npm start
-   ```
+```
 
 ## 🔌 API Integration Details
 
@@ -301,29 +311,34 @@ The system integrates with ResellerClub API for live domain pricing and manageme
 The system provides comprehensive internal APIs:
 
 #### **Authentication APIs**
+
 - `POST /api/auth/register` - User registration
 - `POST /api/auth/login` - User login
 - `POST /api/auth/forgot-password` - Password reset request
 - `POST /api/auth/reset-password` - Password reset confirmation
 
 #### **Domain Management APIs**
+
 - `POST /api/domains/search` - Domain search with pricing
 - `GET /api/domains/user-domains` - Get user's domains
 - `POST /api/domains/dns-records` - Manage DNS records
 - `POST /api/domains/renew` - Domain renewal
 
 #### **Payment APIs**
+
 - `POST /api/payments/create-order` - Create Razorpay order
 - `POST /api/payments/verify` - Verify payment and register domains
 - `GET /api/payments/history` - Payment history
 
 #### **Cart Management APIs**
+
 - `GET /api/cart` - Get user cart
 - `POST /api/cart/add` - Add item to cart
 - `DELETE /api/cart/remove` - Remove item from cart
 - `POST /api/cart/sync` - Sync cart with server
 
 #### **Admin APIs**
+
 - `GET /api/admin/users` - Get all users
 - `GET /api/admin/orders` - Get all orders
 - `GET /api/admin/payments` - Get payment statistics
@@ -366,28 +381,28 @@ The ResellerClub API returns TLD names in specific formats. The system handles t
 
 | Standard TLD | API Format      | Example         | Fallback Price (INR) |
 | ------------ | --------------- | --------------- | -------------------- |
-| com          | centralniczacom | centralniczacom | ₹999                |
-| net          | dotnet          | dotnet          | ₹1,199              |
-| org          | dotorg          | dotorg          | ₹1,099              |
-| in           | dotin           | dotin           | ₹699                |
-| co           | dotco           | dotco           | ₹1,499              |
-| co.in        | dotcoin         | dotcoin         | ₹799                |
-| shop         | dotshop         | dotshop         | ₹1,599              |
-| store        | dotstore        | dotstore        | ₹1,599              |
-| online       | dotonline       | dotonline       | ₹1,999              |
-| site         | dotsite         | dotsite         | ₹1,399              |
-| website      | dotwebsite      | dotwebsite      | ₹1,799              |
-| app          | dotapp          | dotapp          | ₹2,399              |
-| dev          | dotdev          | dotdev          | ₹1,599              |
-| io           | dotio           | dotio           | ₹3,199              |
-| ai           | dotai           | dotai           | ₹3,999              |
-| tech         | dottech         | dottech         | ₹1,999              |
-| digital      | dotdigital      | dotdigital      | ₹1,599              |
-| cloud        | dotcloud        | dotcloud        | ₹1,999              |
-| host         | dothost         | dothost         | ₹1,599              |
-| space        | dotspace        | dotspace        | ₹1,399              |
-| info         | dotinfo         | dotinfo         | ₹1,299              |
-| biz          | dotbiz          | dotbiz          | ₹1,399              |
+| com          | centralniczacom | centralniczacom | ₹999                 |
+| net          | dotnet          | dotnet          | ₹1,199               |
+| org          | dotorg          | dotorg          | ₹1,099               |
+| in           | dotin           | dotin           | ₹699                 |
+| co           | dotco           | dotco           | ₹1,499               |
+| co.in        | dotcoin         | dotcoin         | ₹799                 |
+| shop         | dotshop         | dotshop         | ₹1,599               |
+| store        | dotstore        | dotstore        | ₹1,599               |
+| online       | dotonline       | dotonline       | ₹1,999               |
+| site         | dotsite         | dotsite         | ₹1,399               |
+| website      | dotwebsite      | dotwebsite      | ₹1,799               |
+| app          | dotapp          | dotapp          | ₹2,399               |
+| dev          | dotdev          | dotdev          | ₹1,599               |
+| io           | dotio           | dotio           | ₹3,199               |
+| ai           | dotai           | dotai           | ₹3,999               |
+| tech         | dottech         | dottech         | ₹1,999               |
+| digital      | dotdigital      | dotdigital      | ₹1,599               |
+| cloud        | dotcloud        | dotcloud        | ₹1,999               |
+| host         | dothost         | dothost         | ₹1,599               |
+| space        | dotspace        | dotspace        | ₹1,399               |
+| info         | dotinfo         | dotinfo         | ₹1,299               |
+| biz          | dotbiz          | dotbiz          | ₹1,399               |
 
 #### **Pricing Strategy:**
 
@@ -456,6 +471,7 @@ Here are the current working TLD prices (as of latest API fetch). Prices may var
 | .biz     | N/A              | ₹1,399               | Business     | Business domains                |
 
 #### **Pricing Notes:**
+
 - **Live Pricing**: Fetched from ResellerClub API in real-time
 - **Fallback Pricing**: Used when API is unavailable or fails
 - **Testing Mode**: Uses mock pricing for safe development
@@ -480,30 +496,21 @@ dd/
 │   │   ├── auth/                 # Authentication endpoints
 │   │   ├── cart/                 # Cart management
 │   │   ├── contact/              # Contact form
-│   │   ├── debug-pricing/        # Pricing debug endpoints
 │   │   ├── domains/              # Domain-related endpoints
 │   │   ├── orders/               # Order endpoints
 │   │   └── payments/             # Payment endpoints
 │   ├── about/                    # About Us page
-│   ├── basic/                    # Basic page template
 │   ├── cart/                     # Shopping cart page
 │   ├── checkout/                 # Checkout process
 │   ├── contact/                  # Contact Us page
 │   ├── dashboard/                # User dashboard
-│   ├── debug/                    # Debug pages
-│   ├── dns/                      # DNS management
-│   ├── forgot-password/          # Password reset
+│   ├── domain-management/        # DNS management
+│   ├── reset-password/           # Password reset
 │   ├── login/                    # Login page
-│   ├── minimal/                  # Minimal page template
-│   ├── minimal-home/             # Minimal homepage
-│   ├── payment-result/           # Payment result page
+│   ├── payment-success/          # Payment success page
 │   ├── privacy/                  # Privacy policy
 │   ├── register/                 # Registration page
-│   ├── simple/                   # Simple page template
 │   ├── terms-and-conditions/     # Terms and conditions
-│   ├── test/                     # Test pages
-│   ├── test-mode/                # Testing mode interface
-│   ├── testing-guide/            # Testing documentation
 │   ├── globals.css               # Global styles
 │   ├── layout.tsx                # Root layout
 │   ├── page.tsx                  # Homepage
@@ -605,13 +612,13 @@ Handles all ResellerClub API pricing operations with caching and fallback mechan
 
 ```typescript
 // Get pricing for specific TLDs
-const pricing = await PricingService.getTLDPricing(['com', 'net', 'org']);
+const pricing = await PricingService.getTLDPricing(["com", "net", "org"]);
 
 // Get all domain pricing
 const allPricing = await PricingService.getDomainPricing();
 
 // Get reseller pricing for specific TLD
-const resellerPricing = await PricingService.getResellerPricingForTLD('com');
+const resellerPricing = await PricingService.getResellerPricingForTLD("com");
 ```
 
 ### ResellerClub API Wrapper (`lib/resellerclub-wrapper.ts`)
@@ -620,13 +627,22 @@ Main API integration layer with testing mode support:
 
 ```typescript
 // Search domain availability (automatically switches between real/mock)
-const results = await ResellerClubWrapper.searchDomain('example.com', isTestingMode);
+const results = await ResellerClubWrapper.searchDomain(
+  "example.com",
+  isTestingMode
+);
 
 // Register domain
-const registration = await ResellerClubWrapper.registerDomain(domainData, isTestingMode);
+const registration = await ResellerClubWrapper.registerDomain(
+  domainData,
+  isTestingMode
+);
 
 // Get DNS records
-const dnsRecords = await ResellerClubWrapper.getDNSRecords('example.com', isTestingMode);
+const dnsRecords = await ResellerClubWrapper.getDNSRecords(
+  "example.com",
+  isTestingMode
+);
 ```
 
 ### Cart Management (`store/cartStore.ts`)
@@ -635,10 +651,10 @@ Zustand store for shopping cart with server synchronization:
 
 ```typescript
 // Add item to cart
-addItem({ domainName: 'example.com', price: 999, currency: 'INR' });
+addItem({ domainName: "example.com", price: 999, currency: "INR" });
 
 // Remove item from cart
-removeItem('example.com');
+removeItem("example.com");
 
 // Get total price
 const total = getTotalPrice();
@@ -687,16 +703,19 @@ Testing Mode allows you to test the complete application flow by simulating Rese
 ### How to Use
 
 1. **Enable Testing Mode**
+
    - Go to Admin Dashboard → Settings → Testing Mode tab
    - Toggle the switch to enable testing mode
    - You'll see a yellow indicator in the top-right corner
 
 2. **Test Domain Search**
+
    - All domain searches return mock available domains
    - Pricing is consistent but simulated
    - No real API calls are made to ResellerClub
 
 3. **Test Complete Flow**
+
    - Add domains to cart
    - Proceed to checkout
    - Complete payment with test credentials
@@ -741,6 +760,7 @@ Testing Mode allows you to test the complete application flow by simulating Rese
      - `/api/products/*` endpoints
 
 4. **Payment Processing Issues**
+
    - Verify Razorpay credentials
    - Check webhook configuration
    - Review payment amount calculations
@@ -768,18 +788,21 @@ grep "RESELLERCLUB" logs/app.log
 ## 📊 API Rate Limits & Performance
 
 ### Rate Limits
+
 - **ResellerClub API**: 1000 requests/hour
 - **Authentication endpoints**: 5 requests per minute per IP
 - **Domain search**: 10 requests per minute per user
 - **Payment endpoints**: 3 requests per minute per user
 
 ### Caching Strategy
+
 - **Pricing Data**: 5-minute TTL for ResellerClub pricing
 - **User Sessions**: JWT tokens with configurable expiration
 - **Cart Data**: Persistent storage with server synchronization
 - **API Responses**: Intelligent caching to reduce external API calls
 
 ### Performance Optimizations
+
 - **Batch Processing**: TLD pricing fetched in batches
 - **Lazy Loading**: Components loaded on demand
 - **Code Splitting**: Automatic with Next.js App Router
@@ -790,6 +813,7 @@ grep "RESELLERCLUB" logs/app.log
 ## 🔒 Security Features
 
 ### Authentication & Authorization
+
 - **JWT-based authentication** with proper expiration
 - **Role-based access control** (User, Admin)
 - **Password hashing** using bcrypt with salt rounds
@@ -797,6 +821,7 @@ grep "RESELLERCLUB" logs/app.log
 - **Admin-only route protection** with middleware
 
 ### Input Validation & Sanitization
+
 - **Comprehensive input validation** using validator library
 - **XSS protection** through input sanitization
 - **SQL/NoSQL injection prevention**
@@ -804,6 +829,7 @@ grep "RESELLERCLUB" logs/app.log
 - **Domain name validation** and format verification
 
 ### API Security
+
 - **Rate limiting** on all API endpoints
 - **CORS configuration** for cross-origin requests
 - **API key encryption** and secure storage
@@ -811,6 +837,7 @@ grep "RESELLERCLUB" logs/app.log
 - **Error handling** without information leakage
 
 ### Data Protection
+
 - **Environment variable protection**
 - **Secure database connections** with MongoDB Atlas
 - **Payment data encryption** through Razorpay
@@ -820,6 +847,7 @@ grep "RESELLERCLUB" logs/app.log
 ## 📈 Performance & Scalability
 
 ### Frontend Performance
+
 - **Next.js 14 App Router** with automatic code splitting
 - **Static Generation** for public pages
 - **Image Optimization** with Next.js Image component
@@ -828,6 +856,7 @@ grep "RESELLERCLUB" logs/app.log
 - **Responsive Design** with mobile-first approach
 
 ### Backend Performance
+
 - **API Route Optimization** with Next.js API routes
 - **Database Connection Pooling** with Mongoose
 - **Caching Strategy** for frequently accessed data
@@ -836,6 +865,7 @@ grep "RESELLERCLUB" logs/app.log
 - **Rate Limiting** to prevent abuse
 
 ### State Management
+
 - **Zustand Stores** with persistence
 - **Optimized Re-renders** with selective subscriptions
 - **Cross-tab Synchronization** for testing mode
@@ -843,6 +873,7 @@ grep "RESELLERCLUB" logs/app.log
 - **Memory Management** with proper cleanup
 
 ### Monitoring & Analytics
+
 - **Error Tracking** with comprehensive logging
 - **Performance Monitoring** for API calls
 - **User Analytics** (privacy-compliant)
@@ -852,6 +883,7 @@ grep "RESELLERCLUB" logs/app.log
 ## 📄 Available Pages & Routes
 
 ### Public Pages
+
 - **`/`** - Homepage with domain search and features
 - **`/about`** - About Us page with company information
 - **`/contact`** - Contact Us page with contact form
@@ -863,6 +895,7 @@ grep "RESELLERCLUB" logs/app.log
 - **`/cancellation-refund`** - Cancellation and refund policy
 
 ### User Pages (Authentication Required)
+
 - **`/dashboard`** - User dashboard with domain management
 - **`/cart`** - Shopping cart page
 - **`/checkout`** - Checkout and payment page
@@ -870,6 +903,7 @@ grep "RESELLERCLUB" logs/app.log
 - **`/domain-management`** - Domain management for user domains
 
 ### Admin Pages (Admin Access Required)
+
 - **`/admin`** - Admin dashboard
 - **`/admin/user-management`** - User management
 - **`/admin/order-management`** - Order management
@@ -878,18 +912,21 @@ grep "RESELLERCLUB" logs/app.log
 - **`/admin/system-settings`** - Admin settings and configuration
 
 ### Testing & Development Pages
+
 - **`/test-mode`** - Testing mode interface
 - **`/testing-guide`** - Testing mode documentation
 - **`/debug`** - Debug pages for development
 - **`/test`** - Test pages
 
 ### Template Pages
+
 - **`/basic`** - Basic page template
 - **`/minimal`** - Minimal page template
 - **`/minimal-home`** - Minimal homepage template
 - **`/simple`** - Simple page template
 
 ### API Routes
+
 - **`/api/auth/*`** - Authentication endpoints
 - **`/api/domains/*`** - Domain management endpoints
 - **`/api/payments/*`** - Payment processing endpoints
@@ -903,15 +940,17 @@ grep "RESELLERCLUB" logs/app.log
 ### Testing Mode Usage
 
 1. **Enable Testing Mode**
+
    ```bash
    # Via Admin Panel
    Admin Dashboard → Settings → Testing Mode → Toggle ON
-   
+
    # Via Environment Variable
    TESTING_MODE=true
    ```
 
 2. **Test Domain Operations**
+
    - All domain searches return mock available domains
    - Pricing is simulated but consistent
    - No real API calls to ResellerClub
@@ -988,6 +1027,7 @@ For support and questions:
 - **Documentation**: Check the comprehensive documentation files
 - **Issues**: Create an issue in the repository
 - **Troubleshooting**: Review the troubleshooting section
+
 ## 📚 API Documentation
 
 ### Domain Search API
@@ -997,6 +1037,7 @@ For support and questions:
 Search for domain availability and pricing.
 
 **Request Body:**
+
 ```json
 {
   "domain": "example.com",
@@ -1005,6 +1046,7 @@ Search for domain availability and pricing.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -1033,6 +1075,7 @@ Search for domain availability and pricing.
 Get comprehensive TLD pricing data for admin panel.
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -1060,6 +1103,7 @@ Get comprehensive TLD pricing data for admin panel.
 User authentication endpoint.
 
 **Request Body:**
+
 ```json
 {
   "email": "user@example.com",
@@ -1068,6 +1112,7 @@ User authentication endpoint.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -1088,12 +1133,14 @@ User authentication endpoint.
 ## 📚 Additional Documentation
 
 ### Project Documentation
+
 - **[API.md](./API.md)**: Complete API documentation with endpoints and examples
 - **[PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md)**: Detailed project structure and component architecture
 - **[TESTING_MODE.md](./TESTING_MODE.md)**: Comprehensive testing mode documentation
 - **[components/README.md](./components/README.md)**: Component system documentation
 
 ### Key Scripts
+
 - **`npm run setup`**: Interactive setup script for environment configuration
 - **`npm run init-db`**: Database initialization script
 - **`npm run dev`**: Development server with hot reload
@@ -1102,6 +1149,7 @@ User authentication endpoint.
 - **`npm run lint`**: Code linting
 
 ### Environment Files
+
 - **`.env.local`**: Local environment variables (not committed)
 - **`.env.example`**: Environment variables template
 - **`update_pricing.js`**: Script to update pricing logic in ResellerClub API
