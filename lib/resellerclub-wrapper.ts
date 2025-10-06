@@ -142,7 +142,8 @@ export class ResellerClubWrapper {
       return MockResellerClubAPI.renewDomain(domainName, years);
     }
 
-    return ResellerClubAPI.renewDomain(domainName, years);
+    // TODO: Implement domain renewal
+    throw new Error('Domain renewal not implemented yet');
   }
 
   /**

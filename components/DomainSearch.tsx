@@ -41,6 +41,9 @@ interface SearchResult {
   currency?: string;
   registrationPeriod?: number;
   pricingSource?: "live" | "fallback" | "unavailable";
+  originalPrice?: number;
+  isPromotional?: boolean;
+  promotionalDetails?: any;
 }
 
 interface TLDCategory {
@@ -183,7 +186,7 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
     }
 
     // Remove duplicates and limit to 12 suggestions
-    return [...new Set(suggestions)].slice(0, 12);
+    return Array.from(new Set(suggestions)).slice(0, 12);
   };
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -197,7 +200,7 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
       return;
     }
 
-    setBaseDomain(validation.baseDomain);
+    setBaseDomain(validation.baseDomain || '');
     setIsSearching(true);
     setHasSearched(true);
     setError(null);
@@ -233,7 +236,7 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
         }
       } else {
         // Multiple TLD search
-        searchTlds = selectedTlds.length > 0 ? selectedTlds : getSuggestedTlds(validation.baseDomain);
+        searchTlds = selectedTlds.length > 0 ? selectedTlds : getSuggestedTlds(validation.baseDomain || '');
         console.log('🔍 [FRONTEND] Multiple TLD search:', validation.baseDomain, 'with TLDs:', searchTlds);
 
         const response = await fetch('/api/domains/search', {
@@ -298,7 +301,7 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
 
   const selectAllTlds = (categoryTlds: string[]) => {
     setSelectedTlds(prev => {
-      const newTlds = [...new Set([...prev, ...categoryTlds])];
+      const newTlds = Array.from(new Set([...prev, ...categoryTlds]));
       return newTlds;
     });
   };

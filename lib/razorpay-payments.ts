@@ -50,7 +50,7 @@ export class RazorpayPaymentsService {
         count: limit,
         skip: skip,
       });
-      return response;
+      return response as unknown as RazorpayPaymentListResponse;
     } catch (error) {
       console.error("Error fetching payments from Razorpay:", error);
       throw error;
@@ -73,7 +73,7 @@ export class RazorpayPaymentsService {
         from: Math.floor(from.getTime() / 1000),
         to: Math.floor(to.getTime() / 1000),
       });
-      return response;
+      return response as unknown as RazorpayPaymentListResponse;
     } catch (error) {
       console.error(
         "Error fetching payments by date range from Razorpay:",
@@ -89,7 +89,7 @@ export class RazorpayPaymentsService {
   static async getPaymentById(paymentId: string): Promise<RazorpayPayment> {
     try {
       const response = await razorpay.payments.fetch(paymentId);
-      return response;
+      return response as unknown as RazorpayPayment;
     } catch (error) {
       console.error("Error fetching payment from Razorpay:", error);
       throw error;

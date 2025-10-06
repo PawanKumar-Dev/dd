@@ -230,14 +230,7 @@ export default function DNSPage() {
         name: newRecord.name,
         value: newRecord.value,
         ttl: newRecord.ttl,
-        priority: newRecord.priority,
-        weight: newRecord.weight,
-        port: newRecord.port,
-        service: newRecord.service,
-        protocol: newRecord.protocol,
-        flags: newRecord.flags,
-        tag: newRecord.tag,
-        data: newRecord.data
+        priority: newRecord.priority
       });
 
       if (result.status === 'success') {
@@ -628,7 +621,7 @@ export default function DNSPage() {
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {dnsRecords.map((record) => (
-                        <tr key={record.id}>
+                        <tr key={record._id}>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                             {record.recordType}
                           </td>
@@ -646,7 +639,7 @@ export default function DNSPage() {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <button
-                              onClick={() => handleDeleteRecord(record.id!)}
+                              onClick={() => handleDeleteRecord(record._id)}
                               className="text-red-600 hover:text-red-900"
                             >
                               <Trash2 className="h-4 w-4" />

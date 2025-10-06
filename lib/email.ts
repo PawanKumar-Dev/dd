@@ -17,7 +17,7 @@ async function createTransporter() {
   try {
     const transporter = nodemailer.createTransport({
       host: SMTP_HOST,
-      port: parseInt(SMTP_PORT),
+      port: parseInt(SMTP_PORT || '587'),
       secure: SMTP_SECURE,
       auth: {
         user: SMTP_USER,
