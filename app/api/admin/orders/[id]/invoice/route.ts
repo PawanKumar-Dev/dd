@@ -160,7 +160,7 @@ export async function GET(
     pdf.setFont("helvetica", "normal");
     let currentY = tableHeaderY + 12;
 
-    order.domains.forEach((domain, index) => {
+    order.domains.forEach((domain: any, index: number) => {
       if (currentY > pageHeight - 50) {
         pdf.addPage();
         currentY = 20;
@@ -228,9 +228,9 @@ export async function GET(
 
     // Order summary
     const subtotal = order.domains
-      .filter((d) => d.status === "registered")
+      .filter((d: any) => d.status === "registered")
       .reduce(
-        (total, domain) => total + domain.price * domain.registrationPeriod,
+        (total: number, domain: any) => total + domain.price * domain.registrationPeriod,
         0
       );
     const tax = 0;

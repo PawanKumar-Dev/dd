@@ -17,6 +17,7 @@ interface Payment {
   customerEmail: string;
   domainNames: string[];
   orderId?: string;
+  invoiceNumber?: string;
   createdAt: string;
   processedAt?: string;
   refunded: boolean;

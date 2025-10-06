@@ -37,8 +37,6 @@ export async function GET(request: NextRequest) {
         lastName: user.lastName,
         email: user.email,
         role: user.role,
-        createdAt: user.createdAt,
-        lastLogin: user.lastLogin,
         isActive: user.isActive !== false, // Default to true if not set
       })),
     });

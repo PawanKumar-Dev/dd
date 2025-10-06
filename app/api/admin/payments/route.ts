@@ -86,7 +86,7 @@ export async function GET(request: NextRequest) {
             paymentDetails.customerEmail ||
             razorpayPayment.email,
           domainNames:
-            orderData?.domains?.map((d) => d.domainName) ||
+            orderData?.domains?.map((d: any) => d.domainName) ||
             paymentDetails.domainNames ||
             [],
           orderId: orderData?.orderId || paymentDetails.orderId,

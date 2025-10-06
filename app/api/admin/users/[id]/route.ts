@@ -82,7 +82,6 @@ export async function PUT(
         lastName: user.lastName,
         role: user.role,
         isActive: user.isActive,
-        updatedAt: user.updatedAt,
       },
     });
   } catch (error) {
