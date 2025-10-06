@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { CreditCard, Search, Filter, MoreVertical, Eye, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { CreditCard, Search, Filter, MoreVertical, Eye, CheckCircle, XCircle, Clock, DollarSign } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayoutNew';
 import AdminDataTable from '@/components/admin/AdminDataTable';
 

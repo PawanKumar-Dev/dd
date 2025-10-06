@@ -393,9 +393,9 @@ export class ResellerClubAPI {
               currency: currency,
               registrationPeriod: 1, // Default to 1 year
               pricingSource: pricingSource, // Add pricing source info
-              originalPrice: livePricing[tld]?.originalPrice,
-              isPromotional: livePricing[tld]?.isPromotional || false,
-              promotionalDetails: livePricing[tld]?.promotionalDetails,
+              originalPrice: livePricing && tld ? livePricing[tld]?.originalPrice : undefined,
+              isPromotional: livePricing && tld ? livePricing[tld]?.isPromotional || false : false,
+              promotionalDetails: livePricing && tld ? livePricing[tld]?.promotionalDetails : undefined,
             });
           } else {
             console.warn(
@@ -675,17 +675,19 @@ export class ResellerClubAPI {
             let currency = "INR";
             let pricingSource: "live" | "fallback" | "unavailable" =
               "unavailable";
-
-            if (isAvailable) {
+            
+            // Get TLD and live pricing for all domains
+            const tld = domain.split(".").pop()?.toLowerCase();
+            let livePricing: any = null;
+            
+            if (isAvailable && tld) {
               try {
-                const tld = domain.split(".").pop()?.toLowerCase();
-                if (tld) {
-                  console.log(
-                    `💰 [PRODUCTION] Fetching live customer pricing for ${domain} (TLD: ${tld})`
-                  );
-                  const livePricing = await PricingService.getTLDPricing([tld]);
+                console.log(
+                  `💰 [PRODUCTION] Fetching live customer pricing for ${domain} (TLD: ${tld})`
+                );
+                livePricing = await PricingService.getTLDPricing([tld]);
 
-                  if (livePricing && livePricing[tld]) {
+                if (livePricing && livePricing[tld]) {
                     const customerPrice =
                       parseFloat(livePricing[tld].price) || 0;
                     const resellerPrice =
@@ -715,7 +717,6 @@ export class ResellerClubAPI {
                       );
                     }
                   }
-                }
               } catch (error) {
                 console.warn(
                   `⚠️ [PRODUCTION] Failed to fetch live customer pricing for ${domain}:`,
@@ -748,9 +749,9 @@ export class ResellerClubAPI {
               currency: currency,
               registrationPeriod: 1, // Default to 1 year
               pricingSource: pricingSource, // Add pricing source info
-              originalPrice: livePricing[tld]?.originalPrice,
-              isPromotional: livePricing[tld]?.isPromotional || false,
-              promotionalDetails: livePricing[tld]?.promotionalDetails,
+              originalPrice: livePricing && tld ? livePricing[tld]?.originalPrice : undefined,
+              isPromotional: livePricing && tld ? livePricing[tld]?.isPromotional || false : false,
+              promotionalDetails: livePricing && tld ? livePricing[tld]?.promotionalDetails : undefined,
             });
           } else {
             console.warn(
