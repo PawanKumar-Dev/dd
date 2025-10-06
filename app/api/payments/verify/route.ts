@@ -290,8 +290,8 @@ export async function POST(request: NextRequest) {
       failedDomains: failedDomains,
     });
 
-    // Determine order status
-    const orderStatus = successfulDomains.length > 0 ? "completed" : "failed";
+    // Determine order status - always "completed" if payment succeeded
+    const orderStatus = "completed";
 
     // Create order record with payment verification details
     const order = new Order({

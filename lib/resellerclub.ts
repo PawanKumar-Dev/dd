@@ -250,7 +250,6 @@ export class ResellerClubAPI {
    */
   static async searchDomain(domainName: string): Promise<DomainSearchResult[]> {
     const startTime = Date.now();
-    console.log(`🔍 [PRODUCTION] Starting domain search for: "${domainName}"`);
 
     // Check if domain already has a TLD
     const hasTLD = domainName.includes(".");
@@ -261,16 +260,10 @@ export class ResellerClubAPI {
     if (!hasTLD) {
       // For domains without TLD, search with multiple TLDs
       searchParams.tlds = "com,net,org,info,biz,co,in,co.in";
-      console.log(
-        `🔍 [PRODUCTION] Domain without TLD detected, will search with multiple TLDs`
-      );
     } else {
       // For domains with TLD, extract the TLD and use it in the tlds parameter
       const tld = domainName.split(".").pop();
       searchParams.tlds = tld;
-      console.log(
-        `🔍 [PRODUCTION] Domain with TLD detected, searching with TLD: "${tld}"`
-      );
     }
 
     try {
@@ -378,13 +371,7 @@ export class ResellerClubAPI {
               }
             }
 
-            console.log(`🏷️ [PRODUCTION] Processing domain: ${domain}`, {
-              status: domainData.status,
-              available: isAvailable,
-              price: price,
-              currency: currency,
-              rawData: domainData,
-            });
+            // Processing domain
 
             results.push({
               domainName: domain,
@@ -419,22 +406,7 @@ export class ResellerClubAPI {
         .filter((r) => r.available && r.price > 0)
         .reduce((sum, r) => sum + r.price, 0);
 
-      console.log(`✅ [PRODUCTION] Domain search completed successfully:`, {
-        domain: domainName,
-        hasTLD: hasTLD,
-        searchType: hasTLD ? "exact-domain" : "multiple-tlds",
-        resultsCount: results.length,
-        availableCount: availableCount,
-        livePricingCount: livePricingCount,
-        totalCustomerPrice: `₹${totalCustomerPrice.toLocaleString()}`,
-        totalTime: responseTime + "ms",
-        results: results.map((r) => ({
-          domain: r.domainName,
-          available: r.available,
-          price: r.price,
-          pricingSource: r.pricingSource,
-        })),
-      });
+      // Domain search completed successfully
 
       return results;
     } catch (error) {
@@ -518,11 +490,6 @@ export class ResellerClubAPI {
     tlds: string[]
   ): Promise<DomainSearchResult[]> {
     const startTime = Date.now();
-    console.log(
-      `🔍 [PRODUCTION] Starting domain search for: "${domainName}" with TLDs: ${tlds.join(
-        ", "
-      )}`
-    );
 
     try {
       const response = await api.get("/api/domains/available.json", {
@@ -732,13 +699,7 @@ export class ResellerClubAPI {
               }
             }
 
-            console.log(`🏷️ [PRODUCTION] Processing domain: ${domain}`, {
-              status: domainData.status,
-              available: isAvailable,
-              price: price,
-              currency: currency,
-              rawData: domainData,
-            });
+            // Processing domain
 
             results.push({
               domainName: domain,
@@ -773,22 +734,7 @@ export class ResellerClubAPI {
         .filter((r) => r.available && r.price > 0)
         .reduce((sum, r) => sum + r.price, 0);
 
-      console.log(`✅ [PRODUCTION] Domain search completed successfully:`, {
-        domain: domainName,
-        tlds: tlds,
-        searchType: "multiple-tlds",
-        resultsCount: results.length,
-        availableCount: availableCount,
-        livePricingCount: livePricingCount,
-        totalCustomerPrice: `₹${totalCustomerPrice.toLocaleString()}`,
-        totalTime: responseTime + "ms",
-        results: results.map((r) => ({
-          domain: r.domainName,
-          available: r.available,
-          price: r.price,
-          pricingSource: r.pricingSource,
-        })),
-      });
+      // Domain search completed successfully
 
       return results;
     } catch (error) {
@@ -858,9 +804,6 @@ export class ResellerClubAPI {
   static async getResellerPricingForTLD(
     tld: string
   ): Promise<{ price: number; currency: string } | null> {
-    const startTime = Date.now();
-    console.log(`💰 [PRODUCTION] Fetching reseller pricing for TLD: ${tld}`);
-
     try {
       // Fetch reseller pricing
       const response = await api.get("/api/products/reseller-price.json");
@@ -873,17 +816,10 @@ export class ResellerClubAPI {
           const price = parseFloat(tldPricing.addnewdomain["1"]);
           const currency = "INR"; // ResellerClub typically returns prices in INR
 
-          console.log(
-            `✅ [PRODUCTION] Live reseller pricing for ${tld}: ₹${price} ${currency} (${
-              Date.now() - startTime
-            }ms)`
-          );
-
           return { price, currency };
         }
       }
 
-      console.log(`⚠️ [PRODUCTION] No reseller pricing found for TLD: ${tld}`);
       return null;
     } catch (error) {
       console.error(
@@ -924,8 +860,10 @@ export class ResellerClubAPI {
     try {
       // Always use ResellerClub nameservers as default for domain registration
       const resellerClubNameServers = [
-        "ns1.resellerclub.com",
-        "ns2.resellerclub.com",
+        "deepak1299294.mercury.orderbox-dns.com",
+        "deepak1299294.venus.orderbox-dns.com",
+        "deepak1299294.earth.orderbox-dns.com",
+        "deepak1299294.mars.orderbox-dns.com",
       ];
 
       // Use custom nameservers if provided, otherwise use ResellerClub defaults
@@ -939,16 +877,19 @@ export class ResellerClubAPI {
         nameServers
       );
 
+      // Prepare nameserver parameters - ResellerClub expects 'ns' parameter with comma-separated values
+      const nameserverParams: any = {
+        "domain-name": domainData.domainName,
+        years: domainData.years,
+        "customer-id": domainData.customerId,
+        "admin-contact-id": domainData.adminContactId,
+        "tech-contact-id": domainData.techContactId,
+        "billing-contact-id": domainData.billingContactId,
+        ns: nameServers.join(","), // Pass nameservers as comma-separated string
+      };
+
       const response = await api.post("/api/domains/register.json", null, {
-        params: {
-          "domain-name": domainData.domainName,
-          years: domainData.years,
-          "customer-id": domainData.customerId,
-          ns: nameServers,
-          "admin-contact-id": domainData.adminContactId,
-          "tech-contact-id": domainData.techContactId,
-          "billing-contact-id": domainData.billingContactId,
-        },
+        params: nameserverParams,
       });
 
       const responseTime = Date.now() - startTime;

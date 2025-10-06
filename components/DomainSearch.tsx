@@ -237,7 +237,6 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
       } else {
         // Multiple TLD search
         searchTlds = selectedTlds.length > 0 ? selectedTlds : getSuggestedTlds(validation.baseDomain || '');
-        console.log('🔍 [FRONTEND] Multiple TLD search:', validation.baseDomain, 'with TLDs:', searchTlds);
 
         const response = await fetch('/api/domains/search', {
           method: 'POST',
@@ -524,7 +523,7 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
       )}
 
       {/* Enhanced Results Section */}
-      {hasSearched && (
+      {hasSearched && !isSearching && (
         <div className="space-y-4 max-w-4xl mx-auto">
           {/* Results Header */}
           <div className="bg-white rounded-lg shadow-sm border border-[var(--google-border-light)] p-3 sm:p-4">
@@ -537,22 +536,18 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
                   <h2 className="text-base sm:text-lg font-semibold text-[var(--google-text-primary)]" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
                     Search Results
                   </h2>
-                  {!isSearching && (
-                    <p className="text-xs sm:text-sm text-[var(--google-text-secondary)]" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
-                      {results.length} domain{results.length !== 1 ? 's' : ''} found
-                    </p>
-                  )}
+                  <p className="text-xs sm:text-sm text-[var(--google-text-secondary)]" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
+                    {results.length} domain{results.length !== 1 ? 's' : ''} found
+                  </p>
                 </div>
               </div>
-              {!isSearching && (
-                <button
-                  onClick={clearSearch}
-                  className="px-3 py-1.5 text-sm text-[var(--google-text-secondary)] hover:text-[var(--google-text-primary)] hover:bg-[var(--google-bg-secondary)] rounded-md transition-colors self-start sm:self-auto"
-                  style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}
-                >
-                  Clear
-                </button>
-              )}
+              <button
+                onClick={clearSearch}
+                className="px-3 py-1.5 text-sm text-[var(--google-text-secondary)] hover:text-[var(--google-text-primary)] hover:bg-[var(--google-bg-secondary)] rounded-md transition-colors self-start sm:self-auto"
+                style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}
+              >
+                Clear
+              </button>
             </div>
           </div>
 

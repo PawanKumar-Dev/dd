@@ -15,7 +15,12 @@ interface NameServerConfig {
 const RESELLERCLUB_DEFAULT = {
   id: 'resellerclub-default',
   name: 'ResellerClub Default',
-  servers: ['ns1.resellerclub.com', 'ns2.resellerclub.com'],
+  servers: [
+    'deepak1299294.mercury.orderbox-dns.com',
+    'deepak1299294.venus.orderbox-dns.com',
+    'deepak1299294.earth.orderbox-dns.com',
+    'deepak1299294.mars.orderbox-dns.com'
+  ],
   isDefault: true,
   isActive: true,
 };
@@ -269,8 +274,8 @@ export default function NameServerManagement() {
           <div
             key={config.id}
             className={`p-4 rounded-lg border transition-colors ${config.isActive
-                ? 'border-[var(--google-blue)] bg-[var(--google-blue-light)]'
-                : 'border-gray-200 bg-white hover:bg-gray-50'
+              ? 'border-[var(--google-blue)] bg-[var(--google-blue-light)]'
+              : 'border-gray-200 bg-white hover:bg-gray-50'
               }`}
           >
             <div className="flex items-center justify-between">

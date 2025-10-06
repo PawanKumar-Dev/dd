@@ -17,18 +17,14 @@ export async function GET(request: NextRequest) {
 
     if (tlds.length > 0) {
       // Fetch pricing for specific TLDs
-      console.log(`📝 [API-${requestId}] Fetching pricing for TLDs:`, tlds);
       pricingData = await ResellerClubAPI.getTLDPricing(tlds);
     } else {
       // Fetch all pricing data
-      console.log(`📝 [API-${requestId}] Fetching all pricing data`);
       pricingData = await ResellerClubAPI.getDomainPricing();
     }
 
+    // Pricing data fetched successfully
     const responseTime = Date.now() - startTime;
-    console.log(
-      `✅ [API-${requestId}] Pricing data fetched successfully in ${responseTime}ms`
-    );
 
     return NextResponse.json({
       success: true,

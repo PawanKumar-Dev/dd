@@ -203,7 +203,6 @@ export class PricingService {
    */
   static async getTLDPricing(tlds: string[]): Promise<{ [tld: string]: any }> {
     const startTime = Date.now();
-    console.log(`💰 [PRICING] Fetching pricing for TLDs: ${tlds.join(", ")}`);
 
     try {
       const pricingData = await this.getDomainPricing();
@@ -213,19 +212,12 @@ export class PricingService {
       let promotionalData: any = null;
       try {
         promotionalData = await this.getPromotionalPricing();
-        console.log(`🎯 [PRICING] Promotional pricing data retrieved`);
       } catch (error) {
         console.warn(
           `⚠️ [PRICING] Could not fetch promotional pricing:`,
           error
         );
       }
-
-      // Get available TLDs count for logging
-      const availableTlds = Object.keys(pricingData.customerPricing || {});
-      console.log(
-        `🔍 [PRICING] Processing ${availableTlds.length} TLDs from API`
-      );
 
       // Extract pricing for requested TLDs
       tlds.forEach((tld) => {
