@@ -56,18 +56,18 @@ export async function POST(request: NextRequest) {
 
     // Send confirmation email to user with sanitized data
     const confirmationEmailSent = await EmailService.sendEmail({
-      to: emailValidation.sanitized,
+      to: emailValidation.sanitized || email,
       subject: "Thank you for contacting Excel Technologies",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #3b82f6;">Thank you for contacting us!</h2>
-          <p>Hello ${InputValidator.sanitizeHtml(nameValidation.sanitized)},</p>
+          <p>Hello ${InputValidator.sanitizeHtml(nameValidation.sanitized || name)},</p>
           <p>We have received your message regarding "${InputValidator.sanitizeHtml(
-            subjectValidation.sanitized
+            subjectValidation.sanitized || subject
           )}" and will get back to you within 24 hours.</p>
           <p>Your message:</p>
           <div style="background-color: #f3f4f6; padding: 15px; border-radius: 6px; margin: 20px 0;">
-            ${InputValidator.sanitizeHtml(messageValidation.sanitized)}
+            ${InputValidator.sanitizeHtml(messageValidation.sanitized || message)}
           </div>
           <p>If you have any urgent questions, please call us at +91-777-888-9674.</p>
           <br>

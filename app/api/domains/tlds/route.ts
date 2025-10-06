@@ -504,7 +504,7 @@ export async function GET(request: NextRequest) {
       "circle",
     ];
 
-    const pricing = await ResellerClubAPI.getDomainPricing(comprehensiveTlds);
+    const pricing = await ResellerClubAPI.getDomainPricing();
 
     console.log(`✅ [API-${requestId}] TLDs fetched successfully:`, {
       tldsCount: comprehensiveTlds.length,

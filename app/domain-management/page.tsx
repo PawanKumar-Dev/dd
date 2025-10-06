@@ -26,9 +26,9 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { ResellerClubAPI } from '@/lib/resellerclub';
+import { DNSRecord } from '@/lib/types';
 
-interface DNSRecord {
-  id?: string;
+interface DNSRecordForm {
   recordType: 'A' | 'AAAA' | 'CNAME' | 'MX' | 'TXT' | 'NS';
   name: string;
   value: string;
@@ -48,21 +48,6 @@ interface Domain {
   lastUpdated?: string;
 }
 
-interface DNSRecord {
-  id?: string;
-  recordType: 'A' | 'AAAA' | 'CNAME' | 'MX' | 'TXT' | 'NS' | 'SRV' | 'CAA';
-  name: string;
-  value: string;
-  ttl: number;
-  priority?: number;
-  weight?: number;
-  port?: number;
-  service?: string;
-  protocol?: string;
-  flags?: number;
-  tag?: string;
-  data?: string;
-}
 
 export default function DNSPage() {
   const [domains, setDomains] = useState<Domain[]>([]);
@@ -70,7 +55,7 @@ export default function DNSPage() {
   const [dnsRecords, setDnsRecords] = useState<DNSRecord[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [newRecord, setNewRecord] = useState<DNSRecord>({
+  const [newRecord, setNewRecord] = useState<DNSRecordForm>({
     recordType: 'A',
     name: '',
     value: '',
@@ -106,7 +91,7 @@ export default function DNSPage() {
       setDomains(data.domains || []);
 
       if (data.domains?.length === 0) {
-        toast.info('No domains found. Register a domain to get started!');
+        toast('No domains found. Register a domain to get started!');
       }
     } catch (error) {
       console.error('❌ [DNS] Failed to load domains:', error);
@@ -162,19 +147,15 @@ export default function DNSPage() {
         if (result.data.records) {
           Object.entries(result.data.records).forEach(([recordId, record]: [string, any]) => {
             records.push({
-              id: recordId,
+              _id: recordId,
+              domainId: selectedDomain,
               recordType: record.type || 'A',
               name: record.name || '',
               value: record.value || '',
               ttl: parseInt(record.ttl) || 3600,
               priority: record.priority ? parseInt(record.priority) : undefined,
-              weight: record.weight ? parseInt(record.weight) : undefined,
-              port: record.port ? parseInt(record.port) : undefined,
-              service: record.service,
-              protocol: record.protocol,
-              flags: record.flags ? parseInt(record.flags) : undefined,
-              tag: record.tag,
-              data: record.data
+              createdAt: new Date(),
+              updatedAt: new Date(),
             });
           });
         }
@@ -191,26 +172,35 @@ export default function DNSPage() {
       // Fallback to mock data for development
       setDnsRecords([
         {
-          id: '1',
+          _id: '1',
+          domainId: selectedDomain,
           recordType: 'A',
           name: '@',
           value: '192.168.1.1',
           ttl: 3600,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
         {
-          id: '2',
+          _id: '2',
+          domainId: selectedDomain,
           recordType: 'CNAME',
           name: 'www',
           value: 'example.com',
           ttl: 3600,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
         {
-          id: '3',
+          _id: '3',
+          domainId: selectedDomain,
           recordType: 'MX',
           name: '@',
           value: 'mail.example.com',
           ttl: 3600,
           priority: 10,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       ]);
     } finally {

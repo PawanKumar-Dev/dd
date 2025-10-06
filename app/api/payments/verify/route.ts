@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
         message: "Payment already processed",
         orderId: existingOrder.orderId,
         invoiceNumber: existingOrder.invoiceNumber,
-        registrationResults: existingOrder.domains.map((d) => ({
+        registrationResults: existingOrder.domains.map((d: any) => ({
           domainName: d.domainName,
           status: d.status,
           orderId: d.orderId,
