@@ -13,6 +13,12 @@ interface PaymentResult {
   invoiceNumber?: string;
   successfulDomains?: string[];
   failedDomains?: string[];
+  registrationResults?: Array<{
+    domainName: string;
+    status: string;
+    orderId?: string;
+    error?: string;
+  }>;
   errorMessage?: string;
   amount?: number;
   currency?: string;
@@ -197,6 +203,10 @@ export default function PaymentResultPage() {
                     <span className="font-semibold text-green-800">₹{result.amount.toFixed(2)} {result.currency}</span>
                   </div>
                 )}
+                <div className="flex justify-between">
+                  <span className="text-green-700">Payment Status:</span>
+                  <span className="font-semibold text-green-800">✅ Successful</span>
+                </div>
               </div>
             </div>
           )}
@@ -218,18 +228,39 @@ export default function PaymentResultPage() {
 
           {result.failedDomains && Array.isArray(result.failedDomains) && result.failedDomains.length > 0 && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-6 text-left">
-              <h3 className="text-lg font-semibold text-red-800 mb-3">Failed Domain Registrations</h3>
-              <div className="space-y-2">
+              <div className="flex items-center mb-3">
+                <AlertCircle className="h-5 w-5 text-red-600 mr-2" />
+                <h3 className="text-lg font-semibold text-red-800">Failed Domain Registrations</h3>
+              </div>
+              <div className="space-y-3">
                 {result.failedDomains.map((domain, index) => (
-                  <div key={index} className="flex items-center text-red-700">
-                    <XCircle className="h-4 w-4 mr-2 text-red-600" />
-                    <span className="font-mono">{domain}</span>
+                  <div key={index} className="flex items-center justify-between bg-red-100 rounded-lg p-3">
+                    <div className="flex items-center">
+                      <XCircle className="h-5 w-5 mr-2 text-red-600" />
+                      <span className="font-mono text-red-800">{domain}</span>
+                    </div>
+                    <span className="text-red-600 text-sm">Registration Failed</span>
                   </div>
                 ))}
               </div>
-              <p className="text-sm text-red-600 mt-3">
-                Please contact support for assistance with failed registrations.
-              </p>
+              <div className="mt-4 p-3 bg-red-100 rounded-lg">
+                <p className="text-red-700 text-sm font-medium mb-2">What happens next?</p>
+                <ul className="text-red-600 text-sm space-y-1">
+                  <li>• Your payment has been processed successfully</li>
+                  <li>• We will attempt to register the failed domains again</li>
+                  <li>• If registration still fails, you will receive a full refund</li>
+                  <li>• You will be notified via email about the final status</li>
+                </ul>
+              </div>
+              <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                <p className="text-blue-700 text-sm">
+                  <strong>Need immediate assistance?</strong> Contact our support team at{' '}
+                  <a href="mailto:support@exceltechnologies.com" className="text-blue-600 underline">
+                    support@exceltechnologies.com
+                  </a>{' '}
+                  with your Order ID: <span className="font-mono">{result.orderId}</span>
+                </p>
+              </div>
             </div>
           )}
 

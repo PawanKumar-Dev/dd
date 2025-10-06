@@ -922,12 +922,29 @@ export class ResellerClubAPI {
     );
 
     try {
+      // Always use ResellerClub nameservers as default for domain registration
+      const resellerClubNameServers = [
+        "ns1.resellerclub.com",
+        "ns2.resellerclub.com",
+      ];
+
+      // Use custom nameservers if provided, otherwise use ResellerClub defaults
+      const nameServers =
+        domainData.nameServers && domainData.nameServers.length > 0
+          ? domainData.nameServers
+          : resellerClubNameServers;
+
+      console.log(
+        `🌐 [PRODUCTION] Using nameservers for ${domainData.domainName}:`,
+        nameServers
+      );
+
       const response = await api.post("/api/domains/register.json", null, {
         params: {
           "domain-name": domainData.domainName,
           years: domainData.years,
           "customer-id": domainData.customerId,
-          ns: domainData.nameServers || [],
+          ns: nameServers,
           "admin-contact-id": domainData.adminContactId,
           "tech-contact-id": domainData.techContactId,
           "billing-contact-id": domainData.billingContactId,

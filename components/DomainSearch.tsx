@@ -350,24 +350,24 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
   return (
     <div className={`w-full max-w-5xl mx-auto ${className}`}>
       {/* Google Workspace Style Search Form - Always Visible */}
-      <div className="bg-white rounded-xl shadow-lg border-2 border-gray-200 p-4 sm:p-6 lg:p-8 mb-4 sm:mb-6">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6 max-w-4xl mx-auto">
         <div className="text-center mb-4 sm:mb-6">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>Find Your Perfect Domain</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>Find Your Perfect Domain</h2>
         </div>
 
         <form onSubmit={handleSearch} className="space-y-4">
           {/* Domain Input */}
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto">
             <div className="flex-1">
               <div className="relative group">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
                 <Input
                   id="domain-input"
                   type="text"
                   value={searchTerm}
                   onChange={handleInputChange}
                   placeholder="Enter domain name (e.g., example or example.com)"
-                  className="pl-12 pr-4 py-3 sm:py-4 text-base sm:text-lg border-2 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 rounded-xl transition-all duration-200 hover:border-gray-400 bg-white text-gray-900 placeholder-gray-500"
+                  className="pl-10 pr-4 py-2.5 text-sm border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 rounded-lg transition-all duration-200 hover:border-gray-400 bg-white text-gray-900 placeholder-gray-500"
                   disabled={isSearching}
                   style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}
                 />
@@ -379,7 +379,7 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
                 variant="primary"
                 size="lg"
                 disabled={isSearching || !searchTerm.trim()}
-                className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 bg-blue-600 hover:bg-blue-700 text-white border-0"
+                className="w-full sm:w-auto px-4 py-2.5 text-sm font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 bg-blue-600 hover:bg-blue-700 text-white border-0"
                 style={{
                   fontFamily: 'Google Sans, system-ui, sans-serif'
                 }}
@@ -507,17 +507,17 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
 
       {/* Enhanced Loading State */}
       {isSearching && (
-        <div className="bg-white rounded-xl shadow-lg border-2 border-gray-200 p-8 mb-4 sm:mb-6">
-          <div className="flex items-center justify-center py-20">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4 sm:mb-6 max-w-4xl mx-auto">
+          <div className="flex items-center justify-center py-12">
             <div className="text-center">
               <div className="relative">
-                <div className="w-20 h-20 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-8"></div>
+                <div className="w-12 h-12 border-3 border-gray-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-6"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Search className="h-8 w-8 text-blue-600 animate-pulse" />
+                  <Search className="h-5 w-5 text-blue-600 animate-pulse" />
                 </div>
               </div>
-              <h3 className="text-2xl font-semibold text-gray-900 mb-3" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>Searching for domains...</h3>
-              <p className="text-gray-600 text-lg" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>Please wait while we check availability and pricing</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>Searching for domains...</h3>
+              <p className="text-gray-600 text-sm" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>Please wait while we check availability and pricing</p>
             </div>
           </div>
         </div>
@@ -525,7 +525,7 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
 
       {/* Enhanced Results Section */}
       {hasSearched && (
-        <div className="space-y-6">
+        <div className="space-y-4 max-w-4xl mx-auto">
           {/* Results Header */}
           <div className="bg-white rounded-lg shadow-sm border border-[var(--google-border-light)] p-3 sm:p-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -612,22 +612,27 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
                           )}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
                             <h4 className="text-base sm:text-lg font-semibold text-[var(--google-text-primary)] truncate" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>{result.domainName}</h4>
-                            {result.available && result.pricingSource && (
-                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium self-start ${result.pricingSource === 'live'
-                                ? 'bg-[var(--google-blue-light)] text-[var(--google-blue)]'
-                                : 'bg-[var(--google-bg-tertiary)] text-[var(--google-text-secondary)]'
-                                }`}
-                                style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
-                                {result.pricingSource === 'live' && 'Live'}
-                                {result.pricingSource === 'unavailable' && 'N/A'}
+                            <div className="flex items-center gap-2">
+                              {result.available && result.pricingSource && (
+                                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${result.pricingSource === 'live'
+                                  ? 'bg-[var(--google-blue-light)] text-[var(--google-blue)]'
+                                  : 'bg-[var(--google-bg-tertiary)] text-[var(--google-text-secondary)]'
+                                  }`}
+                                  style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
+                                  {result.pricingSource === 'live' && 'Live'}
+                                  {result.pricingSource === 'unavailable' && 'N/A'}
+                                </span>
+                              )}
+                              <span className={`px-2 py-1 text-xs font-medium rounded-full ${result.available
+                                ? 'text-white bg-gradient-to-r from-green-500 to-green-600'
+                                : 'text-white bg-gradient-to-r from-red-500 to-red-600'
+                                }`} style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
+                                {result.available ? 'Available' : 'Taken'}
                               </span>
-                            )}
+                            </div>
                           </div>
-                          <p className={`text-xs ${result.available ? 'text-[var(--google-green)]' : 'text-[var(--google-error)]'}`} style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
-                            {result.available ? 'Available' : 'Taken'}
-                          </p>
                         </div>
                       </div>
 
