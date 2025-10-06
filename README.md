@@ -2,19 +2,6 @@
 
 A comprehensive domain management platform built with Next.js 14, featuring live pricing integration with ResellerClub API, user management, admin panel functionality, and advanced testing capabilities. This system provides a complete solution for domain registration, management, and e-commerce operations.
 
-## 📋 Table of Contents
-
-- [Features](#-features)
-- [Tech Stack](#️-tech-stack)
-- [Project Structure](#-project-structure)
-- [Installation](#-installation)
-- [Configuration](#-configuration)
-- [API Documentation](#-api-documentation)
-- [Testing](#-testing)
-- [Deployment](#-deployment)
-- [Contributing](#-contributing)
-- [License](#-license)
-
 ## 🎯 Overview
 
 This domain management system is designed to provide a complete solution for domain registration and management services. It integrates with ResellerClub API to provide live pricing data, supports both customer and reseller pricing models, and includes comprehensive admin tools for managing TLD pricing and margins.
