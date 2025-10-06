@@ -21,7 +21,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { DollarSign, RefreshCw, Search, Filter, Download, Globe } from 'lucide-react';
+import { DollarSign, RefreshCw, Search, Filter, Globe } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayoutNew';
 import AdminDataTable from '@/components/admin/AdminDataTable';
 
@@ -133,30 +133,6 @@ export default function AdminTLDPricing() {
     router.push('/');
   };
 
-  const handleExportPricing = () => {
-    const csvContent = [
-      ['TLD', 'Customer Price', 'Reseller Price', 'Margin %', 'Currency', 'Category', 'Description'],
-      ...tldPricing.map(tld => [
-        tld.tld,
-        tld.customerPrice.toString(),
-        tld.resellerPrice.toString(),
-        tld.margin ? `${tld.margin.toFixed(2)}%` : 'N/A',
-        tld.currency,
-        tld.category,
-        tld.description || ''
-      ])
-    ].map(row => row.join(',')).join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `tld-pricing-${new Date().toISOString().split('T')[0]}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-  };
 
   // Filter TLD pricing based on search term and category
   const filteredTLDPricing = tldPricing.filter(tld => {
@@ -278,13 +254,6 @@ export default function AdminTLDPricing() {
             )}
           </div>
           <div className="flex space-x-3">
-            <button
-              onClick={handleExportPricing}
-              className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-            >
-              <Download className="h-4 w-4 mr-2" />
-              Export CSV
-            </button>
             <button
               onClick={loadTLDPricing}
               className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"

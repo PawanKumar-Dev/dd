@@ -121,9 +121,13 @@ export default function CheckoutPage() {
             const verifyData = await verifyResponse.json();
 
             if (verifyResponse.ok) {
-              const { successfulDomains, failedDomains, orderId, invoiceNumber } = verifyData;
-
-              clearCart();
+              const {
+                successfulDomains,
+                failedDomains,
+                orderId,
+                invoiceNumber,
+                registrationResults
+              } = verifyData;
 
               // Store payment result in session storage for cleaner URL
               const paymentResult = {
@@ -132,13 +136,21 @@ export default function CheckoutPage() {
                 invoiceNumber: invoiceNumber || '',
                 successfulDomains: successfulDomains || [],
                 failedDomains: failedDomains || [],
+                registrationResults: registrationResults || [],
                 amount: getTotalPrice(),
                 currency: 'INR',
                 timestamp: Date.now()
               };
 
               sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
+
+              // Redirect immediately to success page
               router.push('/payment-success');
+
+              // Clear cart in background after redirect (user won't see this)
+              setTimeout(() => {
+                clearCart();
+              }, 100);
             } else {
               // Store payment result in session storage for cleaner URL
               const paymentResult = {
@@ -150,7 +162,14 @@ export default function CheckoutPage() {
               };
 
               sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
+
+              // Redirect immediately to success page
               router.push('/payment-success');
+
+              // Clear cart in background after redirect (user won't see this)
+              setTimeout(() => {
+                clearCart();
+              }, 100);
             }
           } catch (error) {
             console.error('Payment verification error:', error);
@@ -165,7 +184,14 @@ export default function CheckoutPage() {
             };
 
             sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
+
+            // Redirect immediately to success page
             router.push('/payment-success');
+
+            // Clear cart in background after redirect (user won't see this)
+            setTimeout(() => {
+              clearCart();
+            }, 100);
           }
         },
         prefill: {
@@ -188,7 +214,14 @@ export default function CheckoutPage() {
             };
 
             sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
+
+            // Redirect immediately to success page
             router.push('/payment-success');
+
+            // Clear cart in background after redirect (user won't see this)
+            setTimeout(() => {
+              clearCart();
+            }, 100);
           },
         },
       };
@@ -207,7 +240,14 @@ export default function CheckoutPage() {
         };
 
         sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
+
+        // Redirect immediately to success page
         router.push('/payment-success');
+
+        // Clear cart in background after redirect (user won't see this)
+        setTimeout(() => {
+          clearCart();
+        }, 100);
       });
 
       rzp.open();
@@ -225,7 +265,14 @@ export default function CheckoutPage() {
       };
 
       sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
+
+      // Redirect immediately to success page
       router.push('/payment-success');
+
+      // Clear cart in background after redirect (user won't see this)
+      setTimeout(() => {
+        clearCart();
+      }, 100);
     }
   };
 
@@ -312,6 +359,33 @@ export default function CheckoutPage() {
                   <span className="text-2xl font-bold text-blue-600">
                     ₹{getTotalPrice().toFixed(2)}
                   </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Nameserver Configuration */}
+            <div className="mt-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Nameserver Configuration</h3>
+              <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Choose Nameservers
+                  </label>
+                  <select
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    defaultValue="resellerclub"
+                  >
+                    <option value="resellerclub">ResellerClub Default (Recommended)</option>
+                    <option value="custom">Custom Nameservers</option>
+                  </select>
+                </div>
+                <div className="text-sm text-gray-600">
+                  <p className="mb-2">
+                    <strong>ResellerClub Default:</strong> ns1.resellerclub.com, ns2.resellerclub.com
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    You can change nameservers later from your dashboard after domain registration.
+                  </p>
                 </div>
               </div>
             </div>
