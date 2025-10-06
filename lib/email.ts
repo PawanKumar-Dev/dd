@@ -545,4 +545,97 @@ export class EmailService {
       html,
     });
   }
+
+  /**
+   * Send admin notification for failed domain registrations
+   */
+  static async sendFailedDomainRegistrationNotification(
+    adminEmail: string,
+    orderId: string,
+    customerName: string,
+    customerEmail: string,
+    successfulDomains: string[],
+    failedDomains: string[],
+    amount: number,
+    currency: string
+  ): Promise<boolean> {
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+          <h2 style="color: #dc2626; margin: 0 0 10px 0;">⚠️ Domain Registration Failure Alert</h2>
+          <p style="margin: 0; color: #7f1d1d; font-weight: 500;">
+            Payment was successful but some domains failed to register. Immediate action required.
+          </p>
+        </div>
+
+        <div style="background-color: #f9fafb; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+          <h3 style="color: #374151; margin: 0 0 15px 0;">Order Details</h3>
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td style="padding: 8px 0; font-weight: 500; color: #6b7280;">Order ID:</td>
+              <td style="padding: 8px 0; color: #111827; font-family: monospace;">${orderId}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; font-weight: 500; color: #6b7280;">Customer:</td>
+              <td style="padding: 8px 0; color: #111827;">${customerName} (${customerEmail})</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; font-weight: 500; color: #6b7280;">Amount:</td>
+              <td style="padding: 8px 0; color: #111827; font-weight: 600;">${currency} ${amount.toFixed(2)}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px 0; font-weight: 500; color: #6b7280;">Payment Status:</td>
+              <td style="padding: 8px 0; color: #059669; font-weight: 600;">✅ Successful</td>
+            </tr>
+          </table>
+        </div>
+
+        <div style="background-color: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+          <h3 style="color: #0369a1; margin: 0 0 15px 0;">✅ Successfully Registered Domains</h3>
+          ${successfulDomains.length > 0 ? `
+            <ul style="margin: 0; padding-left: 20px;">
+              ${successfulDomains.map(domain => `<li style="color: #059669; margin: 5px 0;">${domain}</li>`).join('')}
+            </ul>
+          ` : '<p style="color: #6b7280; margin: 0;">No domains were successfully registered.</p>'}
+        </div>
+
+        <div style="background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+          <h3 style="color: #dc2626; margin: 0 0 15px 0;">❌ Failed Domain Registrations</h3>
+          <ul style="margin: 0; padding-left: 20px;">
+            ${failedDomains.map(domain => `<li style="color: #dc2626; margin: 5px 0; font-weight: 500;">${domain}</li>`).join('')}
+          </ul>
+        </div>
+
+        <div style="background-color: #fffbeb; border: 1px solid #fed7aa; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+          <h3 style="color: #d97706; margin: 0 0 15px 0;">🚨 Required Actions</h3>
+          <ol style="margin: 0; padding-left: 20px; color: #92400e;">
+            <li style="margin: 8px 0;">Check ResellerClub API logs for registration errors</li>
+            <li style="margin: 8px 0;">Attempt manual domain registration for failed domains</li>
+            <li style="margin: 8px 0;">If registration still fails, process refund for failed domains</li>
+            <li style="margin: 8px 0;">Notify customer about the status update</li>
+            <li style="margin: 8px 0;">Update order status in admin panel</li>
+          </ol>
+        </div>
+
+        <div style="background-color: #f3f4f6; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+          <p style="margin: 0; color: #6b7280; font-size: 14px;">
+            <strong>Next Steps:</strong> Please log into the admin panel to review the full order details and take appropriate action. 
+            The customer has been charged successfully, so timely resolution is critical.
+          </p>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+          <p style="margin: 0; color: #6b7280; font-size: 14px;">
+            This is an automated notification from Excel Technologies Domain Management System
+          </p>
+        </div>
+      </div>
+    `;
+
+    return this.sendEmail({
+      to: adminEmail,
+      subject: `🚨 URGENT: Domain Registration Failed - Order ${orderId}`,
+      html,
+    });
+  }
 }
