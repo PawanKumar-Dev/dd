@@ -12,8 +12,7 @@ export interface IDNSRecord extends Document {
 const DNSRecordSchema = new Schema<IDNSRecord>(
   {
     domainId: {
-      type: Schema.Types.ObjectId,
-      ref: "Domain",
+      type: String,
       required: [true, "Domain ID is required"],
     },
     recordType: {

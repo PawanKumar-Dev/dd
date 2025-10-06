@@ -393,9 +393,9 @@ export class ResellerClubAPI {
               currency: currency,
               registrationPeriod: 1, // Default to 1 year
               pricingSource: pricingSource, // Add pricing source info
-              originalPrice: livePricing && tld ? livePricing[tld]?.originalPrice : undefined,
-              isPromotional: livePricing && tld ? livePricing[tld]?.isPromotional || false : false,
-              promotionalDetails: livePricing && tld ? livePricing[tld]?.promotionalDetails : undefined,
+              originalPrice: undefined,
+              isPromotional: false,
+              promotionalDetails: undefined,
             });
           } else {
             console.warn(
@@ -470,7 +470,7 @@ export class ResellerClubAPI {
           throw new Error(
             "ResellerClub API rate limit exceeded. Please try again later."
           );
-        } else if (error.response?.status >= 500) {
+        } else if (error.response?.status && error.response.status >= 500) {
           throw new Error(
             "ResellerClub API server error. Please try again later."
           );
@@ -675,11 +675,11 @@ export class ResellerClubAPI {
             let currency = "INR";
             let pricingSource: "live" | "fallback" | "unavailable" =
               "unavailable";
-            
+
             // Get TLD and live pricing for all domains
             const tld = domain.split(".").pop()?.toLowerCase();
             let livePricing: any = null;
-            
+
             if (isAvailable && tld) {
               try {
                 console.log(
@@ -688,35 +688,33 @@ export class ResellerClubAPI {
                 livePricing = await PricingService.getTLDPricing([tld]);
 
                 if (livePricing && livePricing[tld]) {
-                    const customerPrice =
-                      parseFloat(livePricing[tld].price) || 0;
-                    const resellerPrice =
-                      parseFloat(livePricing[tld].resellerPrice) || 0;
-                    const margin =
-                      customerPrice > 0 && resellerPrice > 0
-                        ? ((customerPrice - resellerPrice) / customerPrice) *
-                          100
-                        : 0;
+                  const customerPrice = parseFloat(livePricing[tld].price) || 0;
+                  const resellerPrice =
+                    parseFloat(livePricing[tld].resellerPrice) || 0;
+                  const margin =
+                    customerPrice > 0 && resellerPrice > 0
+                      ? ((customerPrice - resellerPrice) / customerPrice) * 100
+                      : 0;
 
-                    price = customerPrice; // Use customer price for display
-                    currency = livePricing[tld].currency || "INR";
-                    pricingSource = "live";
+                  price = customerPrice; // Use customer price for display
+                  currency = livePricing[tld].currency || "INR";
+                  pricingSource = "live";
 
+                  console.log(
+                    `✅ [PRODUCTION] Live customer pricing for ${domain}: ₹${customerPrice} ${currency}`
+                  );
+                  if (resellerPrice > 0) {
                     console.log(
-                      `✅ [PRODUCTION] Live customer pricing for ${domain}: ₹${customerPrice} ${currency}`
+                      `📊 [PRODUCTION] Reseller pricing for ${domain}: ₹${resellerPrice} ${currency} (Margin: ${
+                        margin > 0 ? "+" : ""
+                      }${margin.toFixed(1)}%)`
                     );
-                    if (resellerPrice > 0) {
-                      console.log(
-                        `📊 [PRODUCTION] Reseller pricing for ${domain}: ₹${resellerPrice} ${currency} (Margin: ${
-                          margin > 0 ? "+" : ""
-                        }${margin.toFixed(1)}%)`
-                      );
-                    } else {
-                      console.log(
-                        `⚠️ [PRODUCTION] No reseller pricing available for ${domain}`
-                      );
-                    }
+                  } else {
+                    console.log(
+                      `⚠️ [PRODUCTION] No reseller pricing available for ${domain}`
+                    );
                   }
+                }
               } catch (error) {
                 console.warn(
                   `⚠️ [PRODUCTION] Failed to fetch live customer pricing for ${domain}:`,
@@ -749,9 +747,9 @@ export class ResellerClubAPI {
               currency: currency,
               registrationPeriod: 1, // Default to 1 year
               pricingSource: pricingSource, // Add pricing source info
-              originalPrice: livePricing && tld ? livePricing[tld]?.originalPrice : undefined,
-              isPromotional: livePricing && tld ? livePricing[tld]?.isPromotional || false : false,
-              promotionalDetails: livePricing && tld ? livePricing[tld]?.promotionalDetails : undefined,
+              originalPrice: undefined,
+              isPromotional: false,
+              promotionalDetails: undefined,
             });
           } else {
             console.warn(
@@ -828,7 +826,7 @@ export class ResellerClubAPI {
           throw new Error(
             "ResellerClub API rate limit exceeded. Please try again later."
           );
-        } else if (error.response?.status >= 500) {
+        } else if (error.response?.status && error.response.status >= 500) {
           throw new Error(
             "ResellerClub API server error. Please try again later."
           );
@@ -991,7 +989,7 @@ export class ResellerClubAPI {
         } else if (error.response?.status === 429) {
           errorMessage =
             "ResellerClub API rate limit exceeded. Please try again later.";
-        } else if (error.response?.status >= 500) {
+        } else if (error.response?.status && error.response.status >= 500) {
           errorMessage =
             "ResellerClub API server error. Please try again later.";
         } else if (error.code === "ECONNABORTED") {

@@ -43,8 +43,7 @@ const DomainSchema = new Schema<IDomain>(
       max: 10,
     },
     userId: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
+      type: String,
       required: [true, "User ID is required"],
     },
     orderId: {

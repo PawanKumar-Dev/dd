@@ -281,7 +281,7 @@ export class InputValidator {
     return {
       isValid: errors.length === 0,
       errors,
-      sanitized: domainIds,
+      sanitized: domainIds.join(","),
     };
   }
 }

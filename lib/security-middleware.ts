@@ -167,7 +167,7 @@ export class SecurityMiddleware {
     const url = new URL(request.url);
     const queryParams = url.searchParams;
 
-    for (const [key, value] of queryParams.entries()) {
+    for (const [key, value] of Array.from(queryParams.entries())) {
       const securityCheck = SecurityValidator.containsMaliciousPatterns(value);
       if (securityCheck.isMalicious) {
         reasons.push(`Suspicious query parameter: ${key}`);
