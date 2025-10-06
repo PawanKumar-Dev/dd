@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayoutNew';
 import AdminDataTable from '@/components/admin/AdminDataTable';
+import FailedDomainNotifications from '@/components/admin/FailedDomainNotifications';
 
 interface User {
   _id: string;
@@ -259,6 +260,9 @@ export default function AdminDashboard() {
           <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
           <p className="text-gray-600 mt-2">Welcome back, {user?.firstName}. Here's what's happening with your system.</p>
         </div>
+
+        {/* Failed Domain Registration Notifications */}
+        <FailedDomainNotifications />
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">

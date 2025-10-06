@@ -364,27 +364,57 @@ export async function POST(request: NextRequest) {
 
     // Send admin notification email
     try {
-      const adminEmailSent = await EmailService.sendAdminNotification(
-        process.env.ADMIN_EMAIL || "sales@exceltechnologies.in",
-        "New Domain Order",
-        `A new domain order has been placed by ${user.firstName} ${user.lastName} (${user.email})`,
-        {
-          orderId: order.orderId,
-          invoiceNumber: order.invoiceNumber,
-          customerName: `${user.firstName} ${user.lastName}`,
-          customerEmail: user.email,
-          amount: order.amount,
-          currency: order.currency,
-          successfulDomains: successfulDomains.map((d) => d.domainName),
-          failedDomains: failedDomains.map((d) => d.domainName),
-          orderStatus: orderStatus,
-        }
-      );
+      let adminEmailSent = false;
 
-      if (adminEmailSent) {
-        console.log(`✅ Admin notification email sent`);
+      if (failedDomains.length > 0) {
+        // Send specialized notification for failed domain registrations
+        adminEmailSent =
+          await EmailService.sendFailedDomainRegistrationNotification(
+            process.env.ADMIN_EMAIL || "sales@exceltechnologies.in",
+            order.orderId,
+            `${user.firstName} ${user.lastName}`,
+            user.email,
+            successfulDomains.map((d) => d.domainName),
+            failedDomains.map((d) => d.domainName),
+            order.amount,
+            order.currency
+          );
+
+        if (adminEmailSent) {
+          console.log(
+            `🚨 [ADMIN-NOTIFICATION] Failed domain registration alert sent for order ${order.orderId}`
+          );
+        }
       } else {
-        console.error(`❌ Failed to send admin notification email`);
+        // Send regular notification for successful orders
+        adminEmailSent = await EmailService.sendAdminNotification(
+          process.env.ADMIN_EMAIL || "sales@exceltechnologies.in",
+          "New Domain Order",
+          `A new domain order has been placed by ${user.firstName} ${user.lastName} (${user.email})`,
+          {
+            orderId: order.orderId,
+            invoiceNumber: order.invoiceNumber,
+            customerName: `${user.firstName} ${user.lastName}`,
+            customerEmail: user.email,
+            amount: order.amount,
+            currency: order.currency,
+            successfulDomains: successfulDomains.map((d) => d.domainName),
+            failedDomains: failedDomains.map((d) => d.domainName),
+            orderStatus: orderStatus,
+          }
+        );
+
+        if (adminEmailSent) {
+          console.log(
+            `✅ [ADMIN-NOTIFICATION] Order notification sent for order ${order.orderId}`
+          );
+        }
+      }
+
+      if (!adminEmailSent) {
+        console.error(
+          `❌ [ADMIN-NOTIFICATION] Failed to send admin notification email for order ${order.orderId}`
+        );
       }
     } catch (adminEmailError) {
       console.error("Admin email sending error:", adminEmailError);
