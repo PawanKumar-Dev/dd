@@ -184,11 +184,27 @@ export async function POST(request: NextRequest) {
     for (const item of cartItems) {
       console.log(`🔄 [PAYMENT-VERIFY] Registering domain: ${item.domainName}`);
       try {
+        // Get user's nameserver configuration (if any)
+        let nameServers: string[] | undefined;
+        try {
+          // In a real implementation, you might store this in the database
+          // For now, we'll use ResellerClub defaults as configured in the API
+          console.log(
+            `🌐 [PAYMENT-VERIFY] Using ResellerClub default nameservers for ${item.domainName}`
+          );
+        } catch (error) {
+          console.warn(
+            `⚠️ [PAYMENT-VERIFY] Could not fetch nameserver config, using defaults:`,
+            error
+          );
+        }
+
         const result = await ResellerClubWrapper.registerDomain(
           {
             domainName: item.domainName,
             years: item.registrationPeriod || 1,
             customerId: user._id,
+            nameServers: nameServers, // Will use ResellerClub defaults if undefined
           },
           testingMode
         );

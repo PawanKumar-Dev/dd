@@ -28,7 +28,8 @@ import {
   Server, Wifi, CheckCircle, ArrowRight, Zap, Receipt, FileText, Calendar,
   CreditCard, Download, Eye, X, Plus, RefreshCw, AlertTriangle, Info,
   ExternalLink, Edit3, Trash2, Search, Filter, Download as DownloadIcon,
-  Activity, BarChart3, PieChart, TrendingDown, AlertCircle, CheckCircle2
+  Activity, BarChart3, PieChart, TrendingDown, AlertCircle, CheckCircle2,
+  DollarSign
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCartStore } from '@/store/cartStore';
@@ -38,6 +39,7 @@ import ClientOnly from '@/components/ClientOnly';
 import Invoice from '@/components/Invoice';
 import DNSManagementModal from '@/components/DNSManagementModal';
 import DomainRenewalModal from '@/components/DomainRenewalModal';
+import NameServerManagement from '@/components/NameServerManagement';
 
 interface User {
   id: string;
@@ -271,108 +273,87 @@ export default function DashboardPage() {
         transition={{ duration: 0.4, ease: 'easeOut' }}
       >
 
-        {/* Welcome Section */}
-        <div className="bg-gradient-to-r from-primary-600 to-primary-800 text-white rounded-lg p-8 mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold mb-2">
-                Welcome back, {user.firstName}! 👋
-              </h1>
-              <p className="text-primary-100 text-lg mb-4">
-                Manage your domains and explore new opportunities
-              </p>
-              <Link
-                href="/"
-                className="inline-flex items-center px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white font-medium rounded-lg transition-all duration-200 border border-white border-opacity-30"
-              >
-                <Globe className="h-4 w-4 mr-2" />
-                Visit Homepage
-              </Link>
-            </div>
-            <div className="hidden md:flex items-center space-x-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold">{domains.length}</div>
-                <div className="text-primary-100 text-sm">Domains</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">{getItemCount()}</div>
-                <div className="text-primary-100 text-sm">In Cart</div>
-              </div>
-            </div>
-          </div>
+        {/* Header Section */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-600 mt-2">Welcome back, {user?.firstName}. Manage your domains and orders.</p>
         </div>
 
         {/* Quick Actions */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+        <div className="grid md:grid-cols-2 gap-4 mb-8">
+          <Link
+            href="/"
+            className="bg-white rounded-lg shadow-sm p-4 border border-gray-200 hover:shadow-md transition-shadow duration-200 group"
+          >
             <div className="flex items-center">
-              <div className="bg-primary-100 rounded-full p-3 mr-4">
-                <ShoppingCart className="h-6 w-6 text-primary-600" />
+              <div className="bg-blue-100 rounded-lg p-2 mr-3">
+                <Globe className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Shopping Cart</h3>
-                <p className="text-gray-600 text-sm">{getItemCount()} items</p>
+                <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">Search Domains</h3>
+                <p className="text-gray-600 text-sm">Find and register new domains</p>
               </div>
             </div>
-          </div>
+          </Link>
 
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+          <Link
+            href="/domain-management"
+            className="bg-white rounded-lg shadow-sm p-4 border border-gray-200 hover:shadow-md transition-shadow duration-200 group"
+          >
             <div className="flex items-center">
-              <div className="bg-primary-100 rounded-full p-3 mr-4">
-                <Globe className="h-6 w-6 text-primary-600" />
+              <div className="bg-green-100 rounded-lg p-2 mr-3">
+                <Server className="h-5 w-5 text-green-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">My Domains</h3>
-                <p className="text-gray-600 text-sm">{domains.length} registered</p>
-              </div>
-            </div>
-          </div>
-
-          <Link href="/" className="bg-white rounded-lg shadow-sm p-6 border border-gray-200 hover:shadow-md transition-shadow duration-200">
-            <div className="flex items-center">
-              <div className="bg-green-100 rounded-full p-3 mr-4">
-                <ArrowRight className="h-6 w-6 text-green-600" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900">Visit Homepage</h3>
-                <p className="text-gray-600 text-sm">Search for new domains</p>
+                <h3 className="font-semibold text-gray-900 group-hover:text-green-600 transition-colors">DNS Management</h3>
+                <p className="text-gray-600 text-sm">Manage your domain DNS settings</p>
               </div>
             </div>
           </Link>
         </div>
 
         {/* Tabs */}
-        <div className="border-b border-gray-200 mb-8">
-          <nav className="-mb-px flex space-x-8">
+        <div className="border-b border-gray-200 mb-6">
+          <nav className="flex space-x-8">
             <button
               onClick={() => setActiveTab('cart')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'cart'
-                ? 'border-primary-500 text-primary-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
             >
-              <ShoppingCart className="h-5 w-5 inline mr-2" />
+              <ShoppingCart className="h-4 w-4 inline mr-2" />
               Cart ({getItemCount()})
             </button>
             <button
               onClick={() => setActiveTab('domains')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'domains'
-                ? 'border-primary-500 text-primary-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
             >
-              <Globe className="h-5 w-5 inline mr-2" />
-              My Domains
+              <Globe className="h-4 w-4 inline mr-2" />
+              My Domains ({domains.length})
             </button>
             <button
               onClick={() => setActiveTab('orders')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'orders'
-                ? 'border-primary-500 text-primary-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
             >
-              <Receipt className="h-5 w-5 inline mr-2" />
+              <Receipt className="h-4 w-4 inline mr-2" />
               Orders ({orders.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('nameservers')}
+              className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'nameservers'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+            >
+              <Server className="h-4 w-4 inline mr-2" />
+              Nameservers
             </button>
           </nav>
         </div>
@@ -380,11 +361,11 @@ export default function DashboardPage() {
 
         {/* Cart Tab */}
         {activeTab === 'cart' && (
-          <div>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
             {cartItems.length === 0 ? (
-              <div className="text-center py-16">
-                <div className="bg-gradient-to-br from-green-50 to-emerald-100 rounded-full p-6 w-24 h-24 mx-auto mb-6 flex items-center justify-center">
-                  <ShoppingCart className="h-12 w-12 text-green-600" />
+              <div className="text-center py-16 px-6">
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-full p-6 w-24 h-24 mx-auto mb-6 flex items-center justify-center">
+                  <ShoppingCart className="h-12 w-12 text-blue-600" />
                 </div>
                 <h3 className="text-2xl font-semibold text-gray-900 mb-3">Your cart is empty</h3>
                 <p className="text-gray-600 text-lg mb-8 max-w-md mx-auto">
@@ -393,13 +374,13 @@ export default function DashboardPage() {
                 <div className="space-y-4">
                   <Link
                     href="/"
-                    className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                    className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md"
                   >
                     <Globe className="h-5 w-5 mr-2" />
                     Search Domains
                   </Link>
                   <p className="text-sm text-gray-500">
-                    Or visit the <Link href="/" className="text-green-600 hover:text-green-700 underline">homepage</Link> to get started
+                    Or visit the <Link href="/" className="text-blue-600 hover:text-blue-700 underline">homepage</Link> to get started
                   </p>
                 </div>
               </div>
@@ -684,6 +665,13 @@ export default function DashboardPage() {
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {/* Nameservers Tab */}
+        {activeTab === 'nameservers' && (
+          <div>
+            <NameServerManagement />
           </div>
         )}
       </motion.div>
