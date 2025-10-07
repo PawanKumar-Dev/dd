@@ -1018,22 +1018,27 @@ export class ResellerClubAPI {
       country: string;
       zipcode: string;
     };
-  }): Promise<{ status: string; customerId?: number; contactId?: number; error?: string }> {
+  }): Promise<{
+    status: string;
+    customerId?: number;
+    contactId?: number;
+    error?: string;
+  }> {
     // For now, we'll use default ResellerClub customer and contact IDs
     // In a real implementation, you would:
     // 1. Check if user already has ResellerClub customer ID and contact ID in your database
     // 2. If not, create them using createCustomer and createContact methods
     // 3. Store the ResellerClub IDs in your user record
-    
+
     // Using default IDs for testing
     // You should replace these with actual ResellerClub IDs
     const defaultCustomerId = 19532562; // Replace with your actual ResellerClub customer ID
     const defaultContactId = 20187243; // Replace with your actual ResellerClub contact ID
-    
+
     console.log(
       `🔍 [PRODUCTION] Using default ResellerClub IDs - Customer: ${defaultCustomerId}, Contact: ${defaultContactId} for user: ${userData.email}`
     );
-    
+
     return {
       status: "success",
       customerId: defaultCustomerId,
@@ -1093,9 +1098,11 @@ export class ResellerClubAPI {
         "domain-name": domainData.domainName,
         years: domainData.years,
         "customer-id": domainData.customerId, // ResellerClub customer ID (numeric)
+        "reg-contact-id": domainData.adminContactId, // Registrant contact ID (domain owner)
         "admin-contact-id": domainData.adminContactId,
         "tech-contact-id": domainData.techContactId,
         "billing-contact-id": domainData.billingContactId,
+        "invoice-option": "NoInvoice", // Set invoice option
         ns: nameServers.join(","), // Pass nameservers as comma-separated string
       };
 
