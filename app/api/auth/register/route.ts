@@ -4,6 +4,7 @@ import User from "@/models/User";
 import { AuthService } from "@/lib/auth";
 import { EmailService } from "@/lib/email";
 import { InputValidator } from "@/lib/validation";
+import crypto from "crypto";
 
 export async function POST(request: NextRequest) {
   try {
@@ -53,7 +54,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create new user with sanitized data
+    // Generate activation token
+    const activationToken = crypto.randomBytes(32).toString("hex");
+    const activationTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+    // Create new user with sanitized data (not activated by default)
     const user = new User({
       email: emailValidation.sanitized,
       password: passwordValidation.sanitized,
@@ -62,34 +67,33 @@ export async function POST(request: NextRequest) {
       phone: phoneValidation.sanitized,
       address: addressValidation.sanitized,
       role: "user",
+      isActivated: false,
+      activationToken,
+      activationTokenExpiry,
     });
 
     await user.save();
 
-    // Generate token
-    const token = AuthService.generateToken({
-      userId: user._id.toString(),
-      email: user.email,
-      role: user.role,
-    });
-
-    // Send welcome email (async, don't wait for it)
-    EmailService.sendWelcomeEmail(
+    // Send activation email (async, don't wait for it)
+    EmailService.sendActivationEmail(
       user.email,
-      `${user.firstName} ${user.lastName}`
+      `${user.firstName} ${user.lastName}`,
+      activationToken
     ).catch((error) => {
-      console.error("Welcome email failed:", error);
+      console.error("Activation email failed:", error);
     });
 
     return NextResponse.json({
-      message: "User created successfully",
-      token,
+      message:
+        "User created successfully. Please check your email to activate your account.",
+      requiresActivation: true,
       user: {
         id: user._id,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
+        isActivated: user.isActivated,
       },
     });
   } catch (error) {

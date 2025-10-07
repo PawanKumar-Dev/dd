@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import RegisterForm from '@/components/RegisterForm';
+import MultiStageRegisterForm from '@/components/MultiStageRegisterForm';
 
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -36,5 +36,5 @@ export default function RegisterPage() {
     );
   }
 
-  return <RegisterForm />;
+  return <MultiStageRegisterForm />;
 }

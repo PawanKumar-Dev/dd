@@ -17,7 +17,7 @@ async function createTransporter() {
   try {
     const transporter = nodemailer.createTransport({
       host: SMTP_HOST,
-      port: parseInt(SMTP_PORT || '587'),
+      port: parseInt(SMTP_PORT || "587"),
       secure: SMTP_SECURE,
       auth: {
         user: SMTP_USER,
@@ -581,7 +581,9 @@ export class EmailService {
             </tr>
             <tr>
               <td style="padding: 8px 0; font-weight: 500; color: #6b7280;">Amount:</td>
-              <td style="padding: 8px 0; color: #111827; font-weight: 600;">${currency} ${amount.toFixed(2)}</td>
+              <td style="padding: 8px 0; color: #111827; font-weight: 600;">${currency} ${amount.toFixed(
+      2
+    )}</td>
             </tr>
             <tr>
               <td style="padding: 8px 0; font-weight: 500; color: #6b7280;">Payment Status:</td>
@@ -592,17 +594,31 @@ export class EmailService {
 
         <div style="background-color: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
           <h3 style="color: #0369a1; margin: 0 0 15px 0;">✅ Successfully Registered Domains</h3>
-          ${successfulDomains.length > 0 ? `
+          ${
+            successfulDomains.length > 0
+              ? `
             <ul style="margin: 0; padding-left: 20px;">
-              ${successfulDomains.map(domain => `<li style="color: #059669; margin: 5px 0;">${domain}</li>`).join('')}
+              ${successfulDomains
+                .map(
+                  (domain) =>
+                    `<li style="color: #059669; margin: 5px 0;">${domain}</li>`
+                )
+                .join("")}
             </ul>
-          ` : '<p style="color: #6b7280; margin: 0;">No domains were successfully registered.</p>'}
+          `
+              : '<p style="color: #6b7280; margin: 0;">No domains were successfully registered.</p>'
+          }
         </div>
 
         <div style="background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
           <h3 style="color: #dc2626; margin: 0 0 15px 0;">❌ Failed Domain Registrations</h3>
           <ul style="margin: 0; padding-left: 20px;">
-            ${failedDomains.map(domain => `<li style="color: #dc2626; margin: 5px 0; font-weight: 500;">${domain}</li>`).join('')}
+            ${failedDomains
+              .map(
+                (domain) =>
+                  `<li style="color: #dc2626; margin: 5px 0; font-weight: 500;">${domain}</li>`
+              )
+              .join("")}
           </ul>
         </div>
 
@@ -635,6 +651,124 @@ export class EmailService {
     return this.sendEmail({
       to: adminEmail,
       subject: `🚨 URGENT: Domain Registration Failed - Order ${orderId}`,
+      html,
+    });
+  }
+
+  /**
+   * Send account activation email
+   */
+  static async sendActivationEmail(
+    userEmail: string,
+    userName: string,
+    activationToken: string
+  ): Promise<boolean> {
+    const activationUrl = `${
+      process.env.APP_URL || "http://localhost:3000"
+    }/activate?token=${activationToken}`;
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Activate Your Account - Excel Technologies</title>
+      </head>
+      <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f8f9fa;">
+        <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); padding: 30px; text-align: center;">
+            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: bold;">🎉 Welcome to Excel Technologies!</h1>
+            <p style="color: #bfdbfe; margin: 10px 0 0 0; font-size: 16px;">Activate your account to get started</p>
+          </div>
+          
+          <!-- Content -->
+          <div style="padding: 30px;">
+            <div style="text-align: center; margin-bottom: 30px;">
+              <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                <span style="color: #ffffff; font-size: 32px;">✓</span>
+              </div>
+              <h2 style="color: #374151; margin: 0 0 10px 0; font-size: 20px;">Account Created Successfully!</h2>
+              <p style="color: #6b7280; margin: 0; font-size: 16px;">Hi ${userName}, your account has been created and is ready for activation.</p>
+            </div>
+            
+            <div style="background-color: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 20px; margin-bottom: 25px;">
+              <h3 style="color: #0369a1; margin: 0 0 15px 0; font-size: 16px;">🔐 Account Activation Required</h3>
+              <p style="color: #0c4a6e; margin: 0; line-height: 1.5;">
+                To complete your registration and access your dashboard, please click the activation button below. 
+                This ensures the security of your account and verifies your email address.
+              </p>
+            </div>
+            
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${activationUrl}" 
+                 style="display: inline-block; background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);">
+                Activate My Account
+              </a>
+            </div>
+            
+            <div style="background-color: #f9fafb; border-radius: 6px; padding: 15px; margin-bottom: 25px;">
+              <p style="color: #6b7280; margin: 0 0 10px 0; font-size: 14px; font-weight: bold;">Can't click the button?</p>
+              <p style="color: #6b7280; margin: 0; font-size: 14px; word-break: break-all;">
+                Copy and paste this link into your browser:<br>
+                <span style="color: #3b82f6;">${activationUrl}</span>
+              </p>
+            </div>
+            
+            <div style="background-color: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; padding: 15px; margin-bottom: 25px;">
+              <h4 style="color: #92400e; margin: 0 0 10px 0; font-size: 14px;">⏰ Important Notes</h4>
+              <ul style="color: #92400e; margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.5;">
+                <li>This activation link will expire in 24 hours</li>
+                <li>If the link expires, you can request a new one from the login page</li>
+                <li>Keep your login credentials secure and don't share them</li>
+              </ul>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+              <p style="color: #6b7280; margin: 0; font-size: 14px;">
+                Once activated, you'll be able to:
+              </p>
+              <div style="display: flex; justify-content: center; gap: 20px; margin-top: 15px; flex-wrap: wrap;">
+                <div style="text-align: center;">
+                  <div style="width: 40px; height: 40px; background: #dbeafe; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+                    <span style="color: #3b82f6; font-size: 18px;">🌐</span>
+                  </div>
+                  <p style="color: #374151; margin: 0; font-size: 12px; font-weight: bold;">Search Domains</p>
+                </div>
+                <div style="text-align: center;">
+                  <div style="width: 40px; height: 40px; background: #dbeafe; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+                    <span style="color: #3b82f6; font-size: 18px;">🛒</span>
+                  </div>
+                  <p style="color: #374151; margin: 0; font-size: 12px; font-weight: bold;">Manage Cart</p>
+                </div>
+                <div style="text-align: center;">
+                  <div style="width: 40px; height: 40px; background: #dbeafe; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+                    <span style="color: #3b82f6; font-size: 18px;">📊</span>
+                  </div>
+                  <p style="color: #374151; margin: 0; font-size: 12px; font-weight: bold;">View Dashboard</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Footer -->
+          <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+            <p style="color: #6b7280; margin: 0; font-size: 14px;">
+              This email was sent to ${userEmail}. If you didn't create an account, please ignore this email.
+            </p>
+            <p style="color: #9ca3af; margin: 5px 0 0 0; font-size: 12px;">
+              © 2024 Excel Technologies. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    return this.sendEmail({
+      to: userEmail,
+      subject: "🎉 Activate Your Account - Excel Technologies",
       html,
     });
   }

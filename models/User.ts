@@ -17,6 +17,9 @@ export interface IUser extends Document {
   };
   role: "admin" | "user";
   isActive: boolean;
+  isActivated: boolean;
+  activationToken?: string;
+  activationTokenExpiry?: Date;
   resetToken?: string;
   resetTokenExpiry?: Date;
   cart?: Array<{
@@ -97,6 +100,16 @@ const UserSchema = new Schema<IUser>(
     isActive: {
       type: Boolean,
       default: true,
+    },
+    isActivated: {
+      type: Boolean,
+      default: false,
+    },
+    activationToken: {
+      type: String,
+    },
+    activationTokenExpiry: {
+      type: Date,
     },
     resetToken: {
       type: String,

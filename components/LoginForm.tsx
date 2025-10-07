@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Eye, EyeOff, Lock, Mail, User, CheckCircle } from 'lucide-react';
 import Button from './Button';
 import Input from './Input';
 import Card from './Card';
@@ -21,7 +21,9 @@ export default function LoginForm({ className = '' }: LoginFormProps) {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [activationMessage, setActivationMessage] = useState('');
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // Load form data from localStorage on component mount (excluding password)
   useEffect(() => {
@@ -40,7 +42,13 @@ export default function LoginForm({ className = '' }: LoginFormProps) {
         console.error('Error parsing saved form data:', error);
       }
     }
-  }, []);
+
+    // Check for activation message
+    const message = searchParams.get('message');
+    if (message) {
+      setActivationMessage(decodeURIComponent(message));
+    }
+  }, [searchParams]);
 
   // Save form data to localStorage whenever it changes (excluding password)
   useEffect(() => {
@@ -104,7 +112,15 @@ export default function LoginForm({ className = '' }: LoginFormProps) {
           }
         }, 100);
       } else {
-        toast.error(data.error || 'Login failed');
+        if (data.requiresActivation) {
+          toast.error(data.message || 'Account not activated');
+          // Redirect to activation page with user email
+          setTimeout(() => {
+            router.push(`/activate?email=${encodeURIComponent(formData.email)}&message=${encodeURIComponent(data.message || 'Account not activated')}`);
+          }, 1000);
+        } else {
+          toast.error(data.error || 'Login failed');
+        }
       }
     } catch (error) {
       toast.error('An error occurred. Please try again.');
@@ -140,6 +156,14 @@ export default function LoginForm({ className = '' }: LoginFormProps) {
         </div>
 
         <Card>
+          {activationMessage && (
+            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <div className="flex items-center">
+                <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
+                <p className="text-green-800 text-sm font-medium">{activationMessage}</p>
+              </div>
+            </div>
+          )}
           <form className="space-y-6" onSubmit={handleSubmit}>
             <Input
               label="Email address"

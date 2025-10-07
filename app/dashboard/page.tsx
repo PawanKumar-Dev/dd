@@ -201,6 +201,12 @@ export default function DashboardPage() {
 
     const userObj = JSON.parse(userData);
 
+    // Check if user account is activated
+    if (!userObj.isActivated) {
+      router.push('/activate?message=Account not activated');
+      return;
+    }
+
     // Redirect admin users to admin dashboard
     if (userObj.role === 'admin') {
       router.push('/admin/dashboard');

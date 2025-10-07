@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, Lock, Mail, User, UserPlus, Phone, MapPin } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, User, UserPlus, Phone, MapPin, MapPinIcon, Loader2 } from 'lucide-react';
 import Button from './Button';
 import Input from './Input';
 import Card from './Card';
@@ -32,7 +32,53 @@ export default function RegisterForm({ className = '' }: RegisterFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const router = useRouter();
+
+  const totalSteps = 4;
+
+  // Step validation functions
+  const validateStep = (step: number): boolean => {
+    switch (step) {
+      case 1: // Personal Info
+        return !!(formData.firstName && formData.lastName && formData.email);
+      case 2: // Contact Info
+        return !!(formData.phone);
+      case 3: // Address Info
+        return !!(formData.address.line1 && formData.address.city && formData.address.state && formData.address.zipcode);
+      case 4: // Password
+        return !!(formData.password && formData.confirmPassword && formData.password === formData.confirmPassword);
+      default:
+        return false;
+    }
+  };
+
+  const nextStep = () => {
+    if (validateStep(currentStep)) {
+      if (!completedSteps.includes(currentStep)) {
+        setCompletedSteps([...completedSteps, currentStep]);
+      }
+      if (currentStep < totalSteps) {
+        setCurrentStep(currentStep + 1);
+      }
+    } else {
+      toast.error('Please fill in all required fields before proceeding');
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const goToStep = (step: number) => {
+    if (step <= currentStep || completedSteps.includes(step - 1)) {
+      setCurrentStep(step);
+    }
+  };
 
   // Load form data from localStorage on component mount (excluding passwords)
   useEffect(() => {
@@ -78,6 +124,14 @@ export default function RegisterForm({ className = '' }: RegisterFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // If not on final step, go to next step
+    if (currentStep < totalSteps) {
+      nextStep();
+      return;
+    }
+
+    // Final step - submit the form
     setIsLoading(true);
 
     // Validate passwords match
@@ -152,6 +206,100 @@ export default function RegisterForm({ className = '' }: RegisterFormProps) {
     }
   };
 
+  const detectLocation = async () => {
+    if (!navigator.geolocation) {
+      toast.error('Geolocation is not supported by this browser');
+      return;
+    }
+
+    setIsDetectingLocation(true);
+
+    try {
+      // Get current position
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 300000 // 5 minutes
+        });
+      });
+
+      const { latitude, longitude } = position.coords;
+
+      // Use reverse geocoding to get address details
+      // Try multiple geocoding services for better reliability
+      let data: any;
+      try {
+        // Primary service: BigDataCloud (free, no API key required)
+        const response = await fetch(
+          `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`
+        );
+
+        if (!response.ok) {
+          throw new Error('Primary geocoding service failed');
+        }
+
+        data = await response.json();
+      } catch (primaryError) {
+        console.warn('Primary geocoding failed, trying fallback:', primaryError);
+
+        // Fallback service: OpenStreetMap Nominatim (free, no API key required)
+        const fallbackResponse = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1&accept-language=en`
+        );
+
+        if (!fallbackResponse.ok) {
+          throw new Error('All geocoding services failed');
+        }
+
+        const fallbackData = await fallbackResponse.json();
+
+        // Convert Nominatim format to our expected format
+        data = {
+          city: fallbackData.address?.city || fallbackData.address?.town || fallbackData.address?.village,
+          locality: fallbackData.address?.city || fallbackData.address?.town || fallbackData.address?.village,
+          principalSubdivision: fallbackData.address?.state,
+          administrativeAreaLevel1: fallbackData.address?.state,
+          countryCode: fallbackData.address?.country_code?.toUpperCase(),
+          postcode: fallbackData.address?.postcode,
+          localityInfo: {
+            administrative: [{
+              name: fallbackData.address?.city || fallbackData.address?.town || fallbackData.address?.village
+            }]
+          }
+        };
+      }
+
+      // Update form with detected location
+      setFormData(prev => ({
+        ...prev,
+        address: {
+          line1: data.localityInfo?.administrative?.[0]?.name || data.principalSubdivision || '',
+          city: data.city || data.locality || '',
+          state: data.principalSubdivision || data.administrativeAreaLevel1 || '',
+          country: data.countryCode || 'IN',
+          zipcode: data.postcode || '',
+        }
+      }));
+
+      toast.success('Location detected and address filled automatically!');
+    } catch (error: any) {
+      console.error('Location detection error:', error);
+
+      if (error.code === 1) {
+        toast.error('Location access denied. Please enable location permissions.');
+      } else if (error.code === 2) {
+        toast.error('Location unavailable. Please check your internet connection.');
+      } else if (error.code === 3) {
+        toast.error('Location request timed out. Please try again.');
+      } else {
+        toast.error('Failed to detect location. Please fill the address manually.');
+      }
+    } finally {
+      setIsDetectingLocation(false);
+    }
+  };
+
   return (
     <div className={`min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 ${className}`}>
       <div className="max-w-md w-full space-y-8">
@@ -223,10 +371,25 @@ export default function RegisterForm({ className = '' }: RegisterFormProps) {
 
             {/* Address Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900 flex items-center">
-                <MapPin className="h-5 w-5 text-gray-400 mr-2" />
-                Address Information
-              </h3>
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium text-gray-900 flex items-center">
+                  <MapPin className="h-5 w-5 text-gray-400 mr-2" />
+                  Address Information
+                </h3>
+                <button
+                  type="button"
+                  onClick={detectLocation}
+                  disabled={isDetectingLocation}
+                  className="flex items-center gap-2 px-3 py-1.5 text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isDetectingLocation ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <MapPinIcon className="h-4 w-4" />
+                  )}
+                  {isDetectingLocation ? 'Detecting...' : 'Auto-fill'}
+                </button>
+              </div>
 
               <Input
                 label="Address Line 1"

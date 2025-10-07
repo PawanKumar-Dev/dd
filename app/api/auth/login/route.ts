@@ -46,6 +46,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check if user account is activated
+    if (!user.isActivated) {
+      return NextResponse.json(
+        {
+          error: "Account not activated",
+          requiresActivation: true,
+          message:
+            "Please check your email and click the activation link to activate your account.",
+        },
+        { status: 401 }
+      );
+    }
+
     // Verify password
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
