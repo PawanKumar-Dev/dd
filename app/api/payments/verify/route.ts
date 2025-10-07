@@ -207,6 +207,7 @@ export async function POST(request: NextRequest) {
             firstName: user.firstName,
             lastName: user.lastName,
             phone: user.phone,
+            companyName: user.companyName,
             address: user.address
               ? {
                   line1: user.address.line1,

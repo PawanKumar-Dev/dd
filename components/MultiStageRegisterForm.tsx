@@ -22,6 +22,7 @@ export default function MultiStageRegisterForm({ className = '' }: RegisterFormP
     password: '',
     confirmPassword: '',
     phone: '',
+    phoneCc: '+91',
     companyName: '',
     address: {
       line1: '',
@@ -47,7 +48,7 @@ export default function MultiStageRegisterForm({ className = '' }: RegisterFormP
       case 1: // Personal Info
         return !!(formData.firstName && formData.lastName && formData.email && formData.companyName);
       case 2: // Contact Info
-        return !!(formData.phone);
+        return !!(formData.phone && formData.phoneCc);
       case 3: // Address Info
         return !!(formData.address.line1 && formData.address.city && formData.address.state && formData.address.zipcode);
       case 4: // Password
@@ -371,18 +372,45 @@ export default function MultiStageRegisterForm({ className = '' }: RegisterFormP
               <p className="text-gray-600">How can we reach you?</p>
             </div>
 
-            <Input
-              label="Phone number"
-              name="phone"
-              type="tel"
-              placeholder="Enter your phone number"
-              value={formData.phone}
-              onChange={handleChange}
-              required
-              fullWidth
-              icon={<Phone className="h-4 w-4 text-gray-400" />}
-              helperText="Include country code (e.g., +91 for India)"
-            />
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Country Code
+                </label>
+                <select
+                  name="phoneCc"
+                  value={formData.phoneCc}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+                >
+                  <option value="+91">🇮🇳 +91 (India)</option>
+                  <option value="+1">🇺🇸 +1 (USA)</option>
+                  <option value="+44">🇬🇧 +44 (UK)</option>
+                  <option value="+61">🇦🇺 +61 (Australia)</option>
+                  <option value="+49">🇩🇪 +49 (Germany)</option>
+                  <option value="+33">🇫🇷 +33 (France)</option>
+                  <option value="+65">🇸🇬 +65 (Singapore)</option>
+                  <option value="+971">🇦🇪 +971 (UAE)</option>
+                  <option value="+81">🇯🇵 +81 (Japan)</option>
+                  <option value="+86">🇨🇳 +86 (China)</option>
+                </select>
+              </div>
+              <div className="col-span-2">
+                <Input
+                  label="Phone number"
+                  name="phone"
+                  type="tel"
+                  placeholder="Enter your phone number"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  required
+                  fullWidth
+                  icon={<Phone className="h-4 w-4 text-gray-400" />}
+                  helperText="Enter phone number without country code"
+                />
+              </div>
+            </div>
           </div>
         );
 

@@ -8,8 +8,16 @@ import crypto from "crypto";
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, firstName, lastName, phone, address } =
-      await request.json();
+    const {
+      email,
+      password,
+      firstName,
+      lastName,
+      phone,
+      phoneCc,
+      companyName,
+      address,
+    } = await request.json();
 
     // Validate all inputs
     const emailValidation = InputValidator.validateEmail(email);
@@ -23,6 +31,11 @@ export async function POST(request: NextRequest) {
       "Last name"
     );
     const phoneValidation = InputValidator.validatePhone(phone);
+    const phoneCcValidation = InputValidator.validatePhoneCc(phoneCc);
+    const companyNameValidation = InputValidator.validateName(
+      companyName,
+      "Company name"
+    );
     const addressValidation = InputValidator.validateAddress(address);
 
     const allErrors = [
@@ -31,6 +44,8 @@ export async function POST(request: NextRequest) {
       ...firstNameValidation.errors,
       ...lastNameValidation.errors,
       ...phoneValidation.errors,
+      ...phoneCcValidation.errors,
+      ...companyNameValidation.errors,
       ...addressValidation.errors,
     ];
 
@@ -65,6 +80,8 @@ export async function POST(request: NextRequest) {
       firstName: firstNameValidation.sanitized,
       lastName: lastNameValidation.sanitized,
       phone: phoneValidation.sanitized,
+      phoneCc: phoneCcValidation.sanitized,
+      companyName: companyNameValidation.sanitized,
       address: addressValidation.sanitized,
       role: "user",
       isActivated: false,

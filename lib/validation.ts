@@ -188,6 +188,44 @@ export class InputValidator {
   }
 
   /**
+   * Validate and sanitize phone country code
+   */
+  static validatePhoneCc(phoneCc: string): ValidationResult {
+    const errors: string[] = [];
+
+    if (!phoneCc || typeof phoneCc !== "string") {
+      errors.push("Phone country code is required");
+      return { isValid: false, errors };
+    }
+
+    // Buffer overflow protection - limit input size
+    if (phoneCc.length > 10) {
+      errors.push("Phone country code is too long");
+      return { isValid: false, errors };
+    }
+
+    // Trim whitespace
+    const sanitized = phoneCc.trim();
+
+    // Validate country code format (+XX or +XXX)
+    if (!/^\+[1-9]\d{0,3}$/.test(sanitized)) {
+      errors.push("Phone country code must be in format +XX or +XXX (e.g., +91, +1, +44)");
+    }
+
+    // Enhanced security validation
+    const securityCheck = SecurityValidator.containsMaliciousPatterns(sanitized);
+    if (securityCheck.isMalicious) {
+      errors.push("Phone country code contains potentially malicious content");
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors,
+      sanitized: securityCheck.sanitized,
+    };
+  }
+
+  /**
    * Validate and sanitize address
    */
   static validateAddress(address: {

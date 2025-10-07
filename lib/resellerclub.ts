@@ -1015,6 +1015,8 @@ export class ResellerClubAPI {
     firstName: string;
     lastName: string;
     phone?: string;
+    phoneCc?: string;
+    companyName?: string;
     address?: {
       line1: string;
       city: string;
@@ -1041,13 +1043,14 @@ export class ResellerClubAPI {
         username: userData.email,
         passwd: `TempPass${Date.now()}`, // Generate temporary password
         name: `${userData.firstName} ${userData.lastName}`,
-        company: `${userData.firstName} ${userData.lastName}`, // Use full name as company
+        company:
+          userData.companyName || `${userData.firstName} ${userData.lastName}`, // Use companyName from user data
         addressLine1: userData.address?.line1 || "Default Address",
         city: userData.address?.city || "Default City",
         state: userData.address?.state || "Default State",
         country: userData.address?.country || "IN",
         zipcode: userData.address?.zipcode || "000000",
-        phoneCc: "91", // Default to India
+        phoneCc: userData.phoneCc?.replace('+', '') || "91", // Use user's phone country code or default to India
         phone: userData.phone || "0000000000",
         langPref: "en",
       });
@@ -1075,14 +1078,15 @@ export class ResellerClubAPI {
       const contactResult = await ResellerClubAPI.createContact({
         customerId: customerId,
         name: `${userData.firstName} ${userData.lastName}`,
-        company: `${userData.firstName} ${userData.lastName}`, // Use full name as company
+        company:
+          userData.companyName || `${userData.firstName} ${userData.lastName}`, // Use companyName from user data
         email: userData.email,
         addressLine1: userData.address?.line1 || "Default Address",
         city: userData.address?.city || "Default City",
         state: userData.address?.state || "Default State",
         country: userData.address?.country || "IN",
         zipcode: userData.address?.zipcode || "000000",
-        phoneCc: "91", // Default to India
+        phoneCc: userData.phoneCc?.replace('+', '') || "91", // Use user's phone country code or default to India
         phone: userData.phone || "0000000000",
         type: "Contact",
       });
