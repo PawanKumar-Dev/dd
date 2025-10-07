@@ -64,6 +64,18 @@ export default function CheckoutPage() {
     };
   }, [router, syncWithServer]);
 
+  // Redirect to dashboard if cart is empty (after cart has been loaded)
+  useEffect(() => {
+    if (!isLoading && cartItems.length === 0 && user) {
+      // Small delay to prevent immediate redirect during page load
+      const timer = setTimeout(() => {
+        router.push('/dashboard');
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [cartItems.length, isLoading, user, router]);
+
   const handlePayment = async () => {
     if (cartItems.length === 0) {
       toast.error('Cart is empty');
@@ -144,13 +156,11 @@ export default function CheckoutPage() {
 
               sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
 
+              // Clear cart immediately before redirect
+              clearCart();
+
               // Redirect immediately to success page
               router.push('/payment-success');
-
-              // Clear cart in background after redirect (user won't see this)
-              setTimeout(() => {
-                clearCart();
-              }, 100);
             } else {
               // Store payment result in session storage for cleaner URL
               const paymentResult = {
@@ -163,13 +173,11 @@ export default function CheckoutPage() {
 
               sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
 
+              // Clear cart immediately before redirect
+              clearCart();
+
               // Redirect immediately to success page
               router.push('/payment-success');
-
-              // Clear cart in background after redirect (user won't see this)
-              setTimeout(() => {
-                clearCart();
-              }, 100);
             }
           } catch (error) {
             console.error('Payment verification error:', error);
@@ -185,13 +193,11 @@ export default function CheckoutPage() {
 
             sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
 
+            // Clear cart immediately before redirect
+            clearCart();
+
             // Redirect immediately to success page
             router.push('/payment-success');
-
-            // Clear cart in background after redirect (user won't see this)
-            setTimeout(() => {
-              clearCart();
-            }, 100);
           }
         },
         prefill: {
@@ -241,13 +247,11 @@ export default function CheckoutPage() {
 
         sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
 
+        // Clear cart immediately before redirect
+        clearCart();
+
         // Redirect immediately to success page
         router.push('/payment-success');
-
-        // Clear cart in background after redirect (user won't see this)
-        setTimeout(() => {
-          clearCart();
-        }, 100);
       });
 
       rzp.open();
@@ -266,13 +270,11 @@ export default function CheckoutPage() {
 
       sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
 
+      // Clear cart immediately before redirect
+      clearCart();
+
       // Redirect immediately to success page
       router.push('/payment-success');
-
-      // Clear cart in background after redirect (user won't see this)
-      setTimeout(() => {
-        clearCart();
-      }, 100);
     }
   };
 
@@ -292,13 +294,14 @@ export default function CheckoutPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 max-w-md">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Cart is Empty</h2>
-            <p className="text-gray-600 mb-6">Add some domains to your cart before proceeding to checkout.</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Redirecting...</h2>
+            <p className="text-gray-600 mb-6">Your cart is empty. Redirecting you to the dashboard.</p>
             <button
-              onClick={() => router.push('/')}
+              onClick={() => router.push('/dashboard')}
               className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
             >
-              Browse Domains
+              Go to Dashboard
             </button>
           </div>
         </div>
