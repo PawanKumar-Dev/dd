@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { AuthService } from "@/lib/auth";
 import { RazorpayService } from "@/lib/razorpay";
 import { ResellerClubWrapper } from "@/lib/resellerclub-wrapper";
+import { ResellerClubAPI } from "@/lib/resellerclub";
 import { EmailService } from "@/lib/email";
 import connectDB from "@/lib/mongodb";
 import Order from "@/models/Order";
@@ -199,11 +200,36 @@ export async function POST(request: NextRequest) {
           );
         }
 
+        // Get or create ResellerClub customer ID
+        const customerResult = await ResellerClubAPI.getOrCreateCustomer({
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          phone: user.phone,
+          address: user.address
+            ? {
+                line1: user.address.line1,
+                city: user.address.city,
+                state: user.address.state,
+                country: user.address.country,
+                zipcode: user.address.zipcode,
+              }
+            : undefined,
+        });
+
+        if (customerResult.status !== "success" || !customerResult.customerId) {
+          console.error(
+            `❌ [PAYMENT-VERIFY] Failed to get ResellerClub customer ID for user ${user.email}:`,
+            customerResult.error
+          );
+          throw new Error("Failed to get ResellerClub customer ID");
+        }
+
         const result = await ResellerClubWrapper.registerDomain(
           {
             domainName: item.domainName,
             years: item.registrationPeriod || 1,
-            customerId: user._id,
+            customerId: customerResult.customerId, // Use ResellerClub customer ID
             nameServers: nameServers, // Will use ResellerClub defaults if undefined
           },
           testingMode
