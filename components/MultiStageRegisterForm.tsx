@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Eye, EyeOff, Lock, Mail, User, UserPlus, Phone, MapPin, MapPinIcon, Loader2, CheckCircle } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, User, UserPlus, Phone, MapPin, MapPinIcon, Loader2, CheckCircle, Building } from 'lucide-react';
 import Button from './Button';
 import Input from './Input';
 import Card from './Card';
@@ -22,6 +22,7 @@ export default function MultiStageRegisterForm({ className = '' }: RegisterFormP
     password: '',
     confirmPassword: '',
     phone: '',
+    companyName: '',
     address: {
       line1: '',
       city: '',
@@ -44,7 +45,7 @@ export default function MultiStageRegisterForm({ className = '' }: RegisterFormP
   const validateStep = (step: number): boolean => {
     switch (step) {
       case 1: // Personal Info
-        return !!(formData.firstName && formData.lastName && formData.email);
+        return !!(formData.firstName && formData.lastName && formData.email && formData.companyName);
       case 2: // Contact Info
         return !!(formData.phone);
       case 3: // Address Info
@@ -343,6 +344,18 @@ export default function MultiStageRegisterForm({ className = '' }: RegisterFormP
               required
               fullWidth
               icon={<Mail className="h-4 w-4 text-gray-400" />}
+            />
+
+            <Input
+              label="Company name"
+              name="companyName"
+              placeholder="Enter your company name"
+              value={formData.companyName}
+              onChange={handleChange}
+              required
+              fullWidth
+              icon={<Building className="h-4 w-4 text-gray-400" />}
+              helperText="Required for ResellerClub registration"
             />
           </div>
         );

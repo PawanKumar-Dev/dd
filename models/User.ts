@@ -7,7 +7,7 @@ export interface IUser extends Document {
   firstName: string;
   lastName: string;
   phone: string;
-  companyName?: string;
+  companyName: string;
   address: {
     line1: string;
     city: string;
@@ -62,6 +62,7 @@ const UserSchema = new Schema<IUser>(
     },
     companyName: {
       type: String,
+      required: [true, "Company name is required"],
       trim: true,
     },
     address: {

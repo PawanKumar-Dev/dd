@@ -858,7 +858,7 @@ export class ResellerClubAPI {
           username: customerData.username,
           passwd: customerData.passwd,
           name: customerData.name,
-          company: customerData.company || "",
+          company: customerData.company || customerData.name, // Use name as company if not provided
           "address-line-1": customerData.addressLine1,
           city: customerData.city,
           state: customerData.state,
@@ -945,7 +945,7 @@ export class ResellerClubAPI {
         params: {
           "customer-id": contactData.customerId,
           name: contactData.name,
-          company: contactData.company || "",
+          company: contactData.company || contactData.name, // Use name as company if not provided
           email: contactData.email,
           "address-line-1": contactData.addressLine1,
           city: contactData.city,
@@ -1041,7 +1041,7 @@ export class ResellerClubAPI {
         username: userData.email,
         passwd: `TempPass${Date.now()}`, // Generate temporary password
         name: `${userData.firstName} ${userData.lastName}`,
-        company: "",
+        company: `${userData.firstName} ${userData.lastName}`, // Use full name as company
         addressLine1: userData.address?.line1 || "Default Address",
         city: userData.address?.city || "Default City",
         state: userData.address?.state || "Default State",
@@ -1075,7 +1075,7 @@ export class ResellerClubAPI {
       const contactResult = await ResellerClubAPI.createContact({
         customerId: customerId,
         name: `${userData.firstName} ${userData.lastName}`,
-        company: "",
+        company: `${userData.firstName} ${userData.lastName}`, // Use full name as company
         email: userData.email,
         addressLine1: userData.address?.line1 || "Default Address",
         city: userData.address?.city || "Default City",
