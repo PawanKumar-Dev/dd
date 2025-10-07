@@ -1,6 +1,6 @@
 # Excel Technologies - Domain Management System
 
-A modern, full-stack domain management platform built with Next.js 14, featuring live ResellerClub API integration, secure payment processing, and comprehensive admin tools.
+A modern, full-stack domain management platform built with Next.js 14, featuring complete ResellerClub API integration, secure payment processing, and comprehensive admin tools.
 
 ## 🎯 Overview
 
@@ -12,15 +12,15 @@ Complete domain registration and management solution with real-time pricing, sec
 
 - **Live Domain Search** - Real-time availability with ResellerClub API
 - **Promotional Pricing** - Dynamic pricing with promotional offers
-- **DNS Management** - Complete DNS record management
-- **Domain Transfer** - Seamless domain transfer process
+- **DNS Management** - Complete DNS record management with ResellerClub nameservers
+- **Domain Registration** - Complete ResellerClub API integration
 
 ### 💳 Payment & Security
 
 - **Multi-layer Payment Verification** - Razorpay integration with signature verification
 - **Secure Authentication** - JWT-based auth with role-based access
 - **Payment Security** - Domain registration only after confirmed payment
-- **Failed Domain Handling** - Automatic retry and refund processes
+- **Failed Domain Handling** - Automatic admin alerts and retry processes
 
 ### 👥 User Experience
 
@@ -113,6 +113,29 @@ ADMIN_EMAIL=admin@yourdomain.com
 - **Admin Panel** - Comprehensive management tools
 - **User Dashboard** - Customer account interface
 
+## 🔧 ResellerClub API Integration
+
+### Complete Domain Registration Flow
+
+1. **Search Domain** - Check availability via `/api/domains/search.json`
+2. **Create Customer** - Create ResellerClub customer via `/api/customers/signup.json`
+3. **Create Contact** - Create contact via `/api/contacts/add.json`
+4. **Register Domain** - Register domain via `/api/domains/register.json`
+
+### API Methods
+
+- `ResellerClubAPI.searchDomain()` - Domain availability search
+- `ResellerClubAPI.createCustomer()` - Customer creation
+- `ResellerClubAPI.createContact()` - Contact creation
+- `ResellerClubAPI.registerDomain()` - Domain registration
+- `ResellerClubAPI.getOrCreateCustomerAndContact()` - Complete flow helper
+
+### Default Configuration
+
+- **Nameservers**: ResellerClub default nameservers
+- **Customer ID**: Configurable default customer ID
+- **Contact ID**: Configurable default contact ID
+
 ## 📱 Pages & Routes
 
 ### Public Pages
@@ -135,7 +158,7 @@ ADMIN_EMAIL=admin@yourdomain.com
 
 ### Admin Pages
 
-- `/admin/dashboard` - Admin overview
+- `/admin/dashboard` - Admin overview with failed domain alerts
 - `/admin/user-management` - User administration
 - `/admin/order-management` - Order tracking
 - `/admin/payment-management` - Payment monitoring
@@ -203,6 +226,7 @@ npm start
 3. Configure ResellerClub API credentials
 4. Set up Razorpay account
 5. Configure SMTP for email notifications
+6. Update default ResellerClub customer and contact IDs
 
 ## 📈 Performance
 
@@ -212,13 +236,43 @@ npm start
 - **Lazy Loading** - Component lazy loading
 - **Bundle Optimization** - Webpack optimization
 
-## 🔄 Recent Updates (v2.2.0)
+## 🔄 Recent Updates (v2.3.0)
 
-- **Admin Notifications** - Real-time failed domain registration alerts
+### ResellerClub API Integration
+
+- **Complete Domain Registration Flow** - Full ResellerClub API integration
+- **Customer Management** - ResellerClub customer creation and management
+- **Contact Management** - ResellerClub contact creation and management
+- **Proper ID Management** - Numeric customer and contact IDs
+- **Nameserver Configuration** - ResellerClub default nameservers
+
+### Admin Notifications
+
+- **Real-time Alerts** - Failed domain registration notifications
 - **Enhanced UI** - Improved admin dashboard with notifications
 - **Payment Security** - Background cart clearing after payment
 - **Error Handling** - Better failed domain registration handling
-- **User Experience** - Smoother checkout and payment flow
+
+### User Experience
+
+- **Smoother Checkout** - Improved payment and registration flow
+- **Responsive Design** - Mobile-first approach
+- **Live Pricing** - Real-time domain pricing from ResellerClub
+
+## 🔧 Configuration
+
+### ResellerClub Setup
+
+1. Get ResellerClub API credentials
+2. Update `RESELLERCLUB_USERNAME` and `RESELLERCLUB_API_KEY`
+3. Replace default customer and contact IDs in `lib/resellerclub.ts`
+4. Configure nameservers in system settings
+
+### Payment Setup
+
+1. Create Razorpay account
+2. Get API keys and webhook secret
+3. Configure webhook URL: `https://yourdomain.com/api/webhooks/razorpay`
 
 ## 📞 Support
 
