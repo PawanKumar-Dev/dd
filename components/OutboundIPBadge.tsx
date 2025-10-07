@@ -25,10 +25,10 @@ export default function OutboundIPBadge() {
       try {
         setLoading(true);
         setError(null);
-        
+
         const response = await fetch('/api/check-ip');
         const data = await response.json();
-        
+
         if (data.success) {
           setIpData(data);
         } else {
@@ -42,10 +42,10 @@ export default function OutboundIPBadge() {
     };
 
     fetchIP();
-    
+
     // Refresh IP every 5 minutes
     const interval = setInterval(fetchIP, 5 * 60 * 1000);
-    
+
     return () => clearInterval(interval);
   }, []);
 
@@ -75,8 +75,8 @@ export default function OutboundIPBadge() {
   const isMultipleIPs = allIPs.length > 1;
 
   return (
-    <Badge 
-      variant={isMultipleIPs ? "secondary" : "default"} 
+    <Badge
+      variant={isMultipleIPs ? "secondary" : "default"}
       className="text-xs cursor-help"
       title={`Outbound IP: ${primaryIP}${isMultipleIPs ? `\nAll IPs: ${allIPs.join(', ')}` : ''}\nLast checked: ${new Date(timestamp).toLocaleString()}`}
     >

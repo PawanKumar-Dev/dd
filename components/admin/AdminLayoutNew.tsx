@@ -130,7 +130,7 @@ export default function AdminLayoutNew({ children, user, onLogout }: AdminLayout
                 <span className="text-xs text-gray-500">IP:</span>
                 <OutboundIPBadge />
               </div>
-              
+
               {/* Admin User Info - Right aligned */}
               <div className="flex items-center space-x-3 bg-gray-50 rounded-lg px-3 py-2">
                 <div className="h-8 w-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-sm">
