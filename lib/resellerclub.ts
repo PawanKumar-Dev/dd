@@ -867,6 +867,9 @@ export class ResellerClubAPI {
           "phone-cc": customerData.phoneCc,
           phone: customerData.phone,
           "lang-pref": customerData.langPref || "en",
+          "reseller-id":
+            process.env.RESELLERCLUB_RESELLER_ID ||
+            process.env.RESELLERCLUB_USERNAME, // Add reseller ID
         },
       });
 
@@ -953,6 +956,9 @@ export class ResellerClubAPI {
           "phone-cc": contactData.phoneCc,
           phone: contactData.phone,
           type: contactData.type,
+          "reseller-id":
+            process.env.RESELLERCLUB_RESELLER_ID ||
+            process.env.RESELLERCLUB_USERNAME, // Add reseller ID
         },
       });
 
@@ -1024,26 +1030,102 @@ export class ResellerClubAPI {
     contactId?: number;
     error?: string;
   }> {
-    // For now, we'll use default ResellerClub customer and contact IDs
-    // In a real implementation, you would:
-    // 1. Check if user already has ResellerClub customer ID and contact ID in your database
-    // 2. If not, create them using createCustomer and createContact methods
-    // 3. Store the ResellerClub IDs in your user record
-
-    // Using default IDs for testing
-    // You should replace these with actual ResellerClub IDs
-    const defaultCustomerId = 19532562; // Replace with your actual ResellerClub customer ID
-    const defaultContactId = 20187243; // Replace with your actual ResellerClub contact ID
-
     console.log(
-      `🔍 [PRODUCTION] Using default ResellerClub IDs - Customer: ${defaultCustomerId}, Contact: ${defaultContactId} for user: ${userData.email}`
+      `🔍 [PRODUCTION] Getting or creating ResellerClub customer and contact for user: ${userData.email}`
     );
 
-    return {
-      status: "success",
-      customerId: defaultCustomerId,
-      contactId: defaultContactId,
-    };
+    try {
+      // TODO: Check if user already has ResellerClub customer ID in your database
+      // For now, we'll create a new customer for each user
+
+      // Create customer
+      const customerResult = await ResellerClubAPI.createCustomer({
+        username: userData.email,
+        passwd: `TempPass${Date.now()}`, // Generate temporary password
+        name: `${userData.firstName} ${userData.lastName}`,
+        company: "",
+        addressLine1: userData.address?.line1 || "Default Address",
+        city: userData.address?.city || "Default City",
+        state: userData.address?.state || "Default State",
+        country: userData.address?.country || "IN",
+        zipcode: userData.address?.zipcode || "000000",
+        phoneCc: "91", // Default to India
+        phone: userData.phone || "0000000000",
+        langPref: "en",
+      });
+
+      if (
+        customerResult.status !== "success" ||
+        !customerResult.data?.customerid
+      ) {
+        console.error(
+          `❌ [PRODUCTION] Failed to create ResellerClub customer for user ${userData.email}:`,
+          customerResult.error
+        );
+        return {
+          status: "error",
+          error: `Failed to create customer: ${customerResult.error}`,
+        };
+      }
+
+      const customerId = parseInt(customerResult.data.customerid);
+      console.log(
+        `✅ [PRODUCTION] Created ResellerClub customer ${customerId} for user: ${userData.email}`
+      );
+
+      // Create contact
+      const contactResult = await ResellerClubAPI.createContact({
+        customerId: customerId,
+        name: `${userData.firstName} ${userData.lastName}`,
+        company: "",
+        email: userData.email,
+        addressLine1: userData.address?.line1 || "Default Address",
+        city: userData.address?.city || "Default City",
+        state: userData.address?.state || "Default State",
+        country: userData.address?.country || "IN",
+        zipcode: userData.address?.zipcode || "000000",
+        phoneCc: "91", // Default to India
+        phone: userData.phone || "0000000000",
+        type: "Contact",
+      });
+
+      if (
+        contactResult.status !== "success" ||
+        !contactResult.data?.contactid
+      ) {
+        console.error(
+          `❌ [PRODUCTION] Failed to create ResellerClub contact for user ${userData.email}:`,
+          contactResult.error
+        );
+        return {
+          status: "error",
+          error: `Failed to create contact: ${contactResult.error}`,
+        };
+      }
+
+      const contactId = parseInt(contactResult.data.contactid);
+      console.log(
+        `✅ [PRODUCTION] Created ResellerClub contact ${contactId} for user: ${userData.email}`
+      );
+
+      // TODO: Store customerId and contactId in your user database record
+      // await updateUserResellerClubIds(userData.email, customerId, contactId);
+
+      return {
+        status: "success",
+        customerId: customerId,
+        contactId: contactId,
+      };
+    } catch (error) {
+      console.error(
+        `❌ [PRODUCTION] Error in getOrCreateCustomerAndContact for user ${userData.email}:`,
+        error
+      );
+      return {
+        status: "error",
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
   }
 
   /**

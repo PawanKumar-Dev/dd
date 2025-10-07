@@ -74,6 +74,7 @@ MONGODB_URI=mongodb://localhost:27017/domain-management
 RESELLERCLUB_API_URL=https://httpapi.com/api
 RESELLERCLUB_USERNAME=your_username
 RESELLERCLUB_API_KEY=your_api_key
+RESELLERCLUB_RESELLER_ID=your_reseller_id
 
 # Razorpay
 RAZORPAY_KEY_ID=your_key_id
