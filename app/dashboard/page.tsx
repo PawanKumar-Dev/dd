@@ -37,6 +37,7 @@ import { useTestingStore } from '@/store/testingStore';
 import Navigation from '@/components/Navigation';
 import ClientOnly from '@/components/ClientOnly';
 import Invoice from '@/components/Invoice';
+import OutboundIPBadge from '@/components/OutboundIPBadge';
 import DNSManagementModal from '@/components/DNSManagementModal';
 import DomainRenewalModal from '@/components/DomainRenewalModal';
 import NameServerManagement from '@/components/NameServerManagement';
@@ -275,8 +276,16 @@ export default function DashboardPage() {
 
         {/* Header Section */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600 mt-2">Welcome back, {user?.firstName}. Manage your domains and orders.</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+              <p className="text-gray-600 mt-2">Welcome back, {user?.firstName}. Manage your domains and orders.</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-500">Server IP:</span>
+              <OutboundIPBadge />
+            </div>
+          </div>
         </div>
 
         {/* Quick Actions */}
@@ -318,8 +327,8 @@ export default function DashboardPage() {
             <button
               onClick={() => setActiveTab('cart')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'cart'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
             >
               <ShoppingCart className="h-4 w-4 inline mr-2" />
@@ -328,8 +337,8 @@ export default function DashboardPage() {
             <button
               onClick={() => setActiveTab('domains')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'domains'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
             >
               <Globe className="h-4 w-4 inline mr-2" />
@@ -338,8 +347,8 @@ export default function DashboardPage() {
             <button
               onClick={() => setActiveTab('orders')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'orders'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
             >
               <Receipt className="h-4 w-4 inline mr-2" />
@@ -348,8 +357,8 @@ export default function DashboardPage() {
             <button
               onClick={() => setActiveTab('nameservers')}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === 'nameservers'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
             >
               <Server className="h-4 w-4 inline mr-2" />

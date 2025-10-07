@@ -16,6 +16,7 @@ import {
 import AdminLayout from '@/components/admin/AdminLayoutNew';
 import AdminDataTable from '@/components/admin/AdminDataTable';
 import FailedDomainNotifications from '@/components/admin/FailedDomainNotifications';
+import OutboundIPBadge from '@/components/OutboundIPBadge';
 
 interface User {
   _id: string;
@@ -257,8 +258,16 @@ export default function AdminDashboard() {
       <div className="space-y-6">
         {/* Page Header */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
-          <p className="text-gray-600 mt-2">Welcome back, {user?.firstName}. Here's what's happening with your system.</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
+              <p className="text-gray-600 mt-2">Welcome back, {user?.firstName}. Here's what's happening with your system.</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-500">Outbound IP:</span>
+              <OutboundIPBadge />
+            </div>
+          </div>
         </div>
 
         {/* Failed Domain Registration Notifications */}
