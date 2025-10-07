@@ -37,7 +37,6 @@ import { useTestingStore } from '@/store/testingStore';
 import Navigation from '@/components/Navigation';
 import ClientOnly from '@/components/ClientOnly';
 import Invoice from '@/components/Invoice';
-import OutboundIPBadge from '@/components/OutboundIPBadge';
 import DNSManagementModal from '@/components/DNSManagementModal';
 import DomainRenewalModal from '@/components/DomainRenewalModal';
 import NameServerManagement from '@/components/NameServerManagement';
@@ -280,10 +279,6 @@ export default function DashboardPage() {
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
               <p className="text-gray-600 mt-2">Welcome back, {user?.firstName}. Manage your domains and orders.</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-500">Server IP:</span>
-              <OutboundIPBadge />
             </div>
           </div>
         </div>

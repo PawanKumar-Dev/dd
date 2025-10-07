@@ -17,7 +17,6 @@ import {
   Receipt,
   DollarSign
 } from 'lucide-react';
-import OutboundIPBadge from '@/components/OutboundIPBadge';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -39,7 +38,7 @@ export default function AdminLayoutNew({ children, user, onLogout }: AdminLayout
     { name: 'Orders', href: '/admin/order-management', icon: Receipt },
     { name: 'Payments', href: '/admin/payment-management', icon: CreditCard },
     { name: 'TLD Pricing', href: '/admin/pricing-management', icon: DollarSign },
-    { name: 'Settings', href: '/admin/system-settings', icon: Settings },
+    { name: 'Settings', href: '/admin/settings', icon: Settings },
   ];
 
   const isActive = (href: string) => {
@@ -125,12 +124,6 @@ export default function AdminLayoutNew({ children, user, onLogout }: AdminLayout
 
             {/* Right side - Admin user info */}
             <div className="flex items-center space-x-3 ml-auto">
-              {/* Outbound IP Badge */}
-              <div className="hidden sm:flex items-center space-x-2">
-                <span className="text-xs text-gray-500">IP:</span>
-                <OutboundIPBadge />
-              </div>
-
               {/* Admin User Info - Right aligned */}
               <div className="flex items-center space-x-3 bg-gray-50 rounded-lg px-3 py-2">
                 <div className="h-8 w-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-sm">
