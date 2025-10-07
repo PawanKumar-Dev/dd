@@ -215,11 +215,10 @@ npm start
 
 ### Feature Flags
 
-| Variable                     | Default | Description                          |
-| ---------------------------- | ------- | ------------------------------------ |
-| `TESTING_MODE`               | `false` | Enable testing mode for ResellerClub |
-| `ENABLE_EMAIL_NOTIFICATIONS` | `true`  | Enable email notifications           |
-| `ENABLE_ADMIN_NOTIFICATIONS` | `true`  | Enable admin notifications           |
+| Variable                     | Default | Description                |
+| ---------------------------- | ------- | -------------------------- |
+| `ENABLE_EMAIL_NOTIFICATIONS` | `true`  | Enable email notifications |
+| `ENABLE_ADMIN_NOTIFICATIONS` | `true`  | Enable admin notifications |
 
 ## 🚨 Security Checklist
 
