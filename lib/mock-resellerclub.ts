@@ -89,11 +89,11 @@ export class MockResellerClubAPI {
   static async registerDomain(domainData: {
     domainName: string;
     years: number;
-    customerId: string;
+    customerId: number; // ResellerClub customer ID (numeric)
     nameServers?: string[];
-    adminContactId?: string;
-    techContactId?: string;
-    billingContactId?: string;
+    adminContactId?: number; // ResellerClub contact ID (numeric)
+    techContactId?: number; // ResellerClub contact ID (numeric)
+    billingContactId?: number; // ResellerClub contact ID (numeric)
   }): Promise<ResellerClubResponse> {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
