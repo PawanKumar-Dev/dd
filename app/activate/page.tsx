@@ -23,18 +23,80 @@ export default function ActivatePage() {
   useEffect(() => {
     if (token) {
       activateAccount(token);
-    } else if (emailParam && messageParam) {
-      // User came from login page with activation required
-      setUserEmail(emailParam);
-      setActivationStatus('invalid');
-      setMessage(decodeURIComponent(messageParam));
-      setIsLoading(false);
+    } else if (messageParam) {
+      // User came from dashboard or login page with activation required
+      const decodedMessage = decodeURIComponent(messageParam);
+      setMessage(decodedMessage);
+
+      if (decodedMessage.includes('Account not activated')) {
+        // User came from dashboard - check if they're actually activated
+        checkActivationStatus();
+      } else {
+        // User came from login page with activation required
+        setActivationStatus('invalid');
+        setMessage(decodedMessage);
+        setIsLoading(false);
+      }
     } else {
       setActivationStatus('invalid');
       setMessage('Invalid activation link. Please check your email and try again.');
       setIsLoading(false);
     }
   }, [token, emailParam, messageParam]);
+
+  const checkActivationStatus = async () => {
+    try {
+      setIsLoading(true);
+
+      // Get token from localStorage for API call
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        // User not logged in, redirect to login immediately
+        router.push('/login?message=Please log in to activate your account.');
+        return;
+      }
+
+      // Make fresh API call to get current user status
+      const response = await fetch('/api/auth/me', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.user) {
+        // Update localStorage with fresh data
+        localStorage.setItem('user', JSON.stringify(data.user));
+
+        if (data.user.isActivated) {
+          // User is already activated, redirect to dashboard
+          setActivationStatus('success');
+          setMessage('Your account is already activated! Redirecting to dashboard...');
+          setTimeout(() => {
+            router.push('/dashboard');
+          }, 2000);
+        } else {
+          // User is not activated, show activation required message
+          setActivationStatus('invalid');
+          setMessage('Your account is not activated. Please check your email for the activation link.');
+        }
+      } else {
+        // API call failed, redirect to login
+        router.push('/login?message=Please log in to activate your account.');
+      }
+    } catch (error) {
+      console.error('Check activation status error:', error);
+      // If there's an error checking status, redirect to login
+      router.push('/login?message=Unable to check activation status. Please log in.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const activateAccount = async (activationToken: string) => {
     try {
@@ -54,10 +116,19 @@ export default function ActivatePage() {
         setMessage(data.message);
         setUserEmail(data.user?.email || '');
 
-        // Redirect to login after 3 seconds
+        // Store token and user data in localStorage for immediate login
+        if (data.token && data.user) {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+
+          // Store token in cookie for server-side access
+          document.cookie = `token=${data.token}; path=/; max-age=${24 * 60 * 60}`;
+        }
+
+        // Redirect to dashboard after 2 seconds
         setTimeout(() => {
-          router.push('/login?activated=true');
-        }, 3000);
+          router.push('/dashboard');
+        }, 2000);
       } else {
         if (data.error === 'Token expired') {
           setActivationStatus('expired');

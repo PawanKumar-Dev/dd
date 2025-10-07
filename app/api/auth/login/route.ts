@@ -87,6 +87,8 @@ export async function POST(request: NextRequest) {
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
+        isActivated: user.isActivated,
+        isActive: user.isActive,
       },
     });
   } catch (error) {
