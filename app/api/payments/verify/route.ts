@@ -200,29 +200,34 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        // Get or create ResellerClub customer ID
-        const customerResult = await ResellerClubAPI.getOrCreateCustomer({
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          phone: user.phone,
-          address: user.address
-            ? {
-                line1: user.address.line1,
-                city: user.address.city,
-                state: user.address.state,
-                country: user.address.country,
-                zipcode: user.address.zipcode,
-              }
-            : undefined,
-        });
+        // Get or create ResellerClub customer and contact IDs
+        const customerResult =
+          await ResellerClubAPI.getOrCreateCustomerAndContact({
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            phone: user.phone,
+            address: user.address
+              ? {
+                  line1: user.address.line1,
+                  city: user.address.city,
+                  state: user.address.state,
+                  country: user.address.country,
+                  zipcode: user.address.zipcode,
+                }
+              : undefined,
+          });
 
-        if (customerResult.status !== "success" || !customerResult.customerId) {
+        if (
+          customerResult.status !== "success" ||
+          !customerResult.customerId ||
+          !customerResult.contactId
+        ) {
           console.error(
-            `❌ [PAYMENT-VERIFY] Failed to get ResellerClub customer ID for user ${user.email}:`,
+            `❌ [PAYMENT-VERIFY] Failed to get ResellerClub customer/contact IDs for user ${user.email}:`,
             customerResult.error
           );
-          throw new Error("Failed to get ResellerClub customer ID");
+          throw new Error("Failed to get ResellerClub customer/contact IDs");
         }
 
         const result = await ResellerClubWrapper.registerDomain(
@@ -230,6 +235,9 @@ export async function POST(request: NextRequest) {
             domainName: item.domainName,
             years: item.registrationPeriod || 1,
             customerId: customerResult.customerId, // Use ResellerClub customer ID
+            adminContactId: customerResult.contactId, // Use ResellerClub contact ID for admin
+            techContactId: customerResult.contactId, // Use same contact ID for tech
+            billingContactId: customerResult.contactId, // Use same contact ID for billing
             nameServers: nameServers, // Will use ResellerClub defaults if undefined
           },
           testingMode
