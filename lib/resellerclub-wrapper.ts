@@ -72,11 +72,11 @@ export class ResellerClubWrapper {
     domainData: {
       domainName: string;
       years: number;
-      customerId: string;
+      customerId: number; // ResellerClub customer ID (numeric)
       nameServers?: string[];
-      adminContactId?: string;
-      techContactId?: string;
-      billingContactId?: string;
+      adminContactId?: number; // ResellerClub contact ID (numeric)
+      techContactId?: number; // ResellerClub contact ID (numeric)
+      billingContactId?: number; // ResellerClub contact ID (numeric)
     },
     isTestingMode: boolean = false
   ): Promise<ResellerClubResponse> {
@@ -143,7 +143,7 @@ export class ResellerClubWrapper {
     }
 
     // TODO: Implement domain renewal
-    throw new Error('Domain renewal not implemented yet');
+    throw new Error("Domain renewal not implemented yet");
   }
 
   /**

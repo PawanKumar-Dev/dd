@@ -831,16 +831,227 @@ export class ResellerClubAPI {
   }
 
   /**
+   * Create a customer in ResellerClub system
+   */
+  static async createCustomer(customerData: {
+    username: string;
+    passwd: string;
+    name: string;
+    company?: string;
+    addressLine1: string;
+    city: string;
+    state: string;
+    country: string;
+    zipcode: string;
+    phoneCc: string;
+    phone: string;
+    langPref?: string;
+  }): Promise<{ status: string; data?: any; error?: string }> {
+    const startTime = Date.now();
+    console.log(
+      `🚀 [PRODUCTION] Creating ResellerClub customer: ${customerData.username}`
+    );
+
+    try {
+      const response = await api.post("/api/customers/signup.json", null, {
+        params: {
+          username: customerData.username,
+          passwd: customerData.passwd,
+          name: customerData.name,
+          company: customerData.company || "",
+          "address-line-1": customerData.addressLine1,
+          city: customerData.city,
+          state: customerData.state,
+          country: customerData.country,
+          zipcode: customerData.zipcode,
+          "phone-cc": customerData.phoneCc,
+          phone: customerData.phone,
+          "lang-pref": customerData.langPref || "en",
+        },
+      });
+
+      const responseTime = Date.now() - startTime;
+      console.log(
+        `✅ [PRODUCTION] Customer created successfully in ${responseTime}ms:`,
+        {
+          responseData: response.data,
+          status: response.status,
+        }
+      );
+
+      return {
+        status: "success",
+        data: response.data,
+      };
+    } catch (error) {
+      const responseTime = Date.now() - startTime;
+      console.error(
+        `❌ [PRODUCTION] Customer creation failed after ${responseTime}ms:`,
+        {
+          error: error instanceof Error ? error.message : "Unknown error",
+          stack: error instanceof Error ? error.stack : undefined,
+          axiosError:
+            error instanceof AxiosError
+              ? {
+                  status: error.response?.status,
+                  statusText: error.response?.statusText,
+                  data: error.response?.data,
+                  code: error.code,
+                }
+              : undefined,
+          customerData: {
+            username: customerData.username,
+            name: customerData.name,
+          },
+        }
+      );
+
+      return {
+        status: "error",
+        error:
+          error instanceof AxiosError
+            ? error.response?.data?.message || error.message
+            : "Unknown error occurred",
+      };
+    }
+  }
+
+  /**
+   * Create a contact in ResellerClub system
+   */
+  static async createContact(contactData: {
+    customerId: number;
+    name: string;
+    company?: string;
+    email: string;
+    addressLine1: string;
+    city: string;
+    state: string;
+    country: string;
+    zipcode: string;
+    phoneCc: string;
+    phone: string;
+    type: "Contact" | "CaDomain" | "IrtContact";
+  }): Promise<{ status: string; data?: any; error?: string }> {
+    const startTime = Date.now();
+    console.log(
+      `🚀 [PRODUCTION] Creating ResellerClub contact: ${contactData.name} (${contactData.email})`
+    );
+
+    try {
+      const response = await api.post("/api/contacts/add.json", null, {
+        params: {
+          "customer-id": contactData.customerId,
+          name: contactData.name,
+          company: contactData.company || "",
+          email: contactData.email,
+          "address-line-1": contactData.addressLine1,
+          city: contactData.city,
+          state: contactData.state,
+          country: contactData.country,
+          zipcode: contactData.zipcode,
+          "phone-cc": contactData.phoneCc,
+          phone: contactData.phone,
+          type: contactData.type,
+        },
+      });
+
+      const responseTime = Date.now() - startTime;
+      console.log(
+        `✅ [PRODUCTION] Contact created successfully in ${responseTime}ms:`,
+        {
+          responseData: response.data,
+          status: response.status,
+        }
+      );
+
+      return {
+        status: "success",
+        data: response.data,
+      };
+    } catch (error) {
+      const responseTime = Date.now() - startTime;
+      console.error(
+        `❌ [PRODUCTION] Contact creation failed after ${responseTime}ms:`,
+        {
+          error: error instanceof Error ? error.message : "Unknown error",
+          stack: error instanceof Error ? error.stack : undefined,
+          axiosError:
+            error instanceof AxiosError
+              ? {
+                  status: error.response?.status,
+                  statusText: error.response?.statusText,
+                  data: error.response?.data,
+                  code: error.code,
+                }
+              : undefined,
+          contactData: {
+            name: contactData.name,
+            email: contactData.email,
+            customerId: contactData.customerId,
+          },
+        }
+      );
+
+      return {
+        status: "error",
+        error:
+          error instanceof AxiosError
+            ? error.response?.data?.message || error.message
+            : "Unknown error occurred",
+      };
+    }
+  }
+
+  /**
+   * Get or create a ResellerClub customer and contact for a user
+   */
+  static async getOrCreateCustomerAndContact(userData: {
+    email: string;
+    firstName: string;
+    lastName: string;
+    phone?: string;
+    address?: {
+      line1: string;
+      city: string;
+      state: string;
+      country: string;
+      zipcode: string;
+    };
+  }): Promise<{ status: string; customerId?: number; contactId?: number; error?: string }> {
+    // For now, we'll use default ResellerClub customer and contact IDs
+    // In a real implementation, you would:
+    // 1. Check if user already has ResellerClub customer ID and contact ID in your database
+    // 2. If not, create them using createCustomer and createContact methods
+    // 3. Store the ResellerClub IDs in your user record
+    
+    // Using default IDs for testing
+    // You should replace these with actual ResellerClub IDs
+    const defaultCustomerId = 19532562; // Replace with your actual ResellerClub customer ID
+    const defaultContactId = 20187243; // Replace with your actual ResellerClub contact ID
+    
+    console.log(
+      `🔍 [PRODUCTION] Using default ResellerClub IDs - Customer: ${defaultCustomerId}, Contact: ${defaultContactId} for user: ${userData.email}`
+    );
+    
+    return {
+      status: "success",
+      customerId: defaultCustomerId,
+      contactId: defaultContactId,
+    };
+  }
+
+  /**
    * Register a domain
    */
   static async registerDomain(domainData: {
     domainName: string;
     years: number;
-    customerId: string;
+    customerId: number; // ResellerClub customer ID (numeric)
     nameServers?: string[];
-    adminContactId?: string;
-    techContactId?: string;
-    billingContactId?: string;
+    adminContactId?: number; // ResellerClub contact ID (numeric)
+    techContactId?: number; // ResellerClub contact ID (numeric)
+    billingContactId?: number; // ResellerClub contact ID (numeric)
   }): Promise<ResellerClubResponse> {
     const startTime = Date.now();
     console.log(
@@ -881,7 +1092,7 @@ export class ResellerClubAPI {
       const nameserverParams: any = {
         "domain-name": domainData.domainName,
         years: domainData.years,
-        "customer-id": domainData.customerId.toString(), // Convert ObjectId to string
+        "customer-id": domainData.customerId, // ResellerClub customer ID (numeric)
         "admin-contact-id": domainData.adminContactId,
         "tech-contact-id": domainData.techContactId,
         "billing-contact-id": domainData.billingContactId,
