@@ -240,25 +240,6 @@ export default function AdminPayments() {
       )
     },
     {
-      key: 'refunded',
-      label: 'Refund',
-      sortable: true,
-      render: (value: boolean, row: Payment) => (
-        <div className="text-center">
-          {value ? (
-            <div>
-              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                Refunded
-              </span>
-              <div className="text-xs text-gray-500 mt-1">₹{row.refundAmount}</div>
-            </div>
-          ) : (
-            <span className="text-sm text-gray-400">-</span>
-          )}
-        </div>
-      )
-    },
-    {
       key: 'actions',
       label: 'Actions',
       render: (value: any, row: Payment) => (

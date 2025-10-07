@@ -72,8 +72,8 @@ MONGODB_URI=mongodb://localhost:27017/domain-management
 
 # ResellerClub API
 RESELLERCLUB_API_URL=https://httpapi.com/api
-RESELLERCLUB_USERNAME=your_username
-RESELLERCLUB_API_KEY=your_api_key
+RESELLERCLUB_ID=your_resellerclub_id
+RESELLERCLUB_SECRET=your_resellerclub_secret
 RESELLERCLUB_RESELLER_ID=your_reseller_id
 
 # Razorpay
@@ -91,7 +91,58 @@ FROM_NAME=Excel Technologies
 
 # Admin
 ADMIN_EMAIL=admin@yourdomain.com
+ADMIN_PASSWORD=your-secure-admin-password
+ADMIN_FIRST_NAME=Admin
+ADMIN_LAST_NAME=User
 ```
+
+## 👤 Admin User Management
+
+### Creating Admin User
+
+The system includes a secure admin user recreation script that enforces security best practices:
+
+```bash
+# First time setup - create admin user
+npm run recreate-admin
+```
+
+### Security Features
+
+- **Environment-based Credentials** - Admin credentials must be set in `.env.local`
+- **Single Admin Policy** - Only one admin user allowed at a time
+- **Credential Verification** - Existing admin credentials verified before recreation
+- **No Default Passwords** - Prevents unauthorized access with default credentials
+
+### Admin Recreation Commands
+
+```bash
+# Create admin user (first time)
+npm run recreate-admin
+
+# Force recreation (if admin exists)
+ADMIN_FORCE_RECREATE=true npm run recreate-admin
+
+# Check existing admin (without recreation)
+npm run recreate-admin
+```
+
+### Required Environment Variables
+
+```env
+# Admin credentials (REQUIRED for security)
+ADMIN_EMAIL=admin@yourdomain.com
+ADMIN_PASSWORD=your-secure-admin-password
+ADMIN_FIRST_NAME=Admin
+ADMIN_LAST_NAME=User
+```
+
+### Security Notes
+
+- **Password is hidden** in script output for security
+- **Credentials must match** environment file exactly
+- **Verification required** before any admin changes
+- **No recreation** without proper credentials
 
 ## 🏗️ Architecture
 
