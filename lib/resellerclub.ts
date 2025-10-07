@@ -881,7 +881,7 @@ export class ResellerClubAPI {
       const nameserverParams: any = {
         "domain-name": domainData.domainName,
         years: domainData.years,
-        "customer-id": domainData.customerId,
+        "customer-id": domainData.customerId.toString(), // Convert ObjectId to string
         "admin-contact-id": domainData.adminContactId,
         "tech-contact-id": domainData.techContactId,
         "billing-contact-id": domainData.billingContactId,
