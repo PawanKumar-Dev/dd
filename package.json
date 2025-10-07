@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "setup": "node scripts/setup.js",
-    "init-db": "node scripts/init-db.js"
+    "init-db": "node scripts/init-db.js",
+    "recreate-admin": "node scripts/recreate-admin.js"
   },
   "dependencies": {
     "@headlessui/react": "1.7.17",
