@@ -26,6 +26,12 @@ interface IPData {
     allIPs: string[];
     timestamp: string;
     services: Record<string, any>;
+    serverInfo?: {
+      userAgent?: string;
+      host?: string;
+      forwarded?: string;
+      realIP?: string;
+    };
   };
   error?: string;
 }
@@ -162,13 +168,13 @@ export default function AdminSettings() {
                     <div>
                       <h4 className="font-semibold text-blue-900">Primary Outbound IP</h4>
                       <p className="text-2xl font-mono text-blue-800 mt-1">
-                        {ipData.data.primaryIP}
+                        {ipData.data?.primaryIP || 'N/A'}
                       </p>
                     </div>
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => copyToClipboard(ipData.data.primaryIP)}
+                      onClick={() => copyToClipboard(ipData.data?.primaryIP || '')}
                       className="flex items-center gap-2"
                     >
                       <Copy className="h-4 w-4" />
