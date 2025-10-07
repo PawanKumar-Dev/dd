@@ -247,8 +247,8 @@ Required environment variables:
 MONGODB_URI=mongodb+srv://...
 NEXTAUTH_SECRET=your-secret
 NEXTAUTH_URL=http://localhost:3000
-RESELLERCLUB_API_ID=your-api-id
-RESELLERCLUB_API_KEY=your-api-key
+RESELLERCLUB_ID=your-resellerclub-id
+RESELLERCLUB_SECRET=your-resellerclub-secret
 RESELLERCLUB_API_URL=https://httpapi.com/api
 RAZORPAY_KEY_ID=your-key-id
 RAZORPAY_KEY_SECRET=your-key-secret

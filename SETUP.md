@@ -46,9 +46,9 @@ NEXTAUTH_SECRET=your-nextauth-secret-here
 NEXTAUTH_URL=http://localhost:3000
 
 # ResellerClub API
-RESELLERCLUB_USERNAME=your-username
-RESELLERCLUB_PASSWORD=your-password
-RESELLERCLUB_API_KEY=your-api-key
+RESELLERCLUB_ID=your-resellerclub-id
+RESELLERCLUB_SECRET=your-resellerclub-secret
+RESELLERCLUB_API_URL=https://httpapi.com/api
 RESELLERCLUB_RESELLER_ID=your-reseller-id
 
 # Razorpay Payment
@@ -112,9 +112,9 @@ sudo systemctl enable mongodb
 
 2. **Configure Environment:**
    ```env
-   RESELLERCLUB_USERNAME=your-username
-   RESELLERCLUB_PASSWORD=your-password
-   RESELLERCLUB_API_KEY=your-api-key
+   RESELLERCLUB_ID=your-resellerclub-id
+   RESELLERCLUB_SECRET=your-resellerclub-secret
+   RESELLERCLUB_API_URL=https://httpapi.com/api
    RESELLERCLUB_RESELLER_ID=your-reseller-id
    ```
 
@@ -202,9 +202,8 @@ npm start
 | -------------------------- | -------- | ------------------------- | ------------------------------- |
 | `MONGODB_URI`              | ✅       | MongoDB connection string | `mongodb://localhost:27017/dms` |
 | `JWT_SECRET`               | ✅       | JWT signing secret        | `your-secret-key`               |
-| `RESELLERCLUB_USERNAME`    | ✅       | ResellerClub username     | `your-username`                 |
-| `RESELLERCLUB_PASSWORD`    | ✅       | ResellerClub password     | `your-password`                 |
-| `RESELLERCLUB_API_KEY`     | ✅       | ResellerClub API key      | `your-api-key`                  |
+| `RESELLERCLUB_ID`          | ✅       | ResellerClub ID           | `your-resellerclub-id`          |
+| `RESELLERCLUB_SECRET`      | ✅       | ResellerClub Secret       | `your-resellerclub-secret`      |
 | `RESELLERCLUB_RESELLER_ID` | ✅       | Your ResellerClub ID      | `123456`                        |
 | `RAZORPAY_KEY_ID`          | ✅       | Razorpay key ID           | `rzp_test_xxxxx`                |
 | `RAZORPAY_KEY_SECRET`      | ✅       | Razorpay secret           | `your-secret`                   |

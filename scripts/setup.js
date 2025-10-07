@@ -26,14 +26,14 @@ const questions = [
     default: 'http://localhost:3000'
   },
   {
-    key: 'RESELLERCLUB_API_ID',
-    question: 'Enter your ResellerClub API ID (Auth User ID): ',
-    default: 'your-resellerclub-api-id'
+    key: 'RESELLERCLUB_ID',
+    question: 'Enter your ResellerClub ID: ',
+    default: 'your-resellerclub-id'
   },
   {
-    key: 'RESELLERCLUB_API_KEY',
-    question: 'Enter your ResellerClub API key: ',
-    default: 'your-resellerclub-api-key'
+    key: 'RESELLERCLUB_SECRET',
+    question: 'Enter your ResellerClub Secret: ',
+    default: 'your-resellerclub-secret'
   },
   {
     key: 'RESELLERCLUB_API_URL',

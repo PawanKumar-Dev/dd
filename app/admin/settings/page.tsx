@@ -34,6 +34,16 @@ export default function AdminSettings() {
   const [ipData, setIpData] = useState<IPData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [lastChecked, setLastChecked] = useState<Date | null>(null);
+  const [user, setUser] = useState<{ firstName: string; lastName: string; role: string } | null>(null);
+
+  useEffect(() => {
+    // Mock user data for now - in real app, this would come from auth context
+    setUser({
+      firstName: 'Admin',
+      lastName: 'User',
+      role: 'admin'
+    });
+  }, []);
 
   const fetchOutboundIP = async () => {
     setIsLoading(true);
@@ -76,7 +86,7 @@ export default function AdminSettings() {
   };
 
   return (
-    <AdminLayoutNew>
+    <AdminLayoutNew user={user}>
       <div className="space-y-6">
         {/* Page Header */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

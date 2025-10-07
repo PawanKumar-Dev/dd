@@ -7,7 +7,8 @@ import { InputValidator } from "@/lib/validation";
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, firstName, lastName, phone, companyName, address } = await request.json();
+    const { email, password, firstName, lastName, phone, address } =
+      await request.json();
 
     // Validate all inputs
     const emailValidation = InputValidator.validateEmail(email);
@@ -59,7 +60,6 @@ export async function POST(request: NextRequest) {
       firstName: firstNameValidation.sanitized,
       lastName: lastNameValidation.sanitized,
       phone: phoneValidation.sanitized,
-      companyName: companyName?.trim() || undefined,
       address: addressValidation.sanitized,
       role: "user",
     });

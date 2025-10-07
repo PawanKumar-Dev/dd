@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, Lock, Mail, User, UserPlus, Phone, MapPin, Building } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, User, UserPlus, Phone, MapPin } from 'lucide-react';
 import Button from './Button';
 import Input from './Input';
 import Card from './Card';
@@ -70,12 +70,11 @@ export default function RegisterForm({ className = '' }: RegisterFormProps) {
       lastName: formData.lastName,
       email: formData.email,
       phone: formData.phone,
-      companyName: formData.companyName,
       address: formData.address,
       // Don't save passwords for security
     };
     localStorage.setItem('registerFormData', JSON.stringify(dataToSave));
-  }, [formData.firstName, formData.lastName, formData.email, formData.phone, formData.companyName, formData.address]);
+  }, [formData.firstName, formData.lastName, formData.email, formData.phone, formData.address]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,7 +99,6 @@ export default function RegisterForm({ className = '' }: RegisterFormProps) {
           email: formData.email,
           password: formData.password,
           phone: formData.phone,
-          companyName: formData.companyName,
           address: formData.address,
         }),
       });
@@ -222,15 +220,6 @@ export default function RegisterForm({ className = '' }: RegisterFormProps) {
               helperText="Include country code (e.g., +91 for India)"
             />
 
-            <Input
-              label="Company name (Optional)"
-              name="companyName"
-              placeholder="Enter your company name"
-              value={formData.companyName}
-              onChange={handleChange}
-              fullWidth
-              icon={<Building className="h-4 w-4 text-gray-400" />}
-            />
 
             {/* Address Section */}
             <div className="space-y-4">

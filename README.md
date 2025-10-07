@@ -316,7 +316,7 @@ npm start
 ### ResellerClub Setup
 
 1. Get ResellerClub API credentials
-2. Update `RESELLERCLUB_USERNAME` and `RESELLERCLUB_API_KEY`
+2. Update `RESELLERCLUB_ID` and `RESELLERCLUB_SECRET`
 3. Replace default customer and contact IDs in `lib/resellerclub.ts`
 4. Configure nameservers in system settings
 

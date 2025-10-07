@@ -135,6 +135,136 @@ export class InputValidator {
   }
 
   /**
+   * Validate and sanitize phone number
+   */
+  static validatePhone(phone: string): ValidationResult {
+    const errors: string[] = [];
+
+    if (!phone || typeof phone !== "string") {
+      errors.push("Phone number is required");
+      return { isValid: false, errors };
+    }
+
+    // Buffer overflow protection - limit input size
+    if (phone.length > 50) {
+      errors.push("Phone number is too long");
+      return { isValid: false, errors };
+    }
+
+    // Trim whitespace
+    const sanitized = phone.trim();
+
+    // Remove common phone number formatting
+    const cleaned = sanitized.replace(/[\s\-\(\)\.]/g, "");
+
+    // Check if it's a valid phone number (digits only, with optional + at start)
+    if (!/^\+?[0-9]+$/.test(cleaned)) {
+      errors.push(
+        "Phone number must contain only digits and optional + prefix"
+      );
+    }
+
+    // Check length (minimum 7 digits, maximum 15 digits)
+    const digitsOnly = cleaned.replace(/^\+/, "");
+    if (digitsOnly.length < 7) {
+      errors.push("Phone number must be at least 7 digits long");
+    }
+    if (digitsOnly.length > 15) {
+      errors.push("Phone number is too long");
+    }
+
+    // Enhanced security validation
+    const securityCheck =
+      SecurityValidator.containsMaliciousPatterns(sanitized);
+    if (securityCheck.isMalicious) {
+      errors.push("Phone number contains potentially malicious content");
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors,
+      sanitized: securityCheck.sanitized,
+    };
+  }
+
+  /**
+   * Validate and sanitize address
+   */
+  static validateAddress(address: {
+    line1: string;
+    city: string;
+    state: string;
+    country: string;
+    zipcode: string;
+  }): ValidationResult {
+    const errors: string[] = [];
+
+    if (!address || typeof address !== "object") {
+      errors.push("Address is required");
+      return { isValid: false, errors };
+    }
+
+    // Validate each address field
+    const requiredFields = [
+      { key: "line1", name: "Address Line 1" },
+      { key: "city", name: "City" },
+      { key: "state", name: "State" },
+      { key: "country", name: "Country" },
+      { key: "zipcode", name: "ZIP Code" },
+    ];
+
+    const sanitized: any = {};
+
+    for (const field of requiredFields) {
+      const value = address[field.key as keyof typeof address];
+
+      if (!value || typeof value !== "string") {
+        errors.push(`${field.name} is required`);
+        continue;
+      }
+
+      // Buffer overflow protection
+      if (value.length > 200) {
+        errors.push(`${field.name} is too long`);
+        continue;
+      }
+
+      // Trim whitespace
+      const trimmed = value.trim();
+
+      if (trimmed.length < 2) {
+        errors.push(`${field.name} must be at least 2 characters long`);
+        continue;
+      }
+
+      // Enhanced security validation
+      const securityCheck =
+        SecurityValidator.containsMaliciousPatterns(trimmed);
+      if (securityCheck.isMalicious) {
+        errors.push(`${field.name} contains potentially malicious content`);
+        continue;
+      }
+
+      sanitized[field.key] = securityCheck.sanitized;
+    }
+
+    // Additional validation for specific fields
+    if (sanitized.country && !/^[A-Z]{2}$/.test(sanitized.country)) {
+      errors.push("Country must be a 2-letter country code (e.g., IN, US)");
+    }
+
+    if (sanitized.zipcode && !/^[A-Z0-9\s\-]{3,10}$/i.test(sanitized.zipcode)) {
+      errors.push("ZIP code format is invalid");
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors,
+      sanitized,
+    };
+  }
+
+  /**
    * Validate and sanitize domain name
    */
   static validateDomainName(domainName: string): ValidationResult {
