@@ -43,8 +43,8 @@ export default function OutboundIPBadge() {
 
     fetchIP();
 
-    // Refresh IP every 5 minutes
-    const interval = setInterval(fetchIP, 5 * 60 * 1000);
+    // Refresh IP every 30 minutes
+    const interval = setInterval(fetchIP, 30 * 60 * 1000);
 
     return () => clearInterval(interval);
   }, []);

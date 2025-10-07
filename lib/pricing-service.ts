@@ -22,11 +22,11 @@ import { ResellerClubResponse, DomainSearchResult } from "./types";
 
 // Environment configuration for ResellerClub API
 const RESELLERCLUB_API_URL = process.env.RESELLERCLUB_API_URL;
-const RESELLERCLUB_API_ID = process.env.RESELLERCLUB_API_ID;
-const RESELLERCLUB_API_KEY = process.env.RESELLERCLUB_API_KEY;
+const RESELLERCLUB_ID = process.env.RESELLERCLUB_ID;
+const RESELLERCLUB_SECRET = process.env.RESELLERCLUB_SECRET;
 
 // Validate required environment variables
-if (!RESELLERCLUB_API_URL || !RESELLERCLUB_API_ID || !RESELLERCLUB_API_KEY) {
+if (!RESELLERCLUB_API_URL || !RESELLERCLUB_ID || !RESELLERCLUB_SECRET) {
   throw new Error(
     "ResellerClub API configuration is missing. Please check your environment variables."
   );
@@ -43,9 +43,9 @@ api.interceptors.request.use(
   (config) => {
     config.params = {
       ...config.params,
-      "auth-userid": RESELLERCLUB_API_ID,
-      "api-key": RESELLERCLUB_API_KEY,
-      "reseller-id": RESELLERCLUB_API_ID, // Use same ID for Indian pricing
+      "auth-userid": RESELLERCLUB_ID,
+      "api-key": RESELLERCLUB_SECRET,
+      "reseller-id": RESELLERCLUB_ID, // Use same ID for Indian pricing
     };
     return config;
   },

@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {
-    console.log("🔍 [CHECK-IP] Checking outbound IP address...");
-
     // Check IP using multiple services for reliability
     const ipServices = [
       "https://api.ipify.org",
@@ -28,8 +26,6 @@ export async function GET(request: NextRequest) {
     // Try each service
     for (const service of ipServices) {
       try {
-        console.log(`🔍 [CHECK-IP] Checking ${service}...`);
-
         const response = await fetch(service, {
           method: "GET",
           headers: {
@@ -64,15 +60,12 @@ export async function GET(request: NextRequest) {
           if (!results.allIPs.includes(ip)) {
             results.allIPs.push(ip);
           }
-
-          console.log(`✅ [CHECK-IP] ${service}: ${ip}`);
         } else {
           results.services[service] = {
             status: "error",
             error: `HTTP ${response.status}`,
             responseTime: "unknown",
           };
-          console.log(`❌ [CHECK-IP] ${service}: HTTP ${response.status}`);
         }
       } catch (error) {
         results.services[service] = {
@@ -80,11 +73,6 @@ export async function GET(request: NextRequest) {
           error: error instanceof Error ? error.message : "Unknown error",
           responseTime: "unknown",
         };
-        console.log(
-          `❌ [CHECK-IP] ${service}: ${
-            error instanceof Error ? error.message : "Unknown error"
-          }`
-        );
       }
     }
 
@@ -101,8 +89,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log(`🎯 [CHECK-IP] Primary outbound IP: ${results.primaryIP}`);
-    console.log(`📊 [CHECK-IP] All detected IPs: ${results.allIPs.join(", ")}`);
+    // Only log once at the end
+    console.log(`✅ [CHECK-IP] Primary outbound IP: ${results.primaryIP}`);
 
     return NextResponse.json({
       success: true,

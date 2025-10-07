@@ -6,6 +6,15 @@ export interface IUser extends Document {
   password: string;
   firstName: string;
   lastName: string;
+  phone: string;
+  companyName?: string;
+  address: {
+    line1: string;
+    city: string;
+    state: string;
+    country: string;
+    zipcode: string;
+  };
   role: "admin" | "user";
   isActive: boolean;
   resetToken?: string;
@@ -42,6 +51,43 @@ const UserSchema = new Schema<IUser>(
       type: String,
       required: [true, "Last name is required"],
       trim: true,
+    },
+    phone: {
+      type: String,
+      required: [true, "Phone number is required"],
+      trim: true,
+    },
+    companyName: {
+      type: String,
+      trim: true,
+    },
+    address: {
+      line1: {
+        type: String,
+        required: [true, "Address line 1 is required"],
+        trim: true,
+      },
+      city: {
+        type: String,
+        required: [true, "City is required"],
+        trim: true,
+      },
+      state: {
+        type: String,
+        required: [true, "State is required"],
+        trim: true,
+      },
+      country: {
+        type: String,
+        required: [true, "Country is required"],
+        trim: true,
+        default: "IN",
+      },
+      zipcode: {
+        type: String,
+        required: [true, "ZIP code is required"],
+        trim: true,
+      },
     },
     role: {
       type: String,

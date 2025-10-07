@@ -555,11 +555,11 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
           {/* Enhanced Error State */}
           {error && (
             <div className="bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-2xl p-6">
-              <div className="flex items-center gap-4">
+              <div className="flex items-center justify-center gap-4">
                 <div className="p-3 bg-red-100 rounded-xl">
                   <XCircle className="h-6 w-6 text-red-600" />
                 </div>
-                <div>
+                <div className="text-center">
                   <h4 className="font-semibold text-red-900 mb-1">Search Error</h4>
                   <p className="text-red-700">{error}</p>
                 </div>
