@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X, Calendar, CreditCard, AlertTriangle, CheckCircle, RefreshCw } from 'lucide-react';
+import { formatIndianDate, formatIndianCurrency } from '@/lib/dateUtils';
 import { toast } from 'react-hot-toast';
 
 interface DomainRenewalModalProps {
@@ -113,11 +114,7 @@ export default function DomainRenewalModal({
 
   const formatDate = (dateString: string) => {
     if (!dateString) return 'Unknown';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+    return formatIndianDate(dateString);
   };
 
   const getDaysUntilExpiry = (dateString: string) => {
@@ -224,7 +221,7 @@ export default function DomainRenewalModal({
                     <div>
                       <p className="text-sm text-gray-600">Renewal Cost</p>
                       <p className="text-2xl font-bold text-gray-900">
-                        ₹{renewalInfo.pricing.price.toLocaleString()}
+                        {formatIndianCurrency(renewalInfo.pricing.price)}
                       </p>
                       <p className="text-sm text-gray-500">
                         for {selectedYears} {selectedYears === 1 ? 'year' : 'years'}

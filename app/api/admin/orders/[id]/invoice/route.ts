@@ -4,6 +4,7 @@ import connectDB from "@/lib/mongodb";
 import Order from "@/models/Order";
 import User from "@/models/User";
 import jsPDF from "jspdf";
+import { formatIndianDate } from "@/lib/dateUtils";
 
 export async function GET(
   request: NextRequest,
@@ -109,7 +110,7 @@ export async function GET(
       invoiceDetailsY + 25
     );
     pdf.text(
-      `Date: ${new Date(order.createdAt).toLocaleDateString()}`,
+      `Date: ${formatIndianDate(order.createdAt)}`,
       pageWidth - 120,
       invoiceDetailsY + 35
     );
