@@ -36,10 +36,18 @@ interface TLDPricing {
   tld: string;
   customerPrice: number;
   resellerPrice: number;
+  promotionalPrice?: number;
   currency: string;
   category: string;
   description?: string;
   margin?: number; // Calculated margin percentage
+  isPromotional?: boolean;
+  promotionalDetails?: {
+    source: string;
+    originalCustomerPrice: number;
+    promotionalPrice: number;
+    discount: number;
+  };
 }
 
 /**
@@ -185,6 +193,37 @@ export default function AdminTLDPricing() {
           <span className="text-sm text-gray-500 ml-1">{row.currency}</span>
         </div>
       )
+    },
+    {
+      key: 'promotionalPrice',
+      label: 'Promotional Price',
+      sortable: true,
+      render: (value: number, row: TLDPricing) => {
+        if (row.isPromotional && row.promotionalPrice) {
+          return (
+            <div className="flex items-center">
+              <DollarSign className="h-4 w-4 text-orange-500 mr-1" />
+              <div className="flex flex-col">
+                <span className="font-semibold text-orange-600">
+                  {formatIndianCurrency(row.promotionalPrice)}
+                </span>
+                <span className="text-xs text-gray-500 line-through">
+                  {formatIndianCurrency(row.customerPrice)}
+                </span>
+              </div>
+              <span className="text-sm text-gray-500 ml-1">{row.currency}</span>
+              <span className="ml-2 px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full font-medium">
+                PROMO
+              </span>
+            </div>
+          );
+        }
+        return (
+          <div className="flex items-center">
+            <span className="text-sm text-gray-400">No promotion</span>
+          </div>
+        );
+      }
     },
     {
       key: 'margin',

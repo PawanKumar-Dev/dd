@@ -209,6 +209,12 @@ export class PricingService {
       const pricingData = await this.getDomainPricing();
       const tldPricing: { [tld: string]: any } = {};
 
+      // Check if pricing data is available
+      if (!pricingData || !pricingData.customerPricing) {
+        console.warn(`⚠️ [PRICING] No customer pricing data available`);
+        return tldPricing;
+      }
+
       // Get promotional pricing data
       let promotionalData: any = null;
       try {
@@ -236,16 +242,20 @@ export class PricingService {
         let foundTld = null;
 
         for (const variation of tldVariations) {
-          if (pricingData.customerPricing[variation]) {
+          if (
+            pricingData.customerPricing &&
+            pricingData.customerPricing[variation]
+          ) {
             foundTld = variation;
             break;
           }
         }
 
         if (foundTld) {
-          const customerPricing = pricingData.customerPricing[foundTld];
-          const resellerPricing = pricingData.resellerPricing[foundTld] || null;
-          const promoPricing = pricingData.promoPricing[foundTld] || null;
+          const customerPricing = pricingData.customerPricing?.[foundTld];
+          const resellerPricing =
+            pricingData.resellerPricing?.[foundTld] || null;
+          const promoPricing = pricingData.promoPricing?.[foundTld] || null;
 
           // Extract customer registration price (1 year)
           let customerPrice = 0;
@@ -289,6 +299,7 @@ export class PricingService {
             await SettingsService.isPromotionalPricingEnabled();
 
           // First, check if we have promo pricing from the API (most reliable)
+
           if (
             promotionalPricingEnabled &&
             promoPrice > 0 &&
