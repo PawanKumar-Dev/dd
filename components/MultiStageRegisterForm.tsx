@@ -95,6 +95,8 @@ export default function MultiStageRegisterForm({ className = '' }: RegisterFormP
           lastName: parsedData.lastName || '',
           email: parsedData.email || '',
           phone: parsedData.phone || '',
+          phoneCc: parsedData.phoneCc || '+91',
+          companyName: parsedData.companyName || '',
           address: parsedData.address || {
             line1: '',
             city: '',
@@ -119,11 +121,13 @@ export default function MultiStageRegisterForm({ className = '' }: RegisterFormP
       lastName: formData.lastName,
       email: formData.email,
       phone: formData.phone,
+      phoneCc: formData.phoneCc,
+      companyName: formData.companyName,
       address: formData.address,
       // Don't save passwords for security
     };
     localStorage.setItem('registerFormData', JSON.stringify(dataToSave));
-  }, [formData.firstName, formData.lastName, formData.email, formData.phone, formData.address]);
+  }, [formData.firstName, formData.lastName, formData.email, formData.phone, formData.phoneCc, formData.companyName, formData.address]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -156,6 +160,8 @@ export default function MultiStageRegisterForm({ className = '' }: RegisterFormP
           email: formData.email,
           password: formData.password,
           phone: formData.phone,
+          phoneCc: formData.phoneCc,
+          companyName: formData.companyName,
           address: formData.address,
         }),
       });
@@ -207,6 +213,12 @@ export default function MultiStageRegisterForm({ className = '' }: RegisterFormP
   const detectLocation = async () => {
     if (!navigator.geolocation) {
       toast.error('Geolocation is not supported by this browser');
+      return;
+    }
+
+    // Check if we're on a secure context (HTTPS or localhost)
+    if (!window.isSecureContext) {
+      toast.error('Location detection requires HTTPS. Please fill the address manually or use a secure connection.');
       return;
     }
 
@@ -285,7 +297,11 @@ export default function MultiStageRegisterForm({ className = '' }: RegisterFormP
       console.error('Location detection error:', error);
 
       if (error.code === 1) {
-        toast.error('Location access denied. Please enable location permissions.');
+        if (error.message.includes('secure origins')) {
+          toast.error('Location detection requires HTTPS. Please use a secure connection or fill the address manually.');
+        } else {
+          toast.error('Location access denied. Please enable location permissions.');
+        }
       } else if (error.code === 2) {
         toast.error('Location unavailable. Please check your internet connection.');
       } else if (error.code === 3) {
