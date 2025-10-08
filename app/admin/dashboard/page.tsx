@@ -16,6 +16,7 @@ import {
 import AdminLayout from '@/components/admin/AdminLayoutNew';
 import AdminDataTable from '@/components/admin/AdminDataTable';
 import FailedDomainNotifications from '@/components/admin/FailedDomainNotifications';
+import { formatIndianDate } from '@/lib/dateUtils';
 
 interface User {
   _id: string;
@@ -176,7 +177,7 @@ export default function AdminDashboard() {
         </span>
       )
     },
-    { key: 'createdAt', label: 'Joined', sortable: true, render: (value: string) => new Date(value).toLocaleDateString() }
+    { key: 'createdAt', label: 'Joined', sortable: true, render: (value: string) => formatIndianDate(value) }
   ];
 
 
@@ -238,7 +239,7 @@ export default function AdminDashboard() {
       key: 'createdAt',
       label: 'Date',
       sortable: true,
-      render: (value: string) => new Date(value).toLocaleDateString()
+      render: (value: string) => formatIndianDate(value)
     }
   ];
 

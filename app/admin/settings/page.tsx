@@ -13,6 +13,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import AdminLayoutNew from '@/components/admin/AdminLayoutNew';
+import { formatIndianTime } from '@/lib/dateUtils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -139,7 +140,7 @@ export default function AdminSettings() {
                   </p>
                   {lastChecked && (
                     <p className="text-sm text-gray-500">
-                      Last checked: {lastChecked.toLocaleTimeString()}
+                      Last checked: {formatIndianTime(lastChecked)}
                     </p>
                   )}
                 </div>
