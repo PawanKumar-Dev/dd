@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Download, FileText, X } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { formatIndianDate } from '@/lib/dateUtils';
 
 interface InvoiceProps {
   order: {
@@ -146,7 +147,7 @@ export default function Invoice({ order, isOpen, onClose }: InvoiceProps) {
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">Invoice Details:</h3>
                 <div className="text-gray-700 space-y-1">
                   <p><span className="font-medium">Order ID:</span> {order.orderId}</p>
-                  <p><span className="font-medium">Invoice Date:</span> {new Date(order.createdAt).toLocaleDateString()}</p>
+                  <p><span className="font-medium">Invoice Date:</span> {formatIndianDate(order.createdAt)}</p>
                   <p><span className="font-medium">Status:</span>
                     <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${order.status === 'completed'
                       ? 'bg-green-100 text-green-800'

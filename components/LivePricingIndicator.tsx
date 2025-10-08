@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { RefreshCw, DollarSign, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { formatIndianDate } from '@/lib/dateUtils';
 
 interface LivePricingIndicatorProps {
   domainName: string;
@@ -71,7 +72,7 @@ export default function LivePricingIndicator({ domainName, tld, onPriceUpdate }:
     if (diffInHours === 1) return '1 hour ago';
     if (diffInHours < 24) return `${diffInHours} hours ago`;
 
-    return date.toLocaleDateString();
+    return formatIndianDate(date);
   };
 
   return (
