@@ -1038,10 +1038,24 @@ export class ResellerClubAPI {
       // TODO: Check if user already has ResellerClub customer ID in your database
       // For now, we'll create a new customer for each user
 
+      // Generate ResellerClub-compliant password (8-15 alphanumeric characters)
+      const tempPassword = `Temp${Math.random().toString(36).substring(2, 10)}`;
+
+      // Clean phone number (remove spaces and non-digits)
+      const cleanPhone = userData.phone?.replace(/\D/g, "") || "0000000000";
+
+      console.log(`🔧 [PRODUCTION] Generated ResellerClub credentials:`, {
+        password: tempPassword,
+        passwordLength: tempPassword.length,
+        originalPhone: userData.phone,
+        cleanPhone: cleanPhone,
+        phoneCc: userData.phoneCc?.replace("+", "") || "91",
+      });
+
       // Create customer
       const customerResult = await ResellerClubAPI.createCustomer({
         username: userData.email,
-        passwd: `TempPass${Date.now()}`, // Generate temporary password
+        passwd: tempPassword, // Generate ResellerClub-compliant password
         name: `${userData.firstName} ${userData.lastName}`,
         company:
           userData.companyName || `${userData.firstName} ${userData.lastName}`, // Use companyName from user data
@@ -1050,15 +1064,12 @@ export class ResellerClubAPI {
         state: userData.address?.state || "Default State",
         country: userData.address?.country || "IN",
         zipcode: userData.address?.zipcode || "000000",
-        phoneCc: userData.phoneCc?.replace('+', '') || "91", // Use user's phone country code or default to India
-        phone: userData.phone || "0000000000",
+        phoneCc: userData.phoneCc?.replace("+", "") || "91", // Use user's phone country code or default to India
+        phone: cleanPhone, // Clean phone number without spaces
         langPref: "en",
       });
 
-      if (
-        customerResult.status !== "success" ||
-        !customerResult.data?.customerid
-      ) {
+      if (customerResult.status !== "success" || !customerResult.data) {
         console.error(
           `❌ [PRODUCTION] Failed to create ResellerClub customer for user ${userData.email}:`,
           customerResult.error
@@ -1069,7 +1080,8 @@ export class ResellerClubAPI {
         };
       }
 
-      const customerId = parseInt(customerResult.data.customerid);
+      // ResellerClub returns customer ID directly as a number
+      const customerId = parseInt(customerResult.data);
       console.log(
         `✅ [PRODUCTION] Created ResellerClub customer ${customerId} for user: ${userData.email}`
       );
@@ -1086,7 +1098,7 @@ export class ResellerClubAPI {
         state: userData.address?.state || "Default State",
         country: userData.address?.country || "IN",
         zipcode: userData.address?.zipcode || "000000",
-        phoneCc: userData.phoneCc?.replace('+', '') || "91", // Use user's phone country code or default to India
+        phoneCc: userData.phoneCc?.replace("+", "") || "91", // Use user's phone country code or default to India
         phone: userData.phone || "0000000000",
         type: "Contact",
       });
