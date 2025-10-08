@@ -47,6 +47,7 @@ async function initializeDatabase() {
       lastName: adminLastName,
       role: 'admin',
       isActive: true,
+      isActivated: true,
     });
 
     await adminUser.save();
