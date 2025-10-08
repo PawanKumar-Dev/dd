@@ -125,11 +125,7 @@ export async function GET(request: NextRequest) {
               margin: margin,
             });
 
-            console.log(
-              `📊 [ADMIN] Processed ${tld}: Customer ₹${customerPrice}, Reseller ₹${resellerPrice}, Margin ${
-                margin > 0 ? "+" : ""
-              }${margin.toFixed(1)}%`
-            );
+            // Individual TLD processing logged in summary
           }
         } catch (error) {
           console.warn(

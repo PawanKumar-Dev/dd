@@ -1,5 +1,5 @@
 import Settings from "@/models/Settings";
-import { connectToDatabase } from "@/lib/mongodb";
+import { connectToDatabase } from "@/lib/mongoose";
 
 export class SettingsService {
   private static cache = new Map<string, { value: any; timestamp: number }>();

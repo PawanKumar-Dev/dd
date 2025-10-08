@@ -307,15 +307,11 @@ export class PricingService {
                   originalResellerPrice: resellerPrice,
                 };
 
-                console.log(
-                  `🎯 [PRICING] Applied promotional pricing for ${cleanTld}: ₹${customerPrice} → ₹${finalCustomerPrice} (Valid: ${promotion.starttime} to ${promotion.endtime})`
-                );
+                // Promotional pricing applied (logged in summary)
               }
             }
           } else if (!promotionalPricingEnabled) {
-            console.log(
-              `ℹ️ [PRICING] Promotional pricing disabled - using regular pricing for ${cleanTld}`
-            );
+            // Promotional pricing disabled (logged in summary)
           }
 
           tldPricing[cleanTld] = {
@@ -337,19 +333,29 @@ export class PricingService {
                 100
               : 0;
 
-          console.log(
-            `✅ [PRICING] Found ${cleanTld}: Customer ₹${finalCustomerPrice}${
-              isPromotional ? " (PROMO)" : ""
-            }, Reseller ₹${finalResellerPrice} (Margin: ${
-              margin > 0 ? "+" : ""
-            }${margin.toFixed(1)}%)`
-          );
+          // Individual TLD logging removed for cleaner output
         }
       }
 
-      console.log(
-        `✅ [PRICING] TLD pricing extracted in ${Date.now() - startTime}ms`
+      // Summary logging
+      const totalTlds = Object.keys(tldPricing).length;
+      const promotionalTlds = Object.values(tldPricing).filter(
+        (tld) => tld.isPromotional
+      ).length;
+      const totalCustomerPrice = Object.values(tldPricing).reduce(
+        (sum, tld) => sum + (tld.price || 0),
+        0
       );
+
+      console.log(
+        `✅ [PRICING] Processed ${totalTlds} TLDs in ${
+          Date.now() - startTime
+        }ms - ` +
+          `Total: ₹${totalCustomerPrice.toFixed(
+            2
+          )}, Promotional: ${promotionalTlds} TLDs`
+      );
+
       return tldPricing;
     } catch (error) {
       console.error(`❌ [PRICING] Failed to fetch TLD pricing:`, error);
