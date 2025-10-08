@@ -238,13 +238,13 @@ SMTP_PORT=587
 
 ### Promotional Pricing
 
-- **Multi-API Integration**: Fetches from customer, reseller, and promo pricing APIs
-- **Automatic Detection**: Compares promo prices with customer prices to identify active promotions
-- **Two-Tier System**: Primary promo API data with fallback to promotional details API
-- **Real-time Application**: Applies promotional pricing when `promoPrice < customerPrice`
+- **Working API Integration**: Uses ResellerClub's `/api/resellers/promo-details.json` endpoint
+- **Real-time Detection**: Automatically detects active promotions for TLDs
+- **Time-based Validation**: Checks promotion validity periods (start/end timestamps)
+- **Automatic Application**: Applies promotional pricing when active promotions are found
 - **Visual Indicators**: Displays strikethrough original prices and PROMO badges
 - **Admin Control**: Toggle promotional pricing display on/off
-- **Source Tracking**: Tracks whether pricing came from promo API or promotional data
+- **Comprehensive Logging**: Detailed logs for promotional pricing detection and application
 
 ## 🔒 Security Features
 

@@ -77,6 +77,11 @@ export default function AdminTLDPricing() {
   const [pricingSource, setPricingSource] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<string>('tld');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [priceRange, setPriceRange] = useState<{ min: number, max: number }>({ min: 0, max: 100000 });
+  const [showOnlyPromotional, setShowOnlyPromotional] = useState<boolean>(false);
+  const [showOnlyWithMargin, setShowOnlyWithMargin] = useState<boolean>(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -143,16 +148,83 @@ export default function AdminTLDPricing() {
   };
 
 
-  // Filter TLD pricing based on search term and category
+  // Filter TLD pricing based on search term, category, and other filters
   const filteredTLDPricing = tldPricing.filter(tld => {
     const matchesSearch = tld.tld.toLowerCase().includes(searchTerm.toLowerCase()) ||
       tld.description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || tld.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    const matchesPriceRange = tld.customerPrice >= priceRange.min && tld.customerPrice <= priceRange.max;
+    const matchesPromotional = !showOnlyPromotional || tld.isPromotional;
+    const matchesMargin = !showOnlyWithMargin || (tld.margin && tld.margin > 0);
+
+    return matchesSearch && matchesCategory && matchesPriceRange && matchesPromotional && matchesMargin;
   });
 
   // Get unique categories for filter
   const categories = ['all', ...Array.from(new Set(tldPricing.map(tld => tld.category)))];
+
+  // Sort filtered TLD pricing
+  const sortedTLDPricing = [...filteredTLDPricing].sort((a, b) => {
+    let aValue: any, bValue: any;
+
+    switch (sortBy) {
+      case 'tld':
+        aValue = a.tld.toLowerCase();
+        bValue = b.tld.toLowerCase();
+        break;
+      case 'customerPrice':
+        aValue = a.customerPrice;
+        bValue = b.customerPrice;
+        break;
+      case 'resellerPrice':
+        aValue = a.resellerPrice;
+        bValue = b.resellerPrice;
+        break;
+      case 'promotionalPrice':
+        // For promotional price sorting, prioritize TLDs with promotional prices
+        if (a.isPromotional && b.isPromotional) {
+          aValue = a.promotionalPrice || 0;
+          bValue = b.promotionalPrice || 0;
+        } else if (a.isPromotional && !b.isPromotional) {
+          return -1; // Promotional TLDs come first
+        } else if (!a.isPromotional && b.isPromotional) {
+          return 1; // Promotional TLDs come first
+        } else {
+          aValue = a.customerPrice;
+          bValue = b.customerPrice;
+        }
+        break;
+      case 'margin':
+        aValue = a.margin || 0;
+        bValue = b.margin || 0;
+        break;
+      case 'category':
+        aValue = a.category;
+        bValue = b.category;
+        break;
+      default:
+        aValue = a.tld.toLowerCase();
+        bValue = b.tld.toLowerCase();
+    }
+
+    if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
+    if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  const handleSort = (key: string) => {
+    if (sortBy === key) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(key);
+      setSortOrder('asc');
+    }
+  };
+
+  const getSortIcon = (key: string) => {
+    if (sortBy !== key) return null;
+    return sortOrder === 'asc' ? '↑' : '↓';
+  };
 
   const columns = [
     {
@@ -309,33 +381,115 @@ export default function AdminTLDPricing() {
 
         {/* Filters */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search TLDs or descriptions..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
+          <div className="space-y-4">
+            {/* Search and Category Row */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search TLDs or descriptions..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+              <div className="sm:w-48">
+                <div className="relative">
+                  <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
+                  >
+                    {categories.map(category => (
+                      <option key={category} value={category}>
+                        {category === 'all' ? 'All Categories' : category}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
-            <div className="sm:w-48">
-              <div className="relative">
-                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
-                >
-                  {categories.map(category => (
-                    <option key={category} value={category}>
-                      {category === 'all' ? 'All Categories' : category}
-                    </option>
-                  ))}
-                </select>
+
+            {/* Price Range and Special Filters Row */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              {/* Price Range */}
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Price Range (₹)</label>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="number"
+                    placeholder="Min"
+                    value={priceRange.min}
+                    onChange={(e) => setPriceRange({ ...priceRange, min: Number(e.target.value) || 0 })}
+                    className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <span className="text-gray-500">to</span>
+                  <input
+                    type="number"
+                    placeholder="Max"
+                    value={priceRange.max}
+                    onChange={(e) => setPriceRange({ ...priceRange, max: Number(e.target.value) || 100000 })}
+                    className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              {/* Special Filters */}
+              <div className="flex flex-col sm:flex-row gap-4">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={showOnlyPromotional}
+                    onChange={(e) => setShowOnlyPromotional(e.target.checked)}
+                    className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">Show only promotional</span>
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={showOnlyWithMargin}
+                    onChange={(e) => setShowOnlyWithMargin(e.target.checked)}
+                    className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">Show only with margin</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Sorting Options */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Sort by</label>
+                <div className="flex items-center space-x-2">
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="tld">TLD Name</option>
+                    <option value="customerPrice">Customer Price</option>
+                    <option value="resellerPrice">Reseller Price</option>
+                    <option value="promotionalPrice">Promotional Price</option>
+                    <option value="margin">Margin</option>
+                    <option value="category">Category</option>
+                  </select>
+                  <button
+                    onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                    className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    {sortOrder === 'asc' ? '↑ Ascending' : '↓ Descending'}
+                  </button>
+                </div>
+              </div>
+              <div className="flex items-end">
+                <div className="text-sm text-gray-600">
+                  Showing {sortedTLDPricing.length} of {tldPricing.length} TLDs
+                </div>
               </div>
             </div>
           </div>
@@ -345,7 +499,7 @@ export default function AdminTLDPricing() {
         <AdminDataTable
           title="TLD Pricing"
           columns={columns}
-          data={filteredTLDPricing}
+          data={sortedTLDPricing}
           searchable={false}
           pagination={true}
           pageSize={20}

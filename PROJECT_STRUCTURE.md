@@ -275,7 +275,7 @@ function MyPage() {
 - **Component README**: Detailed component documentation
 - **API Documentation**: Complete API reference
 - **Project README**: Setup and usage instructions
-- **Promotional Pricing Guide**: Comprehensive promotional pricing system documentation
+- **Promotional Pricing Guide**: Working promotional pricing system documentation
 - **Code Comments**: Inline documentation
 
 ### Documentation Files

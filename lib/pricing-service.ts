@@ -215,16 +215,7 @@ export class PricingService {
         return tldPricing;
       }
 
-      // Get promotional pricing data
-      let promotionalData: any = null;
-      try {
-        promotionalData = await this.getPromotionalPricing();
-      } catch (error) {
-        console.warn(
-          `⚠️ [PRICING] Could not fetch promotional pricing:`,
-          error
-        );
-      }
+      // Promotional pricing data is now included in the main pricing data
 
       // Extract pricing for requested TLDs
       for (const tld of tlds) {
@@ -278,90 +269,76 @@ export class PricingService {
             resellerPrice = parseFloat(resellerPricing.addnewdomain["1"]);
           }
 
-          // Extract promo registration price (1 year) - this is the discounted price
+          // Check for promotional pricing from promo details API
           let promoPrice = 0;
-          if (
-            promoPricing &&
-            promoPricing.addnewdomain &&
-            promoPricing.addnewdomain["1"]
-          ) {
-            promoPrice = parseFloat(promoPricing.addnewdomain["1"]);
-          }
-
-          // Check for promotional pricing
-          let finalCustomerPrice = customerPrice;
-          let finalResellerPrice = resellerPrice;
           let isPromotional = false;
           let promotionalDetails = null;
+
+          // Look for active promotions for this TLD in promo details
+          if (pricingData.promoDetails) {
+            const activePromotions = Object.values(
+              pricingData.promoDetails
+            ).filter((promo: any) => {
+              const isActive = promo.isactive === "true";
+              const hasProductKey = promo.productkey;
+              const tldMatches =
+                promo.productkey &&
+                promo.productkey.toLowerCase().includes(cleanTld.toLowerCase());
+
+              return isActive && hasProductKey && tldMatches;
+            });
+
+            if (activePromotions.length > 0) {
+              const promotion = activePromotions[0] as any;
+              const now = new Date();
+              const startTime = new Date(parseInt(promotion.starttime) * 1000);
+              const endTime = new Date(parseInt(promotion.endtime) * 1000);
+
+              // Check if promotion is currently active
+              if (now >= startTime && now <= endTime) {
+                promoPrice = parseFloat(promotion.customerprice) || 0;
+                isPromotional = true;
+                promotionalDetails = {
+                  source: "promo-details-api",
+                  originalCustomerPrice: customerPrice,
+                  promotionalPrice: promoPrice,
+                  discount: customerPrice - promoPrice,
+                  startTime: promotion.starttime,
+                  endTime: promotion.endtime,
+                  period: promotion.period,
+                  actionType: promotion.actiontype,
+                };
+
+                console.log(
+                  `✅ [PRICING] Applied promotional pricing for ${cleanTld}: Original ₹${customerPrice} → Promotional ₹${promoPrice}`
+                );
+              } else {
+                console.log(
+                  `⏰ [PRICING] Promotion for ${cleanTld} is not currently active (${startTime.toISOString()} - ${endTime.toISOString()})`
+                );
+              }
+            }
+          }
+
+          // Apply promotional pricing if found
+          let finalCustomerPrice = customerPrice;
+          let finalResellerPrice = resellerPrice;
 
           // Check if promotional pricing is enabled
           const promotionalPricingEnabled =
             await SettingsService.isPromotionalPricingEnabled();
 
-          // First, check if we have promo pricing from the API (most reliable)
-
-          if (
-            promotionalPricingEnabled &&
-            promoPrice > 0 &&
-            promoPrice < customerPrice
-          ) {
+          if (promotionalPricingEnabled && isPromotional && promoPrice > 0) {
             finalCustomerPrice = promoPrice;
-            isPromotional = true;
-            promotionalDetails = {
-              source: "promo-api",
-              originalCustomerPrice: customerPrice,
-              promotionalPrice: promoPrice,
-              discount: customerPrice - promoPrice,
-            };
-
             console.log(
-              `✅ [PRICING] Applied promo API pricing for ${cleanTld}: Original ₹${customerPrice} → Promotional ₹${finalCustomerPrice}`
+              `✅ [PRICING] Applied promotional pricing for ${cleanTld}: Original ₹${customerPrice} → Promotional ₹${finalCustomerPrice}`
             );
-          }
-          // Fallback to promotional data if promo API doesn't have data
-          else if (promotionalPricingEnabled && promotionalData) {
-            // Look for active promotions for this TLD
-            const activePromotions = Object.values(promotionalData).filter(
-              (promo: any) => {
-                const isActive = promo.isactive === "true";
-                const hasProductKey = promo.productkey;
-                const tldMatches =
-                  promo.productkey &&
-                  promo.productkey
-                    .toLowerCase()
-                    .includes(cleanTld.toLowerCase());
-
-                return isActive && hasProductKey && tldMatches;
-              }
+          } else if (promotionalPricingEnabled && !isPromotional) {
+            console.log(
+              `❌ [PRICING] No active promotions found for TLD ${cleanTld}`
             );
-
-            if (activePromotions.length > 0) {
-              const promotion = activePromotions[0] as any;
-              const now = new Date();
-              const startTime = new Date(promotion.starttime);
-              const endTime = new Date(promotion.endtime);
-
-              // Check if promotion is currently active
-              if (now >= startTime && now <= endTime) {
-                finalCustomerPrice =
-                  parseFloat(promotion.customerprice) || customerPrice;
-                finalResellerPrice =
-                  parseFloat(promotion.resellerprice) || resellerPrice;
-                isPromotional = true;
-                promotionalDetails = {
-                  source: "promo-data",
-                  startTime: promotion.starttime,
-                  endTime: promotion.endtime,
-                  period: promotion.period,
-                  originalCustomerPrice: customerPrice,
-                  originalResellerPrice: resellerPrice,
-                };
-
-                console.log(
-                  `✅ [PRICING] Applied promotional pricing for ${cleanTld}: Original ₹${customerPrice} → Promotional ₹${finalCustomerPrice}`
-                );
-              }
-            }
+          } else if (!promotionalPricingEnabled) {
+            console.log(`🚫 [PRICING] Promotional pricing is disabled`);
           }
 
           tldPricing[cleanTld] = {

@@ -4,38 +4,44 @@ This document provides comprehensive documentation for the promotional pricing s
 
 ## Overview
 
-The promotional pricing system fetches data from multiple ResellerClub APIs to provide accurate promotional pricing information, automatically detecting and applying promotional discounts when available.
+The promotional pricing system uses ResellerClub's working promotional pricing API to provide accurate promotional pricing information, automatically detecting and applying promotional discounts when available.
 
 ## Architecture
 
-### Multi-API Integration
+### Working API Integration
 
 The system fetches pricing data from three ResellerClub APIs in parallel:
 
 1. **Customer Price API** (`/api/products/customer-price.json`)
+
    - Customer-facing prices (what users see)
    - Includes markup and standard pricing
 
 2. **Reseller Price API** (`/api/products/reseller-price.json`)
+
    - Base reseller costs (what you pay)
    - No markup or promotional discounts
 
-3. **Promo Price API** (`/api/products/promo-price.json`)
-   - Promotional/discounted prices
-   - Limited-time offers and special pricing
+3. **Promotional Details API** (`/api/resellers/promo-details.json`)
+   - Active promotional information
+   - Contains promotion validity periods and pricing details
+   - Primary source for promotional pricing data
 
-### Two-Tier Detection System
+### Real-time Detection System
 
-#### Primary: Promo API Detection
-- Fetches promotional prices directly from ResellerClub's promo API
-- Compares promo price with customer price
-- Applies promotional pricing when `promoPrice < customerPrice`
-- Most reliable source for current promotional offers
+#### Promotional Detection Process
 
-#### Fallback: Promotional Data API
-- Uses promotional details API for additional promotion information
-- Checks active promotions based on TLD and time periods
-- Provides backup promotional pricing when promo API doesn't have data
+- Fetches active promotions from ResellerClub's promotional details API
+- Checks promotion status (`isactive: "true"`)
+- Validates TLD matching (productkey contains TLD name)
+- Verifies time validity (current time between start and end timestamps)
+- Applies promotional pricing when all conditions are met
+
+#### Time-based Validation
+
+- Converts Unix timestamps to JavaScript Date objects
+- Checks if current time falls within promotion validity period
+- Logs promotion status for debugging and monitoring
 
 ## Implementation Details
 
@@ -43,21 +49,21 @@ The system fetches pricing data from three ResellerClub APIs in parallel:
 
 ```typescript
 static async getDomainPricing(): Promise<any> {
-  // Fetch all three pricing APIs in parallel
+  // Fetch all working pricing APIs in parallel
   const [
     customerPricingResponse,
     resellerPricingResponse,
-    promoPricingResponse,
+    promoDetailsResponse,
   ] = await Promise.all([
     api.get("/api/products/customer-price.json"),
     api.get("/api/products/reseller-price.json"),
-    api.get("/api/products/promo-price.json"),
+    api.get("/api/resellers/promo-details.json"),
   ]);
 
   return {
     customerPricing: customerPricingResponse.data,
     resellerPricing: resellerPricingResponse.data,
-    promoPricing: promoPricingResponse.data,
+    promoDetails: promoDetailsResponse.data,
     timestamp: new Date().toISOString(),
   };
 }
@@ -67,32 +73,54 @@ static async getDomainPricing(): Promise<any> {
 
 The pricing service implements the core promotional pricing logic:
 
-1. **Extract Pricing Data**: Gets customer, reseller, and promo prices for each TLD
-2. **Compare Prices**: Checks if promo price is lower than customer price
-3. **Apply Promotional Pricing**: Sets promotional flags and details when applicable
-4. **Return Enhanced Data**: Includes original price, promotional status, and details
+1. **Extract Pricing Data**: Gets customer, reseller prices and promotional details for each TLD
+2. **Detect Active Promotions**: Checks for active promotions matching the TLD
+3. **Validate Time Periods**: Ensures promotions are currently valid
+4. **Apply Promotional Pricing**: Sets promotional flags and details when applicable
+5. **Return Enhanced Data**: Includes original price, promotional status, and details
 
 ```typescript
-// Extract promo registration price (1 year) - this is the discounted price
+// Check for promotional pricing from promo details API
 let promoPrice = 0;
-if (
-  promoPricing &&
-  promoPricing.addnewdomain &&
-  promoPricing.addnewdomain["1"]
-) {
-  promoPrice = parseFloat(promoPricing.addnewdomain["1"]);
-}
+let isPromotional = false;
+let promotionalDetails = null;
 
-// First, check if we have promo pricing from the API (most reliable)
-if (promotionalPricingEnabled && promoPrice > 0 && promoPrice < customerPrice) {
-  finalCustomerPrice = promoPrice;
-  isPromotional = true;
-  promotionalDetails = {
-    source: "promo-api",
-    originalCustomerPrice: customerPrice,
-    promotionalPrice: promoPrice,
-    discount: customerPrice - promoPrice,
-  };
+// Look for active promotions for this TLD in promo details
+if (pricingData.promoDetails) {
+  const activePromotions = Object.values(pricingData.promoDetails).filter(
+    (promo: any) => {
+      const isActive = promo.isactive === "true";
+      const hasProductKey = promo.productkey;
+      const tldMatches =
+        promo.productkey &&
+        promo.productkey.toLowerCase().includes(cleanTld.toLowerCase());
+
+      return isActive && hasProductKey && tldMatches;
+    }
+  );
+
+  if (activePromotions.length > 0) {
+    const promotion = activePromotions[0] as any;
+    const now = new Date();
+    const startTime = new Date(parseInt(promotion.starttime) * 1000);
+    const endTime = new Date(parseInt(promotion.endtime) * 1000);
+
+    // Check if promotion is currently active
+    if (now >= startTime && now <= endTime) {
+      promoPrice = parseFloat(promotion.customerprice) || 0;
+      isPromotional = true;
+      promotionalDetails = {
+        source: "promo-details-api",
+        originalCustomerPrice: customerPrice,
+        promotionalPrice: promoPrice,
+        discount: customerPrice - promoPrice,
+        startTime: promotion.starttime,
+        endTime: promotion.endtime,
+        period: promotion.period,
+        actionType: promotion.actiontype,
+      };
+    }
+  }
 }
 ```
 
@@ -106,30 +134,35 @@ When a domain has promotional pricing, the response includes:
 {
   "domainName": "example.eu",
   "available": true,
-  "price": 198,
+  "price": 218.9,
   "currency": "INR",
   "registrationPeriod": 1,
   "pricingSource": "live",
-  "originalPrice": 768,
+  "originalPrice": 768.0,
   "isPromotional": true,
   "promotionalDetails": {
-    "source": "promo-api",
-    "originalCustomerPrice": 768,
-    "promotionalPrice": 198,
-    "discount": 570
+    "source": "promo-details-api",
+    "originalCustomerPrice": 768.0,
+    "promotionalPrice": 218.9,
+    "discount": 549.1,
+    "startTime": "1759276800",
+    "endTime": "1764633599",
+    "period": "1",
+    "actionType": "addnewdomain"
   }
 }
 ```
 
 ### Promotional Details Fields
 
-- **source**: Indicates data source (`"promo-api"` or `"promo-data"`)
+- **source**: Indicates data source (`"promo-details-api"`)
 - **originalCustomerPrice**: Original customer price before promotion
 - **promotionalPrice**: Discounted promotional price
 - **discount**: Amount saved (original - promotional)
-- **startTime**: Promotion start time (for promo-data source)
-- **endTime**: Promotion end time (for promo-data source)
-- **period**: Promotion period (for promo-data source)
+- **startTime**: Promotion start time (Unix timestamp)
+- **endTime**: Promotion end time (Unix timestamp)
+- **period**: Promotion period (registration years)
+- **actionType**: Type of action (e.g., "addnewdomain")
 
 ## Frontend Integration
 
@@ -145,19 +178,19 @@ The frontend displays promotional pricing with:
 ### Component Usage
 
 ```tsx
-{result.isPromotional && (
-  <div className="flex items-center gap-2">
-    <span className="text-sm text-gray-500 line-through">
-      ₹{result.originalPrice}
-    </span>
-    <span className="text-lg font-bold text-green-600">
-      ₹{result.price}
-    </span>
-    <span className="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full">
-      PROMO
-    </span>
-  </div>
-)}
+{
+  result.isPromotional && (
+    <div className="flex items-center gap-2">
+      <span className="text-sm text-gray-500 line-through">
+        ₹{result.originalPrice}
+      </span>
+      <span className="text-lg font-bold text-green-600">₹{result.price}</span>
+      <span className="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full">
+        PROMO
+      </span>
+    </div>
+  );
+}
 ```
 
 ## Admin Configuration
@@ -193,7 +226,7 @@ Admins can enable/disable promotional pricing display:
 All three pricing APIs are fetched in parallel to minimize latency:
 
 ```typescript
-const [customerPricingResponse, resellerPricingResponse, promoPricingResponse] = 
+const [customerPricingResponse, resellerPricingResponse, promoPricingResponse] =
   await Promise.all([
     api.get("/api/products/customer-price.json"),
     api.get("/api/products/reseller-price.json"),
@@ -244,11 +277,13 @@ The system includes comprehensive logging for promotional pricing:
 ### Common Issues
 
 1. **No Promotional Pricing Detected**
+
    - Check if promotional pricing is enabled in admin settings
    - Verify ResellerClub API credentials and permissions
    - Check if promo API has data for the specific TLD
 
 2. **Incorrect Promotional Prices**
+
    - Verify promo API data structure matches expected format
    - Check TLD matching logic for different TLD formats
    - Ensure price comparison logic is working correctly
