@@ -14,7 +14,6 @@ interface User {
   email: string;
   role: string;
   createdAt: string;
-  lastLogin?: string;
   isActive?: boolean;
 }
 
@@ -179,16 +178,6 @@ export default function AdminUsers() {
         <span className={`px-2 py-1 text-xs font-medium rounded-full ${row.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
           }`}>
           {row.isActive ? 'active' : 'inactive'}
-        </span>
-      )
-    },
-    {
-      key: 'lastLogin',
-      label: 'Last Login',
-      sortable: true,
-      render: (value: string) => (
-        <span className="text-sm text-gray-600">
-          {value || 'Never'}
         </span>
       )
     },
