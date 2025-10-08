@@ -338,9 +338,23 @@ export class ResellerClubAPI {
                     currency = livePricing[tld].currency || "INR";
                     pricingSource = "live";
 
+                    // Extract promotional pricing data
+                    const isPromotional =
+                      livePricing[tld].isPromotional || false;
+                    const originalPrice = livePricing[tld].originalPrice;
+                    const promotionalDetails =
+                      livePricing[tld].promotionalDetails;
+
                     console.log(
-                      `✅ [PRODUCTION] Live customer pricing for ${domain}: ₹${customerPrice} ${currency}`
+                      `✅ [PRODUCTION] Live customer pricing for ${domain}: ₹${customerPrice} ${currency}${
+                        isPromotional ? " (PROMOTIONAL)" : ""
+                      }`
                     );
+                    if (isPromotional && originalPrice) {
+                      console.log(
+                        `🎯 [PRODUCTION] Promotional pricing: Original ₹${originalPrice} → Promotional ₹${customerPrice}`
+                      );
+                    }
                     if (resellerPrice > 0) {
                       console.log(
                         `📊 [PRODUCTION] Reseller pricing for ${domain}: ₹${resellerPrice} ${currency} (Margin: ${

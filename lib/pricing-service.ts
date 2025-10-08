@@ -19,6 +19,7 @@
 
 import axios from "axios";
 import { ResellerClubResponse, DomainSearchResult } from "./types";
+import { SettingsService } from "./settings-service";
 
 // Environment configuration for ResellerClub API
 const RESELLERCLUB_API_URL = process.env.RESELLERCLUB_API_URL;
@@ -220,7 +221,7 @@ export class PricingService {
       }
 
       // Extract pricing for requested TLDs
-      tlds.forEach((tld) => {
+      for (const tld of tlds) {
         const cleanTld = tld.startsWith(".") ? tld.substring(1) : tld;
 
         // Try different variations of the TLD name
@@ -272,7 +273,11 @@ export class PricingService {
           let isPromotional = false;
           let promotionalDetails = null;
 
-          if (promotionalData) {
+          // Check if promotional pricing is enabled
+          const promotionalPricingEnabled =
+            await SettingsService.isPromotionalPricingEnabled();
+
+          if (promotionalPricingEnabled && promotionalData) {
             // Look for active promotions for this TLD
             const activePromotions = Object.values(promotionalData).filter(
               (promo: any) =>
@@ -307,6 +312,10 @@ export class PricingService {
                 );
               }
             }
+          } else if (!promotionalPricingEnabled) {
+            console.log(
+              `ℹ️ [PRICING] Promotional pricing disabled - using regular pricing for ${cleanTld}`
+            );
           }
 
           tldPricing[cleanTld] = {
@@ -336,7 +345,7 @@ export class PricingService {
             }${margin.toFixed(1)}%)`
           );
         }
-      });
+      }
 
       console.log(
         `✅ [PRICING] TLD pricing extracted in ${Date.now() - startTime}ms`
