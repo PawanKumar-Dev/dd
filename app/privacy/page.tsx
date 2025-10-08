@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import ClientOnly from '@/components/ClientOnly';
 import { motion } from 'framer-motion';
 import { Shield, Calendar, Lock, Eye, Database, Mail } from 'lucide-react';
+import { formatIndianDate } from '@/lib/dateUtils';
 
 interface User {
   firstName: string;
@@ -60,7 +61,7 @@ export default function PrivacyPage() {
             </p>
             <div className="flex items-center justify-center mt-4 text-sm text-gray-500">
               <Calendar className="h-4 w-4 mr-2" />
-              Last updated: {new Date().toLocaleDateString()}
+              Last updated: {formatIndianDate(new Date())}
             </div>
           </div>
 
