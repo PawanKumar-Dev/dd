@@ -276,6 +276,15 @@ export class PricingService {
 
           // Look for active promotions for this TLD in promo details
           if (pricingData.promoDetails) {
+            console.log(
+              `🔍 [PRICING] Checking promotions for TLD ${cleanTld}:`,
+              {
+                promotionalDataKeys: Object.keys(pricingData.promoDetails),
+                promotionalDataCount: Object.keys(pricingData.promoDetails)
+                  .length,
+              }
+            );
+
             const activePromotions = Object.values(
               pricingData.promoDetails
             ).filter((promo: any) => {
@@ -283,7 +292,21 @@ export class PricingService {
               const hasProductKey = promo.productkey;
               const tldMatches =
                 promo.productkey &&
-                promo.productkey.toLowerCase().includes(cleanTld.toLowerCase());
+                (promo.productkey
+                  .toLowerCase()
+                  .includes(cleanTld.toLowerCase()) ||
+                  promo.productkey.toLowerCase() ===
+                    `dot${cleanTld.toLowerCase()}` ||
+                  promo.productkey.toLowerCase() ===
+                    `centralnicza${cleanTld.toLowerCase()}`);
+
+              console.log(`🔍 [PRICING] Checking promotion:`, {
+                productkey: promo.productkey,
+                isActive,
+                hasProductKey,
+                tldMatches,
+                cleanTld,
+              });
 
               return isActive && hasProductKey && tldMatches;
             });

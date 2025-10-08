@@ -77,6 +77,7 @@ export async function GET(request: NextRequest) {
         "ca",
         "au",
         "de",
+        "eu",
         "fr",
         "it",
         "es",
