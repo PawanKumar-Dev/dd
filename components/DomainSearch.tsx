@@ -570,25 +570,6 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
           {/* Results */}
           {!isSearching && results.length > 0 && (
             <div className="space-y-4">
-              {/* Compact Legend */}
-              <div className="bg-white rounded-lg shadow-sm border border-[var(--google-border-light)] p-3">
-                <div className="flex items-center gap-4 text-xs">
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-2 h-2 bg-[var(--google-green)] rounded-full"></div>
-                    <span className="text-[var(--google-text-secondary)]" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>Live Price</span>
-                  </div>
-                  {results.some(r => r.isPromotional) && (
-                    <div className="flex items-center gap-1.5">
-                      <div className="w-2 h-2 bg-gradient-to-r from-orange-500 to-red-500 rounded-full"></div>
-                      <span className="text-[var(--google-text-secondary)]" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>Promotional</span>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-2 h-2 bg-[var(--google-text-tertiary)] rounded-full"></div>
-                    <span className="text-[var(--google-text-secondary)]" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>Unavailable</span>
-                  </div>
-                </div>
-              </div>
 
               {/* Results */}
               <div className="grid gap-3">
