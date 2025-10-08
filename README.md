@@ -1,266 +1,270 @@
-# Excel Technologies - Domain Management System
+# Domain Management System
 
-A modern, full-stack domain management platform built with Next.js 14, featuring complete ResellerClub API integration, secure payment processing, and comprehensive admin tools.
+A comprehensive domain registration and management platform built with Next.js 14, featuring ResellerClub API integration, payment processing, and admin management capabilities.
 
-## 🎯 Overview
+## 🚀 Features
 
-Complete domain registration and management solution with real-time pricing, secure payments, DNS management, and advanced admin capabilities. Built for both customers and administrators with a focus on security, performance, and user experience.
+### Core Functionality
 
-## ✨ Key Features
+- **Domain Search & Registration** - Search and register domains across 400+ TLDs
+- **Live Pricing** - Real-time pricing from ResellerClub API with promotional pricing support
+- **Payment Processing** - Integrated Razorpay payment gateway
+- **User Management** - Registration, authentication, and profile management
+- **Order Management** - Complete order tracking and invoice generation
+- **Admin Panel** - Comprehensive admin dashboard for system management
 
-### 🔍 Domain Management
+### Advanced Features
 
-- **Live Domain Search** - Real-time availability with ResellerClub API
-- **Promotional Pricing** - Dynamic pricing with promotional offers
-- **DNS Management** - Complete DNS record management with ResellerClub nameservers
-- **Domain Registration** - Complete ResellerClub API integration
+- **Promotional Pricing** - Admin-configurable promotional pricing display
+- **Multi-stage Registration** - Step-by-step user registration with geolocation
+- **Indian Timezone Support** - All dates and times displayed in IST
+- **Email Notifications** - Automated email notifications for orders and updates
+- **PDF Invoices** - Generate and download PDF invoices
+- **Failed Domain Alerts** - Admin notifications for failed domain registrations
 
-### 💳 Payment & Security
+## 🛠️ Tech Stack
 
-- **Multi-layer Payment Verification** - Razorpay integration with signature verification
-- **Secure Authentication** - JWT-based auth with role-based access
-- **Payment Security** - Domain registration only after confirmed payment
-- **Failed Domain Handling** - Automatic admin alerts and retry processes
+### Frontend
 
-### 👥 User Experience
+- **Next.js 14** - React framework with App Router
+- **TypeScript** - Type-safe development
+- **Tailwind CSS** - Utility-first CSS framework
+- **Framer Motion** - Animation library
+- **React Hook Form** - Form handling
+- **React Hot Toast** - Toast notifications
 
-- **User Dashboard** - Domain management and account control
-- **Shopping Cart** - Persistent cart with server synchronization
-- **Responsive Design** - Google Workspace theme, mobile-first
-- **Real-time Notifications** - Live updates and status alerts
+### Backend
 
-### 🛠️ Admin Tools
+- **Next.js API Routes** - Serverless API endpoints
+- **MongoDB** - NoSQL database with Mongoose ODM
+- **JWT Authentication** - Secure token-based authentication
+- **Bcrypt** - Password hashing
 
-- **Admin Dashboard** - Comprehensive management interface
-- **Order Management** - Track and manage all orders
-- **User Management** - Customer account administration
-- **Failed Domain Alerts** - Real-time notifications for registration failures
-- **Pricing Management** - TLD pricing and margin control
+### External Services
 
-## 🚀 Quick Start
+- **ResellerClub API** - Domain registration and pricing
+- **Razorpay** - Payment processing
+- **Nodemailer** - Email sending
+- **Puppeteer** - PDF generation
+
+## 📁 Project Structure
+
+```
+dd/
+├── app/                          # Next.js App Router
+│   ├── api/                      # API routes
+│   │   ├── auth/                 # Authentication endpoints
+│   │   ├── admin/                # Admin-only endpoints
+│   │   ├── domains/              # Domain-related endpoints
+│   │   ├── orders/               # Order management
+│   │   └── payments/             # Payment processing
+│   ├── admin/                    # Admin panel pages
+│   ├── dashboard/                # User dashboard
+│   └── (auth)/                   # Authentication pages
+├── components/                   # Reusable React components
+│   ├── admin/                    # Admin-specific components
+│   ├── ui/                       # Base UI components
+│   └── forms/                    # Form components
+├── lib/                          # Utility libraries
+│   ├── auth.ts                   # Authentication service
+│   ├── resellerclub.ts          # ResellerClub API integration
+│   ├── pricing-service.ts       # Pricing management
+│   ├── settings-service.ts      # Application settings
+│   └── dateUtils.ts             # Date formatting utilities
+├── models/                       # MongoDB schemas
+├── scripts/                      # Database scripts
+└── public/                       # Static assets
+```
+
+## 🚀 Getting Started
 
 ### Prerequisites
 
 - Node.js 18+
-- MongoDB
+- MongoDB database
 - ResellerClub API credentials
 - Razorpay account
 
 ### Installation
 
+1. **Clone the repository**
+
 ```bash
-# Clone repository
 git clone <repository-url>
-cd domain-management-system
-
-# Install dependencies
-npm install
-
-# Environment setup
-cp .env.example .env.local
-# Configure your environment variables
-
-# Run development server
-npm run dev
+   cd dd
 ```
 
-### Environment Variables
+2. **Install dependencies**
+
+   ```bash
+   npm install
+   ```
+
+3. **Environment Setup**
+   Create `.env.local` file:
 
 ```env
 # Database
 MONGODB_URI=mongodb://localhost:27017/domain-management
 
 # ResellerClub API
-RESELLERCLUB_API_URL=https://httpapi.com/api
-RESELLERCLUB_ID=your_resellerclub_id
-RESELLERCLUB_SECRET=your_resellerclub_secret
+   RESELLERCLUB_API_KEY=your_api_key
 RESELLERCLUB_RESELLER_ID=your_reseller_id
 
 # Razorpay
 RAZORPAY_KEY_ID=your_key_id
 RAZORPAY_KEY_SECRET=your_key_secret
-RAZORPAY_WEBHOOK_SECRET=your_webhook_secret
 
-# Email
+   # JWT
+   JWT_SECRET=your_jwt_secret
+
+   # Admin
+   ADMIN_EMAIL=admin@example.com
+   ADMIN_PASSWORD=your_admin_password
+
+   # Email (Optional)
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
-SMTP_USER=your_email
-SMTP_PASS=your_password
-FROM_EMAIL=noreply@yourdomain.com
-FROM_NAME=Excel Technologies
-
-# Admin
-ADMIN_EMAIL=admin@yourdomain.com
-ADMIN_PASSWORD=your-secure-admin-password
-ADMIN_FIRST_NAME=Admin
-ADMIN_LAST_NAME=User
+   SMTP_USER=your_email@gmail.com
+   SMTP_PASS=your_app_password
 ```
 
-## 👤 Admin User Management
-
-### Creating Admin User
-
-The system includes a secure admin user recreation script that enforces security best practices:
+4. **Initialize Database**
 
 ```bash
-# First time setup - create admin user
-npm run recreate-admin
+   npm run init-db
 ```
 
-### Security Features
-
-- **Environment-based Credentials** - Admin credentials must be set in `.env.local`
-- **Single Admin Policy** - Only one admin user allowed at a time
-- **Credential Verification** - Existing admin credentials verified before recreation
-- **No Default Passwords** - Prevents unauthorized access with default credentials
-
-### Admin Recreation Commands
+5. **Start Development Server**
 
 ```bash
-# Create admin user (first time)
-npm run recreate-admin
-
-# Force recreation (if admin exists)
-ADMIN_FORCE_RECREATE=true npm run recreate-admin
-
-# Check existing admin (without recreation)
-npm run recreate-admin
+   npm run dev
 ```
 
-### Required Environment Variables
+6. **Access Application**
+   - Frontend: http://localhost:3000
+   - Admin Panel: http://localhost:3000/admin
 
-```env
-# Admin credentials (REQUIRED for security)
-ADMIN_EMAIL=admin@yourdomain.com
-ADMIN_PASSWORD=your-secure-admin-password
-ADMIN_FIRST_NAME=Admin
-ADMIN_LAST_NAME=User
-```
+## 🔧 Available Scripts
 
-### Security Notes
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run init-db` - Initialize database with admin user
+- `npm run recreate-admin` - Recreate admin user
 
-- **Password is hidden** in script output for security
-- **Credentials must match** environment file exactly
-- **Verification required** before any admin changes
-- **No recreation** without proper credentials
+## 👥 User Roles
 
-## 🏗️ Architecture
+### Admin
 
-### Tech Stack
+- Full system access
+- User management
+- Order management
+- Payment management
+- Pricing management
+- Settings configuration
+- Failed domain notifications
 
-- **Frontend**: Next.js 14, React 18, TypeScript
-- **Styling**: Tailwind CSS, Google Workspace theme
-- **Backend**: Next.js API Routes, Node.js
-- **Database**: MongoDB with Mongoose
-- **Authentication**: JWT with HTTP-only cookies
-- **Payments**: Razorpay integration
-- **Email**: Nodemailer with SMTP
-- **State Management**: Zustand with persistence
+### Regular User
 
-### Key Components
+- Domain search and registration
+- Order history
+- Profile management
+- Invoice download
 
-- **Domain Search** - Live availability checking
-- **Payment Processing** - Secure payment verification
-- **DNS Management** - Record management interface
-- **Admin Panel** - Comprehensive management tools
-- **User Dashboard** - Customer account interface
+## 🌐 API Endpoints
 
-## 🔧 ResellerClub API Integration
+### Authentication
 
-### Complete Domain Registration Flow
-
-1. **Search Domain** - Check availability via `/api/domains/search.json`
-2. **Create Customer** - Create ResellerClub customer via `/api/customers/signup.json`
-3. **Create Contact** - Create contact via `/api/contacts/add.json`
-4. **Register Domain** - Register domain via `/api/domains/register.json`
-
-### API Methods
-
-- `ResellerClubAPI.searchDomain()` - Domain availability search
-- `ResellerClubAPI.createCustomer()` - Customer creation
-- `ResellerClubAPI.createContact()` - Contact creation
-- `ResellerClubAPI.registerDomain()` - Domain registration
-- `ResellerClubAPI.getOrCreateCustomerAndContact()` - Complete flow helper
-
-### Default Configuration
-
-- **Nameservers**: ResellerClub default nameservers
-- **Customer ID**: Configurable default customer ID
-- **Contact ID**: Configurable default contact ID
-
-## 📱 Pages & Routes
-
-### Public Pages
-
-- `/` - Homepage with domain search
-- `/about` - About page
-- `/contact` - Contact form
-- `/privacy` - Privacy policy
-- `/terms-and-conditions` - Terms and conditions
-
-### User Pages
-
-- `/login` - User authentication
-- `/register` - User registration
-- `/dashboard` - User dashboard
-- `/domain-management` - DNS management
-- `/cart` - Shopping cart
-- `/checkout` - Payment processing
-- `/payment-success` - Payment confirmation
-
-### Admin Pages
-
-- `/admin/dashboard` - Admin overview with failed domain alerts
-- `/admin/user-management` - User administration
-- `/admin/order-management` - Order tracking
-- `/admin/payment-management` - Payment monitoring
-- `/admin/pricing-management` - TLD pricing control
-- `/admin/system-settings` - System configuration
-
-## 🔧 API Endpoints
-
-### Domain Management
-
-- `GET /api/domains/search` - Search domain availability
-- `GET /api/domains/tlds` - Get TLD pricing
-- `POST /api/domains/dns` - DNS record management
-
-### Payment Processing
-
-- `POST /api/payments/create-order` - Create Razorpay order
-- `POST /api/payments/verify` - Verify payment and register domains
-- `POST /api/webhooks/razorpay` - Razorpay webhook handler
-
-### User Management
-
-- `POST /api/auth/login` - User authentication
 - `POST /api/auth/register` - User registration
-- `GET /api/user/domains` - Get user domains
+- `POST /api/auth/login` - User login
+- `POST /api/auth/activate` - Account activation
+- `POST /api/auth/resend-activation` - Resend activation email
+- `POST /api/auth/forgot-password` - Password reset request
+- `POST /api/auth/reset-password` - Password reset
+- `POST /api/auth/resend-activation` - Resend activation
+
+### Domains
+
+- `GET /api/domains/search` - Search domains
+- `POST /api/domains/renew` - Renew domain
+
+### Orders
+
+- `GET /api/orders` - Get user orders
+- `GET /api/orders/[id]` - Get specific order
+- `GET /api/orders/[id]/invoice` - Download invoice
+
+### Payments
+
+- `POST /api/payments/create-order` - Create payment order
+- `POST /api/payments/verify` - Verify payment
 
 ### Admin APIs
 
 - `GET /api/admin/users` - Get all users
 - `GET /api/admin/orders` - Get all orders
-- `GET /api/admin/failed-domains` - Get failed domain registrations
+- `GET /api/admin/payments` - Get payment data
+- `GET /api/admin/tld-pricing` - Get TLD pricing
+- `GET /api/admin/settings` - Get settings
+- `POST /api/admin/settings` - Update settings
+- `GET /api/admin/settings/promotional-pricing` - Get promotional pricing setting
+- `POST /api/admin/settings/promotional-pricing` - Update promotional pricing
 
-## 🛡️ Security Features
+## 🎯 Key Features Explained
 
-- **JWT Authentication** - Secure token-based auth
-- **Role-based Access** - Admin and user permissions
-- **Input Validation** - Comprehensive data validation
-- **XSS Protection** - Cross-site scripting prevention
-- **Rate Limiting** - API request throttling
-- **Payment Verification** - Multi-layer payment security
-- **HTTPS Enforcement** - Secure communication
+### Domain Search
 
-## 📊 Admin Notifications
+- Real-time availability checking
+- Live pricing from ResellerClub
+- Support for 400+ TLDs
+- Promotional pricing support
+- Cached pricing for performance
 
-### Failed Domain Registration Alerts
+### Payment Processing
 
-- **Email Notifications** - Urgent alerts to admin email
-- **Dashboard Alerts** - Real-time notifications in admin panel
-- **Action Items** - Clear next steps for resolution
-- **Order Tracking** - Complete order and customer details
+- Razorpay integration
+- Secure payment verification
+- Automatic domain registration on successful payment
+- Invoice generation
+
+### Admin Management
+
+- User management with role-based access
+- Order tracking and management
+- Payment monitoring
+- Pricing configuration
+- System settings management
+
+### Promotional Pricing
+
+- Admin-configurable promotional pricing
+- Real-time promotional price application
+- Original price display
+- Promotional period tracking
+
+## 🔒 Security Features
+
+- JWT-based authentication
+- Password hashing with bcrypt
+- Input validation and sanitization
+- CSRF protection
+- Rate limiting on API endpoints
+- Secure payment processing
+
+## 📱 Responsive Design
+
+- Mobile-first approach
+- Responsive admin panel
+- Touch-friendly interface
+- Optimized for all screen sizes
+
+## 🌍 Internationalization
+
+- Indian timezone support (IST)
+- Indian currency formatting (₹)
+- Indian date formats (DD/MM/YYYY)
+- Localized number formatting
 
 ## 🚀 Deployment
 
@@ -268,76 +272,58 @@ ADMIN_LAST_NAME=User
 
 ```bash
 npm run build
-npm start
+npm run start
 ```
 
-### Environment Setup
+### Environment Variables
 
-1. Configure all environment variables
-2. Set up MongoDB database
-3. Configure ResellerClub API credentials
-4. Set up Razorpay account
-5. Configure SMTP for email notifications
-6. Update default ResellerClub customer and contact IDs
+Ensure all production environment variables are set:
 
-## 📈 Performance
+- Database connection string
+- API credentials
+- JWT secret
+- Email configuration
 
-- **Code Splitting** - Automatic route-based splitting
-- **Image Optimization** - Next.js image optimization
-- **Caching** - API response caching
-- **Lazy Loading** - Component lazy loading
-- **Bundle Optimization** - Webpack optimization
+### Database Setup
 
-## 🔄 Recent Updates (v2.3.0)
+Run the initialization script on first deployment:
 
-### ResellerClub API Integration
+```bash
+npm run init-db
+```
 
-- **Complete Domain Registration Flow** - Full ResellerClub API integration
-- **Customer Management** - ResellerClub customer creation and management
-- **Contact Management** - ResellerClub contact creation and management
-- **Proper ID Management** - Numeric customer and contact IDs
-- **Nameserver Configuration** - ResellerClub default nameservers
+## 📊 Monitoring & Logging
 
-### Admin Notifications
+- Comprehensive logging system
+- Error tracking
+- Performance monitoring
+- Admin notifications for failures
 
-- **Real-time Alerts** - Failed domain registration notifications
-- **Enhanced UI** - Improved admin dashboard with notifications
-- **Payment Security** - Background cart clearing after payment
-- **Error Handling** - Better failed domain registration handling
+## 🤝 Contributing
 
-### User Experience
-
-- **Smoother Checkout** - Improved payment and registration flow
-- **Responsive Design** - Mobile-first approach
-- **Live Pricing** - Real-time domain pricing from ResellerClub
-
-## 🔧 Configuration
-
-### ResellerClub Setup
-
-1. Get ResellerClub API credentials
-2. Update `RESELLERCLUB_ID` and `RESELLERCLUB_SECRET`
-3. Replace default customer and contact IDs in `lib/resellerclub.ts`
-4. Configure nameservers in system settings
-
-### Payment Setup
-
-1. Create Razorpay account
-2. Get API keys and webhook secret
-3. Configure webhook URL: `https://yourdomain.com/api/webhooks/razorpay`
-
-## 📞 Support
-
-For technical support or questions:
-
-- **Email**: support@exceltechnologies.com
-- **Admin Panel**: Real-time system monitoring
-- **Documentation**: Comprehensive API and component docs
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
 ## 📄 License
 
-This project is proprietary software developed by Excel Technologies.
+This project is licensed under the MIT License.
 
----
+## 🆘 Support
 
-**Built with ❤️ by Excel Technologies**
+For support and questions:
+
+- Check the API documentation in `API.md`
+- Review the code comments
+- Create an issue in the repository
+
+## 🔄 Recent Updates
+
+- ✅ Promotional pricing system implementation
+- ✅ Admin settings management
+- ✅ Indian timezone support
+- ✅ Verbose logging reduction
+- ✅ Enhanced error handling
+- ✅ Improved user experience
