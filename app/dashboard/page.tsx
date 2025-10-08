@@ -22,6 +22,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { formatIndianDate } from '@/lib/dateUtils';
 import {
   ShoppingCart, Globe, LogOut, User, Settings, Star, Award, Shield, Clock,
   Lock, Smartphone, Headphones, Mail, Phone, MapPin, TrendingUp, Database,
@@ -581,7 +582,7 @@ export default function DashboardPage() {
                             {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                           </span>
                           <span className="text-sm text-gray-500">
-                            {new Date(order.createdAt).toLocaleDateString()}
+                            {formatIndianDate(order.createdAt)}
                           </span>
                         </div>
                       </div>
