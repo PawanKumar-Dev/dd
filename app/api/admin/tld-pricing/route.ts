@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AuthService } from "@/lib/auth";
 import { PricingService } from "@/lib/pricing-service";
+import { formatIndianCurrency, formatIndianNumber } from "@/lib/dateUtils";
 
 export async function GET(request: NextRequest) {
   try {
@@ -109,9 +110,10 @@ export async function GET(request: NextRequest) {
           if (tldData && tldData[tld]) {
             const customerPrice = parseFloat(tldData[tld].price) || 0;
             const resellerPrice = parseFloat(tldData[tld].resellerPrice) || 0;
-            const margin = customerPrice > 0 && resellerPrice > 0 
-              ? ((customerPrice - resellerPrice) / customerPrice * 100)
-              : 0;
+            const margin =
+              customerPrice > 0 && resellerPrice > 0
+                ? ((customerPrice - resellerPrice) / customerPrice) * 100
+                : 0;
 
             tldPricing.push({
               tld: `.${tld}`,
@@ -124,7 +126,9 @@ export async function GET(request: NextRequest) {
             });
 
             console.log(
-              `📊 [ADMIN] Processed ${tld}: Customer ₹${customerPrice}, Reseller ₹${resellerPrice}, Margin ${margin > 0 ? '+' : ''}${margin.toFixed(1)}%`
+              `📊 [ADMIN] Processed ${tld}: Customer ₹${customerPrice}, Reseller ₹${resellerPrice}, Margin ${
+                margin > 0 ? "+" : ""
+              }${margin.toFixed(1)}%`
             );
           }
         } catch (error) {
@@ -139,14 +143,28 @@ export async function GET(request: NextRequest) {
     // Sort by TLD name
     tldPricing.sort((a, b) => a.tld.localeCompare(b.tld));
 
-    const totalCustomerPrice = tldPricing.reduce((sum, tld) => sum + tld.customerPrice, 0);
-    const totalResellerPrice = tldPricing.reduce((sum, tld) => sum + tld.resellerPrice, 0);
-    const avgMargin = tldPricing.length > 0 
-      ? tldPricing.reduce((sum, tld) => sum + (tld.margin || 0), 0) / tldPricing.length 
-      : 0;
-    
+    const totalCustomerPrice = tldPricing.reduce(
+      (sum, tld) => sum + tld.customerPrice,
+      0
+    );
+    const totalResellerPrice = tldPricing.reduce(
+      (sum, tld) => sum + tld.resellerPrice,
+      0
+    );
+    const avgMargin =
+      tldPricing.length > 0
+        ? tldPricing.reduce((sum, tld) => sum + (tld.margin || 0), 0) /
+          tldPricing.length
+        : 0;
+
     console.log(`✅ [ADMIN] Fetched pricing for ${tldPricing.length} TLDs`);
-    console.log(`📊 [ADMIN] Pricing Summary: Total Customer ₹${totalCustomerPrice.toLocaleString()}, Total Reseller ₹${totalResellerPrice.toLocaleString()}, Avg Margin ${avgMargin > 0 ? '+' : ''}${avgMargin.toFixed(1)}%`);
+    console.log(
+      `📊 [ADMIN] Pricing Summary: Total Customer ${formatIndianCurrency(
+        totalCustomerPrice
+      )}, Total Reseller ${formatIndianCurrency(
+        totalResellerPrice
+      )}, Avg Margin ${avgMargin > 0 ? "+" : ""}${avgMargin.toFixed(1)}%`
+    );
 
     return NextResponse.json({
       success: true,

@@ -231,7 +231,8 @@ export async function GET(
     const subtotal = order.domains
       .filter((d: any) => d.status === "registered")
       .reduce(
-        (total: number, domain: any) => total + domain.price * domain.registrationPeriod,
+        (total: number, domain: any) =>
+          total + domain.price * domain.registrationPeriod,
         0
       );
     const tax = 0;
