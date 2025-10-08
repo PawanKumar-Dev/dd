@@ -257,13 +257,15 @@ export default function AdminPayments() {
     }
   ];
 
-  if (isLoading) {
+  // Don't render anything until user is loaded
+  if (!user || isLoading) {
     return (
-      <AdminLayout user={user} onLogout={handleLogout}>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
         </div>
-      </AdminLayout>
+      </div>
     );
   }
 
