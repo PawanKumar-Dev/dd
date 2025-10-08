@@ -24,6 +24,7 @@ import { useRouter } from 'next/navigation';
 import { DollarSign, RefreshCw, Search, Filter, Globe } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayoutNew';
 import AdminDataTable from '@/components/admin/AdminDataTable';
+import { formatIndianCurrency, formatIndianNumber, formatIndianDateTime } from '@/lib/dateUtils';
 
 /**
  * TLD Pricing Interface
@@ -165,7 +166,7 @@ export default function AdminTLDPricing() {
         <div className="flex items-center">
           <DollarSign className="h-4 w-4 text-green-500 mr-1" />
           <span className="font-semibold text-gray-900">
-            ₹{value.toLocaleString()}
+            {formatIndianCurrency(value)}
           </span>
           <span className="text-sm text-gray-500 ml-1">{row.currency}</span>
         </div>
@@ -179,7 +180,7 @@ export default function AdminTLDPricing() {
         <div className="flex items-center">
           <DollarSign className="h-4 w-4 text-blue-500 mr-1" />
           <span className="font-semibold text-gray-900">
-            ₹{value.toLocaleString()}
+            {formatIndianCurrency(value)}
           </span>
           <span className="text-sm text-gray-500 ml-1">{row.currency}</span>
         </div>
@@ -249,7 +250,7 @@ export default function AdminTLDPricing() {
             </p>
             {lastUpdated && (
               <p className="text-sm text-gray-500 mt-1">
-                Last updated: {new Date(lastUpdated).toLocaleString()}
+                Last updated: {formatIndianDateTime(lastUpdated)}
               </p>
             )}
           </div>

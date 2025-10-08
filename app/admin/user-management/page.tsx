@@ -6,6 +6,7 @@ import { Search, Filter, MoreVertical, Trash2, Eye, RefreshCw } from 'lucide-rea
 import AdminLayout from '@/components/admin/AdminLayoutNew';
 import AdminDataTable from '@/components/admin/AdminDataTable';
 import Modal from '@/components/Modal';
+import { formatIndianDate, formatIndianLongDateTime } from '@/lib/dateUtils';
 
 interface User {
   _id: string;
@@ -197,7 +198,7 @@ export default function AdminUsers() {
 
         return (
           <span className="text-sm text-gray-600">
-            {date.toLocaleDateString()}
+            {formatIndianDate(date)}
           </span>
         );
       }
@@ -308,13 +309,7 @@ export default function AdminUsers() {
               <div>
                 <label className="text-sm font-medium text-gray-500">Registration Date</label>
                 <p className="text-lg font-semibold text-gray-900">
-                  {new Date(selectedUser.createdAt).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
+                  {formatIndianLongDateTime(selectedUser.createdAt)}
                 </p>
               </div>
 
@@ -322,13 +317,7 @@ export default function AdminUsers() {
                 <label className="text-sm font-medium text-gray-500">Last Login</label>
                 <p className="text-lg font-semibold text-gray-900">
                   {selectedUser.lastLogin
-                    ? new Date(selectedUser.lastLogin).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })
+                    ? formatIndianLongDateTime(selectedUser.lastLogin)
                     : 'Never logged in'
                   }
                 </p>
