@@ -47,6 +47,33 @@ A comprehensive domain registration and management platform built with Next.js 1
 - **Nodemailer** - Email sending
 - **Puppeteer** - PDF generation
 
+## 🧪 Testing
+
+The project includes a comprehensive testing suite organized in the `tests/` directory:
+
+### Quick Start
+
+```bash
+# Run all tests
+node tests/run-tests.js
+
+# Run specific test categories
+node tests/run-tests.js api      # API tests
+node tests/run-tests.js debug    # Debug tools
+
+# Run specific tests
+node tests/run-tests.js test-final-promo    # Final promotional pricing test
+node tests/run-tests.js test-eu-pricing     # EU TLD specific test
+```
+
+### Test Categories
+
+- **API Tests** - Test ResellerClub API integration and promotional pricing
+- **Debug Tools** - Debug promotional pricing data and detection
+- **Utility Scripts** - Maintenance and update scripts
+
+For detailed testing documentation, see [tests/README.md](tests/README.md).
+
 ## 📁 Project Structure
 
 ```
