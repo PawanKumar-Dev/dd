@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
+import { formatIndianDateTime } from '@/lib/dateUtils';
 
 interface IPData {
   success: boolean;
@@ -78,7 +79,7 @@ export default function OutboundIPBadge() {
     <Badge
       variant={isMultipleIPs ? "secondary" : "default"}
       className="text-xs cursor-help"
-      title={`Outbound IP: ${primaryIP}${isMultipleIPs ? `\nAll IPs: ${allIPs.join(', ')}` : ''}\nLast checked: ${new Date(timestamp).toLocaleString()}`}
+      title={`Outbound IP: ${primaryIP}${isMultipleIPs ? `\nAll IPs: ${allIPs.join(', ')}` : ''}\nLast checked: ${formatIndianDateTime(timestamp)}`}
     >
       <div className="flex items-center gap-1">
         <div className={`w-2 h-2 rounded-full ${isMultipleIPs ? 'bg-orange-500' : 'bg-green-500'}`}></div>
