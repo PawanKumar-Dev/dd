@@ -191,8 +191,12 @@ export default function AdminOrdersPage() {
         <div className="flex items-center space-x-2">
           <User className="h-4 w-4 text-gray-400" />
           <div>
-            <div className="font-medium text-gray-900">{value.firstName} {value.lastName}</div>
-            <div className="text-sm text-gray-500">{value.email}</div>
+            <div className="font-medium text-gray-900">
+              {value ? `${value.firstName} ${value.lastName}` : 'Unknown User'}
+            </div>
+            <div className="text-sm text-gray-500">
+              {value?.email || 'No email available'}
+            </div>
           </div>
         </div>
       )
@@ -377,11 +381,16 @@ export default function AdminOrdersPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium text-gray-500">Name</label>
-                      <p className="text-lg">{selectedOrder.userId.firstName} {selectedOrder.userId.lastName}</p>
+                      <p className="text-lg">
+                        {selectedOrder.userId
+                          ? `${selectedOrder.userId.firstName} ${selectedOrder.userId.lastName}`
+                          : 'Unknown User'
+                        }
+                      </p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-500">Email</label>
-                      <p className="text-lg">{selectedOrder.userId.email}</p>
+                      <p className="text-lg">{selectedOrder.userId?.email || 'No email available'}</p>
                     </div>
                   </div>
                 </div>

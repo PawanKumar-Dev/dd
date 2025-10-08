@@ -1183,10 +1183,7 @@ export class ResellerClubAPI {
         type: "Contact",
       });
 
-      if (
-        contactResult.status !== "success" ||
-        !contactResult.data?.contactid
-      ) {
+      if (contactResult.status !== "success" || !contactResult.data) {
         console.error(
           `❌ [PRODUCTION] Failed to create ResellerClub contact for user ${userData.email}:`,
           contactResult.error
@@ -1197,7 +1194,8 @@ export class ResellerClubAPI {
         };
       }
 
-      const contactId = parseInt(contactResult.data.contactid);
+      // ResellerClub returns contact ID directly as a number
+      const contactId = parseInt(contactResult.data);
       console.log(
         `✅ [PRODUCTION] Created ResellerClub contact ${contactId} for user: ${userData.email}`
       );

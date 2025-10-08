@@ -199,8 +199,12 @@ export default function AdminDashboard() {
       sortable: true,
       render: (value: any) => (
         <div>
-          <div className="font-medium text-gray-900">{value.firstName} {value.lastName}</div>
-          <div className="text-sm text-gray-500">{value.email}</div>
+          <div className="font-medium text-gray-900">
+            {value ? `${value.firstName} ${value.lastName}` : 'Unknown User'}
+          </div>
+          <div className="text-sm text-gray-500">
+            {value?.email || 'No email available'}
+          </div>
         </div>
       )
     },
