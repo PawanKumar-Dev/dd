@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { AlertTriangle, X, CheckCircle, Clock, User, Mail, CreditCard, ExternalLink } from 'lucide-react';
+import { formatIndianDate, formatIndianDateTime } from '@/lib/dateUtils';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface FailedDomain {
@@ -167,7 +168,7 @@ export default function FailedDomainNotifications() {
                         </div>
                         <div className="flex items-center space-x-2">
                           <Clock className="h-4 w-4" />
-                          <span>{new Date(order.createdAt).toLocaleDateString()}</span>
+                          <span>{formatIndianDate(order.createdAt)}</span>
                         </div>
                       </div>
                     </div>
@@ -190,7 +191,7 @@ export default function FailedDomainNotifications() {
                             <span className="text-xs text-red-600">({domain.error})</span>
                           </div>
                           <span className="text-xs text-gray-500">
-                            {new Date(domain.failedAt).toLocaleString()}
+                            {formatIndianDateTime(domain.failedAt)}
                           </span>
                         </div>
                       ))}
