@@ -1267,22 +1267,24 @@ export class ResellerClubAPI {
         nameServers
       );
 
-      // Prepare nameserver parameters - ResellerClub expects 'ns' parameter with comma-separated values
-      const nameserverParams: any = {
+      // Prepare nameserver parameters using URLSearchParams for correct encoding
+      const params = new URLSearchParams({
         "domain-name": domainData.domainName,
-        years: domainData.years,
-        "customer-id": domainData.customerId, // ResellerClub customer ID (numeric)
-        "reg-contact-id": domainData.adminContactId, // Registrant contact ID (domain owner)
-        "admin-contact-id": domainData.adminContactId,
-        "tech-contact-id": domainData.techContactId,
-        "billing-contact-id": domainData.billingContactId,
-        "invoice-option": "NoInvoice", // Set invoice option
-        ns: nameServers.join(","), // Pass nameservers as comma-separated string
-      };
-
-      const response = await api.post("/api/domains/register.json", null, {
-        params: nameserverParams,
+        years: domainData.years.toString(),
+        "customer-id": domainData.customerId.toString(),
+        "reg-contact-id": domainData.adminContactId?.toString() || "",
+        "admin-contact-id": domainData.adminContactId?.toString() || "",
+        "tech-contact-id": domainData.techContactId?.toString() || "",
+        "billing-contact-id": domainData.billingContactId?.toString() || "",
+        "invoice-option": "NoInvoice",
       });
+
+      // Add each ns param separately using append() method
+      nameServers.forEach((ns) => {
+        params.append("ns", ns);
+      });
+
+      const response = await api.post("/api/domains/register.json", params);
 
       const responseTime = Date.now() - startTime;
       console.log(
