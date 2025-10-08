@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
   Settings,
@@ -40,6 +41,7 @@ interface IPData {
 }
 
 export default function AdminSettings() {
+  const router = useRouter();
   const [ipData, setIpData] = useState<IPData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [lastChecked, setLastChecked] = useState<Date | null>(null);
@@ -147,7 +149,7 @@ export default function AdminSettings() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => window.open('/admin/settings/promotional-pricing', '_blank')}
+                  onClick={() => router.push('/admin/settings/promotional-pricing')}
                   className="flex items-center gap-2"
                 >
                   <Settings className="h-4 w-4" />

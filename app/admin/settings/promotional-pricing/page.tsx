@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { AdminLayout } from '@/components/admin/AdminLayout';
+import AdminLayout from '@/components/admin/AdminLayoutNew';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
@@ -34,7 +34,17 @@ export default function PromotionalPricingSettingsPage() {
   const fetchSetting = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/admin/settings/promotional-pricing');
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error('Authentication required');
+        return;
+      }
+
+      const response = await fetch('/api/admin/settings/promotional-pricing', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
       const data = await response.json();
 
       if (data.success) {
@@ -53,10 +63,17 @@ export default function PromotionalPricingSettingsPage() {
   const updateSetting = async (enabled: boolean) => {
     try {
       setSaving(true);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error('Authentication required');
+        return;
+      }
+
       const response = await fetch('/api/admin/settings/promotional-pricing', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ enabled }),
       });
@@ -135,17 +152,23 @@ export default function PromotionalPricingSettingsPage() {
                         }
                       </p>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      {setting?.enabled ? (
-                        <ToggleRight className="h-6 w-6 text-blue-600" />
-                      ) : (
-                        <ToggleLeft className="h-6 w-6 text-gray-400" />
-                      )}
+                    <div className="flex items-center space-x-3">
                       <Switch
                         checked={setting?.enabled || false}
                         onCheckedChange={updateSetting}
                         disabled={saving}
+                        className="scale-110"
                       />
+                      <div className="flex items-center space-x-1">
+                        {setting?.enabled ? (
+                          <ToggleRight className="h-5 w-5 text-blue-600" />
+                        ) : (
+                          <ToggleLeft className="h-5 w-5 text-gray-400" />
+                        )}
+                        <span className="text-sm font-medium text-gray-700">
+                          {setting?.enabled ? "ON" : "OFF"}
+                        </span>
+                      </div>
                     </div>
                   </div>
 
