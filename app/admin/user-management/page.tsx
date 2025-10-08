@@ -185,11 +185,22 @@ export default function AdminUsers() {
       key: 'createdAt',
       label: 'Joined',
       sortable: true,
-      render: (value: string) => (
-        <span className="text-sm text-gray-600">
-          {new Date(value).toLocaleDateString()}
-        </span>
-      )
+      render: (value: string) => {
+        if (!value) {
+          return <span className="text-sm text-gray-400">-</span>;
+        }
+
+        const date = new Date(value);
+        if (isNaN(date.getTime())) {
+          return <span className="text-sm text-gray-400">-</span>;
+        }
+
+        return (
+          <span className="text-sm text-gray-600">
+            {date.toLocaleDateString()}
+          </span>
+        );
+      }
     },
     {
       key: 'actions',
