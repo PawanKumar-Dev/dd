@@ -18,6 +18,7 @@ import {
   MoreVertical
 } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayoutNew';
+import { formatIndianDate, formatIndianDateTime } from '@/lib/dateUtils';
 import AdminDataTable from '@/components/admin/AdminDataTable';
 import Invoice from '@/components/Invoice';
 import toast from 'react-hot-toast';
@@ -247,7 +248,7 @@ export default function AdminOrdersPage() {
       render: (value: string) => (
         <div className="flex items-center space-x-2">
           <Calendar className="h-4 w-4 text-gray-400" />
-          <span className="text-sm">{new Date(value).toLocaleDateString()}</span>
+          <span className="text-sm">{formatIndianDate(value)}</span>
         </div>
       )
     },
@@ -397,7 +398,7 @@ export default function AdminOrdersPage() {
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-500">Date</label>
-                      <p className="text-lg">{new Date(selectedOrder.createdAt).toLocaleString()}</p>
+                      <p className="text-lg">{formatIndianDateTime(selectedOrder.createdAt)}</p>
                     </div>
                   </div>
                 </div>

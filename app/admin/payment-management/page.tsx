@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { CreditCard, Search, Filter, MoreVertical, Eye, CheckCircle, XCircle, Clock, DollarSign } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayoutNew';
 import AdminDataTable from '@/components/admin/AdminDataTable';
+import { formatIndianDate, formatIndianTime, formatIndianDateTime, formatIndianCurrency } from '@/lib/dateUtils';
 
 interface Payment {
   id: string;
@@ -182,7 +183,7 @@ export default function AdminPayments() {
       sortable: true,
       render: (value: number, row: Payment) => (
         <div className="text-sm font-medium text-gray-900">
-          ₹{value.toLocaleString()}
+          {formatIndianCurrency(value)}
         </div>
       )
     },
@@ -234,8 +235,8 @@ export default function AdminPayments() {
       sortable: true,
       render: (value: string) => (
         <div>
-          <div className="text-sm text-gray-900">{new Date(value).toLocaleDateString()}</div>
-          <div className="text-xs text-gray-500">{new Date(value).toLocaleTimeString()}</div>
+          <div className="text-sm text-gray-900">{formatIndianDate(value)}</div>
+          <div className="text-xs text-gray-500">{formatIndianTime(value)}</div>
         </div>
       )
     },
@@ -373,11 +374,11 @@ export default function AdminPayments() {
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-500">Created At</label>
-                      <p className="text-lg">{new Date(selectedPayment.createdAt).toLocaleString()}</p>
+                      <p className="text-lg">{formatIndianDateTime(selectedPayment.createdAt)}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-500">Processed At</label>
-                      <p className="text-lg">{selectedPayment.processedAt ? new Date(selectedPayment.processedAt).toLocaleString() : 'Not processed'}</p>
+                      <p className="text-lg">{selectedPayment.processedAt ? formatIndianDateTime(selectedPayment.processedAt) : 'Not processed'}</p>
                     </div>
                   </div>
                 </div>
