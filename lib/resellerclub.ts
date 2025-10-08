@@ -322,19 +322,13 @@ export class ResellerClubAPI {
                   const livePricing = await PricingService.getTLDPricing([tld]);
 
                   if (livePricing && livePricing[tld]) {
-                    const customerPrice =
-                      parseFloat(livePricing[tld].price) || 0;
+                    const finalPrice = parseFloat(livePricing[tld].price) || 0;
                     const resellerPrice =
                       parseFloat(livePricing[tld].resellerPrice) || 0;
                     const margin =
-                      customerPrice > 0 && resellerPrice > 0
-                        ? ((customerPrice - resellerPrice) / customerPrice) *
-                          100
+                      finalPrice > 0 && resellerPrice > 0
+                        ? ((finalPrice - resellerPrice) / finalPrice) * 100
                         : 0;
-
-                    price = customerPrice; // Use customer price for display
-                    currency = livePricing[tld].currency || "INR";
-                    pricingSource = "live";
 
                     // Extract promotional pricing data
                     const isPromotional =
@@ -343,14 +337,19 @@ export class ResellerClubAPI {
                     const promotionalDetails =
                       livePricing[tld].promotionalDetails;
 
+                    // Use the final price from PricingService (already includes promotional pricing)
+                    price = finalPrice;
+                    currency = livePricing[tld].currency || "INR";
+                    pricingSource = "live";
+
                     console.log(
-                      `✅ [PRODUCTION] Live customer pricing for ${domain}: ₹${customerPrice} ${currency}${
+                      `✅ [PRODUCTION] Live pricing for ${domain}: ₹${finalPrice} ${currency}${
                         isPromotional ? " (PROMOTIONAL)" : ""
                       }`
                     );
                     if (isPromotional && originalPrice) {
                       console.log(
-                        `🎯 [PRODUCTION] Promotional pricing: Original ₹${originalPrice} → Promotional ₹${customerPrice}`
+                        `🎯 [PRODUCTION] Promotional pricing: Original ₹${originalPrice} → Promotional ₹${finalPrice}`
                       );
                     }
                     if (resellerPrice > 0) {

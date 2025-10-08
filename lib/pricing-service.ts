@@ -276,15 +276,6 @@ export class PricingService {
 
           // Look for active promotions for this TLD in promo details
           if (pricingData.promoDetails) {
-            console.log(
-              `🔍 [PRICING] Checking promotions for TLD ${cleanTld}:`,
-              {
-                promotionalDataKeys: Object.keys(pricingData.promoDetails),
-                promotionalDataCount: Object.keys(pricingData.promoDetails)
-                  .length,
-              }
-            );
-
             const activePromotions = Object.values(
               pricingData.promoDetails
             ).filter((promo: any) => {
@@ -299,14 +290,6 @@ export class PricingService {
                     `dot${cleanTld.toLowerCase()}` ||
                   promo.productkey.toLowerCase() ===
                     `centralnicza${cleanTld.toLowerCase()}`);
-
-              console.log(`🔍 [PRICING] Checking promotion:`, {
-                productkey: promo.productkey,
-                isActive,
-                hasProductKey,
-                tldMatches,
-                cleanTld,
-              });
 
               return isActive && hasProductKey && tldMatches;
             });
@@ -350,6 +333,17 @@ export class PricingService {
           // Check if promotional pricing is enabled
           const promotionalPricingEnabled =
             await SettingsService.isPromotionalPricingEnabled();
+
+          console.log(
+            `🔍 [PRICING] Promotional pricing check for ${cleanTld}:`,
+            {
+              promotionalPricingEnabled,
+              isPromotional,
+              promoPrice,
+              customerPrice,
+              finalCustomerPrice,
+            }
+          );
 
           if (promotionalPricingEnabled && isPromotional && promoPrice > 0) {
             finalCustomerPrice = promoPrice;

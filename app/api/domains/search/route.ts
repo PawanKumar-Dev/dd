@@ -50,17 +50,21 @@ export async function POST(request: NextRequest) {
       // Search only for the specific TLD the user entered
       searchTlds = [userTLD];
     } else {
-      // User entered just a base domain (e.g., "anutech") - default to .com
+      // User entered just a base domain (e.g., "anutech")
       baseDomain = domain;
-      searchTlds = ["com"]; // Default to .com only
 
-      console.log(
-        `🌐 [API-${requestId}] Base domain search, defaulting to .com:`,
-        {
-          baseDomain: baseDomain,
-          searchTlds: searchTlds,
-        }
-      );
+      // Use provided TLDs or default to .com
+      if (tlds && typeof tlds === "string") {
+        searchTlds = tlds.split(",").map((tld) => tld.trim());
+      } else {
+        searchTlds = ["com"]; // Default to .com only
+      }
+
+      console.log(`🌐 [API-${requestId}] Base domain search:`, {
+        baseDomain: baseDomain,
+        searchTlds: searchTlds,
+        providedTlds: tlds,
+      });
     }
 
     // Validate base domain name
