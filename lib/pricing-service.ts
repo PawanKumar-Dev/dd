@@ -100,35 +100,45 @@ export class PricingService {
     }
 
     try {
-      // Fetch customer pricing
-      const customerPricingResponse = await api.get(
-        "/api/products/customer-price.json"
-      );
+      // Fetch all pricing data in parallel
+      const [
+        customerPricingResponse,
+        resellerPricingResponse,
+        promoDetailsResponse,
+      ] = await Promise.all([
+        api.get("/api/products/customer-price.json"),
+        api.get("/api/products/reseller-price.json"),
+        api.get("/api/resellers/promo-details.json"),
+      ]);
+
       const customerTldCount = Object.keys(
         customerPricingResponse.data || {}
       ).length;
+      const resellerTldCount = Object.keys(
+        resellerPricingResponse.data || {}
+      ).length;
+      const promoCount = Object.keys(promoDetailsResponse.data || {}).length;
+
       console.log(
         `✅ [PRICING] Customer pricing fetched in ${
           Date.now() - startTime
         }ms - ${customerTldCount} TLDs available`
       );
-
-      // Fetch reseller pricing
-      const resellerPricingResponse = await api.get(
-        "/api/products/reseller-price.json"
-      );
-      const resellerTldCount = Object.keys(
-        resellerPricingResponse.data || {}
-      ).length;
       console.log(
         `✅ [PRICING] Reseller pricing fetched in ${
           Date.now() - startTime
         }ms - ${resellerTldCount} TLDs available`
       );
+      console.log(
+        `✅ [PRICING] Promotional details fetched in ${
+          Date.now() - startTime
+        }ms - ${promoCount} promotions available`
+      );
 
       const pricingData = {
         customerPricing: customerPricingResponse.data,
         resellerPricing: resellerPricingResponse.data,
+        promoDetails: promoDetailsResponse.data,
         timestamp: new Date().toISOString(),
       };
 
