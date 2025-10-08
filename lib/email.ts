@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import { formatIndianDate, formatIndianDateTime } from './dateUtils';
+import { formatIndianDate, formatIndianDateTime } from "./dateUtils";
 
 const SMTP_HOST = process.env.SMTP_HOST;
 const SMTP_PORT = process.env.SMTP_PORT;
@@ -152,9 +152,9 @@ export class EmailService {
     const domainList = domains
       .map(
         (domain) =>
-          `<li>${
-            domain.domainName
-          } - Expires: ${formatIndianDate(domain.expiresAt)}</li>`
+          `<li>${domain.domainName} - Expires: ${formatIndianDate(
+            domain.expiresAt
+          )}</li>`
       )
       .join("");
 
@@ -387,7 +387,9 @@ export class EmailService {
               </tr>
               <tr>
                 <td style="padding: 8px 0; color: #6b7280;">Order Date:</td>
-                <td style="padding: 8px 0; font-weight: 600; color: #1f2937;">${formatIndianDateTime(orderData.createdAt)}</td>
+                <td style="padding: 8px 0; font-weight: 600; color: #1f2937;">${formatIndianDateTime(
+                  orderData.createdAt
+                )}</td>
               </tr>
             </table>
           </div>

@@ -4,26 +4,26 @@
  */
 
 // Indian timezone options
-const INDIAN_TIMEZONE = 'Asia/Kolkata';
-const INDIAN_LOCALE = 'en-IN';
+const INDIAN_TIMEZONE = "Asia/Kolkata";
+const INDIAN_LOCALE = "en-IN";
 
 /**
  * Format a date to Indian date format (DD/MM/YYYY)
  */
 export function formatIndianDate(date: string | Date): string {
-  if (!date) return '-';
-  
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-  
+  if (!date) return "-";
+
+  const dateObj = typeof date === "string" ? new Date(date) : date;
+
   if (isNaN(dateObj.getTime())) {
-    return '-';
+    return "-";
   }
-  
+
   return dateObj.toLocaleDateString(INDIAN_LOCALE, {
     timeZone: INDIAN_TIMEZONE,
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
   });
 }
 
@@ -31,22 +31,22 @@ export function formatIndianDate(date: string | Date): string {
  * Format a date to Indian date and time format (DD/MM/YYYY, HH:MM AM/PM)
  */
 export function formatIndianDateTime(date: string | Date): string {
-  if (!date) return '-';
-  
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-  
+  if (!date) return "-";
+
+  const dateObj = typeof date === "string" ? new Date(date) : date;
+
   if (isNaN(dateObj.getTime())) {
-    return '-';
+    return "-";
   }
-  
+
   return dateObj.toLocaleString(INDIAN_LOCALE, {
     timeZone: INDIAN_TIMEZONE,
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
   });
 }
 
@@ -54,19 +54,19 @@ export function formatIndianDateTime(date: string | Date): string {
  * Format a date to Indian time format (HH:MM AM/PM)
  */
 export function formatIndianTime(date: string | Date): string {
-  if (!date) return '-';
-  
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-  
+  if (!date) return "-";
+
+  const dateObj = typeof date === "string" ? new Date(date) : date;
+
   if (isNaN(dateObj.getTime())) {
-    return '-';
+    return "-";
   }
-  
+
   return dateObj.toLocaleTimeString(INDIAN_LOCALE, {
     timeZone: INDIAN_TIMEZONE,
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
   });
 }
 
@@ -74,19 +74,19 @@ export function formatIndianTime(date: string | Date): string {
  * Format a date to Indian long date format (DD Month YYYY)
  */
 export function formatIndianLongDate(date: string | Date): string {
-  if (!date) return '-';
-  
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-  
+  if (!date) return "-";
+
+  const dateObj = typeof date === "string" ? new Date(date) : date;
+
   if (isNaN(dateObj.getTime())) {
-    return '-';
+    return "-";
   }
-  
+
   return dateObj.toLocaleDateString(INDIAN_LOCALE, {
     timeZone: INDIAN_TIMEZONE,
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
+    day: "numeric",
+    month: "long",
+    year: "numeric",
   });
 }
 
@@ -94,22 +94,22 @@ export function formatIndianLongDate(date: string | Date): string {
  * Format a date to Indian long date and time format (DD Month YYYY, HH:MM AM/PM)
  */
 export function formatIndianLongDateTime(date: string | Date): string {
-  if (!date) return '-';
-  
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-  
+  if (!date) return "-";
+
+  const dateObj = typeof date === "string" ? new Date(date) : date;
+
   if (isNaN(dateObj.getTime())) {
-    return '-';
+    return "-";
   }
-  
+
   return dateObj.toLocaleString(INDIAN_LOCALE, {
     timeZone: INDIAN_TIMEZONE,
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
   });
 }
 
@@ -117,7 +117,9 @@ export function formatIndianLongDateTime(date: string | Date): string {
  * Get current date in Indian timezone
  */
 export function getCurrentIndianDate(): Date {
-  return new Date(new Date().toLocaleString("en-US", { timeZone: INDIAN_TIMEZONE }));
+  return new Date(
+    new Date().toLocaleString("en-US", { timeZone: INDIAN_TIMEZONE })
+  );
 }
 
 /**
@@ -125,10 +127,10 @@ export function getCurrentIndianDate(): Date {
  */
 export function formatIndianCurrency(amount: number): string {
   return new Intl.NumberFormat(INDIAN_LOCALE, {
-    style: 'currency',
-    currency: 'INR',
+    style: "currency",
+    currency: "INR",
     minimumFractionDigits: 0,
-    maximumFractionDigits: 2
+    maximumFractionDigits: 2,
   }).format(amount);
 }
 
