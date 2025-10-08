@@ -7,7 +7,7 @@ A comprehensive domain registration and management platform built with Next.js 1
 ### Core Functionality
 
 - **Domain Search & Registration** - Search and register domains across 400+ TLDs
-- **Live Pricing** - Real-time pricing from ResellerClub API with promotional pricing support
+- **Live Pricing** - Real-time pricing from ResellerClub API with multi-source promotional pricing support
 - **Payment Processing** - Integrated Razorpay payment gateway
 - **User Management** - Registration, authentication, and profile management
 - **Order Management** - Complete order tracking and invoice generation
@@ -15,7 +15,7 @@ A comprehensive domain registration and management platform built with Next.js 1
 
 ### Advanced Features
 
-- **Promotional Pricing** - Admin-configurable promotional pricing display
+- **Promotional Pricing** - Multi-API promotional pricing with automatic detection and display
 - **Multi-stage Registration** - Step-by-step user registration with geolocation
 - **Indian Timezone Support** - All dates and times displayed in IST
 - **Email Notifications** - Automated email notifications for orders and updates
@@ -238,10 +238,13 @@ SMTP_PORT=587
 
 ### Promotional Pricing
 
-- Admin-configurable promotional pricing
-- Real-time promotional price application
-- Original price display
-- Promotional period tracking
+- **Multi-API Integration**: Fetches from customer, reseller, and promo pricing APIs
+- **Automatic Detection**: Compares promo prices with customer prices to identify active promotions
+- **Two-Tier System**: Primary promo API data with fallback to promotional details API
+- **Real-time Application**: Applies promotional pricing when `promoPrice < customerPrice`
+- **Visual Indicators**: Displays strikethrough original prices and PROMO badges
+- **Admin Control**: Toggle promotional pricing display on/off
+- **Source Tracking**: Tracks whether pricing came from promo API or promotional data
 
 ## 🔒 Security Features
 

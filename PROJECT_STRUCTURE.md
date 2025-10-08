@@ -275,6 +275,16 @@ function MyPage() {
 - **Component README**: Detailed component documentation
 - **API Documentation**: Complete API reference
 - **Project README**: Setup and usage instructions
+- **Promotional Pricing Guide**: Comprehensive promotional pricing system documentation
 - **Code Comments**: Inline documentation
+
+### Documentation Files
+
+- `README.md` - Main project documentation
+- `API.md` - Complete API reference with promotional pricing endpoints
+- `PROMOTIONAL_PRICING.md` - Detailed promotional pricing system guide
+- `PROJECT_STRUCTURE.md` - This file, project architecture overview
+- `SETUP.md` - Setup and installation instructions
+- `TESTING_MODE.md` - Testing and development guidelines
 
 This component-based architecture makes the project highly maintainable, scalable, and developer-friendly while providing a consistent user experience across all pages.

@@ -245,6 +245,7 @@ export class PricingService {
         if (foundTld) {
           const customerPricing = pricingData.customerPricing[foundTld];
           const resellerPricing = pricingData.resellerPricing[foundTld] || null;
+          const promoPricing = pricingData.promoPricing[foundTld] || null;
 
           // Extract customer registration price (1 year)
           let customerPrice = 0;
@@ -267,6 +268,16 @@ export class PricingService {
             resellerPrice = parseFloat(resellerPricing.addnewdomain["1"]);
           }
 
+          // Extract promo registration price (1 year) - this is the discounted price
+          let promoPrice = 0;
+          if (
+            promoPricing &&
+            promoPricing.addnewdomain &&
+            promoPricing.addnewdomain["1"]
+          ) {
+            promoPrice = parseFloat(promoPricing.addnewdomain["1"]);
+          }
+
           // Check for promotional pricing
           let finalCustomerPrice = customerPrice;
           let finalResellerPrice = resellerPrice;
@@ -277,13 +288,40 @@ export class PricingService {
           const promotionalPricingEnabled =
             await SettingsService.isPromotionalPricingEnabled();
 
-          if (promotionalPricingEnabled && promotionalData) {
+          // First, check if we have promo pricing from the API (most reliable)
+          if (
+            promotionalPricingEnabled &&
+            promoPrice > 0 &&
+            promoPrice < customerPrice
+          ) {
+            finalCustomerPrice = promoPrice;
+            isPromotional = true;
+            promotionalDetails = {
+              source: "promo-api",
+              originalCustomerPrice: customerPrice,
+              promotionalPrice: promoPrice,
+              discount: customerPrice - promoPrice,
+            };
+
+            console.log(
+              `✅ [PRICING] Applied promo API pricing for ${cleanTld}: Original ₹${customerPrice} → Promotional ₹${finalCustomerPrice}`
+            );
+          }
+          // Fallback to promotional data if promo API doesn't have data
+          else if (promotionalPricingEnabled && promotionalData) {
             // Look for active promotions for this TLD
             const activePromotions = Object.values(promotionalData).filter(
-              (promo: any) =>
-                promo.isactive === "true" &&
-                promo.productkey &&
-                promo.productkey.toLowerCase().includes(cleanTld.toLowerCase())
+              (promo: any) => {
+                const isActive = promo.isactive === "true";
+                const hasProductKey = promo.productkey;
+                const tldMatches =
+                  promo.productkey &&
+                  promo.productkey
+                    .toLowerCase()
+                    .includes(cleanTld.toLowerCase());
+
+                return isActive && hasProductKey && tldMatches;
+              }
             );
 
             if (activePromotions.length > 0) {
@@ -300,6 +338,7 @@ export class PricingService {
                   parseFloat(promotion.resellerprice) || resellerPrice;
                 isPromotional = true;
                 promotionalDetails = {
+                  source: "promo-data",
                   startTime: promotion.starttime,
                   endTime: promotion.endtime,
                   period: promotion.period,
@@ -307,11 +346,11 @@ export class PricingService {
                   originalResellerPrice: resellerPrice,
                 };
 
-                // Promotional pricing applied (logged in summary)
+                console.log(
+                  `✅ [PRICING] Applied promotional pricing for ${cleanTld}: Original ₹${customerPrice} → Promotional ₹${finalCustomerPrice}`
+                );
               }
             }
-          } else if (!promotionalPricingEnabled) {
-            // Promotional pricing disabled (logged in summary)
           }
 
           tldPricing[cleanTld] = {

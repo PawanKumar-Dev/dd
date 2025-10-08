@@ -121,22 +121,19 @@ export class ResellerClubAPI {
     );
 
     try {
-      // Fetch customer pricing
-      const customerPricingResponse = await api.get(
-        "/api/products/customer-price.json"
-      );
-      console.log(
-        `✅ [PRODUCTION] Customer pricing fetched in ${
-          Date.now() - startTime
-        }ms`
-      );
+      // Fetch all three pricing APIs in parallel
+      const [
+        customerPricingResponse,
+        resellerPricingResponse,
+        promoPricingResponse,
+      ] = await Promise.all([
+        api.get("/api/products/customer-price.json"),
+        api.get("/api/products/reseller-price.json"),
+        api.get("/api/products/promo-price.json"),
+      ]);
 
-      // Fetch reseller pricing
-      const resellerPricingResponse = await api.get(
-        "/api/products/reseller-price.json"
-      );
       console.log(
-        `✅ [PRODUCTION] Reseller pricing fetched in ${
+        `✅ [PRODUCTION] All pricing data fetched in ${
           Date.now() - startTime
         }ms`
       );
@@ -144,6 +141,7 @@ export class ResellerClubAPI {
       return {
         customerPricing: customerPricingResponse.data,
         resellerPricing: resellerPricingResponse.data,
+        promoPricing: promoPricingResponse.data,
         timestamp: new Date().toISOString(),
       };
     } catch (error) {
@@ -394,9 +392,18 @@ export class ResellerClubAPI {
               currency: currency,
               registrationPeriod: 1, // Default to 1 year
               pricingSource: pricingSource, // Add pricing source info
-              originalPrice: undefined,
-              isPromotional: false,
-              promotionalDetails: undefined,
+              originalPrice:
+                livePricing && livePricing[tld]
+                  ? livePricing[tld].originalPrice
+                  : undefined,
+              isPromotional:
+                livePricing && livePricing[tld]
+                  ? livePricing[tld].isPromotional || false
+                  : false,
+              promotionalDetails:
+                livePricing && livePricing[tld]
+                  ? livePricing[tld].promotionalDetails
+                  : undefined,
             });
           } else {
             console.warn(
@@ -681,9 +688,22 @@ export class ResellerClubAPI {
                   currency = livePricing[tld].currency || "INR";
                   pricingSource = "live";
 
+                  // Extract promotional pricing data
+                  const isPromotional = livePricing[tld].isPromotional || false;
+                  const originalPrice = livePricing[tld].originalPrice;
+                  const promotionalDetails =
+                    livePricing[tld].promotionalDetails;
+
                   console.log(
-                    `✅ [PRODUCTION] Live customer pricing for ${domain}: ₹${customerPrice} ${currency}`
+                    `✅ [PRODUCTION] Live customer pricing for ${domain}: ₹${customerPrice} ${currency}${
+                      isPromotional ? " (PROMOTIONAL)" : ""
+                    }`
                   );
+                  if (isPromotional && originalPrice) {
+                    console.log(
+                      `🎯 [PRODUCTION] Promotional pricing: Original ₹${originalPrice} → Promotional ₹${customerPrice}`
+                    );
+                  }
                   if (resellerPrice > 0) {
                     console.log(
                       `📊 [PRODUCTION] Reseller pricing for ${domain}: ₹${resellerPrice} ${currency} (Margin: ${
@@ -722,9 +742,18 @@ export class ResellerClubAPI {
               currency: currency,
               registrationPeriod: 1, // Default to 1 year
               pricingSource: pricingSource, // Add pricing source info
-              originalPrice: undefined,
-              isPromotional: false,
-              promotionalDetails: undefined,
+              originalPrice:
+                livePricing && livePricing[tld]
+                  ? livePricing[tld].originalPrice
+                  : undefined,
+              isPromotional:
+                livePricing && livePricing[tld]
+                  ? livePricing[tld].isPromotional || false
+                  : false,
+              promotionalDetails:
+                livePricing && livePricing[tld]
+                  ? livePricing[tld].promotionalDetails
+                  : undefined,
             });
           } else {
             console.warn(

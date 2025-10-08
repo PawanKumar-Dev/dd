@@ -211,11 +211,13 @@ Search for domain availability and pricing.
     "originalPrice": number,
     "isPromotional": true|false,
     "promotionalDetails": {
+      "source": "promo-api" | "promo-data",
+      "originalCustomerPrice": number,
+      "promotionalPrice": number,
+      "discount": number,
       "startTime": "string",
       "endTime": "string",
-      "period": "string",
-      "originalCustomerPrice": number,
-      "originalResellerPrice": number
+      "period": "string"
     }
     }
   ]
@@ -612,6 +614,48 @@ Update application settings (Admin only).
   }
 }
 ```
+
+## Promotional Pricing System
+
+The system implements a comprehensive promotional pricing solution that fetches data from multiple ResellerClub APIs to provide accurate promotional pricing information.
+
+### How It Works
+
+1. **Multi-API Integration**: Fetches pricing from three ResellerClub APIs in parallel:
+   - `/api/products/customer-price.json` - Customer-facing prices
+   - `/api/products/reseller-price.json` - Base reseller costs
+   - `/api/products/promo-price.json` - Promotional/discounted prices
+
+2. **Automatic Detection**: Compares promo prices with customer prices to identify active promotions
+3. **Two-Tier System**: 
+   - Primary: Uses promo API data (most reliable)
+   - Fallback: Uses promotional details API for additional promotion data
+4. **Price Application**: Only applies promotional pricing when `promoPrice < customerPrice`
+
+### Promotional Pricing Data Structure
+
+When a domain has promotional pricing, the response includes:
+
+```json
+{
+  "domainName": "example.eu",
+  "price": 198,
+  "originalPrice": 768,
+  "isPromotional": true,
+  "promotionalDetails": {
+    "source": "promo-api",
+    "originalCustomerPrice": 768,
+    "promotionalPrice": 198,
+    "discount": 570
+  }
+}
+```
+
+### Visual Indicators
+
+- **Strikethrough**: Original price displayed with strikethrough
+- **PROMO Badge**: Visual indicator next to promotional prices
+- **Price Highlighting**: Promotional prices are highlighted
 
 ### GET /api/admin/settings/promotional-pricing
 
