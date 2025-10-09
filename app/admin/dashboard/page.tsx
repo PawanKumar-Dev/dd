@@ -15,7 +15,6 @@ import {
 } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayoutNew';
 import AdminDataTable from '@/components/admin/AdminDataTable';
-import FailedDomainNotifications from '@/components/admin/FailedDomainNotifications';
 import { formatIndianDate } from '@/lib/dateUtils';
 
 interface User {
@@ -49,7 +48,6 @@ interface Order {
     expiresAt?: Date;
   }[];
   successfulDomains: string[];
-  failedDomains: string[];
   createdAt: string;
   updatedAt: string;
   invoiceNumber?: string;
@@ -272,8 +270,6 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Failed Domain Registration Notifications */}
-        <FailedDomainNotifications />
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
