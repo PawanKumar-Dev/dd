@@ -12,9 +12,9 @@ const PORTS = [3000, 3001, 3002];
  */
 async function killPorts(ports) {
   const platform = os.platform();
-  
+
   console.log(`🔍 Checking for processes on ports: ${ports.join(', ')}`);
-  
+
   for (const port of ports) {
     try {
       await killPort(port, platform);
@@ -32,27 +32,27 @@ async function killPorts(ports) {
 function killPort(port, platform) {
   return new Promise((resolve, reject) => {
     let command;
-    
+
     if (platform === 'win32') {
       // Windows command
       command = `netstat -ano | findstr :${port}`;
     } else {
-      // Unix-like systems (Linux, macOS)
-      command = `lsof -ti:${port}`;
+      // Unix-like systems (Linux, macOS) - use netstat instead of lsof
+      command = `netstat -tulpn | grep :${port}`;
     }
-    
+
     exec(command, (error, stdout, stderr) => {
       if (error) {
         // No process found on this port
         console.log(`✅ Port ${port} is already free`);
         return resolve();
       }
-      
+
       if (platform === 'win32') {
         // Parse Windows netstat output
         const lines = stdout.trim().split('\n');
         const pids = new Set();
-        
+
         lines.forEach(line => {
           const parts = line.trim().split(/\s+/);
           if (parts.length >= 5) {
@@ -62,12 +62,12 @@ function killPort(port, platform) {
             }
           }
         });
-        
+
         if (pids.size === 0) {
           console.log(`✅ Port ${port} is already free`);
           return resolve();
         }
-        
+
         // Kill each process
         pids.forEach(pid => {
           exec(`taskkill /PID ${pid} /F`, (killError) => {
@@ -78,17 +78,30 @@ function killPort(port, platform) {
             }
           });
         });
-        
+
         resolve();
       } else {
-        // Unix-like systems
-        const pids = stdout.trim().split('\n').filter(pid => pid && !isNaN(pid));
-        
-        if (pids.length === 0) {
+        // Unix-like systems - parse netstat output
+        const lines = stdout.trim().split('\n');
+        const pids = new Set();
+
+        lines.forEach(line => {
+          // Parse netstat output: tcp6 0 0 :::3000 :::* LISTEN 118942/next-server
+          const parts = line.trim().split(/\s+/);
+          if (parts.length >= 7) {
+            const pidProcess = parts[6]; // e.g., "118942/next-server"
+            const pid = pidProcess.split('/')[0];
+            if (pid && !isNaN(pid)) {
+              pids.add(pid);
+            }
+          }
+        });
+
+        if (pids.size === 0) {
           console.log(`✅ Port ${port} is already free`);
           return resolve();
         }
-        
+
         // Kill each process
         pids.forEach(pid => {
           exec(`kill -9 ${pid}`, (killError) => {
@@ -99,7 +112,7 @@ function killPort(port, platform) {
             }
           });
         });
-        
+
         resolve();
       }
     });
@@ -111,7 +124,7 @@ function killPort(port, platform) {
  */
 async function main() {
   console.log('🚀 Starting port cleanup...\n');
-  
+
   try {
     await killPorts(PORTS);
     console.log('\n✨ Port cleanup completed!');
@@ -124,7 +137,7 @@ async function main() {
 // Handle command line arguments
 if (require.main === module) {
   const args = process.argv.slice(2);
-  
+
   if (args.includes('--help') || args.includes('-h')) {
     console.log(`
 Usage: node kill-ports.js [options]
@@ -138,7 +151,7 @@ Default ports: 3000, 3001, 3002
     `);
     process.exit(0);
   }
-  
+
   if (args.includes('--ports')) {
     const portsIndex = args.indexOf('--ports');
     if (portsIndex + 1 < args.length) {
@@ -153,7 +166,7 @@ Default ports: 3000, 3001, 3002
       PORTS.push(...customPorts);
     }
   }
-  
+
   main();
 }
 
