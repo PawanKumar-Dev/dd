@@ -259,8 +259,9 @@ export class ResellerClubAPI {
       // For domains without TLD, search with multiple TLDs
       searchParams.tlds = "com,net,org,info,biz,co,in,co.in";
     } else {
-      // For domains with TLD, extract the TLD and use it in the tlds parameter
-      const tld = domainName.split(".").pop();
+      // For domains with TLD, extract the full TLD (handle multi-level TLDs like .co.in)
+      const domainParts = domainName.split(".");
+      const tld = domainParts.slice(1).join("."); // Get everything after the first dot
       searchParams.tlds = tld;
     }
 
@@ -314,7 +315,8 @@ export class ResellerClubAPI {
 
             if (isAvailable) {
               try {
-                const tld = domain.split(".").pop()?.toLowerCase();
+                const domainParts = domain.split(".");
+                const tld = domainParts.slice(1).join(".").toLowerCase(); // Get full TLD for multi-level TLDs
                 if (tld) {
                   console.log(
                     `💰 [PRODUCTION] Fetching live customer pricing for ${domain} (TLD: ${tld})`
@@ -562,11 +564,11 @@ export class ResellerClubAPI {
           // Validate domain name format and base domain match
           const domainParts = domain.split(".");
           const isValidFormat =
-            domainParts.length === 2 &&
+            domainParts.length >= 2 && // Allow multi-level TLDs like .co.in, .co.uk
             !domain.includes(",") &&
             !domain.includes("..") &&
             domainParts[0].length > 0 &&
-            domainParts[1].length > 0;
+            domainParts[domainParts.length - 1].length > 0; // Check last part (TLD)
 
           const expectedBaseDomain = domainName.toLowerCase();
           const actualBaseDomain = domainParts[0].toLowerCase();
@@ -583,7 +585,7 @@ export class ResellerClubAPI {
           if (
             domain.includes(",") ||
             domain.includes("..") ||
-            domain.split(".").length !== 2
+            domainParts.length < 2
           ) {
             console.warn(
               `⚠️ [PRODUCTION] Malformed domain name detected: "${domain}"`
@@ -664,7 +666,8 @@ export class ResellerClubAPI {
               "unavailable";
 
             // Get TLD and live pricing for all domains
-            const tld = domain.split(".").pop()?.toLowerCase();
+            const domainParts = domain.split(".");
+            const tld = domainParts.slice(1).join(".").toLowerCase(); // Get full TLD for multi-level TLDs
             let livePricing: any = null;
 
             if (isAvailable && tld) {
@@ -1322,7 +1325,8 @@ export class ResellerClubAPI {
       });
 
       // Add domain-specific policy requirements
-      const tld = domainData.domainName.split(".").pop()?.toLowerCase();
+      const domainParts = domainData.domainName.split(".");
+      const tld = domainParts.slice(1).join(".").toLowerCase(); // Get full TLD for multi-level TLDs
 
       if (tld === "au") {
         // Australian domain policy requirements

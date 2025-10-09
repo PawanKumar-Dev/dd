@@ -101,7 +101,8 @@ export const DOMAIN_REQUIREMENTS: Record<string, DomainRequirement> = {
 export function getDomainRequirements(
   domainName: string
 ): DomainRequirement | null {
-  const tld = domainName.split(".").pop()?.toLowerCase();
+  const domainParts = domainName.split(".");
+  const tld = domainParts.slice(1).join(".").toLowerCase(); // Get full TLD for multi-level TLDs
   if (!tld) return null;
 
   return DOMAIN_REQUIREMENTS[tld] || null;

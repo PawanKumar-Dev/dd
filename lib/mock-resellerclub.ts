@@ -291,7 +291,8 @@ export class MockResellerClubAPI {
     await new Promise((resolve) => setTimeout(resolve, 300));
 
     // Mock pricing based on TLD
-    const tld = domainName.split(".").pop()?.toLowerCase();
+    const domainParts = domainName.split(".");
+    const tld = domainParts.slice(1).join(".").toLowerCase(); // Get full TLD for multi-level TLDs
     const basePrices: { [key: string]: number } = {
       com: 999,
       net: 1199,
