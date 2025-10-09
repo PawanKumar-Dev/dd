@@ -93,11 +93,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify payment amount matches expected amount
+    // Note: item.price is already the total price for the registration period
     const expectedAmount =
-      cartItems.reduce(
-        (total, item) => total + item.price * item.registrationPeriod,
-        0
-      ) * 100; // Convert to paise
+      Math.round(cartItems.reduce((total, item) => total + item.price, 0)) *
+      100; // Convert to paise
 
     if (paymentDetails.amount !== expectedAmount) {
       console.error(
@@ -476,19 +475,21 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Payment verification error:", error);
-    
+
     // Determine error type and provide appropriate response
     let errorMessage = "Payment verification failed";
     let statusCode = 500;
     let errorType = "verification_error";
-    
+
     if (error instanceof Error) {
       if (error.message.includes("Invalid payment signature")) {
-        errorMessage = "Payment signature verification failed. Please try again.";
+        errorMessage =
+          "Payment signature verification failed. Please try again.";
         statusCode = 400;
         errorType = "signature_error";
       } else if (error.message.includes("Payment not found")) {
-        errorMessage = "Payment not found. Please contact support if you were charged.";
+        errorMessage =
+          "Payment not found. Please contact support if you were charged.";
         statusCode = 404;
         errorType = "payment_not_found";
       } else if (error.message.includes("Payment already processed")) {
@@ -496,27 +497,34 @@ export async function POST(request: NextRequest) {
         statusCode = 409;
         errorType = "duplicate_payment";
       } else if (error.message.includes("Insufficient funds")) {
-        errorMessage = "Payment failed due to insufficient funds. Please try again.";
+        errorMessage =
+          "Payment failed due to insufficient funds. Please try again.";
         statusCode = 402;
         errorType = "insufficient_funds";
       } else if (error.message.includes("Card declined")) {
-        errorMessage = "Your card was declined. Please try a different payment method.";
+        errorMessage =
+          "Your card was declined. Please try a different payment method.";
         statusCode = 402;
         errorType = "card_declined";
-      } else if (error.message.includes("Network error") || error.message.includes("timeout")) {
-        errorMessage = "Network error occurred. Please check your payment status in a few minutes.";
+      } else if (
+        error.message.includes("Network error") ||
+        error.message.includes("timeout")
+      ) {
+        errorMessage =
+          "Network error occurred. Please check your payment status in a few minutes.";
         statusCode = 503;
         errorType = "network_error";
       }
     }
-    
+
     return NextResponse.json(
-      { 
+      {
         success: false,
         error: errorMessage,
         errorType: errorType,
-        message: "Payment verification failed. Please contact support if the issue persists.",
-        supportContact: "support@exceltechnologies.com"
+        message:
+          "Payment verification failed. Please contact support if the issue persists.",
+        supportContact: "support@exceltechnologies.com",
       },
       { status: statusCode }
     );
