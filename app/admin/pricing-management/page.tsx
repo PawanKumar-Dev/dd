@@ -36,18 +36,10 @@ interface TLDPricing {
   tld: string;
   customerPrice: number;
   resellerPrice: number;
-  promotionalPrice?: number;
   currency: string;
   category: string;
   description?: string;
   margin?: number; // Calculated margin percentage
-  isPromotional?: boolean;
-  promotionalDetails?: {
-    source: string;
-    originalCustomerPrice: number;
-    promotionalPrice: number;
-    discount: number;
-  };
 }
 
 /**
@@ -80,7 +72,6 @@ export default function AdminTLDPricing() {
   const [sortBy, setSortBy] = useState<string>('tld');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [priceRange, setPriceRange] = useState<{ min: number, max: number }>({ min: 0, max: 100000 });
-  const [showOnlyPromotional, setShowOnlyPromotional] = useState<boolean>(false);
   const [showOnlyWithMargin, setShowOnlyWithMargin] = useState<boolean>(false);
   const router = useRouter();
 
@@ -154,10 +145,9 @@ export default function AdminTLDPricing() {
       tld.description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || tld.category === selectedCategory;
     const matchesPriceRange = tld.customerPrice >= priceRange.min && tld.customerPrice <= priceRange.max;
-    const matchesPromotional = !showOnlyPromotional || tld.isPromotional;
     const matchesMargin = !showOnlyWithMargin || (tld.margin && tld.margin > 0);
 
-    return matchesSearch && matchesCategory && matchesPriceRange && matchesPromotional && matchesMargin;
+    return matchesSearch && matchesCategory && matchesPriceRange && matchesMargin;
   });
 
   // Get unique categories for filter
@@ -179,20 +169,6 @@ export default function AdminTLDPricing() {
       case 'resellerPrice':
         aValue = a.resellerPrice;
         bValue = b.resellerPrice;
-        break;
-      case 'promotionalPrice':
-        // For promotional price sorting, prioritize TLDs with promotional prices
-        if (a.isPromotional && b.isPromotional) {
-          aValue = a.promotionalPrice || 0;
-          bValue = b.promotionalPrice || 0;
-        } else if (a.isPromotional && !b.isPromotional) {
-          return -1; // Promotional TLDs come first
-        } else if (!a.isPromotional && b.isPromotional) {
-          return 1; // Promotional TLDs come first
-        } else {
-          aValue = a.customerPrice;
-          bValue = b.customerPrice;
-        }
         break;
       case 'margin':
         aValue = a.margin || 0;
@@ -265,37 +241,6 @@ export default function AdminTLDPricing() {
           <span className="text-sm text-gray-500 ml-1">{row.currency}</span>
         </div>
       )
-    },
-    {
-      key: 'promotionalPrice',
-      label: 'Promotional Price',
-      sortable: true,
-      render: (value: number, row: TLDPricing) => {
-        if (row.isPromotional && row.promotionalPrice) {
-          return (
-            <div className="flex items-center">
-              <DollarSign className="h-4 w-4 text-orange-500 mr-1" />
-              <div className="flex flex-col">
-                <span className="font-semibold text-orange-600">
-                  {formatIndianCurrency(row.promotionalPrice)}
-                </span>
-                <span className="text-xs text-gray-500 line-through">
-                  {formatIndianCurrency(row.customerPrice)}
-                </span>
-              </div>
-              <span className="text-sm text-gray-500 ml-1">{row.currency}</span>
-              <span className="ml-2 px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full font-medium">
-                PROMO
-              </span>
-            </div>
-          );
-        }
-        return (
-          <div className="flex items-center">
-            <span className="text-sm text-gray-400">No promotion</span>
-          </div>
-        );
-      }
     },
     {
       key: 'margin',
@@ -443,15 +388,6 @@ export default function AdminTLDPricing() {
                 <label className="flex items-center">
                   <input
                     type="checkbox"
-                    checked={showOnlyPromotional}
-                    onChange={(e) => setShowOnlyPromotional(e.target.checked)}
-                    className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">Show only promotional</span>
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
                     checked={showOnlyWithMargin}
                     onChange={(e) => setShowOnlyWithMargin(e.target.checked)}
                     className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
@@ -474,7 +410,6 @@ export default function AdminTLDPricing() {
                     <option value="tld">TLD Name</option>
                     <option value="customerPrice">Customer Price</option>
                     <option value="resellerPrice">Reseller Price</option>
-                    <option value="promotionalPrice">Promotional Price</option>
                     <option value="margin">Margin</option>
                     <option value="category">Category</option>
                   </select>

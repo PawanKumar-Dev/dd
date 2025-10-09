@@ -122,15 +122,11 @@ export class ResellerClubAPI {
 
     try {
       // Fetch all working pricing APIs in parallel
-      const [
-        customerPricingResponse,
-        resellerPricingResponse,
-        promoDetailsResponse,
-      ] = await Promise.all([
-        api.get("/api/products/customer-price.json"),
-        api.get("/api/products/reseller-price.json"),
-        api.get("/api/resellers/promo-details.json"),
-      ]);
+      const [customerPricingResponse, resellerPricingResponse] =
+        await Promise.all([
+          api.get("/api/products/customer-price.json"),
+          api.get("/api/products/reseller-price.json"),
+        ]);
 
       console.log(
         `✅ [PRODUCTION] All pricing data fetched in ${
@@ -141,7 +137,6 @@ export class ResellerClubAPI {
       return {
         customerPricing: customerPricingResponse.data,
         resellerPricing: resellerPricingResponse.data,
-        promoDetails: promoDetailsResponse.data,
         timestamp: new Date().toISOString(),
       };
     } catch (error) {

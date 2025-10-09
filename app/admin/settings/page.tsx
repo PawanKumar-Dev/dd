@@ -153,40 +153,6 @@ export default function AdminSettings() {
           </div>
         </div>
 
-        {/* Promotional Pricing Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-blue-600" />
-              Promotional Pricing Settings
-            </CardTitle>
-            <CardDescription>
-              Control how promotional pricing is displayed in domain search results
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between p-4 border rounded-lg">
-              <div className="space-y-1">
-                <h3 className="font-medium">Promotional Pricing Display</h3>
-                <p className="text-sm text-gray-600">
-                  Enable or disable promotional pricing display in domain search results
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => router.push('/admin/settings/promotional-pricing')}
-                  className="flex items-center gap-2"
-                >
-                  <Settings className="h-4 w-4" />
-                  Configure
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
 
         {/* Server Information */}
         <Card>

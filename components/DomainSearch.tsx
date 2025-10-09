@@ -43,9 +43,6 @@ interface SearchResult {
   currency?: string;
   registrationPeriod?: number;
   pricingSource?: "live" | "fallback" | "unavailable" | "taken";
-  originalPrice?: number;
-  isPromotional?: boolean;
-  promotionalDetails?: any;
 }
 
 interface TLDCategory {
@@ -722,20 +719,10 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
                             <div className="text-left sm:text-right">
                               <div className="flex items-center gap-2 justify-end">
                                 <div className="text-right">
-                                  {result.isPromotional && result.originalPrice && (
-                                    <p className="text-xs text-[var(--google-text-secondary)] line-through" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
-                                      {formatPrice(result.originalPrice, result.currency)}
-                                    </p>
-                                  )}
                                   <p className="text-base sm:text-lg font-bold text-[var(--google-text-primary)]" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
                                     {formatPrice(result.price, result.currency)}
                                   </p>
                                 </div>
-                                {result.isPromotional && (
-                                  <span className="px-2 py-1 text-xs font-medium text-white bg-gradient-to-r from-orange-500 to-red-500 rounded-full">
-                                    PROMO
-                                  </span>
-                                )}
                               </div>
                               <p className="text-xs text-[var(--google-text-secondary)]" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>per year</p>
                             </div>

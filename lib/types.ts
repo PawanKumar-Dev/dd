@@ -71,13 +71,4 @@ export interface DomainSearchResult {
   currency: string;
   registrationPeriod: number;
   pricingSource?: "live" | "fallback" | "unavailable" | "taken";
-  originalPrice?: number;
-  isPromotional?: boolean;
-  promotionalDetails?: {
-    startTime: string;
-    endTime: string;
-    period: string;
-    originalCustomerPrice: number;
-    originalResellerPrice: number;
-  };
 }

@@ -2,27 +2,27 @@
 
 /**
  * =============================================================================
- * FINAL PROMOTIONAL PRICING VERIFICATION TEST SCRIPT
+ * FINAL TLD PRICING VERIFICATION TEST SCRIPT
  * =============================================================================
  * 
- * Purpose: Comprehensive test to verify that ResellerClub promotional pricing
- * is working correctly by testing all pricing sources and comparing results.
- * This is the final verification test after implementing promotional pricing.
+ * Purpose: Comprehensive test to verify that ResellerClub TLD pricing
+ * is working correctly by testing all pricing sources and TLD mappings.
+ * This is the final verification test after implementing TLD pricing system.
  * 
  * What it tests:
- * - All three pricing API endpoints (customer, reseller, promotional details)
- * - TLD format matching across different naming conventions
- * - Active promotional detection and validation
- * - Promotional price calculations and savings analysis
- * - Cross-reference between promotional details and pricing data
+ * - Customer and reseller pricing API endpoints
+ * - TLD mapping accuracy for 200+ TLDs
+ * - Priority-based TLD lookup system
+ * - Price validation and error handling
+ * - Performance and caching verification
  * 
  * Usage:
- *   node tests/api/test-final-promo.js
+ *   node tests/api/test-final-pricing.js
  * 
  * Expected Output:
- * - Complete pricing data from all sources
- * - Active promotional details analysis
- * - TLD-specific promotional pricing verification
+ * - Complete pricing data from customer and reseller APIs
+ * - TLD mapping accuracy verification
+ * - Price validation and error handling results
  * - Comprehensive summary and success confirmation
  * 
  * Dependencies:
@@ -60,7 +60,7 @@ function validateEnvironment() {
  * Display API configuration
  */
 function displayConfiguration() {
-  console.log('🎯 Final ResellerClub Promotional Pricing Test');
+  console.log('🎯 Final ResellerClub TLD Pricing Test');
   console.log('='.repeat(60));
   console.log('   API URL:', RESELLERCLUB_API_URL);
   console.log('   User ID:', RESELLERCLUB_ID);
@@ -71,7 +71,7 @@ function displayConfiguration() {
 /**
  * Fetch all pricing data from ResellerClub API in parallel
  * 
- * This function fetches data from all three pricing endpoints simultaneously
+ * This function fetches data from customer and reseller pricing endpoints
  * to get a complete picture of available pricing information.
  * 
  * @returns {Promise<Object>} Object containing all pricing data
@@ -82,8 +82,8 @@ async function fetchAllPricingData() {
   console.log('');
 
   try {
-    // Fetch all three pricing endpoints in parallel for efficiency
-    const [customerResponse, resellerResponse, promoDetailsResponse] = await Promise.all([
+    // Fetch customer and reseller pricing endpoints in parallel for efficiency
+    const [customerResponse, resellerResponse] = await Promise.all([
       // Customer pricing - what customers see
       axios.get(`${RESELLERCLUB_API_URL}/api/products/customer-price.json`, {
         params: {

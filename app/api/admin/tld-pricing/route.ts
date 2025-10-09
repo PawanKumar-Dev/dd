@@ -23,18 +23,10 @@ export async function GET(request: NextRequest) {
       tld: string;
       customerPrice: number;
       resellerPrice: number;
-      promotionalPrice?: number;
       currency: string;
       category: string;
       description?: string;
       margin?: number;
-      isPromotional?: boolean;
-      promotionalDetails?: {
-        source: string;
-        originalCustomerPrice: number;
-        promotionalPrice: number;
-        discount: number;
-      };
     }> = [];
 
     if (pricingData && pricingData.customerPricing) {
@@ -119,10 +111,6 @@ export async function GET(request: NextRequest) {
           if (tldData && tldData[tld]) {
             const customerPrice = parseFloat(tldData[tld].price) || 0;
             const resellerPrice = parseFloat(tldData[tld].resellerPrice) || 0;
-            const promotionalPrice =
-              parseFloat(tldData[tld].originalPrice) || 0;
-            const isPromotional = tldData[tld].isPromotional || false;
-            const promotionalDetails = tldData[tld].promotionalDetails || null;
 
             const margin =
               customerPrice > 0 && resellerPrice > 0
@@ -133,13 +121,10 @@ export async function GET(request: NextRequest) {
               tld: `.${tld}`,
               customerPrice: customerPrice,
               resellerPrice: resellerPrice,
-              promotionalPrice: isPromotional ? promotionalPrice : undefined,
               currency: tldData[tld].currency || "INR",
               category: getTldCategory(tld),
               description: getTldDescription(tld),
               margin: margin,
-              isPromotional: isPromotional,
-              promotionalDetails: promotionalDetails,
             });
 
             // Individual TLD processing logged in summary
@@ -170,12 +155,6 @@ export async function GET(request: NextRequest) {
           tldPricing.length
         : 0;
 
-    const promotionalTlds = tldPricing.filter(
-      (tld) => tld.isPromotional
-    ).length;
-    const totalPromotionalSavings = tldPricing
-      .filter((tld) => tld.isPromotional && tld.promotionalDetails)
-      .reduce((sum, tld) => sum + (tld.promotionalDetails?.discount || 0), 0);
 
     console.log(`✅ [ADMIN] Fetched pricing for ${tldPricing.length} TLDs`);
     console.log(
@@ -184,11 +163,6 @@ export async function GET(request: NextRequest) {
       )}, Total Reseller ${formatIndianCurrency(
         totalResellerPrice
       )}, Avg Margin ${avgMargin > 0 ? "+" : ""}${avgMargin.toFixed(1)}%`
-    );
-    console.log(
-      `🎯 [ADMIN] Promotional Pricing: ${promotionalTlds} TLDs with promotions, Total Savings ${formatIndianCurrency(
-        totalPromotionalSavings
-      )}`
     );
 
     return NextResponse.json({

@@ -546,7 +546,6 @@ export class PricingService {
           const customerPricing = pricingData.customerPricing?.[foundTld];
           const resellerPricing =
             pricingData.resellerPricing?.[foundTld] || null;
-          const promoPricing = pricingData.promoPricing?.[foundTld] || null;
 
           // Extract customer registration price (1 year)
           let customerPrice = 0;
