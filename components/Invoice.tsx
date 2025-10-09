@@ -23,7 +23,6 @@ interface InvoiceProps {
       error?: string;
     }>;
     successfulDomains: string[];
-    failedDomains: string[];
     createdAt: string;
     updatedAt: string;
     userId?: {
@@ -238,16 +237,6 @@ export default function Invoice({ order, isOpen, onClose }: InvoiceProps) {
               </div>
             )}
 
-            {order.failedDomains.length > 0 && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                <p className="text-red-800 font-medium">
-                  ❌ {order.failedDomains.length} domain(s) failed to register
-                </p>
-                <p className="text-red-600 text-sm mt-1">
-                  Our support team will contact you regarding the failed registrations.
-                </p>
-              </div>
-            )}
 
             {/* Footer */}
             <div className="border-t border-gray-300 pt-6 mt-8">
