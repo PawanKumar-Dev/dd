@@ -168,8 +168,8 @@ SMTP_PORT=587
 ```
 
 6. **Access Application**
-   - Frontend: http://localhost:3000
-   - Admin Panel: http://localhost:3000/admin
+   - Frontend: http://35.209.122.24:3000
+   - Admin Panel: http://35.209.122.24:3000/admin
 
 ## 🔧 Available Scripts
 

@@ -4,7 +4,7 @@ This document provides comprehensive documentation for all API endpoints in the 
 
 ## Base URL
 
-- Development: `http://localhost:3000`
+- Development: `http://35.209.122.24:3000`
 - Production: `https://yourdomain.com`
 
 ## Authentication
