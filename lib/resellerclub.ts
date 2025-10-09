@@ -305,13 +305,18 @@ export class ResellerClubAPI {
         for (const [domain, data] of Object.entries(response.data)) {
           if (typeof data === "object" && data !== null) {
             const domainData = data as any;
+            // Determine domain availability based on status
             let isAvailable = domainData.status === "available";
+            let domainStatus = domainData.status;
+            
+            // Log domain status for debugging
+            console.log(`🔍 [PRODUCTION] Domain ${domain} status: ${domainStatus}`);
 
             // Try to get live pricing first
             let price = 0;
             let currency = "INR";
-            let pricingSource: "live" | "fallback" | "unavailable" =
-              "unavailable";
+            let pricingSource: "live" | "fallback" | "unavailable" | "taken" =
+              isAvailable ? "unavailable" : "taken";
 
             if (isAvailable) {
               try {
@@ -658,12 +663,17 @@ export class ResellerClubAPI {
           }
           if (typeof data === "object" && data !== null) {
             const domainData = data as any;
+            // Determine domain availability based on status
             let isAvailable = domainData.status === "available";
+            let domainStatus = domainData.status;
+            
+            // Log domain status for debugging
+            console.log(`🔍 [PRODUCTION] Domain ${domain} status: ${domainStatus}`);
             // Try to get live pricing first
             let price = 0;
             let currency = "INR";
-            let pricingSource: "live" | "fallback" | "unavailable" =
-              "unavailable";
+            let pricingSource: "live" | "fallback" | "unavailable" | "taken" =
+              isAvailable ? "unavailable" : "taken";
 
             // Get TLD and live pricing for all domains
             const domainParts = domain.split(".");

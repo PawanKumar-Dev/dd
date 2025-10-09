@@ -73,6 +73,36 @@ node tests/run-tests.js test-eu-pricing     # EU TLD specific test
 
 For detailed testing documentation, see [tests/README.md](tests/README.md).
 
+## 🛠️ Utility Scripts
+
+The project includes several utility scripts in the `scripts/` directory for development and maintenance tasks:
+
+### Port Management
+
+**Kill Ports Script** (`scripts/kill-ports.js`)
+
+- Kills processes running on specified ports (default: 3000, 3001, 3002)
+- Cross-platform support (Windows, Linux, macOS)
+- Custom port specification via command line
+- Safe error handling for already-free ports
+
+```bash
+# Kill default ports
+node scripts/kill-ports.js
+
+# Kill custom ports
+node scripts/kill-ports.js --ports 3000,8080,9000
+
+# Show help
+node scripts/kill-ports.js --help
+```
+
+### Database Scripts
+
+- `scripts/init-db.js` - Initialize database with admin user
+- `scripts/recreate-admin.js` - Recreate admin user
+- `scripts/setup.js` - General setup script
+
 ## 📁 Project Structure
 
 ```
@@ -98,7 +128,11 @@ dd/
 │   ├── settings-service.ts      # Application settings
 │   └── dateUtils.ts             # Date formatting utilities
 ├── models/                       # MongoDB schemas
-├── scripts/                      # Database scripts
+├── scripts/                      # Utility and database scripts
+│   ├── kill-ports.js            # Port management utility
+│   ├── init-db.js               # Database initialization
+│   ├── recreate-admin.js        # Admin user recreation
+│   └── setup.js                 # Setup script
 └── public/                       # Static assets
 ```
 
@@ -173,11 +207,19 @@ SMTP_PORT=587
 
 ## 🔧 Available Scripts
 
+### NPM Scripts
+
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run start` - Start production server
 - `npm run init-db` - Initialize database with admin user
 - `npm run recreate-admin` - Recreate admin user
+
+### Utility Scripts
+
+- `node scripts/kill-ports.js` - Kill processes on ports 3000, 3001, 3002
+- `node scripts/kill-ports.js --ports 3000,8080,9000` - Kill processes on custom ports
+- `node scripts/kill-ports.js --help` - Show help for port killing script
 
 ## 👥 User Roles
 

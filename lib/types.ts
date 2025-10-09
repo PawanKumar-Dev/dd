@@ -70,7 +70,7 @@ export interface DomainSearchResult {
   price: number;
   currency: string;
   registrationPeriod: number;
-  pricingSource?: "live" | "fallback" | "unavailable";
+  pricingSource?: "live" | "fallback" | "unavailable" | "taken";
   originalPrice?: number;
   isPromotional?: boolean;
   promotionalDetails?: {
