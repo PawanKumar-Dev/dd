@@ -27,6 +27,7 @@ declare global {
 export default function CheckoutPage() {
   const [user, setUser] = useState<User | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isPaymentInProgress, setIsPaymentInProgress] = useState(false);
   const router = useRouter();
   const { items: cartItems, getTotalPrice, clearCart, syncWithServer, isLoading } = useCartStore();
   const { isTestingMode } = useTestingStore();
@@ -65,8 +66,9 @@ export default function CheckoutPage() {
   }, [router, syncWithServer]);
 
   // Redirect to dashboard if cart is empty (after cart has been loaded)
+  // But not if payment is in progress
   useEffect(() => {
-    if (!isLoading && cartItems.length === 0 && user) {
+    if (!isLoading && cartItems.length === 0 && user && !isPaymentInProgress) {
       // Small delay to prevent immediate redirect during page load
       const timer = setTimeout(() => {
         router.push('/dashboard');
@@ -74,7 +76,7 @@ export default function CheckoutPage() {
 
       return () => clearTimeout(timer);
     }
-  }, [cartItems.length, isLoading, user, router]);
+  }, [cartItems.length, isLoading, user, router, isPaymentInProgress]);
 
   const handlePayment = async () => {
     if (cartItems.length === 0) {
@@ -83,6 +85,7 @@ export default function CheckoutPage() {
     }
 
     setIsProcessing(true);
+    setIsPaymentInProgress(true);
     try {
       const token = localStorage.getItem('token');
 
@@ -157,6 +160,9 @@ export default function CheckoutPage() {
               // Clear cart immediately before redirect
               clearCart();
 
+              // Reset payment in progress flag
+              setIsPaymentInProgress(false);
+
               // Redirect immediately to success page
               router.push('/payment-success');
             } else {
@@ -177,6 +183,7 @@ export default function CheckoutPage() {
                 };
 
                 sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
+                setIsPaymentInProgress(false);
                 router.push('/payment-success');
                 return;
               }
@@ -195,6 +202,9 @@ export default function CheckoutPage() {
               // Clear cart immediately before redirect
               clearCart();
 
+              // Reset payment in progress flag
+              setIsPaymentInProgress(false);
+
               // Redirect immediately to success page
               router.push('/payment-success');
             }
@@ -204,7 +214,7 @@ export default function CheckoutPage() {
             // Determine error message based on error type
             let errorMessage = 'Payment verification failed due to a technical error';
             let errorType = 'verification_error';
-            
+
             if (error instanceof Error) {
               if (error.message.includes('Network')) {
                 errorMessage = 'Network error occurred. Please check your payment status in a few minutes.';
@@ -240,6 +250,9 @@ export default function CheckoutPage() {
             // Clear cart immediately before redirect
             clearCart();
 
+            // Reset payment in progress flag
+            setIsPaymentInProgress(false);
+
             // Redirect immediately to success page
             router.push('/payment-success');
           }
@@ -254,6 +267,7 @@ export default function CheckoutPage() {
         modal: {
           ondismiss: function () {
             setIsProcessing(false);
+            setIsPaymentInProgress(false);
             // Payment was cancelled by user
             const paymentResult = {
               status: 'failed',
@@ -282,11 +296,12 @@ export default function CheckoutPage() {
 
       rzp.on('payment.failed', function (response: any) {
         setIsProcessing(false);
-        
+        setIsPaymentInProgress(false);
+
         // Determine error type and message based on Razorpay error
         let errorMessage = response.error.description || 'Payment failed';
         let errorType = 'payment_failed';
-        
+
         if (response.error) {
           if (response.error.code === 'BAD_REQUEST_ERROR') {
             errorMessage = 'Invalid payment request. Please try again.';
@@ -305,7 +320,7 @@ export default function CheckoutPage() {
             errorType = 'insufficient_funds';
           }
         }
-        
+
         const paymentResult = {
           status: 'failed',
           errorMessage: errorMessage,
@@ -329,6 +344,7 @@ export default function CheckoutPage() {
     } catch (error) {
       console.error('Payment error:', error);
       setIsProcessing(false);
+      setIsPaymentInProgress(false);
 
       // Store payment result in session storage for cleaner URL
       const paymentResult = {

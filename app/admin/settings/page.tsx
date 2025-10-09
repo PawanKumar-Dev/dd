@@ -38,6 +38,12 @@ interface IPData {
     };
   };
   error?: string;
+  lastChecked?: string;
+  checkedBy?: {
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
 }
 
 export default function AdminSettings() {
@@ -71,24 +77,56 @@ export default function AdminSettings() {
     }
 
     setUser(userObj);
+    loadSavedIPData();
   }, [router]);
+
+  const loadSavedIPData = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const response = await fetch('/api/admin/ip-status', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setIpData(data);
+        if (data.lastChecked) {
+          setLastChecked(new Date(data.lastChecked));
+        }
+      }
+    } catch (error) {
+      console.error('Error loading saved IP data:', error);
+    }
+  };
 
   const fetchOutboundIP = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/check-ip');
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const response = await fetch('/api/admin/check-ip', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
       const data = await response.json();
       setIpData(data);
       setLastChecked(new Date());
 
       if (data.success) {
-        toast.success('Outbound IP fetched successfully');
+        toast.success('Outbound IP checked and saved successfully');
       } else {
-        toast.error('Failed to fetch outbound IP');
+        toast.error('Failed to check outbound IP');
       }
     } catch (error) {
       console.error('Error fetching IP:', error);
-      toast.error('Network error while fetching IP');
+      toast.error('Network error while checking IP');
     } finally {
       setIsLoading(false);
     }
@@ -185,6 +223,11 @@ export default function AdminSettings() {
                   {lastChecked && (
                     <p className="text-sm text-gray-500">
                       Last checked: {formatIndianTime(lastChecked)}
+                    </p>
+                  )}
+                  {ipData?.checkedBy && (
+                    <p className="text-sm text-gray-500">
+                      Checked by: {ipData.checkedBy.firstName} {ipData.checkedBy.lastName}
                     </p>
                   )}
                 </div>
@@ -312,7 +355,12 @@ export default function AdminSettings() {
                   <AlertTriangle className="h-5 w-5 text-red-600" />
                   <h4 className="font-semibold text-red-900">Error</h4>
                 </div>
-                <p className="text-red-700">{ipData.error || 'Failed to fetch outbound IP'}</p>
+                <p className="text-red-700 mb-2">{ipData.message || ipData.error || 'Failed to fetch outbound IP'}</p>
+                {ipData.checkedBy && (
+                  <p className="text-sm text-red-600">
+                    Last checked by: {ipData.checkedBy.firstName} {ipData.checkedBy.lastName}
+                  </p>
+                )}
               </motion.div>
             )}
           </CardContent>

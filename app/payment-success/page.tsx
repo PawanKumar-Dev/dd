@@ -277,10 +277,10 @@ export default function PaymentResultPage() {
                 <XCircle className="h-6 w-6 text-red-600 mr-3" />
                 <h3 className="text-lg font-semibold text-red-800">Payment Failed</h3>
               </div>
-              
+
               <div className="mb-4">
                 <p className="text-red-700 font-medium mb-2">{result.errorMessage}</p>
-                
+
                 {/* Error Type Specific Messages */}
                 {result.errorType === 'network_error' && (
                   <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
@@ -292,7 +292,7 @@ export default function PaymentResultPage() {
                     </ul>
                   </div>
                 )}
-                
+
                 {result.errorType === 'card_declined' && (
                   <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
                     <h4 className="text-sm font-medium text-yellow-800 mb-2">What to do:</h4>
@@ -303,7 +303,7 @@ export default function PaymentResultPage() {
                     </ul>
                   </div>
                 )}
-                
+
                 {result.errorType === 'auth_error' && (
                   <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
                     <h4 className="text-sm font-medium text-yellow-800 mb-2">What to do:</h4>
@@ -313,15 +313,22 @@ export default function PaymentResultPage() {
                     </ul>
                   </div>
                 )}
-                
+
                 {result.errorType === 'duplicate_payment' && (
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
                     <h4 className="text-sm font-medium text-blue-800 mb-2">Note:</h4>
                     <p className="text-blue-700 text-sm">This payment has already been processed. Check your dashboard for order details.</p>
                   </div>
                 )}
+
+                {result.errorType === 'user_cancelled' && (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                    <h4 className="text-sm font-medium text-yellow-800 mb-2">No worries!</h4>
+                    <p className="text-yellow-700 text-sm">You can retry your payment anytime. Your cart items have been saved.</p>
+                  </div>
+                )}
               </div>
-              
+
               {/* Support Contact */}
               {result.supportContact && (
                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
@@ -371,7 +378,7 @@ export default function PaymentResultPage() {
                     <ArrowRight className="h-5 w-5 ml-2" />
                   </button>
                 )}
-                
+
                 {/* Show login button for auth errors */}
                 {result.errorType === 'auth_error' && (
                   <button
@@ -383,7 +390,7 @@ export default function PaymentResultPage() {
                     <ArrowRight className="h-5 w-5 ml-2" />
                   </button>
                 )}
-                
+
                 <button
                   onClick={handleGoToDashboard}
                   className="w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center"

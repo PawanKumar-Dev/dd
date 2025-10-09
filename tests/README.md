@@ -7,6 +7,7 @@ This directory contains comprehensive testing scripts for the Domain Management 
 ```
 tests/
 ├── README.md                 # This file - testing documentation
+├── run-tests.js             # Centralized test runner
 ├── api/                      # API testing scripts
 │   ├── test-pricing.js       # Pricing service testing
 │   ├── test-tld-mappings.js  # TLD mapping testing
@@ -14,8 +15,18 @@ tests/
 │   ├── test-simple-pricing.js # Simple pricing verification
 │   ├── test-final-pricing.js  # Final pricing verification
 │   └── test-eu-pricing.js    # EU TLD specific testing
+├── admin/                    # Admin functionality tests
+│   ├── test-ip-check.js      # IP check database functionality
+│   └── test-delete-order.js  # Order deletion functionality
+├── payment/                  # Payment system tests
+│   ├── test-payment-success.js # Payment success page testing
+│   └── test-error-handling.js  # Payment error handling testing
+├── pricing/                  # Pricing system tests
+│   ├── test-ai-pricing.js    # AI TLD pricing testing
+│   └── test-pricing-debug.js # Pricing debugging tests
 ├── debug/                    # Debug and troubleshooting scripts
-│   └── debug-pricing.js      # Pricing debugging
+│   ├── debug-pricing.js      # Pricing debugging
+│   └── debug-ai-pricing.js   # AI pricing debugging
 └── scripts/                  # Utility and maintenance scripts
     └── update_pricing.js     # Pricing data update utility
 ```

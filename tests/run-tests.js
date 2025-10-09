@@ -10,13 +10,23 @@
  * Usage:
  *   node tests/run-tests.js [test-name]
  *   node tests/run-tests.js all
- *   node tests/run-tests.js api
- *   node tests/run-tests.js debug
+ *   node tests/run-tests.js [category]
+ * 
+ * Categories:
+ *   api      - API endpoint tests
+ *   admin    - Admin functionality tests
+ *   payment  - Payment system tests
+ *   pricing  - Pricing system tests
+ *   debug    - Debug tools
+ *   scripts  - Utility scripts
  * 
  * Examples:
  *   node tests/run-tests.js                    # Run all tests
  *   node tests/run-tests.js all                # Run all tests
  *   node tests/run-tests.js api                # Run all API tests
+ *   node tests/run-tests.js admin              # Run admin tests
+ *   node tests/run-tests.js payment            # Run payment tests
+ *   node tests/run-tests.js pricing            # Run pricing tests
  *   node tests/run-tests.js debug              # Run debug tools
  *   node tests/run-tests.js test-final-pricing # Run specific test
  * 
@@ -40,8 +50,21 @@ const testCategories = {
     'test-final-pricing.js',
     'test-eu-pricing.js'
   ],
+  admin: [
+    'test-ip-check.js',
+    'test-delete-order.js'
+  ],
+  payment: [
+    'test-payment-success.js',
+    'test-error-handling.js'
+  ],
+  pricing: [
+    'test-ai-pricing.js',
+    'test-pricing-debug.js'
+  ],
   debug: [
-    'debug-pricing.js'
+    'debug-pricing.js',
+    'debug-ai-pricing.js'
   ],
   scripts: [
     'update_pricing.js'
@@ -102,7 +125,15 @@ async function runCategory(category) {
   let failed = 0;
 
   for (const script of scripts) {
-    const scriptPath = path.join(__dirname, category, script);
+    // Handle different directory structures
+    let scriptPath;
+    if (category === 'api' || category === 'debug' || category === 'scripts') {
+      scriptPath = path.join(__dirname, category, script);
+    } else {
+      // New categories: admin, payment, pricing
+      scriptPath = path.join(__dirname, category, script);
+    }
+    
     const result = await runTest(scriptPath, category);
 
     if (result) {
@@ -183,6 +214,9 @@ function displayHelp() {
   console.log('Commands:');
   console.log('  all                    Run all tests');
   console.log('  api                    Run all API tests');
+  console.log('  admin                  Run admin functionality tests');
+  console.log('  payment                Run payment system tests');
+  console.log('  pricing                Run pricing system tests');
   console.log('  debug                  Run debug tools');
   console.log('  scripts                Run utility scripts');
   console.log('  <test-name>            Run specific test');
