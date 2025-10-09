@@ -48,13 +48,30 @@ export default function AdminSettings() {
   const [user, setUser] = useState<{ firstName: string; lastName: string; role: string } | null>(null);
 
   useEffect(() => {
-    // Mock user data for now - in real app, this would come from auth context
-    setUser({
-      firstName: 'Admin',
-      lastName: 'User',
-      role: 'admin'
-    });
-  }, []);
+    // Check for admin authentication
+    const getCookieValue = (name: string) => {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop()?.split(';').shift();
+      return null;
+    };
+
+    const token = getCookieValue('token') || localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+
+    if (!token || !userData) {
+      router.push('/login');
+      return;
+    }
+
+    const userObj = JSON.parse(userData);
+    if (userObj.role !== 'admin') {
+      router.push('/dashboard');
+      return;
+    }
+
+    setUser(userObj);
+  }, [router]);
 
   const fetchOutboundIP = async () => {
     setIsLoading(true);
@@ -80,6 +97,16 @@ export default function AdminSettings() {
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast.success('IP address copied to clipboard');
+  };
+
+  const handleLogout = () => {
+    // Clear authentication data
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+
+    // Redirect to login page
+    router.push('/');
   };
 
   const getStatusColor = () => {
@@ -109,7 +136,7 @@ export default function AdminSettings() {
   }
 
   return (
-    <AdminLayoutNew user={user}>
+    <AdminLayoutNew user={user} onLogout={handleLogout}>
       <div className="space-y-6">
         {/* Page Header */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

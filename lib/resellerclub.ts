@@ -153,48 +153,6 @@ export class ResellerClubAPI {
   }
 
   /**
-   * Fetch promotional pricing details from ResellerClub API
-   *
-   * Retrieves current promotional pricing information including active promotions,
-   * their validity periods, and promotional prices for both reseller and customer tiers.
-   *
-   * @returns {Promise<any>} Object containing promotional pricing data
-   * @throws {Error} If API request fails or credentials are invalid
-   *
-   * @example
-   * const promoPricing = await ResellerClubAPI.getPromotionalPricing();
-   * console.log(promoPricing); // Promotional pricing data
-   */
-  static async getPromotionalPricing(): Promise<any> {
-    const startTime = Date.now();
-    console.log(
-      `🎯 [PRODUCTION] Fetching promotional pricing from ResellerClub API`
-    );
-
-    try {
-      const response = await api.get("/api/resellers/promo-details.json");
-      console.log(
-        `✅ [PRODUCTION] Promotional pricing fetched in ${
-          Date.now() - startTime
-        }ms`
-      );
-
-      return {
-        promotionalPricing: response.data,
-        timestamp: new Date().toISOString(),
-      };
-    } catch (error) {
-      console.error(
-        `❌ [PRODUCTION] Failed to fetch promotional pricing:`,
-        error
-      );
-      throw new Error(
-        "Failed to fetch promotional pricing from ResellerClub API"
-      );
-    }
-  }
-
-  /**
    * Get pricing for specific TLDs
    */
   static async getTLDPricing(tlds: string[]): Promise<{ [tld: string]: any }> {
@@ -211,10 +169,354 @@ export class ResellerClubAPI {
       tlds.forEach((tld) => {
         const cleanTld = tld.startsWith(".") ? tld.substring(1) : tld;
 
-        if (pricingData.customerPricing[cleanTld]) {
+        // Comprehensive TLD mappings for ResellerClub API
+        const tldMappings: { [key: string]: string } = {
+          com: "domcno",
+          net: "dotnet",
+          org: "domorg",
+          info: "dominfo",
+          biz: "dombiz",
+          co: "dotco",
+          in: "thirdleveldotin",
+          eu: "doteu",
+          uk: "dotuk",
+          us: "domus",
+          ca: "dotca",
+          au: "dotau",
+          de: "dotde",
+          fr: "dotfr",
+          es: "dotes",
+          nl: "dotnl",
+          tv: "dottv",
+          ws: "dotws",
+          vc: "dotvc",
+          cc: "dotcc",
+          io: "dotio",
+          ai: "dotai",
+          app: "dotapp",
+          dev: "dotdev",
+          tech: "dottech",
+          online: "dotonline",
+          site: "dotsite",
+          store: "dotstore",
+          shop: "dotshop",
+          blog: "dotblog",
+          news: "dotnews",
+          media: "dotmedia",
+          email: "dotemail",
+          cloud: "dotcloud",
+          host: "dothost",
+          space: "dotspace",
+          website: "dotwebsite",
+          digital: "dotdigital",
+          global: "dotglobal",
+          world: "dotworld",
+          city: "dotcity",
+          country: "dotcountry",
+          network: "dotnetwork",
+          systems: "dotsystems",
+          solutions: "dotsolutions",
+          services: "dotservices",
+          company: "dotcompany",
+          group: "dotgroup",
+          team: "dotteam",
+          club: "dotclub",
+          community: "dotcommunity",
+          social: "dotsocial",
+          life: "dotlife",
+          live: "dotlive",
+          today: "dottoday",
+          now: "dotnow",
+          here: "dothehere",
+          me: "dotme",
+          name: "dotname",
+          mobi: "dotmobi",
+          tel: "dottel",
+          asia: "dotasia",
+          jobs: "dotjobs",
+          travel: "dottravel",
+          museum: "dotmuseum",
+          aero: "dotaero",
+          coop: "dotcoop",
+          int: "dotint",
+          gov: "dotgov",
+          mil: "dotmil",
+          edu: "dotedu",
+          ac: "dotac",
+          ad: "dotad",
+          ae: "dotae",
+          af: "dotaf",
+          ag: "dotag",
+          al: "dotal",
+          am: "dotam",
+          ao: "dotao",
+          aq: "dotaq",
+          ar: "dotar",
+          as: "dotas",
+          at: "dotat",
+          aw: "dotaw",
+          ax: "dotax",
+          az: "dotaz",
+          ba: "dotba",
+          bb: "dotbb",
+          bd: "dotbd",
+          be: "dotbe",
+          bf: "dotbf",
+          bg: "dotbg",
+          bh: "dotbh",
+          bi: "dotbi",
+          bj: "dotbj",
+          bm: "dotbm",
+          bn: "dotbn",
+          bo: "dotbo",
+          br: "dotbr",
+          bs: "dotbs",
+          bt: "dotbt",
+          bv: "dotbv",
+          bw: "dotbw",
+          by: "dotby",
+          bz: "dotbz",
+          ca: "dotca",
+          cc: "dotcc",
+          cd: "dotcd",
+          cf: "dotcf",
+          cg: "dotcg",
+          ch: "dotch",
+          ci: "dotci",
+          ck: "dotck",
+          cl: "dotcl",
+          cm: "dotcm",
+          cn: "dotcn",
+          co: "dotco",
+          cr: "dotcr",
+          cu: "dotcu",
+          cv: "dotcv",
+          cw: "dotcw",
+          cx: "dotcx",
+          cy: "dotcy",
+          cz: "dotcz",
+          dj: "dotdj",
+          dk: "dotdk",
+          dm: "dotdm",
+          do: "dotdo",
+          dz: "dotdz",
+          ec: "dotec",
+          ee: "dotee",
+          eg: "doteg",
+          eh: "doteh",
+          er: "doter",
+          et: "dotet",
+          fi: "dotfi",
+          fj: "dotfj",
+          fk: "dotfk",
+          fm: "dotfm",
+          fo: "dotfo",
+          fr: "dotfr",
+          ga: "dotga",
+          gb: "dotgb",
+          gd: "dotgd",
+          ge: "dotge",
+          gf: "dotgf",
+          gg: "dotgg",
+          gh: "dotgh",
+          gi: "dotgi",
+          gl: "dotgl",
+          gm: "dotgm",
+          gn: "dotgn",
+          gp: "dotgp",
+          gq: "dotgq",
+          gr: "dotgr",
+          gs: "dotgs",
+          gt: "dotgt",
+          gu: "dotgu",
+          gw: "dotgw",
+          gy: "dotgy",
+          hk: "dothk",
+          hm: "dothm",
+          hn: "dothn",
+          hr: "dothr",
+          ht: "doththt",
+          hu: "dothu",
+          id: "dotid",
+          ie: "dotie",
+          il: "dotil",
+          im: "dotim",
+          in: "thirdleveldotin",
+          io: "dotio",
+          iq: "dotiq",
+          ir: "dotir",
+          is: "dotis",
+          it: "dotit",
+          je: "dotje",
+          jm: "dotjm",
+          jo: "dotjo",
+          jp: "dotjp",
+          ke: "dotke",
+          kg: "dotkg",
+          kh: "dotkh",
+          ki: "dotki",
+          km: "dotkm",
+          kn: "dotkn",
+          kp: "dotkp",
+          kr: "dotkr",
+          kw: "dotkw",
+          ky: "dotky",
+          kz: "dotkz",
+          la: "dotla",
+          lb: "dotlb",
+          lc: "dotlc",
+          li: "dotli",
+          lk: "dotlk",
+          lr: "dotlr",
+          ls: "dotls",
+          lt: "dotlt",
+          lu: "dotlu",
+          lv: "dotlv",
+          ly: "dotly",
+          ma: "dotma",
+          mc: "dotmc",
+          md: "dotmd",
+          me: "dotme",
+          mf: "dotmf",
+          mg: "dotmg",
+          mh: "dotmh",
+          mk: "dotmk",
+          ml: "dotml",
+          mm: "dotmm",
+          mn: "dotmn",
+          mo: "dotmo",
+          mp: "dotmp",
+          mq: "dotmq",
+          mr: "dotmr",
+          ms: "dotms",
+          mt: "dotmt",
+          mu: "dotmu",
+          mv: "dotmv",
+          mw: "dotmw",
+          mx: "dotmx",
+          my: "dotmy",
+          mz: "dotmz",
+          na: "dotna",
+          nc: "dotnc",
+          ne: "dotne",
+          nf: "dotnf",
+          ng: "dotng",
+          ni: "dotni",
+          nl: "dotnl",
+          no: "dotno",
+          np: "dotnp",
+          nr: "dotnr",
+          nu: "dotnu",
+          nz: "dotnz",
+          om: "dotom",
+          pa: "dotpa",
+          pe: "dotpe",
+          pf: "dotpf",
+          pg: "dotpg",
+          ph: "dotph",
+          pk: "dotpk",
+          pl: "dotpl",
+          pm: "dotpm",
+          pn: "dotpn",
+          pr: "dotpr",
+          ps: "dotps",
+          pt: "dotpt",
+          pw: "dotpw",
+          py: "dotpy",
+          qa: "dotqa",
+          re: "dotre",
+          ro: "dotro",
+          rs: "dotrs",
+          ru: "dotru",
+          rw: "dotrw",
+          sa: "dotsa",
+          sb: "dotsb",
+          sc: "dotsc",
+          sd: "dotsd",
+          se: "dotse",
+          sg: "dotsg",
+          sh: "dotsh",
+          si: "dotsi",
+          sj: "dotsj",
+          sk: "dotsk",
+          sl: "dotsl",
+          sm: "dotsm",
+          sn: "dotsn",
+          so: "dotso",
+          sr: "dotsr",
+          ss: "dotss",
+          st: "dotst",
+          sv: "dotsv",
+          sx: "dotsx",
+          sy: "dotsy",
+          sz: "dotsz",
+          tc: "dottc",
+          td: "dottd",
+          tf: "dottf",
+          tg: "dottg",
+          th: "dotth",
+          tj: "dottj",
+          tk: "dottk",
+          tl: "dottl",
+          tm: "dottm",
+          tn: "dottn",
+          to: "dottto",
+          tr: "dottr",
+          tt: "dotttht",
+          tv: "dottv",
+          tw: "dottw",
+          tz: "dottz",
+          ua: "dotua",
+          ug: "dotug",
+          uk: "dotuk",
+          us: "domus",
+          uy: "dotuy",
+          uz: "dotuz",
+          va: "dotva",
+          vc: "dotvc",
+          ve: "dotve",
+          vg: "dotvg",
+          vi: "dotvi",
+          vn: "dotvn",
+          vu: "dotvu",
+          wf: "dotwf",
+          ws: "dotws",
+          ye: "dotye",
+          yt: "dotyt",
+          za: "dotza",
+          zm: "dotzm",
+          zw: "dotzw",
+        };
+
+        // Try different variations of the TLD name
+        const tldVariations = [
+          // Direct mapping first (highest priority)
+          tldMappings[cleanTld],
+          // Original TLD variations
+          cleanTld,
+          `.${cleanTld}`,
+          cleanTld.toUpperCase(),
+          cleanTld.toLowerCase(),
+          // General ResellerClub formats
+          `dot${cleanTld}`,
+          `dom${cleanTld}`,
+          // CentralNic formats (lower priority)
+          `centralnicza${cleanTld}`,
+          `centralnicus${cleanTld}`,
+        ].filter(Boolean); // Remove null values
+
+        let foundTld = null;
+        for (const variation of tldVariations) {
+          if (pricingData.customerPricing[variation]) {
+            foundTld = variation;
+            break;
+          }
+        }
+
+        if (foundTld) {
           tldPricing[cleanTld] = {
-            customer: pricingData.customerPricing[cleanTld],
-            reseller: pricingData.resellerPricing[cleanTld] || null,
+            customer: pricingData.customerPricing[foundTld],
+            reseller: pricingData.resellerPricing[foundTld] || null,
             tld: cleanTld,
           };
         }
@@ -308,9 +610,11 @@ export class ResellerClubAPI {
             // Determine domain availability based on status
             let isAvailable = domainData.status === "available";
             let domainStatus = domainData.status;
-            
+
             // Log domain status for debugging
-            console.log(`🔍 [PRODUCTION] Domain ${domain} status: ${domainStatus}`);
+            console.log(
+              `🔍 [PRODUCTION] Domain ${domain} status: ${domainStatus}`
+            );
 
             // Try to get live pricing first
             let price = 0;
@@ -337,28 +641,14 @@ export class ResellerClubAPI {
                         ? ((finalPrice - resellerPrice) / finalPrice) * 100
                         : 0;
 
-                    // Extract promotional pricing data
-                    const isPromotional =
-                      livePricing[tld].isPromotional || false;
-                    const originalPrice = livePricing[tld].originalPrice;
-                    const promotionalDetails =
-                      livePricing[tld].promotionalDetails;
-
-                    // Use the final price from PricingService (already includes promotional pricing)
+                    // Use the final price from PricingService
                     price = finalPrice;
                     currency = livePricing[tld].currency || "INR";
                     pricingSource = "live";
 
                     console.log(
-                      `✅ [PRODUCTION] Live pricing for ${domain}: ₹${finalPrice} ${currency}${
-                        isPromotional ? " (PROMOTIONAL)" : ""
-                      }`
+                      `✅ [PRODUCTION] Live pricing for ${domain}: ₹${finalPrice} ${currency}`
                     );
-                    if (isPromotional && originalPrice) {
-                      console.log(
-                        `🎯 [PRODUCTION] Promotional pricing: Original ₹${originalPrice} → Promotional ₹${finalPrice}`
-                      );
-                    }
                     if (resellerPrice > 0) {
                       console.log(
                         `📊 [PRODUCTION] Reseller pricing for ${domain}: ₹${resellerPrice} ${currency} (Margin: ${
@@ -398,18 +688,6 @@ export class ResellerClubAPI {
               currency: currency,
               registrationPeriod: 1, // Default to 1 year
               pricingSource: pricingSource, // Add pricing source info
-              originalPrice:
-                livePricing && livePricing[tld]
-                  ? livePricing[tld].originalPrice
-                  : undefined,
-              isPromotional:
-                livePricing && livePricing[tld]
-                  ? livePricing[tld].isPromotional || false
-                  : false,
-              promotionalDetails:
-                livePricing && livePricing[tld]
-                  ? livePricing[tld].promotionalDetails
-                  : undefined,
             });
           } else {
             console.warn(
@@ -666,9 +944,11 @@ export class ResellerClubAPI {
             // Determine domain availability based on status
             let isAvailable = domainData.status === "available";
             let domainStatus = domainData.status;
-            
+
             // Log domain status for debugging
-            console.log(`🔍 [PRODUCTION] Domain ${domain} status: ${domainStatus}`);
+            console.log(
+              `🔍 [PRODUCTION] Domain ${domain} status: ${domainStatus}`
+            );
             // Try to get live pricing first
             let price = 0;
             let currency = "INR";
@@ -700,22 +980,9 @@ export class ResellerClubAPI {
                   currency = livePricing[tld].currency || "INR";
                   pricingSource = "live";
 
-                  // Extract promotional pricing data
-                  const isPromotional = livePricing[tld].isPromotional || false;
-                  const originalPrice = livePricing[tld].originalPrice;
-                  const promotionalDetails =
-                    livePricing[tld].promotionalDetails;
-
                   console.log(
-                    `✅ [PRODUCTION] Live customer pricing for ${domain}: ₹${customerPrice} ${currency}${
-                      isPromotional ? " (PROMOTIONAL)" : ""
-                    }`
+                    `✅ [PRODUCTION] Live customer pricing for ${domain}: ₹${customerPrice} ${currency}`
                   );
-                  if (isPromotional && originalPrice) {
-                    console.log(
-                      `🎯 [PRODUCTION] Promotional pricing: Original ₹${originalPrice} → Promotional ₹${customerPrice}`
-                    );
-                  }
                   if (resellerPrice > 0) {
                     console.log(
                       `📊 [PRODUCTION] Reseller pricing for ${domain}: ₹${resellerPrice} ${currency} (Margin: ${
@@ -754,18 +1021,6 @@ export class ResellerClubAPI {
               currency: currency,
               registrationPeriod: 1, // Default to 1 year
               pricingSource: pricingSource, // Add pricing source info
-              originalPrice:
-                livePricing && livePricing[tld]
-                  ? livePricing[tld].originalPrice
-                  : undefined,
-              isPromotional:
-                livePricing && livePricing[tld]
-                  ? livePricing[tld].isPromotional || false
-                  : false,
-              promotionalDetails:
-                livePricing && livePricing[tld]
-                  ? livePricing[tld].promotionalDetails
-                  : undefined,
             });
           } else {
             console.warn(

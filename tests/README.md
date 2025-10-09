@@ -9,13 +9,13 @@ tests/
 ├── README.md                 # This file - testing documentation
 ├── api/                      # API testing scripts
 │   ├── test-pricing.js       # Pricing service testing
-│   ├── test-promo-prices.js  # Promotional pricing API testing
+│   ├── test-tld-mappings.js  # TLD mapping testing
 │   ├── test-all-endpoints.js # Comprehensive API endpoint testing
-│   ├── test-simple-promo.js  # Simple promotional pricing verification
-│   ├── test-final-promo.js   # Final promotional pricing verification
+│   ├── test-simple-pricing.js # Simple pricing verification
+│   ├── test-final-pricing.js  # Final pricing verification
 │   └── test-eu-pricing.js    # EU TLD specific testing
 ├── debug/                    # Debug and troubleshooting scripts
-│   └── debug-promo.js        # Promotional pricing debugging
+│   └── debug-pricing.js      # Pricing debugging
 └── scripts/                  # Utility and maintenance scripts
     └── update_pricing.js     # Pricing data update utility
 ```
@@ -31,20 +31,20 @@ tests/
 **What it tests**:
 
 - TLD pricing data fetching
-- Promotional pricing detection
+- TLD mapping accuracy
 - Price comparison and validation
 - Error handling and edge cases
 
-#### `test-promo-prices.js`
+#### `test-tld-mappings.js`
 
-**Purpose**: Test ResellerClub promotional pricing API endpoints
-**Usage**: `node tests/api/test-promo-prices.js`
+**Purpose**: Test TLD mapping accuracy and coverage
+**Usage**: `node tests/api/test-tld-mappings.js`
 **What it tests**:
 
-- Multiple ResellerClub API endpoints
-- Normal vs promotional price comparison
-- Promotional discount calculations
-- API response validation
+- TLD mapping accuracy for 200+ TLDs
+- ResellerClub API key format validation
+- Priority-based lookup testing
+- Fallback mechanism validation
 
 #### `test-all-endpoints.js`
 
@@ -54,54 +54,54 @@ tests/
 
 - All known ResellerClub API endpoints
 - Response validation and data structure analysis
-- Promotional pricing data detection
+- TLD pricing data detection
 - Endpoint categorization and success tracking
 
-### Promotional Pricing Tests
+### TLD Pricing Tests
 
-#### `test-simple-promo.js`
+#### `test-simple-pricing.js`
 
-**Purpose**: Simple verification of promotional pricing capabilities
-**Usage**: `node tests/api/test-simple-promo.js`
+**Purpose**: Simple verification of TLD pricing capabilities
+**Usage**: `node tests/api/test-simple-pricing.js`
 **What it tests**:
 
-- Customer, reseller, and promotional pricing APIs
-- Cross-comparison of pricing sources
-- Active promotional details analysis
-- Savings calculations and recommendations
+- Customer and reseller pricing APIs
+- TLD mapping validation
+- Price accuracy verification
+- Performance testing
 
-#### `test-final-promo.js`
+#### `test-final-pricing.js`
 
-**Purpose**: Final verification of promotional pricing implementation
-**Usage**: `node tests/api/test-final-promo.js`
+**Purpose**: Final verification of TLD pricing implementation
+**Usage**: `node tests/api/test-final-pricing.js`
 **What it tests**:
 
 - Complete pricing data fetching
 - TLD format matching across naming conventions
-- Active promotional detection and validation
+- TLD mapping accuracy validation
 - Comprehensive summary and success confirmation
 
 #### `test-eu-pricing.js`
 
-**Purpose**: EU TLD specific promotional pricing testing
+**Purpose**: EU TLD specific pricing testing
 **Usage**: `node tests/api/test-eu-pricing.js`
 **What it tests**:
 
-- EU TLD promotional pricing specifically
+- EU TLD pricing accuracy
 - Domain search API integration
-- Promotional price display verification
+- Price display verification
 
 ## 🔧 Debug Scripts
 
-### `debug-promo.js`
+### `debug-pricing.js`
 
-**Purpose**: Debug promotional pricing data and detection
-**Usage**: `node tests/debug/debug-promo.js`
+**Purpose**: Debug TLD pricing data and mappings
+**Usage**: `node tests/debug/debug-pricing.js`
 **What it provides**:
 
-- Detailed promotional data analysis
-- TLD matching logic debugging
-- Promotional detection troubleshooting
+- Detailed pricing data analysis
+- TLD mapping logic debugging
+- Pricing detection troubleshooting
 - Data structure inspection
 
 ## 🛠️ Utility Scripts
@@ -126,14 +126,14 @@ tests/
 
 ### Running Tests
 
-#### Test All Promotional Pricing
+#### Test All TLD Pricing
 
 ```bash
-# Run comprehensive promotional pricing test
-node tests/api/test-final-promo.js
+# Run comprehensive TLD pricing test
+node tests/api/test-final-pricing.js
 
-# Run simple promotional pricing verification
-node tests/api/test-simple-promo.js
+# Run simple pricing verification
+node tests/api/test-simple-pricing.js
 ```
 
 #### Test Specific Components
@@ -141,6 +141,9 @@ node tests/api/test-simple-promo.js
 ```bash
 # Test pricing service
 node tests/api/test-pricing.js
+
+# Test TLD mappings
+node tests/api/test-tld-mappings.js
 
 # Test all API endpoints
 node tests/api/test-all-endpoints.js
@@ -152,8 +155,8 @@ node tests/api/test-eu-pricing.js
 #### Debug Issues
 
 ```bash
-# Debug promotional pricing
-node tests/debug/debug-promo.js
+# Debug pricing and mappings
+node tests/debug/debug-pricing.js
 ```
 
 ## 📊 Expected Output
@@ -161,7 +164,7 @@ node tests/debug/debug-promo.js
 ### Successful Test Output
 
 ```
-🎯 Final ResellerClub Promotional Pricing Test
+🎯 Final ResellerClub TLD Pricing Test
 ============================================================
    API URL: https://httpapi.com
    User ID: your-user-id
@@ -171,55 +174,48 @@ node tests/debug/debug-promo.js
 ✅ All pricing data fetched successfully!
    Customer pricing TLDs: 407
    Reseller pricing TLDs: 405
-   Promotional details: 1
 
-🎯 Promotional Details Analysis:
-   Total promotions in system: 1
+🔍 Testing TLD Mappings and Pricing:
+📋 TLD: .COM (mapped to: domcno)
+   Customer Price: ₹1,198.80
+   Reseller Price: ₹1,000.00
+   Margin: 16.6%
 
-📋 Active Promotions Details:
-   1. Product Key: doteu
-      Customer Price: ₹218.90
-      Reseller Price: ₹768.00
-      Period: 1 year(s)
-      Status: Active
-      Currently Valid: Yes
-      Start: 10/1/2025 12:00:00 AM
-      End: 12/1/2025 11:59:59 PM
-      Action Type: addnewdomain
+📋 TLD: .NET (mapped to: dotnet)
+   Customer Price: ₹1,558.80
+   Reseller Price: ₹1,300.00
+   Margin: 16.6%
 
-🔍 Testing Specific TLDs for Promotional Pricing:
-📋 TLD: .EU (found as: eu)
+📋 TLD: .INFO (mapped to: dominfo)
+   Customer Price: ₹2,494.80
+   Reseller Price: ₹2,000.00
+   Margin: 19.8%
+
+📋 TLD: .EU (mapped to: doteu)
    Customer Price: ₹768.00
-   Reseller Price: ₹768.00
-   Margin: 0.0%
-   🎉 PROMOTIONAL PRICE: ₹218.90
-   💰 SAVINGS: ₹549.10 (71.5% off)
-   📅 Valid: 10/1/2025 - 12/1/2025
-   🎯 Action Type: addnewdomain
+   Reseller Price: ₹600.00
+   Margin: 21.9%
 
 📊 FINAL TEST SUMMARY
 ==================================================
 📈 Test Results:
-   TLDs tested: 15
-   TLDs with promotional pricing: 1
-   Total potential savings: ₹549.10
-   Active promotional details: 1
-
-🎉 Promotional TLDs Found:
-   .EU: Save ₹549.10 (71.5% off)
+   TLDs tested: 20
+   TLDs with accurate pricing: 20
+   TLD mappings working: 20
+   Average margin: 18.7%
 
 🏆 Final Assessment:
-   ✅ SUCCESS: Promotional pricing is working correctly!
-   ✅ The system can detect and apply promotional pricing.
-   ✅ 1 TLD(s) have active promotional pricing.
-   ✅ Total potential savings: ₹549.10
+   ✅ SUCCESS: TLD pricing system is working correctly!
+   ✅ All TLD mappings are accurate.
+   ✅ Pricing data is being fetched successfully.
+   ✅ 20 TLD(s) have valid pricing data.
 
 💡 Next Steps:
-   ✅ Promotional pricing is working - no action needed
-   ✅ Consider implementing automatic promotional detection in the main application
-   ✅ Monitor promotional details API for new promotions
+   ✅ TLD pricing system is working - no action needed
+   ✅ Monitor ResellerClub API for pricing updates
+   ✅ Consider adding more TLD mappings as needed
 
-✅ Final promotional pricing test completed successfully!
+✅ Final TLD pricing test completed successfully!
 ```
 
 ## 🔍 Troubleshooting
@@ -296,9 +292,9 @@ Tests try multiple TLD format variations for compatibility:
 
 ### Regular Testing
 
-- Run `test-final-promo.js` weekly to verify promotional pricing
+- Run `test-final-pricing.js` weekly to verify TLD pricing
 - Run `test-all-endpoints.js` monthly to check API endpoint status
-- Run `debug-promo.js` when troubleshooting promotional pricing issues
+- Run `debug-pricing.js` when troubleshooting pricing issues
 
 ### Updating Tests
 

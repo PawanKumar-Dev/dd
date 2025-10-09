@@ -7,7 +7,7 @@ A comprehensive domain registration and management platform built with Next.js 1
 ### Core Functionality
 
 - **Domain Search & Registration** - Search and register domains across 400+ TLDs
-- **Live Pricing** - Real-time pricing from ResellerClub API with multi-source promotional pricing support
+- **Live Pricing** - Real-time pricing from ResellerClub API with comprehensive TLD mappings
 - **Payment Processing** - Integrated Razorpay payment gateway
 - **User Management** - Registration, authentication, and profile management
 - **Order Management** - Complete order tracking and invoice generation
@@ -15,7 +15,7 @@ A comprehensive domain registration and management platform built with Next.js 1
 
 ### Advanced Features
 
-- **Promotional Pricing** - Multi-API promotional pricing with automatic detection and display
+- **Comprehensive TLD Mappings** - 200+ TLD mappings for accurate pricing across all domain extensions
 - **Multi-stage Registration** - Step-by-step user registration with geolocation
 - **Indian Timezone Support** - All dates and times displayed in IST
 - **Email Notifications** - Automated email notifications for orders and updates
@@ -67,8 +67,8 @@ node tests/run-tests.js test-eu-pricing     # EU TLD specific test
 
 ### Test Categories
 
-- **API Tests** - Test ResellerClub API integration and promotional pricing
-- **Debug Tools** - Debug promotional pricing data and detection
+- **API Tests** - Test ResellerClub API integration and TLD pricing
+- **Debug Tools** - Debug pricing data and TLD mappings
 - **Utility Scripts** - Maintenance and update scripts
 
 For detailed testing documentation, see [tests/README.md](tests/README.md).
@@ -277,8 +277,6 @@ SMTP_PORT=587
 - `GET /api/admin/tld-pricing` - Get TLD pricing
 - `GET /api/admin/settings` - Get settings
 - `POST /api/admin/settings` - Update settings
-- `GET /api/admin/settings/promotional-pricing` - Get promotional pricing setting
-- `POST /api/admin/settings/promotional-pricing` - Update promotional pricing
 
 ## 🎯 Key Features Explained
 
@@ -286,8 +284,7 @@ SMTP_PORT=587
 
 - Real-time availability checking
 - Live pricing from ResellerClub
-- Support for 400+ TLDs
-- Promotional pricing support
+- Support for 400+ TLDs with comprehensive mappings
 - Cached pricing for performance
 
 ### Payment Processing
@@ -305,15 +302,14 @@ SMTP_PORT=587
 - Pricing configuration
 - System settings management
 
-### Promotional Pricing
+### TLD Pricing System
 
-- **Working API Integration**: Uses ResellerClub's `/api/resellers/promo-details.json` endpoint
-- **Real-time Detection**: Automatically detects active promotions for TLDs
-- **Time-based Validation**: Checks promotion validity periods (start/end timestamps)
-- **Automatic Application**: Applies promotional pricing when active promotions are found
-- **Visual Indicators**: Displays strikethrough original prices and PROMO badges
-- **Admin Control**: Toggle promotional pricing display on/off
-- **Comprehensive Logging**: Detailed logs for promotional pricing detection and application
+- **Comprehensive Mappings**: 200+ TLD mappings for accurate ResellerClub API integration
+- **Priority-based Lookup**: Direct mappings take priority over pattern matching
+- **Multi-format Support**: Handles various ResellerClub API key formats (dot*, dom*, centralnic\*)
+- **Live Pricing**: Real-time pricing from ResellerClub customer and reseller APIs
+- **Performance Optimized**: Intelligent caching with 5-minute TTL
+- **Error Handling**: Robust fallback mechanisms for missing TLD data
 
 ## 🔒 Security Features
 
@@ -393,9 +389,10 @@ For support and questions:
 
 ## 🔄 Recent Updates
 
-- ✅ Promotional pricing system implementation
+- ✅ Comprehensive TLD mappings (200+ TLDs) for accurate pricing
+- ✅ Removed non-working promotional pricing system
+- ✅ Simplified pricing architecture for better performance
 - ✅ Admin settings management
 - ✅ Indian timezone support
-- ✅ Verbose logging reduction
 - ✅ Enhanced error handling
 - ✅ Improved user experience

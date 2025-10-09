@@ -275,14 +275,13 @@ function MyPage() {
 - **Component README**: Detailed component documentation
 - **API Documentation**: Complete API reference
 - **Project README**: Setup and usage instructions
-- **Promotional Pricing Guide**: Working promotional pricing system documentation
+- **TLD Pricing Guide**: Comprehensive TLD mapping and pricing system documentation
 - **Code Comments**: Inline documentation
 
 ### Documentation Files
 
 - `README.md` - Main project documentation
-- `API.md` - Complete API reference with promotional pricing endpoints
-- `PROMOTIONAL_PRICING.md` - Detailed promotional pricing system guide
+- `API.md` - Complete API reference with TLD pricing endpoints
 - `PROJECT_STRUCTURE.md` - This file, project architecture overview
 - `SETUP.md` - Setup and installation instructions
 - `TESTING_MODE.md` - Testing and development guidelines

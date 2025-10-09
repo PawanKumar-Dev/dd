@@ -207,18 +207,7 @@ Search for domain availability and pricing.
     "price": number,
     "currency": "string",
     "registrationPeriod": number,
-    "pricingSource": "string",
-    "originalPrice": number,
-    "isPromotional": true|false,
-    "promotionalDetails": {
-      "source": "promo-api" | "promo-data",
-      "originalCustomerPrice": number,
-      "promotionalPrice": number,
-      "discount": number,
-      "startTime": "string",
-      "endTime": "string",
-      "period": "string"
-    }
+    "pricingSource": "string"
     }
   ]
 }
@@ -545,7 +534,6 @@ Get all application settings (Admin only).
 {
   "success": true,
   "data": {
-    "promotional_pricing_enabled": true|false,
     "other_setting": "value"
   }
 }
@@ -584,104 +572,48 @@ Update application settings (Admin only).
 }
 ```
 
-## Promotional Pricing System
+## TLD Pricing System
 
-The system implements a comprehensive promotional pricing solution that uses ResellerClub's working promotional pricing API to provide accurate promotional pricing information.
+The system implements a comprehensive TLD pricing solution with 200+ TLD mappings for accurate ResellerClub API integration.
 
 ### How It Works
 
-1. **Working API Integration**: Fetches pricing from three ResellerClub APIs in parallel:
+1. **Comprehensive TLD Mappings**: 200+ TLD mappings for accurate ResellerClub API integration
+2. **Priority-based Lookup**: Direct mappings take priority over pattern matching
+3. **Multi-format Support**: Handles various ResellerClub API key formats (dot*, dom*, centralnic\*)
+4. **Live Pricing**: Real-time pricing from ResellerClub customer and reseller APIs
+5. **Performance Optimized**: Intelligent caching with 5-minute TTL
+6. **Error Handling**: Robust fallback mechanisms for missing TLD data
 
-   - `/api/products/customer-price.json` - Customer-facing prices
-   - `/api/products/reseller-price.json` - Base reseller costs
-   - `/api/resellers/promo-details.json` - Active promotional details
-
-2. **Real-time Detection**: Automatically detects active promotions by checking:
-
-   - Promotion status (`isactive: "true"`)
-   - TLD matching (productkey contains TLD name)
-   - Time validation (current time between start and end timestamps)
-
-3. **Automatic Application**: Applies promotional pricing when:
-
-   - Promotional pricing is enabled in admin settings
-   - Active promotion is found for the TLD
-   - Current time is within promotion validity period
-
-4. **Comprehensive Logging**: Detailed logs for promotional pricing detection and application
-
-### Promotional Pricing Data Structure
-
-When a domain has promotional pricing, the response includes:
+### TLD Mapping Examples
 
 ```json
 {
-  "domainName": "example.eu",
-  "price": 218.9,
-  "originalPrice": 768.0,
-  "isPromotional": true,
-  "promotionalDetails": {
-    "source": "promo-details-api",
-    "originalCustomerPrice": 768.0,
-    "promotionalPrice": 218.9,
-    "discount": 549.1,
-    "startTime": "1759276800",
-    "endTime": "1764633599",
-    "period": "1",
-    "actionType": "addnewdomain"
-  }
+  "com": "domcno",
+  "net": "dotnet",
+  "org": "domorg",
+  "info": "dominfo",
+  "biz": "dombiz",
+  "co": "dotco",
+  "in": "thirdleveldotin",
+  "eu": "doteu",
+  "uk": "dotuk",
+  "us": "domus"
 }
 ```
 
-### Visual Indicators
+### Pricing Data Structure
 
-- **Strikethrough**: Original price displayed with strikethrough
-- **PROMO Badge**: Visual indicator next to promotional prices
-- **Price Highlighting**: Promotional prices are highlighted
-
-### GET /api/admin/settings/promotional-pricing
-
-Get promotional pricing setting (Admin only).
-
-**Headers:**
-
-- `Authorization: Bearer <admin-token>`
-
-**Response:**
+Domain search response includes:
 
 ```json
 {
-  "success": true,
-  "isEnabled": true|false,
-  "lastUpdated": "string",
-  "updatedBy": "string"
-}
-```
-
-### POST /api/admin/settings/promotional-pricing
-
-Update promotional pricing setting (Admin only).
-
-**Headers:**
-
-- `Authorization: Bearer <admin-token>`
-
-**Request Body:**
-
-```json
-{
-  "enabled": true|false
-}
-```
-
-**Response:**
-
-```json
-{
-  "success": true,
-  "isEnabled": true|false,
-  "lastUpdated": "string",
-  "updatedBy": "string"
+  "domainName": "example.com",
+  "available": true,
+  "price": 1198.8,
+  "currency": "INR",
+  "registrationPeriod": 1,
+  "pricingSource": "live"
 }
 ```
 

@@ -70,13 +70,6 @@ export class SettingsService {
   }
 
   /**
-   * Check if promotional pricing is enabled
-   */
-  static async isPromotionalPricingEnabled(): Promise<boolean> {
-    return await this.getSetting("promotional_pricing_enabled", true);
-  }
-
-  /**
    * Clear all cached settings
    */
   static clearCache(): void {
