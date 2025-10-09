@@ -592,8 +592,10 @@ export default function MultiStageRegisterForm({ className = '' }: RegisterFormP
     <div className={`min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 ${className}`}>
       <div className="max-w-2xl w-full space-y-8">
         <div className="text-center">
-          <Logo />
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">Create your account</h2>
+          <div className="flex justify-center mb-6">
+            <Logo size="lg" showText={true} />
+          </div>
+          <h2 className="text-3xl font-bold text-gray-900">Create your account</h2>
           <p className="mt-2 text-sm text-gray-600">
             Or{' '}
             <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
