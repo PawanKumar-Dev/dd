@@ -2,7 +2,7 @@ import mongoose, { Document, Schema } from "mongoose";
 
 export interface IOrder extends Document {
   orderId: string;
-  userId: string;
+  userId: Schema.Types.ObjectId;
   paymentId: string;
   razorpayOrderId: string;
   razorpayPaymentId: string;
@@ -42,7 +42,8 @@ const OrderSchema = new Schema<IOrder>(
       index: true,
     },
     userId: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: "User",
       required: true,
       index: true,
     },

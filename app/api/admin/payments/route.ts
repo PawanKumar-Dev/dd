@@ -79,7 +79,9 @@ export async function GET(request: NextRequest) {
           status: razorpayPayment.status,
           paymentMethod: razorpayPayment.method || "Unknown",
           customerName: orderData?.userId
-            ? `${orderData.userId.firstName} ${orderData.userId.lastName}`
+            ? `${orderData.userId.firstName || ""} ${
+                orderData.userId.lastName || ""
+              }`.trim() || "Unknown"
             : paymentDetails.customerName || "Unknown",
           customerEmail:
             orderData?.userId?.email ||

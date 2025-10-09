@@ -102,6 +102,7 @@ node scripts/kill-ports.js --help
 - `scripts/init-db.js` - Initialize database with admin user
 - `scripts/recreate-admin.js` - Recreate admin user
 - `scripts/setup.js` - General setup script
+- `scripts/migrate-order-userids.js` - Migrate Order.userId from String to ObjectId references
 
 ## 📁 Project Structure
 
@@ -132,7 +133,8 @@ dd/
 │   ├── kill-ports.js            # Port management utility
 │   ├── init-db.js               # Database initialization
 │   ├── recreate-admin.js        # Admin user recreation
-│   └── setup.js                 # Setup script
+│   ├── setup.js                 # Setup script
+│   └── migrate-order-userids.js # Order userId migration
 └── public/                       # Static assets
 ```
 
