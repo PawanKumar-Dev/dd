@@ -150,7 +150,6 @@ export async function POST(request: NextRequest) {
           error: d.error,
         })),
         successfulDomains: existingOrder.successfulDomains,
-        failedDomains: existingOrder.failedDomains,
       });
     }
 
@@ -179,7 +178,6 @@ export async function POST(request: NextRequest) {
 
     const registrationResults = [];
     const successfulDomains = [];
-    const failedDomains = [];
     const orderDomains = [];
 
     for (const item of cartItems) {
@@ -275,7 +273,6 @@ export async function POST(request: NextRequest) {
           console.error(
             `❌ [PAYMENT-VERIFY] Domain registration failed: ${item.domainName} - ${result.message}`
           );
-          failedDomains.push(item.domainName);
 
           registrationResults.push({
             domainName: item.domainName,
@@ -298,8 +295,6 @@ export async function POST(request: NextRequest) {
           error
         );
 
-        failedDomains.push(item.domainName);
-
         registrationResults.push({
           domainName: item.domainName,
           status: "failed",
@@ -321,9 +316,7 @@ export async function POST(request: NextRequest) {
     console.log("📊 [PAYMENT-VERIFY] Domain registration summary:", {
       totalDomains: cartItems.length,
       successful: successfulDomains.length,
-      failed: failedDomains.length,
       successfulDomains: successfulDomains,
-      failedDomains: failedDomains,
     });
 
     // Determine order status - always "completed" if payment succeeded
@@ -342,7 +335,6 @@ export async function POST(request: NextRequest) {
       status: orderStatus,
       domains: orderDomains,
       successfulDomains: successfulDomains,
-      failedDomains: failedDomains,
       // Store payment verification details for audit trail
       paymentVerification: {
         verifiedAt: new Date(),
@@ -375,12 +367,6 @@ export async function POST(request: NextRequest) {
               price: d.price,
               registrationPeriod: d.registrationPeriod,
             })),
-          failedDomains: orderDomains
-            .filter((d) => d.status === "failed")
-            .map((d) => ({
-              domainName: d.domainName,
-              error: d.error || "Registration failed",
-            })),
           paymentId: order.paymentId,
           createdAt: order.createdAt,
         }
@@ -402,49 +388,27 @@ export async function POST(request: NextRequest) {
     try {
       let adminEmailSent = false;
 
-      if (failedDomains.length > 0) {
-        // Send specialized notification for failed domain registrations
-        adminEmailSent =
-          await EmailService.sendFailedDomainRegistrationNotification(
-            process.env.ADMIN_EMAIL || "sales@exceltechnologies.in",
-            order.orderId,
-            `${user.firstName} ${user.lastName}`,
-            user.email,
-            successfulDomains.map((d) => d.domainName),
-            failedDomains.map((d) => d.domainName),
-            order.amount,
-            order.currency
-          );
-
-        if (adminEmailSent) {
-          console.log(
-            `🚨 [ADMIN-NOTIFICATION] Failed domain registration alert sent for order ${order.orderId}`
-          );
+      // Send regular notification for orders
+      adminEmailSent = await EmailService.sendAdminNotification(
+        process.env.ADMIN_EMAIL || "sales@exceltechnologies.in",
+        "New Domain Order",
+        `A new domain order has been placed by ${user.firstName} ${user.lastName} (${user.email})`,
+        {
+          orderId: order.orderId,
+          invoiceNumber: order.invoiceNumber,
+          customerName: `${user.firstName} ${user.lastName}`,
+          customerEmail: user.email,
+          amount: order.amount,
+          currency: order.currency,
+          successfulDomains: successfulDomains.map((d) => d.domainName),
+          orderStatus: orderStatus,
         }
-      } else {
-        // Send regular notification for successful orders
-        adminEmailSent = await EmailService.sendAdminNotification(
-          process.env.ADMIN_EMAIL || "sales@exceltechnologies.in",
-          "New Domain Order",
-          `A new domain order has been placed by ${user.firstName} ${user.lastName} (${user.email})`,
-          {
-            orderId: order.orderId,
-            invoiceNumber: order.invoiceNumber,
-            customerName: `${user.firstName} ${user.lastName}`,
-            customerEmail: user.email,
-            amount: order.amount,
-            currency: order.currency,
-            successfulDomains: successfulDomains.map((d) => d.domainName),
-            failedDomains: failedDomains.map((d) => d.domainName),
-            orderStatus: orderStatus,
-          }
+      );
+
+      if (adminEmailSent) {
+        console.log(
+          `✅ [ADMIN-NOTIFICATION] Order notification sent for order ${order.orderId}`
         );
-
-        if (adminEmailSent) {
-          console.log(
-            `✅ [ADMIN-NOTIFICATION] Order notification sent for order ${order.orderId}`
-          );
-        }
       }
 
       if (!adminEmailSent) {
@@ -464,7 +428,6 @@ export async function POST(request: NextRequest) {
       invoiceNumber: order.invoiceNumber,
       registrationResults,
       successfulDomains,
-      failedDomains,
     });
   } catch (error) {
     console.error("Payment verification error:", error);
