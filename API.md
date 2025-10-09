@@ -400,8 +400,7 @@ Verify payment and process domain registration.
   "success": true,
   "message": "Payment verified and domains registered",
   "orderId": "string",
-  "registeredDomains": ["string"],
-  "failedDomains": ["string"]
+  "registeredDomains": ["string"]
 }
 ```
 
@@ -525,36 +524,6 @@ Get TLD pricing data (Admin only).
   ],
   "totalCount": number,
   "lastUpdated": "string"
-}
-```
-
-### GET /api/admin/failed-domains
-
-Get failed domain registrations (Admin only).
-
-**Headers:**
-
-- `Authorization: Bearer <admin-token>`
-
-**Response:**
-
-```json
-{
-  "success": true,
-  "failedDomains": [
-    {
-      "id": "string",
-      "domainName": "string",
-      "orderId": "string",
-      "error": "string",
-      "failedAt": "string",
-      "userId": {
-        "firstName": "string",
-        "lastName": "string",
-        "email": "string"
-      }
-    }
-  ]
 }
 ```
 

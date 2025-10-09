@@ -20,7 +20,6 @@ A comprehensive domain registration and management platform built with Next.js 1
 - **Indian Timezone Support** - All dates and times displayed in IST
 - **Email Notifications** - Automated email notifications for orders and updates
 - **PDF Invoices** - Generate and download PDF invoices
-- **Failed Domain Alerts** - Admin notifications for failed domain registrations
 
 ## 🛠️ Tech Stack
 
@@ -190,7 +189,6 @@ SMTP_PORT=587
 - Payment management
 - Pricing management
 - Settings configuration
-- Failed domain notifications
 
 ### Regular User
 
