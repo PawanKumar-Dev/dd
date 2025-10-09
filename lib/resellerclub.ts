@@ -374,12 +374,12 @@ export class ResellerClubAPI {
                 );
               }
 
-              // If no live pricing available, mark as unavailable
+              // If no live pricing available, mark as unavailable with pricing error
               if (price === 0) {
                 pricingSource = "unavailable";
                 isAvailable = false; // Mark domain as unavailable if no live pricing
                 console.log(
-                  `⚠️ [PRODUCTION] No customer pricing available for ${domain} - marking as unavailable`
+                  `⚠️ [PRODUCTION] Unable to fetch pricing for ${domain} (TLD: ${tld}) - marking as unavailable`
                 );
               }
             }
@@ -725,12 +725,12 @@ export class ResellerClubAPI {
                 );
               }
 
-              // If no live pricing available, mark as unavailable
+              // If no live pricing available, mark as unavailable with pricing error
               if (price === 0) {
                 pricingSource = "unavailable";
                 isAvailable = false; // Mark domain as unavailable if no live pricing
                 console.log(
-                  `⚠️ [PRODUCTION] No customer pricing available for ${domain} - marking as unavailable`
+                  `⚠️ [PRODUCTION] Unable to fetch pricing for ${domain} (TLD: ${tld}) - marking as unavailable`
                 );
               }
             }

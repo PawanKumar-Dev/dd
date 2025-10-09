@@ -634,9 +634,16 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
                               )}
                               <span className={`px-2 py-1 text-xs font-medium rounded-full ${result.available
                                 ? 'text-white bg-gradient-to-r from-green-500 to-green-600'
-                                : 'text-white bg-gradient-to-r from-red-500 to-red-600'
+                                : result.pricingSource === 'unavailable'
+                                  ? 'text-white bg-gradient-to-r from-orange-500 to-orange-600'
+                                  : 'text-white bg-gradient-to-r from-red-500 to-red-600'
                                 }`} style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
-                                {result.available ? 'Available' : 'Taken'}
+                                {result.available
+                                  ? 'Available'
+                                  : result.pricingSource === 'unavailable'
+                                    ? 'Pricing Unavailable'
+                                    : 'Taken'
+                                }
                               </span>
                             </div>
                           </div>
@@ -697,7 +704,12 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
                         ) : (
                           <div className="text-left sm:text-right">
                             <p className="text-xs text-[var(--google-text-secondary)]" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
-                              {result.available ? 'Pricing N/A' : 'Taken'}
+                              {result.available
+                                ? 'Pricing N/A'
+                                : result.pricingSource === 'unavailable'
+                                  ? 'Unable to fetch pricing'
+                                  : 'Taken'
+                              }
                             </p>
                           </div>
                         )}
