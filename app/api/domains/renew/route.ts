@@ -117,7 +117,6 @@ export async function POST(request: NextRequest) {
         },
       ],
       successfulDomains: [domainName],
-      failedDomains: [],
     });
 
     await order.save();
