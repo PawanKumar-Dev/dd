@@ -10,8 +10,7 @@ import {
   Receipt,
   CheckCircle,
   XCircle,
-  Clock,
-  DollarSign
+  Clock
 } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayoutNew';
 import AdminDataTable from '@/components/admin/AdminDataTable';
@@ -272,7 +271,7 @@ export default function AdminDashboard() {
 
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
             <div className="flex items-center">
               <div className="p-2 bg-blue-100 rounded-lg">
@@ -311,18 +310,6 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <div className="flex items-center">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <DollarSign className="h-6 w-6 text-orange-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">TLD Pricing</p>
-                <p className="text-2xl font-bold text-gray-900">Live</p>
-                <p className="text-xs text-gray-500">From ResellerClub</p>
-              </div>
-            </div>
-          </div>
         </div>
 
 

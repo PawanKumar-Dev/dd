@@ -6,6 +6,11 @@ import { ResellerClubAPI } from "@/lib/resellerclub";
 import { EmailService } from "@/lib/email";
 import connectDB from "@/lib/mongodb";
 import Order from "@/models/Order";
+import {
+  isDomainSupported,
+  requiresAdditionalDetails,
+  getDomainRequirements,
+} from "@/lib/domainRequirements";
 
 export async function POST(request: NextRequest) {
   try {
@@ -175,6 +180,46 @@ export async function POST(request: NextRequest) {
       "Status:",
       paymentDetails.status
     );
+
+    // Validate domains before processing
+    const restrictedDomains = [];
+    for (const item of cartItems) {
+      if (
+        requiresAdditionalDetails(item.domainName) ||
+        !isDomainSupported(item.domainName)
+      ) {
+        restrictedDomains.push({
+          domainName: item.domainName,
+          requirements: getDomainRequirements(item.domainName),
+        });
+      }
+    }
+
+    // If any restricted domains found, reject the payment
+    if (restrictedDomains.length > 0) {
+      console.error(
+        "❌ [PAYMENT-VERIFY] Payment rejected due to restricted domains:",
+        restrictedDomains
+      );
+
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Payment rejected",
+          message:
+            "Some domains in your order require additional verification and cannot be processed automatically.",
+          restrictedDomains: restrictedDomains.map((d) => ({
+            domainName: d.domainName,
+            reason:
+              d.requirements?.warningMessage ||
+              "Additional verification required",
+          })),
+          supportContact:
+            "Please contact support@exceltechnologies.com for assistance with these domains.",
+        },
+        { status: 400 }
+      );
+    }
 
     const registrationResults = [];
     const successfulDomains = [];
