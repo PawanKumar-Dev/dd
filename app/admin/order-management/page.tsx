@@ -53,7 +53,6 @@ interface Order {
     expiresAt?: Date;
   }[];
   successfulDomains: string[];
-  failedDomains: string[];
   createdAt: string;
   updatedAt: string;
   invoiceNumber?: string;
@@ -447,32 +446,19 @@ export default function AdminOrdersPage() {
                 </div>
 
                 {/* Summary */}
-                {(selectedOrder.successfulDomains.length > 0 || selectedOrder.failedDomains.length > 0) && (
+                {selectedOrder.successfulDomains.length > 0 && (
                   <div className="border-t pt-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Summary</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {selectedOrder.successfulDomains.length > 0 && (
-                        <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                          <div className="flex items-center space-x-2">
-                            <CheckCircle className="h-5 w-5 text-green-600" />
-                            <span className="font-medium text-green-800">Successfully Registered</span>
-                          </div>
-                          <p className="text-sm text-green-700 mt-1">
-                            {selectedOrder.successfulDomains.join(', ')}
-                          </p>
+                      <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <div className="flex items-center space-x-2">
+                          <CheckCircle className="h-5 w-5 text-green-600" />
+                          <span className="font-medium text-green-800">Successfully Registered</span>
                         </div>
-                      )}
-                      {selectedOrder.failedDomains.length > 0 && (
-                        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                          <div className="flex items-center space-x-2">
-                            <XCircle className="h-5 w-5 text-red-600" />
-                            <span className="font-medium text-red-800">Failed to Register</span>
-                          </div>
-                          <p className="text-sm text-red-700 mt-1">
-                            {selectedOrder.failedDomains.join(', ')}
-                          </p>
-                        </div>
-                      )}
+                        <p className="text-sm text-green-700 mt-1">
+                          {selectedOrder.successfulDomains.join(', ')}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 )}
