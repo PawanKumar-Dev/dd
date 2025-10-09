@@ -135,7 +135,6 @@ export default function CheckoutPage() {
             if (verifyResponse.ok) {
               const {
                 successfulDomains,
-                failedDomains,
                 orderId,
                 invoiceNumber,
                 registrationResults
@@ -147,7 +146,6 @@ export default function CheckoutPage() {
                 orderId: orderId || '',
                 invoiceNumber: invoiceNumber || '',
                 successfulDomains: successfulDomains || [],
-                failedDomains: failedDomains || [],
                 registrationResults: registrationResults || [],
                 amount: getTotalPrice(),
                 currency: 'INR',
