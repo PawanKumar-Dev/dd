@@ -614,6 +614,7 @@ export class ResellerClubAPI {
             // Try to get live pricing first
             let price = 0;
             let currency = "INR";
+            let registrationPeriod = 1;
             let pricingSource: "live" | "fallback" | "unavailable" | "taken" =
               isAvailable ? "unavailable" : "taken";
 
@@ -639,7 +640,10 @@ export class ResellerClubAPI {
                     // Use the final price from PricingService
                     price = finalPrice;
                     currency = livePricing[tld].currency || "INR";
+                    registrationPeriod =
+                      livePricing[tld].registrationPeriod || 1;
                     pricingSource = "live";
+
 
                     console.log(
                       `✅ [PRODUCTION] Live pricing for ${domain}: ₹${finalPrice} ${currency}`
@@ -681,7 +685,7 @@ export class ResellerClubAPI {
               available: isAvailable,
               price: price,
               currency: currency,
-              registrationPeriod: 1, // Default to 1 year
+              registrationPeriod: registrationPeriod, // Use actual registration period
               pricingSource: pricingSource, // Add pricing source info
             });
           } else {
@@ -947,6 +951,7 @@ export class ResellerClubAPI {
             // Try to get live pricing first
             let price = 0;
             let currency = "INR";
+            let registrationPeriod = 1;
             let pricingSource: "live" | "fallback" | "unavailable" | "taken" =
               isAvailable ? "unavailable" : "taken";
 
@@ -1014,7 +1019,7 @@ export class ResellerClubAPI {
               available: isAvailable,
               price: price,
               currency: currency,
-              registrationPeriod: 1, // Default to 1 year
+              registrationPeriod: registrationPeriod, // Use actual registration period
               pricingSource: pricingSource, // Add pricing source info
             });
           } else {

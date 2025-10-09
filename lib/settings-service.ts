@@ -2,27 +2,17 @@ import Settings from "@/models/Settings";
 import { connectToDatabase } from "@/lib/mongoose";
 
 export class SettingsService {
-  private static cache = new Map<string, { value: any; timestamp: number }>();
-  private static CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+  // Caching removed - always fetch fresh data
 
   /**
-   * Get a setting value with caching
+   * Get a setting value
    */
   static async getSetting(key: string, defaultValue: any = null): Promise<any> {
     try {
-      // Check cache first
-      const cached = this.cache.get(key);
-      if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
-        return cached.value;
-      }
-
+      // Fetch from database directly (no caching)
       await connectToDatabase();
       const setting = await Settings.findOne({ key });
-
       const value = setting ? setting.value : defaultValue;
-
-      // Cache the result
-      this.cache.set(key, { value, timestamp: Date.now() });
 
       return value;
     } catch (error) {
@@ -32,7 +22,7 @@ export class SettingsService {
   }
 
   /**
-   * Set a setting value and clear cache
+   * Set a setting value
    */
   static async setSetting(
     key: string,
@@ -57,8 +47,7 @@ export class SettingsService {
         { upsert: true }
       );
 
-      // Clear cache for this key
-      this.cache.delete(key);
+      // No cache to clear
 
       console.log(
         `✅ [SETTINGS] Updated setting ${key} = ${value} by ${updatedBy}`
@@ -70,10 +59,11 @@ export class SettingsService {
   }
 
   /**
-   * Clear all cached settings
+   * Clear all cached settings (no-op since caching is disabled)
    */
   static clearCache(): void {
-    this.cache.clear();
+    // No caching - nothing to clear
+    console.log(`💰 [SETTINGS] Cache clear requested (no caching enabled)`);
   }
 
   /**

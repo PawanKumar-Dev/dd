@@ -60,20 +60,15 @@ api.interceptors.request.use(
  * Pricing Service Class
  *
  * Provides methods for fetching and managing domain pricing data.
- * Includes intelligent caching to improve performance and reduce API calls.
+ * Always fetches fresh data from ResellerClub API.
  */
 export class PricingService {
-  // Cache configuration for pricing data
-  private static pricingCache: {
-    data: any;
-    timestamp: number;
-    ttl: number;
-  } | null = null;
+  // Caching removed - always fetch fresh data
 
   /**
-   * Get domain pricing data with intelligent caching
+   * Get domain pricing data
    *
-   * Fetches live pricing data from ResellerClub API with a 5-minute cache TTL.
+   * Fetches live pricing data from ResellerClub API.
    * This method is used to get both customer and reseller pricing information.
    *
    * @returns {Promise<any>} Object containing customerPricing and resellerPricing data
@@ -90,14 +85,7 @@ export class PricingService {
       `💰 [PRICING] Fetching live domain pricing from ResellerClub API (Indian pricing)`
     );
 
-    // Check cache first (5 minute TTL)
-    if (
-      this.pricingCache &&
-      Date.now() - this.pricingCache.timestamp < this.pricingCache.ttl
-    ) {
-      console.log(`💰 [PRICING] Using cached pricing data`);
-      return this.pricingCache.data;
-    }
+    // No caching - always fetch fresh data
 
     try {
       // Fetch all pricing data in parallel
@@ -135,12 +123,7 @@ export class PricingService {
       const tldCount = Object.keys(customerPricingResponse.data || {}).length;
       console.log(`✅ [PRICING] API returned ${tldCount} TLDs`);
 
-      // Cache the data
-      this.pricingCache = {
-        data: pricingData,
-        timestamp: Date.now(),
-        ttl: 5 * 60 * 1000, // 5 minutes
-      };
+      // No caching - data is returned directly
 
       return pricingData;
     } catch (error) {
@@ -547,18 +530,26 @@ export class PricingService {
           const resellerPricing =
             pricingData.resellerPricing?.[foundTld] || null;
 
-          // Extract customer registration price (1 year)
+          // Extract customer registration price (try 1 year first, then 2 years)
           let customerPrice = 0;
           let currency = "INR";
+          let registrationPeriod = 1;
 
           if (
             customerPricing.addnewdomain &&
             customerPricing.addnewdomain["1"]
           ) {
             customerPrice = parseFloat(customerPricing.addnewdomain["1"]);
+            registrationPeriod = 1;
+          } else if (
+            customerPricing.addnewdomain &&
+            customerPricing.addnewdomain["2"]
+          ) {
+            customerPrice = parseFloat(customerPricing.addnewdomain["2"]);
+            registrationPeriod = 2;
           }
 
-          // Extract reseller registration price (1 year)
+          // Extract reseller registration price (try 1 year first, then 2 years)
           let resellerPrice = 0;
           if (
             resellerPricing &&
@@ -566,12 +557,19 @@ export class PricingService {
             resellerPricing.addnewdomain["1"]
           ) {
             resellerPrice = parseFloat(resellerPricing.addnewdomain["1"]);
+          } else if (
+            resellerPricing &&
+            resellerPricing.addnewdomain &&
+            resellerPricing.addnewdomain["2"]
+          ) {
+            resellerPrice = parseFloat(resellerPricing.addnewdomain["2"]);
           }
 
           tldPricing[cleanTld] = {
             price: customerPrice,
             resellerPrice: resellerPrice,
             currency: currency,
+            registrationPeriod: registrationPeriod,
             customer: customerPricing,
             reseller: resellerPricing,
             tld: cleanTld,
@@ -724,10 +722,10 @@ export class PricingService {
   }
 
   /**
-   * Clear pricing cache
+   * Clear pricing cache (no-op since caching is disabled)
    */
   static clearCache(): void {
-    this.pricingCache = null;
-    console.log(`💰 [PRICING] Cache cleared`);
+    // No caching - nothing to clear
+    console.log(`💰 [PRICING] Cache clear requested (no caching enabled)`);
   }
 }
