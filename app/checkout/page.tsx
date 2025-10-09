@@ -295,6 +295,7 @@ export default function CheckoutPage() {
       const rzp = new window.Razorpay(options);
 
       rzp.on('payment.failed', function (response: any) {
+        console.log('🚨 [CHECKOUT] Payment failed:', response);
         setIsProcessing(false);
         setIsPaymentInProgress(false);
 
@@ -303,6 +304,7 @@ export default function CheckoutPage() {
         let errorType = 'payment_failed';
 
         if (response.error) {
+          console.log('🚨 [CHECKOUT] Error details:', response.error);
           if (response.error.code === 'BAD_REQUEST_ERROR') {
             errorMessage = 'Invalid payment request. Please try again.';
             errorType = 'invalid_request';
@@ -331,12 +333,14 @@ export default function CheckoutPage() {
           supportContact: 'support@exceltechnologies.com'
         };
 
+        console.log('🚨 [CHECKOUT] Storing payment failure result:', paymentResult);
         sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
 
         // Clear cart immediately before redirect
         clearCart();
 
         // Redirect immediately to success page
+        console.log('🚨 [CHECKOUT] Redirecting to payment-success page');
         router.push('/payment-success');
       });
 

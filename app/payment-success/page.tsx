@@ -60,10 +60,12 @@ export default function PaymentResultPage() {
 
     // Get payment result from session storage (cleaner than URL parameters)
     const paymentResultData = sessionStorage.getItem('paymentResult');
+    console.log('📄 [PAYMENT-SUCCESS] Payment result data from sessionStorage:', paymentResultData);
 
     if (paymentResultData) {
       try {
         const parsedResult = JSON.parse(paymentResultData);
+        console.log('📄 [PAYMENT-SUCCESS] Parsed payment result:', parsedResult);
         setResult(parsedResult);
 
         // Clear the session storage after reading
@@ -73,6 +75,7 @@ export default function PaymentResultPage() {
         setResult(null);
       }
     } else {
+      console.log('📄 [PAYMENT-SUCCESS] No payment result data found in sessionStorage');
       // Fallback to URL parameters for backward compatibility
       const status = searchParams.get('status');
       const orderId = searchParams.get('orderId');
@@ -83,6 +86,7 @@ export default function PaymentResultPage() {
       const currency = searchParams.get('currency');
 
       if (status) {
+        console.log('📄 [PAYMENT-SUCCESS] Using URL parameters fallback:', { status, orderId, errorMessage });
         setResult({
           status: status as 'success' | 'failed',
           orderId: orderId || undefined,
@@ -97,6 +101,16 @@ export default function PaymentResultPage() {
 
     setIsLoading(false);
   }, [searchParams]);
+
+  // Debug log to see what result is being displayed
+  useEffect(() => {
+    if (result) {
+      console.log('📄 [PAYMENT-SUCCESS] Current result state:', result);
+      console.log('📄 [PAYMENT-SUCCESS] Result status:', result.status);
+      console.log('📄 [PAYMENT-SUCCESS] Error message:', result.errorMessage);
+      console.log('📄 [PAYMENT-SUCCESS] Error type:', result.errorType);
+    }
+  }, [result]);
 
   const handleRetryPayment = () => {
     router.push('/checkout');
