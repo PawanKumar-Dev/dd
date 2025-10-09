@@ -137,6 +137,26 @@ tests/
 
 ### Running Tests
 
+#### Using the Centralized Test Runner
+
+```bash
+# Run all tests
+node tests/run-tests.js
+
+# Run specific categories
+node tests/run-tests.js api      # API tests
+node tests/run-tests.js admin    # Admin functionality tests
+node tests/run-tests.js payment  # Payment system tests
+node tests/run-tests.js pricing  # Pricing system tests
+node tests/run-tests.js debug    # Debug tools
+
+# Run specific test
+node tests/run-tests.js test-final-pricing
+
+# Show help
+node tests/run-tests.js help
+```
+
 #### Test All TLD Pricing
 
 ```bash
@@ -161,6 +181,18 @@ node tests/api/test-all-endpoints.js
 
 # Test EU TLD specifically
 node tests/api/test-eu-pricing.js
+
+# Test admin functionality
+node tests/admin/test-ip-check.js
+node tests/admin/test-delete-order.js
+
+# Test payment system
+node tests/payment/test-payment-success.js
+node tests/payment/test-error-handling.js
+
+# Test pricing system
+node tests/pricing/test-ai-pricing.js
+node tests/pricing/test-pricing-debug.js
 ```
 
 #### Debug Issues
@@ -228,6 +260,78 @@ node tests/debug/debug-pricing.js
 
 ✅ Final TLD pricing test completed successfully!
 ```
+
+## 🛠️ Admin Functionality Tests
+
+### `test-ip-check.js`
+
+**Purpose**: Test IP check database functionality
+**Usage**: `node tests/admin/test-ip-check.js`
+**What it tests**:
+
+- IP check API endpoint authentication
+- Database storage of IP check results
+- IP status retrieval functionality
+- Admin-only access controls
+
+### `test-delete-order.js`
+
+**Purpose**: Test order deletion functionality
+**Usage**: `node tests/admin/test-delete-order.js`
+**What it tests**:
+
+- Order deletion API endpoint
+- Admin authentication requirements
+- Order deletion confirmation
+- Database cleanup after deletion
+
+## 💳 Payment System Tests
+
+### `test-payment-success.js`
+
+**Purpose**: Test payment success page functionality
+**Usage**: `node tests/payment/test-payment-success.js`
+**What it tests**:
+
+- Payment success page rendering
+- Payment result data handling
+- Error state management
+- User experience flow
+
+### `test-error-handling.js`
+
+**Purpose**: Test payment error handling
+**Usage**: `node tests/payment/test-error-handling.js`
+**What it tests**:
+
+- Payment failure scenarios
+- Error message display
+- User guidance and actions
+- Error recovery mechanisms
+
+## 💰 Pricing System Tests
+
+### `test-ai-pricing.js`
+
+**Purpose**: Test AI TLD pricing functionality
+**Usage**: `node tests/pricing/test-ai-pricing.js`
+**What it tests**:
+
+- AI TLD pricing accuracy
+- Multi-year registration periods
+- Pricing calculation logic
+- TLD-specific pricing rules
+
+### `test-pricing-debug.js`
+
+**Purpose**: Test pricing debugging functionality
+**Usage**: `node tests/pricing/test-pricing-debug.js`
+**What it tests**:
+
+- Pricing debug information
+- TLD mapping verification
+- Price calculation breakdown
+- Error diagnosis tools
 
 ## 🔍 Troubleshooting
 
