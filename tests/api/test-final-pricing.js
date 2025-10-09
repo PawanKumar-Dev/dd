@@ -104,27 +104,16 @@ async function fetchAllPricingData() {
         timeout: 30000
       }),
 
-      // Promotional details - active promotions metadata
-      axios.get(`${RESELLERCLUB_API_URL}/api/resellers/promo-details.json`, {
-        params: {
-          'auth-userid': RESELLERCLUB_ID,
-          'api-key': RESELLERCLUB_SECRET,
-          'format': 'json'
-        },
-        timeout: 30000
-      })
     ]);
 
     console.log('✅ All pricing data fetched successfully!');
     console.log(`   Customer pricing TLDs: ${Object.keys(customerResponse.data).length}`);
     console.log(`   Reseller pricing TLDs: ${Object.keys(resellerResponse.data).length}`);
-    console.log(`   Promotional details: ${Object.keys(promoDetailsResponse.data).length}`);
     console.log('');
 
     return {
       customerData: customerResponse.data,
-      resellerData: resellerResponse.data,
-      promoDetailsData: promoDetailsResponse.data
+      resellerData: resellerResponse.data
     };
 
   } catch (error) {
@@ -364,7 +353,7 @@ function displayFinalSummary(analysis, promotions, testTlds) {
  * 4. Tests specific TLDs for promotional pricing availability
  * 5. Displays comprehensive summary and recommendations
  */
-async function testPromotionalPricing() {
+async function testTLDPricing() {
   try {
     // Validate environment
     validateEnvironment();
@@ -413,5 +402,5 @@ async function main() {
   }
 }
 
-// Run the final promotional pricing test
-main();
+// Run the final TLD pricing test
+testTLDPricing();

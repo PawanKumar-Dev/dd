@@ -18,7 +18,7 @@
  *   node tests/run-tests.js all                # Run all tests
  *   node tests/run-tests.js api                # Run all API tests
  *   node tests/run-tests.js debug              # Run debug tools
- *   node tests/run-tests.js test-final-promo   # Run specific test
+ *   node tests/run-tests.js test-final-pricing # Run specific test
  * 
  * Author: Excel Technologies
  * Created: 2024
@@ -34,14 +34,14 @@ const path = require('path');
 const testCategories = {
   api: [
     'test-pricing.js',
-    'test-promo-prices.js',
+    'test-tld-mappings.js',
     'test-all-endpoints.js',
-    'test-simple-promo.js',
-    'test-final-promo.js',
+    'test-simple-pricing.js',
+    'test-final-pricing.js',
     'test-eu-pricing.js'
   ],
   debug: [
-    'debug-promo.js'
+    'debug-pricing.js'
   ],
   scripts: [
     'update_pricing.js'
@@ -191,7 +191,7 @@ function displayHelp() {
   console.log('Examples:');
   console.log('  node tests/run-tests.js                    # Run all tests');
   console.log('  node tests/run-tests.js api                # Run API tests');
-  console.log('  node tests/run-tests.js test-final-promo   # Run specific test');
+  console.log('  node tests/run-tests.js test-final-pricing # Run specific test');
   console.log('');
   console.log('Available Tests:');
 
