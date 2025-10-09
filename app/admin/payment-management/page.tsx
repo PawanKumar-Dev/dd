@@ -75,9 +75,8 @@ export default function AdminPayments() {
     try {
       setIsLoading(true);
       const token = localStorage.getItem('token');
-      const skip = (page - 1) * pageSize;
-
-      const response = await fetch(`/api/admin/payments?limit=${pageSize}&skip=${skip}`, {
+      // Always fetch only the latest 5 transactions (no pagination)
+      const response = await fetch(`/api/admin/payments?limit=5&skip=0`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -278,7 +277,7 @@ export default function AdminPayments() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Payment Management</h1>
-            <p className="text-gray-600">Domain purchase payments from Razorpay - {totalItems} transactions</p>
+            <p className="text-gray-600">Latest domain purchase payments from Razorpay - showing 5 most recent transactions</p>
           </div>
           <button
             onClick={() => loadPayments(currentPage, searchTerm)}
@@ -292,14 +291,14 @@ export default function AdminPayments() {
 
         {/* Payments Table */}
         <AdminDataTable
-          title="All Payments"
+          title="Latest Payments"
           columns={columns}
           data={payments}
-          searchable={true}
-          pagination={true}
-          pageSize={pageSize}
-          totalItems={totalItems}
-          currentPage={currentPage}
+          searchable={false}
+          pagination={false}
+          pageSize={5}
+          totalItems={payments.length}
+          currentPage={1}
           onPageChange={handlePageChange}
           onSearch={handleSearch}
           isLoading={isLoading}

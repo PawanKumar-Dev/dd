@@ -22,10 +22,10 @@ export async function GET(request: NextRequest) {
     const from = searchParams.get("from");
     const to = searchParams.get("to");
 
-    // Since we need to filter for domain payments, we'll fetch more payments from Razorpay
-    // to ensure we have enough domain payments for the requested page
-    const fetchLimit = Math.max(limit * 3, 50); // Fetch 3x the requested limit or minimum 50
-    const fetchSkip = Math.floor(skip / 3); // Adjust skip accordingly
+    // For the latest transactions, we'll fetch a reasonable number to ensure we have enough domain payments
+    // Since we want only the latest 5, we'll fetch more to filter domain payments
+    const fetchLimit = Math.max(limit * 3, 15); // Fetch 3x the requested limit or minimum 15 for better filtering
+    const fetchSkip = 0; // Always start from the beginning to get the latest payments
 
     let razorpayPayments;
 
@@ -119,6 +119,7 @@ export async function GET(request: NextRequest) {
     );
 
     // Apply pagination to the filtered and enriched results
+    // Since we're fetching from the beginning, we need to adjust pagination
     const startIndex = skip;
     const endIndex = skip + limit;
     const paginatedPayments = allEnrichedPayments.slice(startIndex, endIndex);
