@@ -76,7 +76,6 @@ interface Order {
     expiresAt?: Date;
   }[];
   successfulDomains: string[];
-  failedDomains: string[];
   createdAt: string;
   updatedAt: string;
   invoiceNumber?: string;
@@ -644,15 +643,6 @@ export default function DashboardPage() {
                         </div>
                       )}
 
-                      {order.failedDomains.length > 0 && (
-                        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                          <div className="flex items-center space-x-2">
-                            <span className="text-sm font-medium text-red-800">
-                              Failed to register: {order.failedDomains.join(', ')}
-                            </span>
-                          </div>
-                        </div>
-                      )}
 
                       {/* Invoice Actions */}
                       <div className="mt-4 pt-4 border-t border-gray-200 flex justify-end space-x-3">
