@@ -321,7 +321,7 @@ export default function RegisterForm({ className = '' }: RegisterFormProps) {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <div className="flex justify-center mb-6">
-            <Logo size="lg" showText={true} />
+            <Logo size="lg" showText={false} />
           </div>
           <h2 className="text-3xl font-bold text-gray-900">
             Create your account

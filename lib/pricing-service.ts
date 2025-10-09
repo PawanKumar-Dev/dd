@@ -239,7 +239,20 @@ export class PricingService {
           cleanTld.toLowerCase(),
           `dot${cleanTld}`, // ResellerClub format: dotcom, dotnet, etc.
           `centralnicza${cleanTld}`, // ResellerClub format for some TLDs
-        ];
+          // Special handling for multi-level TLDs
+          cleanTld === "co.in" ? "thirdleveldotin" : null,
+          cleanTld === "co.uk" ? "thirdleveldotuk" : null,
+          cleanTld === "co.ca" ? "thirdleveldotca" : null,
+          cleanTld === "co.au" ? "thirdleveldotau" : null,
+          cleanTld === "co.za" ? "thirdleveldotza" : null,
+          cleanTld === "co.nz" ? "thirdleveldotnz" : null,
+          // Special handling for EU domains
+          cleanTld === "eu" ? "doteu" : null,
+          // Handle other common multi-level TLDs
+          cleanTld.includes(".")
+            ? `thirdleveldot${cleanTld.split(".").pop()}`
+            : null,
+        ].filter(Boolean); // Remove null values
         let foundTld = null;
 
         for (const variation of tldVariations) {

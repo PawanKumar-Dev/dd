@@ -526,14 +526,76 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4 sm:mb-6 max-w-4xl mx-auto">
           <div className="flex items-center justify-center py-12">
             <div className="text-center">
-              <div className="relative">
-                <div className="w-12 h-12 border-3 border-gray-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-6"></div>
+              {/* Enhanced animated search icon */}
+              <div className="relative mb-6">
+                {/* Outer rotating ring */}
+                <div className="w-16 h-16 border-4 border-gray-100 border-t-blue-500 border-r-blue-400 rounded-full animate-spin mx-auto"></div>
+                {/* Inner pulsing ring */}
+                <div className="absolute inset-2 w-12 h-12 border-2 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
+                {/* Center search icon with bounce animation */}
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Search className="h-5 w-5 text-blue-600 animate-pulse" />
+                  <Search className="h-6 w-6 text-blue-600 animate-bounce" style={{ animationDuration: '1s' }} />
+                </div>
+                {/* Floating dots around the search icon */}
+                <div className="absolute -top-2 -right-2 w-2 h-2 bg-blue-400 rounded-full animate-ping"></div>
+                <div className="absolute -bottom-2 -left-2 w-2 h-2 bg-blue-300 rounded-full animate-ping" style={{ animationDelay: '0.5s' }}></div>
+                <div className="absolute -top-1 -left-3 w-1.5 h-1.5 bg-blue-200 rounded-full animate-ping" style={{ animationDelay: '1s' }}></div>
+              </div>
+
+              {/* Animated text with typing effect */}
+              <h3 className="text-lg font-semibold text-gray-900 mb-2 animate-pulse" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
+                <span className="inline-block animate-bounce" style={{ animationDelay: '0.1s' }}>S</span>
+                <span className="inline-block animate-bounce" style={{ animationDelay: '0.2s' }}>e</span>
+                <span className="inline-block animate-bounce" style={{ animationDelay: '0.3s' }}>a</span>
+                <span className="inline-block animate-bounce" style={{ animationDelay: '0.4s' }}>r</span>
+                <span className="inline-block animate-bounce" style={{ animationDelay: '0.5s' }}>c</span>
+                <span className="inline-block animate-bounce" style={{ animationDelay: '0.6s' }}>h</span>
+                <span className="inline-block animate-bounce" style={{ animationDelay: '0.7s' }}>i</span>
+                <span className="inline-block animate-bounce" style={{ animationDelay: '0.8s' }}>n</span>
+                <span className="inline-block animate-bounce" style={{ animationDelay: '0.9s' }}>g</span>
+                <span className="inline-block animate-bounce" style={{ animationDelay: '1.0s' }}> </span>
+                <span className="inline-block animate-bounce" style={{ animationDelay: '1.1s' }}>f</span>
+                <span className="inline-block animate-bounce" style={{ animationDelay: '1.2s' }}>o</span>
+                <span className="inline-block animate-bounce" style={{ animationDelay: '1.3s' }}>r</span>
+                <span className="inline-block animate-bounce" style={{ animationDelay: '1.4s' }}> </span>
+                <span className="inline-block animate-bounce" style={{ animationDelay: '1.5s' }}>d</span>
+                <span className="inline-block animate-bounce" style={{ animationDelay: '1.6s' }}>o</span>
+                <span className="inline-block animate-bounce" style={{ animationDelay: '1.7s' }}>m</span>
+                <span className="inline-block animate-bounce" style={{ animationDelay: '1.8s' }}>a</span>
+                <span className="inline-block animate-bounce" style={{ animationDelay: '1.9s' }}>i</span>
+                <span className="inline-block animate-bounce" style={{ animationDelay: '2.0s' }}>n</span>
+                <span className="inline-block animate-bounce" style={{ animationDelay: '2.1s' }}>s</span>
+                <span className="inline-block animate-bounce" style={{ animationDelay: '2.2s' }}>.</span>
+                <span className="inline-block animate-bounce" style={{ animationDelay: '2.3s' }}>.</span>
+                <span className="inline-block animate-bounce" style={{ animationDelay: '2.4s' }}>.</span>
+              </h3>
+
+              {/* Animated progress dots */}
+              <div className="flex justify-center space-x-1 mb-4">
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.6s' }}></div>
+                <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.8s' }}></div>
+              </div>
+
+              {/* Animated status messages */}
+              <div className="space-y-2">
+                <p className="text-gray-600 text-sm animate-fade-in" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
+                  <span className="inline-block animate-pulse">Please wait while we check availability and pricing</span>
+                </p>
+                <div className="flex items-center justify-center space-x-2 text-xs text-gray-500">
+                  <div className="flex items-center space-x-1">
+                    <div className="w-1 h-1 bg-green-400 rounded-full animate-pulse"></div>
+                    <span className="animate-pulse">Checking domain availability</span>
+                  </div>
+                  <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                  <div className="flex items-center space-x-1">
+                    <div className="w-1 h-1 bg-yellow-400 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+                    <span className="animate-pulse" style={{ animationDelay: '0.5s' }}>Fetching live pricing</span>
+                  </div>
                 </div>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>Searching for domains...</h3>
-              <p className="text-gray-600 text-sm" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>Please wait while we check availability and pricing</p>
             </div>
           </div>
         </div>

@@ -96,6 +96,26 @@ export const DOMAIN_REQUIREMENTS: Record<string, DomainRequirement> = {
     warningMessage:
       "German domains require business registration. Please contact support for assistance.",
   },
+  eu: {
+    tld: "eu",
+    name: "European Union (.eu)",
+    requiresAdditionalDetails: true,
+    supported: false,
+    requirements: [
+      "EU citizenship OR residence in EU/EEA countries",
+      "Company/organization established in EU/EEA",
+      "Valid EU business registration",
+      "Compliance with EURid registry policies",
+    ],
+    restrictions: [
+      "Only EU citizens can register as individuals",
+      "Non-EU citizens must reside in EU/EEA countries",
+      "Companies must be legally established in EU/EEA",
+      "Indian residents without EU citizenship/company cannot register",
+    ],
+    warningMessage:
+      "EU domains require EU citizenship, residence, or business establishment. Indian residents without EU connections cannot register .eu domains. Please contact support for assistance.",
+  },
 };
 
 export function getDomainRequirements(
