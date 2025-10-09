@@ -8,7 +8,7 @@ import Footer from '@/components/Footer';
 import Link from 'next/link';
 
 interface PaymentResult {
-  status: 'success' | 'failed';
+  status: 'success' | 'failed' | 'error';
   orderId?: string;
   invoiceNumber?: string;
   successfulDomains?: string[];
@@ -19,6 +19,12 @@ interface PaymentResult {
     error?: string;
   }>;
   errorMessage?: string;
+  message?: string;
+  restrictedDomains?: Array<{
+    domainName: string;
+    reason: string;
+  }>;
+  supportContact?: string;
   amount?: number;
   currency?: string;
 }
@@ -223,6 +229,45 @@ export default function PaymentResultPage() {
             </div>
           )}
 
+
+          {/* Restricted Domains Error */}
+          {result.status === 'error' && result.restrictedDomains && (
+            <div className="bg-orange-50 border border-orange-200 rounded-lg p-6 mb-8 text-left">
+              <div className="flex items-center mb-4">
+                <AlertCircle className="h-6 w-6 text-orange-600 mr-3" />
+                <h3 className="text-lg font-semibold text-orange-800">Domain Registration Restricted</h3>
+              </div>
+              <p className="text-orange-700 mb-4">{result.message}</p>
+
+              <div className="mb-4">
+                <h4 className="text-sm font-medium text-orange-800 mb-2">Restricted Domains:</h4>
+                <div className="space-y-2">
+                  {result.restrictedDomains.map((domain, index) => (
+                    <div key={index} className="flex items-center justify-between bg-orange-100 rounded-lg p-3">
+                      <div className="flex items-center">
+                        <XCircle className="h-5 w-5 mr-2 text-orange-600" />
+                        <span className="font-mono text-orange-800">{domain.domainName}</span>
+                      </div>
+                      <span className="text-orange-600 text-sm">{domain.reason}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {result.supportContact && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h4 className="text-sm font-medium text-blue-800 mb-2">Next Steps:</h4>
+                  <p className="text-blue-700 text-sm mb-3">{result.supportContact}</p>
+                  <a
+                    href="mailto:support@exceltechnologies.com"
+                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Contact Support
+                  </a>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Error Message */}
           {result.status === 'failed' && result.errorMessage && (

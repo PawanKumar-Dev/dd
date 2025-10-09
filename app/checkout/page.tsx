@@ -160,6 +160,27 @@ export default function CheckoutPage() {
               // Redirect immediately to success page
               router.push('/payment-success');
             } else {
+              // Handle restricted domains error
+              if (verifyData.restrictedDomains) {
+                const restrictedDomainsList = verifyData.restrictedDomains.map((d: any) => d.domainName).join(', ');
+                toast.error(`Payment rejected: ${restrictedDomainsList} require additional verification. Please contact support.`);
+
+                // Store error result for display
+                const paymentResult = {
+                  status: 'error',
+                  message: verifyData.message || 'Payment rejected due to domain restrictions',
+                  restrictedDomains: verifyData.restrictedDomains,
+                  supportContact: verifyData.supportContact,
+                  amount: getTotalPrice(),
+                  currency: 'INR',
+                  timestamp: Date.now()
+                };
+
+                sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
+                router.push('/payment-success');
+                return;
+              }
+
               // Store payment result in session storage for cleaner URL
               const paymentResult = {
                 status: 'failed',
