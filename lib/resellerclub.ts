@@ -1321,6 +1321,31 @@ export class ResellerClubAPI {
         "invoice-option": "NoInvoice",
       });
 
+      // Add domain-specific policy requirements
+      const tld = domainData.domainName.split(".").pop()?.toLowerCase();
+
+      if (tld === "au") {
+        // Australian domain policy requirements
+        params.append("id", "AUS");
+        params.append("id-type", "Business Registration Number");
+        params.append("policy-reason", "1"); // 1 = Business/Commercial use
+      } else if (tld === "uk" || tld === "co.uk") {
+        // UK domain policy requirements
+        params.append("id", "GB");
+        params.append("id-type", "Company Registration Number");
+        params.append("policy-reason", "1");
+      } else if (tld === "ca") {
+        // Canadian domain policy requirements
+        params.append("id", "CA");
+        params.append("id-type", "Business Registration Number");
+        params.append("policy-reason", "1");
+      } else if (tld === "de") {
+        // German domain policy requirements
+        params.append("id", "DE");
+        params.append("id-type", "Business Registration Number");
+        params.append("policy-reason", "1");
+      }
+
       // Add each ns param separately using append() method
       nameServers.forEach((ns) => {
         params.append("ns", ns);
@@ -1329,6 +1354,23 @@ export class ResellerClubAPI {
       const response = await api.post("/api/domains/register.json", params);
 
       const responseTime = Date.now() - startTime;
+
+      // Check if the response contains an error status
+      if (response.data && response.data.status === "error") {
+        console.error(
+          `❌ [PRODUCTION] Domain registration failed for "${domainData.domainName}" in ${responseTime}ms:`,
+          {
+            responseData: response.data,
+            status: response.status,
+          }
+        );
+
+        return {
+          status: "error",
+          message: response.data.error || "Domain registration failed",
+        };
+      }
+
       console.log(
         `✅ [PRODUCTION] Domain registration successful for "${domainData.domainName}" in ${responseTime}ms:`,
         {
