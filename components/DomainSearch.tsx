@@ -23,11 +23,13 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Loader2, CheckCircle, XCircle, Globe, ShoppingCart, Star, TrendingUp, Zap } from 'lucide-react';
+import { Search, Loader2, CheckCircle, XCircle, Globe, ShoppingCart, Star, TrendingUp, Zap, AlertTriangle } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import { useTestingStore } from '@/store/testingStore';
 import toast from 'react-hot-toast';
 import Button from './Button';
+import DomainRequirementsModal from './DomainRequirementsModal';
+import { getDomainRequirements, requiresAdditionalDetails, isDomainSupported } from '@/lib/domainRequirements';
 import Input from './Input';
 
 interface DomainSearchProps {
@@ -102,6 +104,8 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
   const [selectedTlds, setSelectedTlds] = useState<string[]>([]);
   const [showTldSuggestions, setShowTldSuggestions] = useState(false);
   const [searchMode, setSearchMode] = useState<'single' | 'multiple'>('single');
+  const [showRequirementsModal, setShowRequirementsModal] = useState(false);
+  const [selectedDomainForRequirements, setSelectedDomainForRequirements] = useState<string>('');
   const { addItem } = useCartStore();
   const { isTestingMode } = useTestingStore();
   const router = useRouter();
@@ -272,6 +276,19 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
 
   const handleAddToCart = (result: SearchResult) => {
     if (result.available && result.price) {
+      // Check if domain requires additional details
+      if (requiresAdditionalDetails(result.domainName)) {
+        setSelectedDomainForRequirements(result.domainName);
+        setShowRequirementsModal(true);
+        return;
+      }
+
+      // Check if domain is supported
+      if (!isDomainSupported(result.domainName)) {
+        toast.error(`${result.domainName} requires additional verification. Please contact support.`);
+        return;
+      }
+
       const cartItem = {
         domainName: result.domainName,
         price: result.price,
@@ -589,7 +606,21 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
-                            <h4 className="text-base sm:text-lg font-semibold text-[var(--google-text-primary)] truncate" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>{result.domainName}</h4>
+                            <div className="flex items-center gap-2">
+                              <h4 className="text-base sm:text-lg font-semibold text-[var(--google-text-primary)] truncate" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>{result.domainName}</h4>
+                              {requiresAdditionalDetails(result.domainName) && (
+                                <button
+                                  onClick={() => {
+                                    setSelectedDomainForRequirements(result.domainName);
+                                    setShowRequirementsModal(true);
+                                  }}
+                                  className="text-orange-500 hover:text-orange-600 transition-colors"
+                                  title="This domain requires additional verification"
+                                >
+                                  <AlertTriangle className="h-4 w-4" />
+                                </button>
+                              )}
+                            </div>
                             <div className="flex items-center gap-2">
                               {result.available && result.pricingSource && (
                                 <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${result.pricingSource === 'live'
@@ -703,6 +734,23 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
             </div>
           )}
         </div>
+      )}
+
+      {/* Domain Requirements Modal */}
+      {showRequirementsModal && selectedDomainForRequirements && (
+        <DomainRequirementsModal
+          isOpen={showRequirementsModal}
+          onClose={() => {
+            setShowRequirementsModal(false);
+            setSelectedDomainForRequirements('');
+          }}
+          domainName={selectedDomainForRequirements}
+          requirements={getDomainRequirements(selectedDomainForRequirements)!}
+          onContactSupport={() => {
+            // Handle contact support action
+            window.open('mailto:support@exceltechnologies.com?subject=Domain Registration Support');
+          }}
+        />
       )}
     </div>
   );
