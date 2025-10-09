@@ -16,10 +16,12 @@ export default function ForgotPasswordForm({ className = '' }: ForgotPasswordFor
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(''); // Clear previous errors
 
     try {
       const response = await fetch('/api/auth/forgot-password', {
@@ -36,10 +38,15 @@ export default function ForgotPasswordForm({ className = '' }: ForgotPasswordFor
         setIsSubmitted(true);
         toast.success('Password reset email sent!');
       } else {
-        toast.error(data.error || 'Failed to send reset email');
+        // Set error state and show toast
+        const errorMessage = data.message || data.error || 'Failed to send reset email';
+        setError(errorMessage);
+        toast.error(errorMessage);
       }
     } catch (error) {
-      toast.error('An error occurred. Please try again.');
+      const errorMessage = 'An error occurred. Please try again.';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -113,6 +120,19 @@ export default function ForgotPasswordForm({ className = '' }: ForgotPasswordFor
 
         <Card>
           <form className="space-y-6" onSubmit={handleSubmit}>
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <Mail className="h-5 w-5 text-red-400" />
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm text-red-800">{error}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <Input
               label="Email address"
               name="email"

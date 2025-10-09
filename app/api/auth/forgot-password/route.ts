@@ -30,11 +30,16 @@ export async function POST(request: NextRequest) {
     // Find user
     const user = await User.findOne({ email });
     if (!user) {
-      // Don't reveal if user exists or not for security
-      return NextResponse.json({
-        message:
-          "If an account with that email exists, we've sent a password reset link.",
-      });
+      // Inform user that email is not registered
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Email not found",
+          message:
+            "This email address is not registered with us. Please check your email address or create a new account.",
+        },
+        { status: 404 }
+      );
     }
 
     // Security check: Prevent admin password reset via forgot password
