@@ -201,13 +201,38 @@ export default function CheckoutPage() {
           } catch (error) {
             console.error('Payment verification error:', error);
 
+            // Determine error message based on error type
+            let errorMessage = 'Payment verification failed due to a technical error';
+            let errorType = 'verification_error';
+            
+            if (error instanceof Error) {
+              if (error.message.includes('Network')) {
+                errorMessage = 'Network error occurred. Please check your payment status in a few minutes.';
+                errorType = 'network_error';
+              } else if (error.message.includes('timeout')) {
+                errorMessage = 'Request timed out. Please check your payment status in a few minutes.';
+                errorType = 'timeout_error';
+              } else if (error.message.includes('Unauthorized')) {
+                errorMessage = 'Session expired. Please login again and try your payment.';
+                errorType = 'auth_error';
+              } else if (error.message.includes('400')) {
+                errorMessage = 'Invalid payment data. Please try again.';
+                errorType = 'invalid_data';
+              } else if (error.message.includes('500')) {
+                errorMessage = 'Server error occurred. Please contact support if the issue persists.';
+                errorType = 'server_error';
+              }
+            }
+
             // Store payment result in session storage for cleaner URL
             const paymentResult = {
               status: 'failed',
-              errorMessage: 'Payment verification failed due to a technical error',
+              errorMessage: errorMessage,
+              errorType: errorType,
               amount: getTotalPrice(),
               currency: 'INR',
-              timestamp: Date.now()
+              timestamp: Date.now(),
+              supportContact: 'support@exceltechnologies.com'
             };
 
             sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
@@ -233,9 +258,11 @@ export default function CheckoutPage() {
             const paymentResult = {
               status: 'failed',
               errorMessage: 'Payment was cancelled by user',
+              errorType: 'user_cancelled',
               amount: getTotalPrice(),
               currency: 'INR',
-              timestamp: Date.now()
+              timestamp: Date.now(),
+              supportContact: 'support@exceltechnologies.com'
             };
 
             sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
@@ -255,13 +282,38 @@ export default function CheckoutPage() {
 
       rzp.on('payment.failed', function (response: any) {
         setIsProcessing(false);
-        // Payment failed
+        
+        // Determine error type and message based on Razorpay error
+        let errorMessage = response.error.description || 'Payment failed';
+        let errorType = 'payment_failed';
+        
+        if (response.error) {
+          if (response.error.code === 'BAD_REQUEST_ERROR') {
+            errorMessage = 'Invalid payment request. Please try again.';
+            errorType = 'invalid_request';
+          } else if (response.error.code === 'GATEWAY_ERROR') {
+            errorMessage = 'Payment gateway error. Please try again or use a different payment method.';
+            errorType = 'gateway_error';
+          } else if (response.error.code === 'NETWORK_ERROR') {
+            errorMessage = 'Network error occurred. Please check your connection and try again.';
+            errorType = 'network_error';
+          } else if (response.error.reason === 'payment_failed') {
+            errorMessage = 'Your payment was declined. Please try a different payment method.';
+            errorType = 'card_declined';
+          } else if (response.error.reason === 'insufficient_funds') {
+            errorMessage = 'Insufficient funds. Please try a different payment method.';
+            errorType = 'insufficient_funds';
+          }
+        }
+        
         const paymentResult = {
           status: 'failed',
-          errorMessage: response.error.description || 'Payment failed',
+          errorMessage: errorMessage,
+          errorType: errorType,
           amount: getTotalPrice(),
           currency: 'INR',
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          supportContact: 'support@exceltechnologies.com'
         };
 
         sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));

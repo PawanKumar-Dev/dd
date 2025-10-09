@@ -28,9 +28,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Calculate total amount
-    const totalAmount = cartItems.reduce(
-      (sum, item) => sum + item.price * item.registrationPeriod,
-      0
+    // Note: item.price is already the total price for the registration period
+    const totalAmount = Math.round(
+      cartItems.reduce((sum, item) => sum + item.price, 0)
     );
 
     console.log("💰 [CREATE-ORDER] Cart items:", cartItems);

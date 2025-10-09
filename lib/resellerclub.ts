@@ -644,7 +644,6 @@ export class ResellerClubAPI {
                       livePricing[tld].registrationPeriod || 1;
                     pricingSource = "live";
 
-
                     console.log(
                       `✅ [PRODUCTION] Live pricing for ${domain}: ₹${finalPrice} ${currency}`
                     );

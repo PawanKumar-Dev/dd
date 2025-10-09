@@ -19,6 +19,7 @@ interface PaymentResult {
     error?: string;
   }>;
   errorMessage?: string;
+  errorType?: string;
   message?: string;
   restrictedDomains?: Array<{
     domainName: string;
@@ -272,8 +273,68 @@ export default function PaymentResultPage() {
           {/* Error Message */}
           {result.status === 'failed' && result.errorMessage && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-8 text-left">
-              <h3 className="text-lg font-semibold text-red-800 mb-2">Error Details</h3>
-              <p className="text-red-700">{result.errorMessage}</p>
+              <div className="flex items-center mb-4">
+                <XCircle className="h-6 w-6 text-red-600 mr-3" />
+                <h3 className="text-lg font-semibold text-red-800">Payment Failed</h3>
+              </div>
+              
+              <div className="mb-4">
+                <p className="text-red-700 font-medium mb-2">{result.errorMessage}</p>
+                
+                {/* Error Type Specific Messages */}
+                {result.errorType === 'network_error' && (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                    <h4 className="text-sm font-medium text-yellow-800 mb-2">What to do:</h4>
+                    <ul className="text-yellow-700 text-sm space-y-1">
+                      <li>• Check your internet connection</li>
+                      <li>• Wait a few minutes and check your payment status</li>
+                      <li>• If you were charged, contact support with your payment details</li>
+                    </ul>
+                  </div>
+                )}
+                
+                {result.errorType === 'card_declined' && (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                    <h4 className="text-sm font-medium text-yellow-800 mb-2">What to do:</h4>
+                    <ul className="text-yellow-700 text-sm space-y-1">
+                      <li>• Try a different payment method</li>
+                      <li>• Contact your bank to ensure the card is active</li>
+                      <li>• Check if you have sufficient funds</li>
+                    </ul>
+                  </div>
+                )}
+                
+                {result.errorType === 'auth_error' && (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                    <h4 className="text-sm font-medium text-yellow-800 mb-2">What to do:</h4>
+                    <ul className="text-yellow-700 text-sm space-y-1">
+                      <li>• Please login again and retry your payment</li>
+                      <li>• Your cart items have been saved</li>
+                    </ul>
+                  </div>
+                )}
+                
+                {result.errorType === 'duplicate_payment' && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                    <h4 className="text-sm font-medium text-blue-800 mb-2">Note:</h4>
+                    <p className="text-blue-700 text-sm">This payment has already been processed. Check your dashboard for order details.</p>
+                  </div>
+                )}
+              </div>
+              
+              {/* Support Contact */}
+              {result.supportContact && (
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                  <h4 className="text-sm font-medium text-gray-800 mb-2">Need Help?</h4>
+                  <p className="text-gray-700 text-sm mb-3">{result.supportContact}</p>
+                  <a
+                    href="mailto:support@exceltechnologies.com"
+                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Contact Support
+                  </a>
+                </div>
+              )}
             </div>
           )}
 
@@ -299,14 +360,30 @@ export default function PaymentResultPage() {
               </div>
             ) : (
               <div className="space-y-3">
-                <button
-                  onClick={handleRetryPayment}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center"
-                >
-                  <CreditCard className="h-5 w-5 mr-2" />
-                  Retry Payment
-                  <ArrowRight className="h-5 w-5 ml-2" />
-                </button>
+                {/* Show retry button only for certain error types */}
+                {result.errorType !== 'duplicate_payment' && result.errorType !== 'auth_error' && (
+                  <button
+                    onClick={handleRetryPayment}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center"
+                  >
+                    <CreditCard className="h-5 w-5 mr-2" />
+                    {result.errorType === 'network_error' ? 'Try Again' : 'Retry Payment'}
+                    <ArrowRight className="h-5 w-5 ml-2" />
+                  </button>
+                )}
+                
+                {/* Show login button for auth errors */}
+                {result.errorType === 'auth_error' && (
+                  <button
+                    onClick={() => router.push('/login')}
+                    className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center"
+                  >
+                    <CreditCard className="h-5 w-5 mr-2" />
+                    Login and Retry
+                    <ArrowRight className="h-5 w-5 ml-2" />
+                  </button>
+                )}
+                
                 <button
                   onClick={handleGoToDashboard}
                   className="w-full bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center"
