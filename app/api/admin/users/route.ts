@@ -24,7 +24,6 @@ export async function GET(request: NextRequest) {
         email: 1,
         role: 1,
         createdAt: 1,
-        lastLogin: 1,
         isActive: 1,
       }
     ).sort({ createdAt: -1 });

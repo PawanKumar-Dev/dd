@@ -314,16 +314,6 @@ export default function AdminUsers() {
                   {formatIndianLongDateTime(selectedUser.createdAt)}
                 </p>
               </div>
-
-              <div>
-                <label className="text-sm font-medium text-gray-500">Last Login</label>
-                <p className="text-lg font-semibold text-gray-900">
-                  {selectedUser.lastLogin
-                    ? formatIndianLongDateTime(selectedUser.lastLogin)
-                    : 'Never logged in'
-                  }
-                </p>
-              </div>
             </div>
 
             <div className="mt-6 flex justify-end space-x-3">

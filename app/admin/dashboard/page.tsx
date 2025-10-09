@@ -22,7 +22,6 @@ interface User {
   email: string;
   role: string;
   createdAt: string;
-  lastLogin?: string;
   isActive: boolean;
 }
 
