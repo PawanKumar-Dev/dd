@@ -21,7 +21,6 @@ export interface IOrder extends Document {
     expiresAt?: Date;
   }[];
   successfulDomains: string[];
-  failedDomains: string[];
   paymentVerification?: {
     verifiedAt: Date;
     paymentStatus: string;
@@ -107,7 +106,6 @@ const OrderSchema = new Schema<IOrder>(
       },
     ],
     successfulDomains: [String],
-    failedDomains: [String],
     paymentVerification: {
       verifiedAt: {
         type: Date,
