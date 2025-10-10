@@ -27,16 +27,7 @@ interface User {
 }
 
 interface UserSettings {
-  notifications: {
-    email: boolean;
-    sms: boolean;
-    domainExpiry: boolean;
-    paymentReminders: boolean;
-  };
-  security: {
-    twoFactorEnabled: boolean;
-    loginAlerts: boolean;
-  };
+  security: {};
 }
 
 export default function UserSettings() {
@@ -77,21 +68,15 @@ export default function UserSettings() {
 
       // Fetch actual settings data
       try {
-        const response = await fetch('/api/user/settings');
+        const response = await fetch('/api/user/settings', {
+          headers: {
+            'Authorization': `Bearer ${user.email}`,
+            'Content-Type': 'application/json'
+          }
+        });
         if (response.ok) {
           const data = await response.json();
-          setSettings(data.settings || {
-            notifications: {
-              email: true,
-              sms: false,
-              domainExpiry: true,
-              paymentReminders: true
-            },
-            security: {
-              twoFactorEnabled: false,
-              loginAlerts: true
-            }
-          });
+          setSettings(data.settings || {});
         } else {
           // Use default settings
           setSettings({
@@ -100,10 +85,6 @@ export default function UserSettings() {
               sms: false,
               domainExpiry: true,
               paymentReminders: true
-            },
-            security: {
-              twoFactorEnabled: false,
-              loginAlerts: true
             }
           });
         }
@@ -116,10 +97,6 @@ export default function UserSettings() {
             sms: false,
             domainExpiry: true,
             paymentReminders: true
-          },
-          security: {
-            twoFactorEnabled: false,
-            loginAlerts: true
           }
         });
       }
@@ -190,7 +167,6 @@ export default function UserSettings() {
 
   const tabs = [
     { id: 'profile', name: 'Profile', icon: User },
-    { id: 'notifications', name: 'Notifications', icon: Bell },
     { id: 'security', name: 'Security', icon: Shield }
   ];
 
@@ -373,110 +349,6 @@ export default function UserSettings() {
                   </div>
                 )}
 
-                {/* Notifications Tab */}
-                {activeTab === 'notifications' && settings && (
-                  <div className="p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-6">Notification Preferences</h3>
-
-                    <div className="space-y-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h4 className="text-sm font-medium text-gray-900">Email Notifications</h4>
-                          <p className="text-sm text-gray-500">Receive notifications via email</p>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={settings.notifications.email}
-                            onChange={(e) => setSettings(prev => prev ? {
-                              ...prev,
-                              notifications: { ...prev.notifications, email: e.target.checked }
-                            } : null)}
-                            className="sr-only peer"
-                          />
-                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                        </label>
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h4 className="text-sm font-medium text-gray-900">SMS Notifications</h4>
-                          <p className="text-sm text-gray-500">Receive notifications via SMS</p>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={settings.notifications.sms}
-                            onChange={(e) => setSettings(prev => prev ? {
-                              ...prev,
-                              notifications: { ...prev.notifications, sms: e.target.checked }
-                            } : null)}
-                            className="sr-only peer"
-                          />
-                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                        </label>
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h4 className="text-sm font-medium text-gray-900">Domain Expiry Alerts</h4>
-                          <p className="text-sm text-gray-500">Get notified before domains expire</p>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={settings.notifications.domainExpiry}
-                            onChange={(e) => setSettings(prev => prev ? {
-                              ...prev,
-                              notifications: { ...prev.notifications, domainExpiry: e.target.checked }
-                            } : null)}
-                            className="sr-only peer"
-                          />
-                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                        </label>
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h4 className="text-sm font-medium text-gray-900">Payment Reminders</h4>
-                          <p className="text-sm text-gray-500">Get reminders for pending payments</p>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={settings.notifications.paymentReminders}
-                            onChange={(e) => setSettings(prev => prev ? {
-                              ...prev,
-                              notifications: { ...prev.notifications, paymentReminders: e.target.checked }
-                            } : null)}
-                            className="sr-only peer"
-                          />
-                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                        </label>
-                      </div>
-                    </div>
-
-                    <div className="mt-8 flex justify-end">
-                      <button
-                        onClick={handleSaveSettings}
-                        disabled={isSaving}
-                        className="flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
-                      >
-                        {isSaving ? (
-                          <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                            Saving...
-                          </>
-                        ) : (
-                          <>
-                            <Save className="h-4 w-4 mr-2" />
-                            Save Settings
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                )}
 
                 {/* Security Tab */}
                 {activeTab === 'security' && settings && (
@@ -484,47 +356,9 @@ export default function UserSettings() {
                     <h3 className="text-lg font-semibold text-gray-900 mb-6">Security Settings</h3>
 
                     <div className="space-y-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h4 className="text-sm font-medium text-gray-900">Two-Factor Authentication</h4>
-                          <p className="text-sm text-gray-500">Add an extra layer of security to your account</p>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={settings.security.twoFactorEnabled}
-                            onChange={(e) => setSettings(prev => prev ? {
-                              ...prev,
-                              security: { ...prev.security, twoFactorEnabled: e.target.checked }
-                            } : null)}
-                            className="sr-only peer"
-                          />
-                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                        </label>
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h4 className="text-sm font-medium text-gray-900">Login Alerts</h4>
-                          <p className="text-sm text-gray-500">Get notified of new login attempts</p>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={settings.security.loginAlerts}
-                            onChange={(e) => setSettings(prev => prev ? {
-                              ...prev,
-                              security: { ...prev.security, loginAlerts: e.target.checked }
-                            } : null)}
-                            className="sr-only peer"
-                          />
-                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                        </label>
-                      </div>
-
                       <div className="border-t pt-6">
                         <h4 className="text-sm font-medium text-gray-900 mb-4">Change Password</h4>
-                        <div className="space-y-4">
+                        <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                               Current Password
@@ -567,7 +401,7 @@ export default function UserSettings() {
                               placeholder="Confirm new password"
                             />
                           </div>
-                        </div>
+                        </form>
                       </div>
                     </div>
 

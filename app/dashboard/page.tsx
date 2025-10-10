@@ -61,13 +61,18 @@ export default function UserDashboard() {
   const loadDashboardData = async () => {
     try {
       setIsLoading(true);
-      
+
       // Simulate API calls for dashboard data
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       // Fetch actual dashboard data
       try {
-        const response = await fetch('/api/user/dashboard');
+        const response = await fetch('/api/user/dashboard', {
+          headers: {
+            'Authorization': `Bearer ${user.email}`,
+            'Content-Type': 'application/json'
+          }
+        });
         if (response.ok) {
           const data = await response.json();
           setStats(data.stats);
@@ -180,15 +185,15 @@ export default function UserDashboard() {
               };
 
               return (
-      <motion.div
+                <motion.div
                   key={card.title}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                   className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
-      >
-          <div className="flex items-center justify-between">
-            <div>
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
                       <p className="text-sm font-medium text-gray-600 mb-1">
                         {card.title}
                       </p>
@@ -202,13 +207,13 @@ export default function UserDashboard() {
                     <div className={`p-3 rounded-lg ${colorClasses[card.color as keyof typeof colorClasses]}`}>
                       <Icon className="h-6 w-6" />
                     </div>
-            </div>
+                  </div>
                 </motion.div>
               );
             })}
-        </div>
+          </div>
 
-        {/* Quick Actions */}
+          {/* Quick Actions */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             {/* Recent Orders */}
             <motion.div
@@ -219,18 +224,18 @@ export default function UserDashboard() {
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900">Recent Orders</h3>
-            <button
+                <button
                   onClick={() => router.push('/dashboard/orders')}
                   className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center"
                 >
                   View All
                   <ArrowRight className="h-4 w-4 ml-1" />
-            </button>
+                </button>
               </div>
               <div className="space-y-3">
                 {stats?.recentOrders.map((order) => (
                   <div key={order.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
-                        <div>
+                    <div>
                       <p className="font-medium text-gray-900">{order.domain}</p>
                       <p className="text-sm text-gray-500">{order.date}</p>
                     </div>
@@ -262,15 +267,15 @@ export default function UserDashboard() {
               <div className="space-y-3">
                 {stats?.upcomingRenewals.map((renewal, index) => (
                   <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
-                      <div>
+                    <div>
                       <p className="font-medium text-gray-900">{renewal.domain}</p>
                       <p className="text-sm text-gray-500">Expires: {renewal.expiryDate}</p>
-                      </div>
-                      <div className="text-right">
+                    </div>
+                    <div className="text-right">
                       <p className="text-sm font-medium text-orange-600">{renewal.daysLeft} days left</p>
                       <button className="text-xs text-blue-600 hover:text-blue-700">
-                          Renew
-                        </button>
+                        Renew
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -297,8 +302,8 @@ export default function UserDashboard() {
                   <p className="text-sm text-gray-500">Find and register new domains</p>
                 </div>
               </button>
-              
-                        <button
+
+              <button
                 onClick={() => router.push('/cart')}
                 className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
               >
@@ -307,9 +312,9 @@ export default function UserDashboard() {
                   <p className="font-medium text-gray-900">View Cart</p>
                   <p className="text-sm text-gray-500">{getItemCount()} items</p>
                 </div>
-                        </button>
-              
-                        <button
+              </button>
+
+              <button
                 onClick={() => router.push('/dashboard/settings')}
                 className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
               >
@@ -318,10 +323,10 @@ export default function UserDashboard() {
                   <p className="font-medium text-gray-900">Account Settings</p>
                   <p className="text-sm text-gray-500">Manage your profile</p>
                 </div>
-                        </button>
-                      </div>
-      </motion.div>
-    </div>
+              </button>
+            </div>
+          </motion.div>
+        </div>
       </UserLayout>
     </ClientOnly>
   );
