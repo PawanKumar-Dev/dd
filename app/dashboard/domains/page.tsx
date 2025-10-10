@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
   Globe, Search, Plus, RefreshCw, Settings, ExternalLink,
-  Calendar, Shield, AlertTriangle, CheckCircle, Clock, Loader2, X
+  Shield, Clock, Loader2, X
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import UserLayout from '@/components/user/UserLayout';
@@ -69,10 +69,10 @@ export default function UserDomains() {
     }
 
     setUser(userObj);
-    loadDomains();
+    loadDomains(userObj);
   }, [router]);
 
-  const loadDomains = async () => {
+  const loadDomains = async (userObj?: User) => {
     try {
       setIsLoading(true);
 
@@ -81,9 +81,16 @@ export default function UserDomains() {
 
       // Fetch actual domains data
       try {
+        const userEmail = userObj?.email || user?.email;
+        if (!userEmail) {
+          console.error('No user email available for API call');
+          setDomains([]);
+          return;
+        }
+
         const response = await fetch('/api/user/domains', {
           headers: {
-            'Authorization': `Bearer ${user.email}`,
+            'Authorization': `Bearer ${userEmail}`,
             'Content-Type': 'application/json'
           }
         });
@@ -383,42 +390,6 @@ export default function UserDomains() {
             )}
           </div>
 
-          {/* Summary */}
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <div className="flex items-center">
-                <CheckCircle className="h-8 w-8 text-green-600 mr-3" />
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Active Domains</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {domains.filter(d => d.status === 'active').length}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <div className="flex items-center">
-                <AlertTriangle className="h-8 w-8 text-red-600 mr-3" />
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Expired Domains</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {domains.filter(d => d.status === 'expired').length}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <div className="flex items-center">
-                <Calendar className="h-8 w-8 text-blue-600 mr-3" />
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Total Domains</p>
-                  <p className="text-2xl font-bold text-gray-900">{domains.length}</p>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* DNS Management Modal */}

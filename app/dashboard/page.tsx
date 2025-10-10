@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
   Globe, ShoppingCart, Receipt, TrendingUp, Clock, CheckCircle,
-  AlertTriangle, DollarSign, Calendar, ArrowRight, Plus, RefreshCw
+  AlertTriangle, Calendar, ArrowRight, Plus, RefreshCw
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCartStore } from '@/store/cartStore';
@@ -25,7 +25,6 @@ interface DashboardStats {
   totalDomains: number;
   activeDomains: number;
   totalOrders: number;
-  totalSpent: number;
   recentOrders: any[];
   upcomingRenewals: any[];
 }
@@ -82,7 +81,6 @@ export default function UserDashboard() {
             totalDomains: 0,
             activeDomains: 0,
             totalOrders: 0,
-            totalSpent: 0,
             recentOrders: [],
             upcomingRenewals: []
           });
@@ -122,7 +120,7 @@ export default function UserDashboard() {
     return (
       <UserLayout user={user} onLogout={handleLogout}>
         <div className="p-6">
-          <DataLoading type="card" count={4} />
+          <DataLoading type="card" count={3} />
         </div>
       </UserLayout>
     );
