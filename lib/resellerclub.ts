@@ -1810,6 +1810,50 @@ export class ResellerClubAPI {
   }
 
   /**
+   * Update DNS record
+   */
+  static async updateDNSRecord(
+    domainName: string,
+    recordId: string,
+    recordData: {
+      type: string;
+      name: string;
+      value: string;
+      ttl: number;
+      priority?: number;
+    }
+  ): Promise<ResellerClubResponse> {
+    try {
+      const response = await api.post(
+        "/api/domains/dns/modify-record.json",
+        null,
+        {
+          params: {
+            "domain-name": domainName,
+            "record-id": recordId,
+            type: recordData.type,
+            name: recordData.name,
+            value: recordData.value,
+            ttl: recordData.ttl,
+            priority: recordData.priority,
+          },
+        }
+      );
+
+      return {
+        status: "success",
+        data: response.data,
+      };
+    } catch (error) {
+      console.error("ResellerClub update DNS record error:", error);
+      return {
+        status: "error",
+        message: "Failed to update DNS record",
+      };
+    }
+  }
+
+  /**
    * Delete DNS record
    */
   static async deleteDNSRecord(
@@ -1837,6 +1881,72 @@ export class ResellerClubAPI {
       return {
         status: "error",
         message: "Failed to delete DNS record",
+      };
+    }
+  }
+
+  /**
+   * Set default nameservers
+   */
+  static async setDefaultNameservers(
+    domainName: string
+  ): Promise<ResellerClubResponse> {
+    try {
+      const response = await api.post(
+        "/api/domains/use-default-ns.json",
+        null,
+        {
+          params: {
+            "domain-name": domainName,
+          },
+        }
+      );
+
+      return {
+        status: "success",
+        data: response.data,
+      };
+    } catch (error) {
+      console.error("ResellerClub set default nameservers error:", error);
+      return {
+        status: "error",
+        message: "Failed to set default nameservers",
+      };
+    }
+  }
+
+  /**
+   * Set custom nameservers
+   */
+  static async setCustomNameservers(
+    domainName: string,
+    nameservers: string[]
+  ): Promise<ResellerClubResponse> {
+    try {
+      const params: any = {
+        "domain-name": domainName,
+      };
+
+      // Add nameservers as ns1, ns2, etc.
+      nameservers.forEach((ns, index) => {
+        params[`ns${index + 1}`] = ns;
+      });
+
+      const response = await api.post(
+        "/api/domains/modify-ns.json",
+        null,
+        { params }
+      );
+
+      return {
+        status: "success",
+        data: response.data,
+      };
+    } catch (error) {
+      console.error("ResellerClub set custom nameservers error:", error);
+      return {
+        status: "error",
+        message: "Failed to set custom nameservers",
       };
     }
   }
