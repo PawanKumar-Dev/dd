@@ -21,9 +21,10 @@ interface DNSManagementProps {
   domainName: string;
   isOpen: boolean;
   onClose: () => void;
+  domainStatus?: string;
 }
 
-export default function DNSManagement({ domainName, isOpen, onClose }: DNSManagementProps) {
+export default function DNSManagement({ domainName, isOpen, onClose, domainStatus }: DNSManagementProps) {
   const [records, setRecords] = useState<DNSRecord[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -52,9 +53,20 @@ export default function DNSManagement({ domainName, isOpen, onClose }: DNSManage
 
   useEffect(() => {
     if (isOpen) {
+      // Check if domain is still being processed
+      if (domainStatus === 'processing' || domainStatus === 'pending') {
+        toast.error('Domain is still being processed. Please wait for registration to complete.');
+        onClose();
+        return;
+      }
+      if (domainStatus === 'failed') {
+        toast.error('Domain registration failed. DNS management is not available.');
+        onClose();
+        return;
+      }
       loadDNSData();
     }
-  }, [isOpen, domainName]);
+  }, [isOpen, domainName, domainStatus]);
 
   const loadDNSData = async () => {
     setIsLoading(true);

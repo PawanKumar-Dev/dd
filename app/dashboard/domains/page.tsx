@@ -5,12 +5,13 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
   Globe, Search, Plus, RefreshCw, Settings, ExternalLink,
-  Calendar, Shield, AlertTriangle, CheckCircle, Clock
+  Calendar, Shield, AlertTriangle, CheckCircle, Clock, Loader2
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import UserLayout from '@/components/user/UserLayout';
 import { PageLoading, DataLoading } from '@/components/user/LoadingComponents';
 import DNSManagement from '@/components/user/DNSManagement';
+import DomainBookingProgress from '@/components/DomainBookingProgress';
 import ClientOnly from '@/components/ClientOnly';
 
 interface User {
@@ -24,12 +25,19 @@ interface User {
 interface Domain {
   id: string;
   name: string;
-  status: 'active' | 'expired' | 'pending' | 'suspended';
+  status: 'active' | 'expired' | 'pending' | 'processing' | 'failed' | 'suspended';
   registrationDate: string;
   expiryDate: string;
   registrar: string;
   nameservers: string[];
   autoRenew: boolean;
+  bookingStatus?: {
+    step: string;
+    message: string;
+    timestamp: Date;
+    progress: number;
+  }[];
+  orderId?: string;
 }
 
 export default function UserDomains() {
@@ -40,6 +48,8 @@ export default function UserDomains() {
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [selectedDomain, setSelectedDomain] = useState<Domain | null>(null);
   const [isDNSModalOpen, setIsDNSModalOpen] = useState(false);
+  const [showBookingProgress, setShowBookingProgress] = useState(false);
+  const [bookingDomain, setBookingDomain] = useState<Domain | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -105,6 +115,10 @@ export default function UserDomains() {
         return 'bg-red-100 text-red-800';
       case 'pending':
         return 'bg-yellow-100 text-yellow-800';
+      case 'processing':
+        return 'bg-blue-100 text-blue-800';
+      case 'failed':
+        return 'bg-red-100 text-red-800';
       case 'suspended':
         return 'bg-gray-100 text-gray-800';
       default:
@@ -120,6 +134,10 @@ export default function UserDomains() {
         return <AlertTriangle className="h-4 w-4" />;
       case 'pending':
         return <Clock className="h-4 w-4" />;
+      case 'processing':
+        return <Loader2 className="h-4 w-4 animate-spin" />;
+      case 'failed':
+        return <AlertTriangle className="h-4 w-4" />;
       case 'suspended':
         return <Shield className="h-4 w-4" />;
       default:
@@ -127,11 +145,27 @@ export default function UserDomains() {
     }
   };
 
-  const filteredDomains = domains.filter(domain => {
-    const matchesSearch = domain.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filterStatus === 'all' || domain.status === filterStatus;
-    return matchesSearch && matchesFilter;
-  });
+  const handleViewBookingProgress = (domain: Domain) => {
+    setBookingDomain(domain);
+    setShowBookingProgress(true);
+  };
+
+  const handleManageDomain = (domain: Domain) => {
+    if (domain.status === 'processing' || domain.status === 'pending') {
+      toast.error('Domain is still being processed. Please wait for registration to complete.');
+      return;
+    }
+    if (domain.status === 'failed') {
+      toast.error('Domain registration failed. Please contact support.');
+      return;
+    }
+    setSelectedDomain(domain);
+    setIsDNSModalOpen(true);
+  };
+
+  const canManageDomain = (domain: Domain) => {
+    return domain.status === 'active' || domain.status === 'expired';
+  };
 
   if (!user) {
     return <PageLoading page="domains" />;

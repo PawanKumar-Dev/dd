@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { CheckCircle, XCircle, ArrowRight, Home, CreditCard, AlertCircle } from 'lucide-react';
+import { CheckCircle, XCircle, ArrowRight, Home, CreditCard, AlertCircle, Clock, Loader2 } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import DomainBookingProgress from '@/components/DomainBookingProgress';
 import Link from 'next/link';
 
 interface PaymentResult {
@@ -34,6 +35,7 @@ export default function PaymentResultPage() {
   const [result, setResult] = useState<PaymentResult | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
+  const [processingDomains, setProcessingDomains] = useState<string[]>([]);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -109,8 +111,30 @@ export default function PaymentResultPage() {
       console.log('📄 [PAYMENT-SUCCESS] Result status:', result.status);
       console.log('📄 [PAYMENT-SUCCESS] Error message:', result.errorMessage);
       console.log('📄 [PAYMENT-SUCCESS] Error type:', result.errorType);
+
+      // Check for domains that are still being processed
+      if (result.status === 'success' && result.orderId) {
+        checkProcessingDomains(result.orderId);
+      }
     }
   }, [result]);
+
+  const checkProcessingDomains = async (orderId: string) => {
+    try {
+      const response = await fetch(`/api/domains/booking-status?orderId=${orderId}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.domains) {
+          const processing = data.domains.filter((domain: any) =>
+            domain.status === 'processing' || domain.status === 'pending'
+          ).map((domain: any) => domain.domainName);
+          setProcessingDomains(processing);
+        }
+      }
+    } catch (error) {
+      console.error('Error checking processing domains:', error);
+    }
+  };
 
   const handleRetryPayment = () => {
     router.push('/checkout');
@@ -238,6 +262,37 @@ export default function PaymentResultPage() {
                   <div key={index} className="flex items-center text-green-700">
                     <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
                     <span className="font-mono">{domain}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Processing Domains */}
+          {processingDomains.length > 0 && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6 text-left">
+              <div className="flex items-center mb-4">
+                <Loader2 className="h-6 w-6 text-blue-600 mr-3 animate-spin" />
+                <h3 className="text-lg font-semibold text-blue-800">Domains Being Processed</h3>
+              </div>
+              <p className="text-blue-700 mb-4">
+                The following domains are currently being registered with ResellerClub. This process may take a few minutes.
+              </p>
+              <div className="space-y-4">
+                {processingDomains.map((domain, index) => (
+                  <div key={index} className="bg-white border border-blue-200 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center">
+                        <Clock className="h-5 w-5 mr-2 text-blue-600" />
+                        <span className="font-mono text-blue-800 font-medium">{domain}</span>
+                      </div>
+                      <span className="text-sm text-blue-600 bg-blue-100 px-2 py-1 rounded">Processing</span>
+                    </div>
+                    <DomainBookingProgress
+                      orderId={result.orderId!}
+                      domainName={domain}
+                      autoRefresh={true}
+                    />
                   </div>
                 ))}
               </div>

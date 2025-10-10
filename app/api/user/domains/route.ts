@@ -1,91 +1,82 @@
-/**
- * User Domains API Endpoint
- * 
- * This endpoint provides access to user's registered domains
- * and integrates with ResellerClub API for real domain data.
- * 
- * @author Excel Technologies
- * @version 2.0.0
- * @since 2024
- */
-
-import { NextRequest, NextResponse } from 'next/server';
-import { ResellerClubAPI } from '@/lib/resellerclub';
+import { NextRequest, NextResponse } from "next/server";
+import { connectDB } from "@/lib/mongodb";
+import Order from "@/models/Order";
+import User from "@/models/User";
 
 export async function GET(request: NextRequest) {
-  const requestId = Math.random().toString(36).substring(7);
-  const startTime = Date.now();
-
   try {
-    console.log(`🔄 [API-${requestId}] Fetching user domains...`);
+    await connectDB();
 
-    // In a real implementation, you would:
-    // 1. Get user ID from JWT token
-    // 2. Query database for user's domains
-    // 3. Fetch domain details from ResellerClub API
-    
-    // For now, we'll return mock data with ResellerClub integration
-    const mockDomains = [
-      {
-        id: '1',
-        domainName: 'example.com',
-        status: 'registered',
-        expiryDate: '2025-12-31',
-        autoRenew: true,
-        nameServers: ['ns1.example.com', 'ns2.example.com'],
-        registrar: 'ResellerClub',
-        creationDate: '2024-01-01',
-        lastUpdated: new Date().toISOString()
-      },
-      {
-        id: '2',
-        domainName: 'test.org',
-        status: 'registered',
-        expiryDate: '2025-06-15',
-        autoRenew: false,
-        nameServers: ['ns1.test.org', 'ns2.test.org'],
-        registrar: 'ResellerClub',
-        creationDate: '2024-01-15',
-        lastUpdated: new Date().toISOString()
-      },
-      {
-        id: '3',
-        domainName: 'demo.net',
-        status: 'registered',
-        expiryDate: '2025-03-20',
-        autoRenew: true,
-        nameServers: ['ns1.demo.net', 'ns2.demo.net'],
-        registrar: 'ResellerClub',
-        creationDate: '2024-01-20',
-        lastUpdated: new Date().toISOString()
-      }
-    ];
+    // Get user from Authorization header
+    const authHeader = request.headers.get("authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-    // TODO: Integrate with ResellerClub API to get real domain data
-    // const domains = await ResellerClubAPI.getUserDomains(userId);
+    const token = authHeader.split(" ")[1];
 
-    const responseTime = Date.now() - startTime;
-    console.log(`✅ [API-${requestId}] User domains fetched in ${responseTime}ms - ${mockDomains.length} domains`);
+    // Verify token and get user
+    const user = await User.findOne({
+      $or: [{ token: token }, { "tokens.token": token }],
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    }
+
+    // Get all orders for the user
+    const orders = await Order.find({ userId: user._id })
+      .sort({ createdAt: -1 })
+      .populate("userId", "email firstName lastName");
+
+    // Extract domains from orders
+    const domains = [];
+    const domainMap = new Map();
+
+    orders.forEach((order) => {
+      order.domains.forEach((domain) => {
+        const domainKey = domain.domainName;
+
+        // Only add if not already processed or if this is a more recent status
+        if (
+          !domainMap.has(domainKey) ||
+          (domain.status === "registered" &&
+            domainMap.get(domainKey).status !== "registered")
+        ) {
+          domainMap.set(domainKey, {
+            id: `${order._id}_${domain.domainName}`,
+            name: domain.domainName,
+            status: domain.status,
+            registrationDate: order.createdAt.toISOString().split("T")[0],
+            expiryDate: domain.expiresAt
+              ? domain.expiresAt.toISOString().split("T")[0]
+              : null,
+            registrar: "ResellerClub",
+            nameservers: [], // Will be populated from DNS records if needed
+            autoRenew: false,
+            bookingStatus: domain.bookingStatus || [],
+            orderId: order.orderId,
+            resellerClubOrderId: domain.resellerClubOrderId,
+            resellerClubCustomerId: domain.resellerClubCustomerId,
+            resellerClubContactId: domain.resellerClubContactId,
+            error: domain.error,
+          });
+        }
+      });
+    });
+
+    // Convert map to array
+    const domainArray = Array.from(domainMap.values());
 
     return NextResponse.json({
       success: true,
-      domains: mockDomains,
-      totalCount: mockDomains.length,
-      responseTime: `${responseTime}ms`,
-      lastUpdated: new Date().toISOString()
+      domains: domainArray,
+      total: domainArray.length,
     });
-
   } catch (error) {
-    const responseTime = Date.now() - startTime;
-    console.error(`❌ [API-${requestId}] Failed to fetch user domains:`, error);
-    
+    console.error("Error fetching user domains:", error);
     return NextResponse.json(
-      {
-        success: false,
-        error: 'Failed to fetch user domains',
-        message: error instanceof Error ? error.message : 'Unknown error',
-        responseTime: `${responseTime}ms`
-      },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
