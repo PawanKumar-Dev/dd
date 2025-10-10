@@ -15,10 +15,19 @@ export interface IOrder extends Document {
     price: number;
     currency: string;
     registrationPeriod: number;
-    status: "registered" | "failed";
+    status: "pending" | "processing" | "registered" | "failed" | "cancelled";
+    bookingStatus: {
+      step: "payment_verified" | "customer_created" | "contact_created" | "domain_registering" | "domain_registered" | "domain_failed";
+      message: string;
+      timestamp: Date;
+      progress: number; // 0-100
+    }[];
     error?: string;
     orderId?: string;
     expiresAt?: Date;
+    resellerClubOrderId?: string;
+    resellerClubCustomerId?: string;
+    resellerClubContactId?: string;
   }[];
   successfulDomains: string[];
   paymentVerification?: {
@@ -98,12 +107,38 @@ const OrderSchema = new Schema<IOrder>(
         },
         status: {
           type: String,
-          enum: ["registered", "failed"],
-          required: true,
+          enum: ["pending", "processing", "registered", "failed", "cancelled"],
+          default: "pending",
         },
+        bookingStatus: [
+          {
+            step: {
+              type: String,
+              enum: ["payment_verified", "customer_created", "contact_created", "domain_registering", "domain_registered", "domain_failed"],
+              required: true,
+            },
+            message: {
+              type: String,
+              required: true,
+            },
+            timestamp: {
+              type: Date,
+              default: Date.now,
+            },
+            progress: {
+              type: Number,
+              min: 0,
+              max: 100,
+              required: true,
+            },
+          },
+        ],
         error: String,
         orderId: String,
         expiresAt: Date,
+        resellerClubOrderId: String,
+        resellerClubCustomerId: String,
+        resellerClubContactId: String,
       },
     ],
     successfulDomains: [String],

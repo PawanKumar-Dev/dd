@@ -223,6 +223,17 @@ export async function POST(request: NextRequest) {
 
     for (const item of cartItems) {
       console.log(`🔄 [PAYMENT-VERIFY] Registering domain: ${item.domainName}`);
+      
+      // Initialize domain booking status
+      const domainBookingStatus = [
+        {
+          step: "payment_verified" as const,
+          message: "Payment verified successfully",
+          timestamp: new Date(),
+          progress: 20,
+        },
+      ];
+
       try {
         // Get user's nameserver configuration (if any)
         let nameServers: string[] | undefined;
@@ -240,6 +251,14 @@ export async function POST(request: NextRequest) {
         }
 
         // Get or create ResellerClub customer and contact IDs
+        console.log(`👤 [PAYMENT-VERIFY] Creating/verifying ResellerClub customer for: ${user.email}`);
+        domainBookingStatus.push({
+          step: "customer_created" as const,
+          message: "Creating customer account with ResellerClub",
+          timestamp: new Date(),
+          progress: 40,
+        });
+
         const customerResult =
           await ResellerClubAPI.getOrCreateCustomerAndContact({
             email: user.email,
@@ -271,6 +290,22 @@ export async function POST(request: NextRequest) {
           throw new Error("Failed to get ResellerClub customer/contact IDs");
         }
 
+        console.log(`✅ [PAYMENT-VERIFY] Customer created successfully: ${customerResult.customerId}`);
+        domainBookingStatus.push({
+          step: "contact_created" as const,
+          message: "Customer and contact created successfully",
+          timestamp: new Date(),
+          progress: 60,
+        });
+
+        console.log(`🌐 [PAYMENT-VERIFY] Starting domain registration for: ${item.domainName}`);
+        domainBookingStatus.push({
+          step: "domain_registering" as const,
+          message: "Registering domain with ResellerClub",
+          timestamp: new Date(),
+          progress: 80,
+        });
+
         const result = await ResellerClubWrapper.registerDomain(
           {
             domainName: item.domainName,
@@ -287,6 +322,14 @@ export async function POST(request: NextRequest) {
           console.log(
             `✅ [PAYMENT-VERIFY] Domain registration successful: ${item.domainName}`
           );
+          
+          domainBookingStatus.push({
+            step: "domain_registered" as const,
+            message: "Domain registered successfully",
+            timestamp: new Date(),
+            progress: 100,
+          });
+
           const expiresAt = new Date(
             Date.now() +
               (item.registrationPeriod || 1) * 365 * 24 * 60 * 60 * 1000
@@ -306,13 +349,24 @@ export async function POST(request: NextRequest) {
             currency: item.currency || "INR",
             registrationPeriod: item.registrationPeriod || 1,
             status: "registered",
+            bookingStatus: domainBookingStatus,
             orderId: result.data?.orderid,
             expiresAt,
+            resellerClubOrderId: result.data?.orderid,
+            resellerClubCustomerId: customerResult.customerId,
+            resellerClubContactId: customerResult.contactId,
           });
         } else {
           console.error(
             `❌ [PAYMENT-VERIFY] Domain registration failed: ${item.domainName} - ${result.message}`
           );
+          
+          domainBookingStatus.push({
+            step: "domain_failed" as const,
+            message: `Domain registration failed: ${result.message}`,
+            timestamp: new Date(),
+            progress: 100,
+          });
 
           registrationResults.push({
             domainName: item.domainName,
@@ -326,7 +380,10 @@ export async function POST(request: NextRequest) {
             currency: item.currency || "INR",
             registrationPeriod: item.registrationPeriod || 1,
             status: "failed",
+            bookingStatus: domainBookingStatus,
             error: result.message,
+            resellerClubCustomerId: customerResult.customerId,
+            resellerClubContactId: customerResult.contactId,
           });
         }
       } catch (error) {
@@ -334,6 +391,13 @@ export async function POST(request: NextRequest) {
           `Domain registration error for ${item.domainName}:`,
           error
         );
+
+        domainBookingStatus.push({
+          step: "domain_failed" as const,
+          message: `Registration failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          timestamp: new Date(),
+          progress: 100,
+        });
 
         registrationResults.push({
           domainName: item.domainName,
@@ -347,6 +411,7 @@ export async function POST(request: NextRequest) {
           currency: item.currency || "INR",
           registrationPeriod: item.registrationPeriod || 1,
           status: "failed",
+          bookingStatus: domainBookingStatus,
           error: "Registration failed",
         });
       }
