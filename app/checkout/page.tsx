@@ -9,6 +9,7 @@ import { useTestingStore } from '@/store/testingStore';
 import ClientOnly from '@/components/ClientOnly';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import { usePreventNavigation } from '@/hooks/usePreventNavigation';
 
 interface User {
   id: string;
@@ -64,6 +65,12 @@ export default function CheckoutPage() {
       document.body.removeChild(script);
     };
   }, [router, syncWithServer]);
+
+  // Prevent user from leaving page during payment processing
+  usePreventNavigation(
+    isPaymentInProgress,
+    'Payment is in progress. Are you sure you want to leave? This may cancel your payment.'
+  );
 
   // Redirect to dashboard if cart is empty (after cart has been loaded)
   // But not if payment is in progress
@@ -472,7 +479,11 @@ export default function CheckoutPage() {
           <div className="flex items-center py-4 pt-24">
             <button
               onClick={() => router.back()}
-              className="flex items-center text-gray-600 hover:text-gray-900 mr-4"
+              disabled={isPaymentInProgress}
+              className={`flex items-center mr-4 ${isPaymentInProgress
+                  ? 'text-gray-400 cursor-not-allowed'
+                  : 'text-gray-600 hover:text-gray-900'
+                }`}
             >
               <ArrowLeft className="h-5 w-5 mr-1" />
               Back to Cart
@@ -552,18 +563,33 @@ export default function CheckoutPage() {
 
               <button
                 onClick={handlePayment}
-                disabled={isProcessing || cartItems.length === 0}
+                disabled={isProcessing || isPaymentInProgress || cartItems.length === 0}
                 className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors flex items-center justify-center"
               >
-                {isProcessing ? (
+                {isProcessing || isPaymentInProgress ? (
                   <>
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                    Processing...
+                    {isPaymentInProgress ? 'Payment in Progress...' : 'Processing...'}
                   </>
                 ) : (
                   `Pay ₹${getTotalPrice().toFixed(2)}`
                 )}
               </button>
+
+              {/* Payment Progress Indicator */}
+              {isPaymentInProgress && (
+                <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <div className="flex items-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-600 mr-3"></div>
+                    <div>
+                      <p className="text-sm font-medium text-yellow-800">Payment in Progress</p>
+                      <p className="text-xs text-yellow-700">
+                        Please do not close this page or navigate away. Your payment is being processed.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <p className="text-xs text-gray-500 text-center mt-4">
                 By proceeding, you agree to our{' '}
