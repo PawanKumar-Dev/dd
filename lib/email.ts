@@ -260,6 +260,9 @@ export class EmailService {
       orderId: string;
       invoiceNumber: string;
       amount: number;
+      subtotal?: number;
+      gstRate?: number;
+      gstAmount?: number;
       currency: string;
       successfulDomains: Array<{
         domainName: string;
@@ -316,15 +319,19 @@ export class EmailService {
       )
       .join("");
 
-    const subtotal = orderData.successfulDomains.reduce(
-      (total, domain) => total + domain.price * domain.registrationPeriod,
-      0
-    );
-    
-    // Calculate GST (18%)
-    const gstRate = 18;
-    const gstAmount = Math.round((subtotal * gstRate) / 100 * 100) / 100;
-    const total = orderData.amount || (subtotal + gstAmount);
+    const subtotal =
+      orderData.subtotal ||
+      orderData.successfulDomains.reduce(
+        (total, domain) => total + domain.price * domain.registrationPeriod,
+        0
+      );
+
+    // Use GST from order if available, otherwise calculate it
+    const gstRate = orderData.gstRate || 18;
+    const gstAmount =
+      orderData.gstAmount ||
+      Math.round(((subtotal * gstRate) / 100) * 100) / 100;
+    const total = orderData.amount || subtotal + gstAmount;
 
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; background-color: #ffffff;">
