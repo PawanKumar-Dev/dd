@@ -1932,11 +1932,9 @@ export class ResellerClubAPI {
         params[`ns${index + 1}`] = ns;
       });
 
-      const response = await api.post(
-        "/api/domains/modify-ns.json",
-        null,
-        { params }
-      );
+      const response = await api.post("/api/domains/modify-ns.json", null, {
+        params,
+      });
 
       return {
         status: "success",

@@ -48,35 +48,17 @@ export class ResellerClubWrapper {
   }
 
   /**
-   * Get domain pricing for specific TLDs
-   */
-  static async getDomainPricing(
-    tlds: string[],
-    isTestingMode: boolean = false
-  ): Promise<any> {
-    if (isTestingMode) {
-      console.log(
-        "🧪 Testing Mode: Using mock ResellerClub API for domain pricing"
-      );
-      return MockResellerClubAPI.getDomainPricing(tlds);
-    }
-
-    // Use the new PricingService for live pricing
-    return PricingService.getTLDPricing(tlds);
-  }
-
-  /**
    * Register a domain
    */
   static async registerDomain(
-    domainData: {
-      domainName: string;
-      years: number;
-      customerId: number; // ResellerClub customer ID (numeric)
-      nameServers?: string[];
-      adminContactId?: number; // ResellerClub contact ID (numeric)
-      techContactId?: number; // ResellerClub contact ID (numeric)
-      billingContactId?: number; // ResellerClub contact ID (numeric)
+    domainName: string,
+    years: number,
+    customerId: number,
+    nameServers?: string[],
+    contacts?: {
+      admin: number;
+      tech: number;
+      billing: number;
     },
     isTestingMode: boolean = false
   ): Promise<ResellerClubResponse> {
@@ -84,13 +66,25 @@ export class ResellerClubWrapper {
       console.log(
         "🧪 Testing Mode: Using mock ResellerClub API for domain registration"
       );
-      return MockResellerClubAPI.registerDomain(domainData);
+      return MockResellerClubAPI.registerDomain(
+        domainName,
+        years,
+        customerId,
+        nameServers,
+        contacts
+      );
     }
 
     console.log(
-      `🌐 [PRODUCTION] ResellerClub Wrapper: Initiating domain registration for "${domainData.domainName}"`
+      `🌐 [PRODUCTION] ResellerClub Wrapper: Initiating domain registration for "${domainName}"`
     );
-    return ResellerClubAPI.registerDomain(domainData);
+    return ResellerClubAPI.registerDomain(
+      domainName,
+      years,
+      customerId,
+      nameServers,
+      contacts
+    );
   }
 
   /**
@@ -142,8 +136,7 @@ export class ResellerClubWrapper {
       return MockResellerClubAPI.renewDomain(domainName, years);
     }
 
-    // TODO: Implement domain renewal
-    throw new Error("Domain renewal not implemented yet");
+    return ResellerClubAPI.renewDomain(domainName, years);
   }
 
   /**
@@ -192,27 +185,6 @@ export class ResellerClubWrapper {
   }
 
   /**
-   * Delete DNS record
-   */
-  static async deleteDNSRecord(
-    domainName: string,
-    recordId: string,
-    isTestingMode: boolean = false
-  ): Promise<ResellerClubResponse> {
-    if (isTestingMode) {
-      console.log(
-        "🧪 Testing Mode: Using mock ResellerClub API for deleting DNS record"
-      );
-      return MockResellerClubAPI.deleteDNSRecord(domainName, recordId);
-    }
-
-    console.log(
-      `🌐 [PRODUCTION] ResellerClub Wrapper: Deleting DNS record for "${domainName}"`
-    );
-    return ResellerClubAPI.deleteDNSRecord(domainName, recordId);
-  }
-
-  /**
    * Update DNS record
    */
   static async updateDNSRecord(
@@ -245,43 +217,64 @@ export class ResellerClubWrapper {
   }
 
   /**
-   * Get domain renewal pricing
+   * Delete DNS record
    */
-  static async getRenewalPricing(
+  static async deleteDNSRecord(
     domainName: string,
-    years: number,
+    recordId: string,
     isTestingMode: boolean = false
   ): Promise<ResellerClubResponse> {
     if (isTestingMode) {
       console.log(
-        "🧪 Testing Mode: Using mock ResellerClub API for renewal pricing"
+        "🧪 Testing Mode: Using mock ResellerClub API for deleting DNS record"
       );
-      return MockResellerClubAPI.getRenewalPricing(domainName, years);
+      return MockResellerClubAPI.deleteDNSRecord(domainName, recordId);
     }
 
     console.log(
-      `🌐 [PRODUCTION] ResellerClub Wrapper: Getting renewal pricing for "${domainName}"`
+      `🌐 [PRODUCTION] ResellerClub Wrapper: Deleting DNS record for "${domainName}"`
     );
-    return ResellerClubAPI.getRenewalPricing(domainName, years);
+    return ResellerClubAPI.deleteDNSRecord(domainName, recordId);
   }
 
   /**
-   * Get domain expiry date
+   * Set default nameservers
    */
-  static async getDomainExpiry(
+  static async setDefaultNameservers(
     domainName: string,
     isTestingMode: boolean = false
   ): Promise<ResellerClubResponse> {
     if (isTestingMode) {
       console.log(
-        "🧪 Testing Mode: Using mock ResellerClub API for domain expiry"
+        "🧪 Testing Mode: Using mock ResellerClub API for setting default nameservers"
       );
-      return MockResellerClubAPI.getDomainExpiry(domainName);
+      return MockResellerClubAPI.setDefaultNameservers(domainName);
     }
 
     console.log(
-      `🌐 [PRODUCTION] ResellerClub Wrapper: Getting expiry date for "${domainName}"`
+      `🌐 [PRODUCTION] ResellerClub Wrapper: Setting default nameservers for "${domainName}"`
     );
-    return ResellerClubAPI.getDomainExpiry(domainName);
+    return ResellerClubAPI.setDefaultNameservers(domainName);
+  }
+
+  /**
+   * Set custom nameservers
+   */
+  static async setCustomNameservers(
+    domainName: string,
+    nameservers: string[],
+    isTestingMode: boolean = false
+  ): Promise<ResellerClubResponse> {
+    if (isTestingMode) {
+      console.log(
+        "🧪 Testing Mode: Using mock ResellerClub API for setting custom nameservers"
+      );
+      return MockResellerClubAPI.setCustomNameservers(domainName, nameservers);
+    }
+
+    console.log(
+      `🌐 [PRODUCTION] ResellerClub Wrapper: Setting custom nameservers for "${domainName}"`
+    );
+    return ResellerClubAPI.setCustomNameservers(domainName, nameservers);
   }
 }
