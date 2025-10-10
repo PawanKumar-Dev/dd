@@ -3,7 +3,7 @@
  * 
  * This component provides a comprehensive domain search interface that allows users to:
  * - Search for domain availability across multiple TLDs
- * - View live pricing from ResellerClub API
+ * - View live pricing from domain registrar API
  * - Add domains to cart for purchase
  * - Get TLD suggestions based on domain type
  * 
@@ -662,7 +662,7 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
                             <div className="flex items-center gap-2">
-                            <h4 className="text-base sm:text-lg font-semibold text-[var(--google-text-primary)] truncate" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>{result.domainName}</h4>
+                              <h4 className="text-base sm:text-lg font-semibold text-[var(--google-text-primary)] truncate" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>{result.domainName}</h4>
                               {requiresAdditionalDetails(result.domainName) && (
                                 <button
                                   onClick={() => {
@@ -690,10 +690,10 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
                               <span className={`px-2 py-1 text-xs font-medium rounded-full ${result.available
                                 ? 'text-white bg-gradient-to-r from-green-500 to-green-600'
                                 : result.pricingSource === 'taken'
-                                ? 'text-white bg-gradient-to-r from-red-500 to-red-600'
-                                : result.pricingSource === 'unavailable'
-                                ? 'text-white bg-gradient-to-r from-orange-500 to-orange-600'
-                                : 'text-white bg-gradient-to-r from-red-500 to-red-600'
+                                  ? 'text-white bg-gradient-to-r from-red-500 to-red-600'
+                                  : result.pricingSource === 'unavailable'
+                                    ? 'text-white bg-gradient-to-r from-orange-500 to-orange-600'
+                                    : 'text-white bg-gradient-to-r from-red-500 to-red-600'
                                 }`} style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
                                 {result.available
                                   ? 'Available'
@@ -753,13 +753,13 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
                         ) : (
                           <div className="text-left sm:text-right">
                             <p className="text-xs text-[var(--google-text-secondary)]" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
-                              {result.available 
-                                ? 'Pricing N/A' 
+                              {result.available
+                                ? 'Pricing N/A'
                                 : result.pricingSource === 'taken'
-                                ? 'Domain is taken'
-                                : result.pricingSource === 'unavailable'
-                                ? 'Unable to fetch pricing'
-                                : 'Taken'
+                                  ? 'Domain is taken'
+                                  : result.pricingSource === 'unavailable'
+                                    ? 'Unable to fetch pricing'
+                                    : 'Taken'
                               }
                             </p>
                           </div>

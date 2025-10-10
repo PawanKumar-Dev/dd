@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
             expiryDate: domain.expiresAt
               ? domain.expiresAt.toISOString().split("T")[0]
               : null,
-            registrar: "ResellerClub",
+            registrar: "Domain Registrar",
             nameservers: [], // Will be populated from DNS records if needed
             autoRenew: false,
             bookingStatus: domain.bookingStatus || [],

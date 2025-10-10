@@ -276,7 +276,7 @@ export default function PaymentResultPage() {
                 <h3 className="text-lg font-semibold text-blue-800">Domains Being Processed</h3>
               </div>
               <p className="text-blue-700 mb-4">
-                The following domains are currently being registered with ResellerClub. This process may take a few minutes.
+                The following domains are currently being registered. This process may take a few minutes.
               </p>
               <div className="space-y-4">
                 {processingDomains.map((domain, index) => (

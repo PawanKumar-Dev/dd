@@ -2,7 +2,7 @@
  * Enhanced Domain Management Page
  * 
  * This page provides comprehensive domain management capabilities including:
- * - Real-time DNS record management via ResellerClub API
+ * - Real-time DNS record management via domain registrar API
  * - Domain status monitoring and details
  * - Bulk DNS operations
  * - DNS record validation and error handling
@@ -106,7 +106,7 @@ export default function DNSPage() {
           expiryDate: '2025-12-31',
           autoRenew: true,
           nameServers: ['ns1.example.com', 'ns2.example.com'],
-          registrar: 'ResellerClub',
+          registrar: 'Domain Registrar',
           creationDate: '2024-01-01'
         },
         {
@@ -116,7 +116,7 @@ export default function DNSPage() {
           expiryDate: '2025-06-15',
           autoRenew: false,
           nameServers: ['ns1.test.org', 'ns2.test.org'],
-          registrar: 'ResellerClub',
+          registrar: 'Domain Registrar',
           creationDate: '2024-01-15'
         },
       ]);
@@ -135,13 +135,13 @@ export default function DNSPage() {
 
       console.log(`🔄 [DNS] Loading DNS records for ${domain.domainName}...`);
 
-      // Use ResellerClub API to get DNS records
+      // Use domain registrar API to get DNS records
       const result = await ResellerClubAPI.getDNSRecords(domain.domainName);
 
       if (result.status === 'success' && result.data) {
         console.log('✅ [DNS] DNS records loaded successfully');
 
-        // Parse ResellerClub DNS records response
+        // Parse domain registrar DNS records response
         const records: DNSRecord[] = [];
 
         if (result.data.records) {
@@ -224,7 +224,7 @@ export default function DNSPage() {
     try {
       console.log(`🔄 [DNS] Adding DNS record for ${domain.domainName}...`);
 
-      // Use ResellerClub API to add DNS record
+      // Use domain registrar API to add DNS record
       const result = await ResellerClubAPI.addDNSRecord(domain.domainName, {
         type: newRecord.recordType,
         name: newRecord.name,
@@ -270,7 +270,7 @@ export default function DNSPage() {
     try {
       console.log(`🔄 [DNS] Deleting DNS record ${recordId} for ${domain.domainName}...`);
 
-      // Use ResellerClub API to delete DNS record
+      // Use domain registrar API to delete DNS record
       const result = await ResellerClubAPI.deleteDNSRecord(domain.domainName, recordId);
 
       if (result.status === 'success') {
@@ -301,7 +301,7 @@ export default function DNSPage() {
     try {
       console.log(`🔄 [DNS] Saving DNS records for ${domain.domainName}...`);
 
-      // Since ResellerClub API doesn't have a bulk save endpoint,
+      // Since domain registrar API doesn't have a bulk save endpoint,
       // we'll just refresh the records to show current state
       await loadDNSRecords(selectedDomain);
 

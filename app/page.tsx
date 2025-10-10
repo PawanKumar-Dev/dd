@@ -177,9 +177,9 @@ export default function HomePage() {
               <div className="bg-gray-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
                 <Server className="h-10 w-10 text-primary-600" />
               </div>
-              <h4 className="text-xl font-semibold mb-2">ResellerClub API</h4>
+              <h4 className="text-xl font-semibold mb-2">Domain Registrar API</h4>
               <p className="text-gray-600">
-                Direct integration with ResellerClub's production API for real-time domain operations
+                Direct integration with domain registrar's production API for real-time domain operations
               </p>
             </div>
 

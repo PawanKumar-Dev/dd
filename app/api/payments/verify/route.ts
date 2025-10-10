@@ -223,7 +223,7 @@ export async function POST(request: NextRequest) {
 
     for (const item of cartItems) {
       console.log(`🔄 [PAYMENT-VERIFY] Registering domain: ${item.domainName}`);
-      
+
       // Initialize domain booking status
       const domainBookingStatus = [
         {
@@ -251,10 +251,12 @@ export async function POST(request: NextRequest) {
         }
 
         // Get or create ResellerClub customer and contact IDs
-        console.log(`👤 [PAYMENT-VERIFY] Creating/verifying ResellerClub customer for: ${user.email}`);
+        console.log(
+          `👤 [PAYMENT-VERIFY] Creating/verifying customer account for: ${user.email}`
+        );
         domainBookingStatus.push({
           step: "customer_created" as const,
-          message: "Creating customer account with ResellerClub",
+          message: "Setting up your account",
           timestamp: new Date(),
           progress: 40,
         });
@@ -290,39 +292,41 @@ export async function POST(request: NextRequest) {
           throw new Error("Failed to get ResellerClub customer/contact IDs");
         }
 
-        console.log(`✅ [PAYMENT-VERIFY] Customer created successfully: ${customerResult.customerId}`);
+        console.log(
+          `✅ [PAYMENT-VERIFY] Customer account created successfully: ${customerResult.customerId}`
+        );
         domainBookingStatus.push({
           step: "contact_created" as const,
-          message: "Customer and contact created successfully",
+          message: "Account setup completed",
           timestamp: new Date(),
           progress: 60,
         });
 
-        console.log(`🌐 [PAYMENT-VERIFY] Starting domain registration for: ${item.domainName}`);
+        console.log(
+          `🌐 [PAYMENT-VERIFY] Starting domain registration for: ${item.domainName}`
+        );
         domainBookingStatus.push({
           step: "domain_registering" as const,
-          message: "Registering domain with ResellerClub",
+          message: "Registering domain",
           timestamp: new Date(),
           progress: 80,
         });
 
-        const result = await ResellerClubWrapper.registerDomain(
-          {
-            domainName: item.domainName,
-            years: item.registrationPeriod || 1,
-            customerId: customerResult.customerId, // Use ResellerClub customer ID
-            adminContactId: customerResult.contactId, // Use ResellerClub contact ID for admin
-            techContactId: customerResult.contactId, // Use same contact ID for tech
-            billingContactId: customerResult.contactId, // Use same contact ID for billing
-            nameServers: nameServers, // Will use ResellerClub defaults if undefined
-          },
-        );
+        const result = await ResellerClubWrapper.registerDomain({
+          domainName: item.domainName,
+          years: item.registrationPeriod || 1,
+          customerId: customerResult.customerId, // Use ResellerClub customer ID
+          adminContactId: customerResult.contactId, // Use ResellerClub contact ID for admin
+          techContactId: customerResult.contactId, // Use same contact ID for tech
+          billingContactId: customerResult.contactId, // Use same contact ID for billing
+          nameServers: nameServers, // Will use ResellerClub defaults if undefined
+        });
 
         if (result.status === "success") {
           console.log(
             `✅ [PAYMENT-VERIFY] Domain registration successful: ${item.domainName}`
           );
-          
+
           domainBookingStatus.push({
             step: "domain_registered" as const,
             message: "Domain registered successfully",
@@ -360,7 +364,7 @@ export async function POST(request: NextRequest) {
           console.error(
             `❌ [PAYMENT-VERIFY] Domain registration failed: ${item.domainName} - ${result.message}`
           );
-          
+
           domainBookingStatus.push({
             step: "domain_failed" as const,
             message: `Domain registration failed: ${result.message}`,
@@ -394,7 +398,9 @@ export async function POST(request: NextRequest) {
 
         domainBookingStatus.push({
           step: "domain_failed" as const,
-          message: `Registration failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          message: `Registration failed: ${
+            error instanceof Error ? error.message : "Unknown error"
+          }`,
           timestamp: new Date(),
           progress: 100,
         });

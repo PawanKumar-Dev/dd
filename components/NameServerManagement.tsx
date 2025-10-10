@@ -13,8 +13,8 @@ interface NameServerConfig {
 }
 
 const RESELLERCLUB_DEFAULT = {
-  id: 'resellerclub-default',
-  name: 'ResellerClub Default',
+  id: 'default-nameservers',
+  name: 'Default Nameservers',
   servers: [
     'deepak1299294.mercury.orderbox-dns.com',
     'deepak1299294.venus.orderbox-dns.com',
@@ -118,7 +118,7 @@ export default function NameServerManagement() {
 
   const handleDelete = (configId: string) => {
     if (configs.find(c => c.id === configId)?.isDefault) {
-      toast.error('Cannot delete ResellerClub default configuration');
+      toast.error('Cannot delete default configuration');
       return;
     }
 
@@ -133,7 +133,7 @@ export default function NameServerManagement() {
       isActive: config.isDefault
     }));
     saveConfigs(updatedConfigs);
-    toast.success('Reset to ResellerClub default nameservers');
+    toast.success('Reset to default nameservers');
   };
 
   const activeConfig = configs.find(config => config.isActive) || RESELLERCLUB_DEFAULT;
@@ -340,7 +340,7 @@ export default function NameServerManagement() {
           style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}
         >
           <RotateCcw className="w-4 h-4" />
-          Reset to ResellerClub Default
+          Reset to Default Nameservers
         </button>
       </div>
     </div>

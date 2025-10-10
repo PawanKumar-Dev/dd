@@ -372,7 +372,7 @@ export default function MultiStageRegisterForm({ className = '' }: RegisterFormP
               required
               fullWidth
               icon={<Building className="h-4 w-4 text-gray-400" />}
-              helperText="Required for ResellerClub registration"
+              helperText="Required for domain registration"
             />
           </div>
         );
