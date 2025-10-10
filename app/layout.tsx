@@ -2,9 +2,6 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
-import TestingModeIndicator from '@/components/TestingModeIndicator';
-import TestingModeBanner from '@/components/TestingModeBanner';
-import { TestingModeProvider } from '@/components/TestingModeProvider';
 import ClientOnly from '@/components/ClientOnly';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -30,13 +27,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <TestingModeProvider>
-          {children}
-          <ClientOnly>
-            <TestingModeIndicator />
-          </ClientOnly>
-          <Toaster position="top-right" />
-        </TestingModeProvider>
+        {children}
+        <Toaster position="top-right" />
       </body>
     </html>
   );

@@ -20,14 +20,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Check if testing mode is enabled
-    const testingMode = request.headers.get("x-testing-mode") === "true";
-
     // Get DNS records
-    const result = await ResellerClubWrapper.getDNSRecords(
-      domainName,
-      testingMode
-    );
+    const result = await ResellerClubWrapper.getDNSRecords(domainName);
 
     if (result.status === "error") {
       return NextResponse.json({ error: result.message }, { status: 500 });
@@ -73,14 +67,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if testing mode is enabled
-    const testingMode = request.headers.get("x-testing-mode") === "true";
-
     // Add DNS record
     const result = await ResellerClubWrapper.addDNSRecord(
       domainName,
-      recordData,
-      testingMode
+      recordData
     );
 
     if (result.status === "error") {
@@ -118,15 +108,11 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    // Check if testing mode is enabled
-    const testingMode = request.headers.get("x-testing-mode") === "true";
-
     // Update DNS record
     const result = await ResellerClubWrapper.updateDNSRecord(
       domainName,
       recordId,
-      recordData,
-      testingMode
+      recordData
     );
 
     if (result.status === "error") {
@@ -165,14 +151,10 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Check if testing mode is enabled
-    const testingMode = request.headers.get("x-testing-mode") === "true";
-
     // Delete DNS record
     const result = await ResellerClubWrapper.deleteDNSRecord(
       domainName,
-      recordId,
-      testingMode
+      recordId
     );
 
     if (result.status === "error") {

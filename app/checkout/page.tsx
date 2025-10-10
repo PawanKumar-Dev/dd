@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, CreditCard, Shield } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCartStore } from '@/store/cartStore';
-import { useTestingStore } from '@/store/testingStore';
 import ClientOnly from '@/components/ClientOnly';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
@@ -31,7 +30,6 @@ export default function CheckoutPage() {
   const [isPaymentInProgress, setIsPaymentInProgress] = useState(false);
   const router = useRouter();
   const { items: cartItems, getTotalPrice, clearCart, syncWithServer, isLoading } = useCartStore();
-  const { isTestingMode } = useTestingStore();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -151,7 +149,6 @@ export default function CheckoutPage() {
               headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`,
-                'x-testing-mode': isTestingMode.toString(),
               },
               body: JSON.stringify({
                 razorpay_order_id: response.razorpay_order_id,

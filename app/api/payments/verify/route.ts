@@ -126,9 +126,6 @@ export async function POST(request: NextRequest) {
       "✅ [PAYMENT-VERIFY] Payment verification successful. Proceeding with domain registration..."
     );
 
-    // Check if testing mode is enabled
-    const testingMode = request.headers.get("x-testing-mode") === "true";
-
     // Connect to database
     await connectDB();
 
@@ -284,7 +281,6 @@ export async function POST(request: NextRequest) {
             billingContactId: customerResult.contactId, // Use same contact ID for billing
             nameServers: nameServers, // Will use ResellerClub defaults if undefined
           },
-          testingMode
         );
 
         if (result.status === "success") {

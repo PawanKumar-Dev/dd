@@ -25,7 +25,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, Loader2, CheckCircle, XCircle, Globe, ShoppingCart, Star, TrendingUp, Zap, AlertTriangle } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
-import { useTestingStore } from '@/store/testingStore';
 import toast from 'react-hot-toast';
 import Button from './Button';
 import DomainRequirementsModal from './DomainRequirementsModal';
@@ -104,7 +103,6 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
   const [showRequirementsModal, setShowRequirementsModal] = useState(false);
   const [selectedDomainForRequirements, setSelectedDomainForRequirements] = useState<string>('');
   const { addItem } = useCartStore();
-  const { isTestingMode } = useTestingStore();
   const router = useRouter();
 
   // Load saved search state on component mount
@@ -218,7 +216,6 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'x-testing-mode': isTestingMode.toString(),
           },
           body: JSON.stringify({
             domain: domainToSearch
@@ -243,7 +240,6 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'x-testing-mode': isTestingMode.toString(),
           },
           body: JSON.stringify({
             domain: validation.baseDomain,

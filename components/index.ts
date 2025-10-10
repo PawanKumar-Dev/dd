@@ -47,11 +47,6 @@ export { default as PageTransition } from "./PageTransition";
 export { default as LoadingPage } from "./LoadingPage";
 
 // Testing Components
-export { default as TestingModeIndicator } from "./TestingModeIndicator";
-export { default as TestingModeToggle } from "./admin/TestingModeToggle";
-export { default as TestingModeBanner } from "./TestingModeBanner";
-export { default as TestingModeStatus } from "./TestingModeStatus";
-export { TestingModeProvider } from "./TestingModeProvider";
 
 // Utility Components
 export { default as ClientOnly } from "./ClientOnly";

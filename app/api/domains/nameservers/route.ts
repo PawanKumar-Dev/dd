@@ -19,17 +19,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if testing mode is enabled
-    const testingMode = request.headers.get("x-testing-mode") === "true";
-
     let result;
 
     if (action === "set-default") {
       // Set default nameservers
-      result = await ResellerClubWrapper.setDefaultNameservers(
-        domainName,
-        testingMode
-      );
+      result = await ResellerClubWrapper.setDefaultNameservers(domainName);
     } else if (action === "set-custom") {
       // Set custom nameservers
       if (
@@ -58,8 +52,7 @@ export async function POST(request: NextRequest) {
 
       result = await ResellerClubWrapper.setCustomNameservers(
         domainName,
-        nameservers,
-        testingMode
+        nameservers
       );
     } else {
       return NextResponse.json(
