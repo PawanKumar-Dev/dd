@@ -44,8 +44,10 @@ export default function Invoice({ order, isOpen, onClose }: InvoiceProps) {
     .filter(d => d.status === 'registered')
     .reduce((total, domain) => total + (domain.price * domain.registrationPeriod), 0);
 
-  const tax = 0; // No tax for now
-  const total = subtotal + tax;
+  // Use GST from order if available, otherwise calculate it
+  const gstRate = order.gstRate || 18;
+  const gstAmount = order.gstAmount || Math.round((subtotal * gstRate) / 100 * 100) / 100;
+  const total = order.amount || (subtotal + gstAmount);
 
   const handleDownloadPDF = async () => {
     setIsGeneratingPDF(true);

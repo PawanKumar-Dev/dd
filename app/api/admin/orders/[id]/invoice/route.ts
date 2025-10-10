@@ -235,8 +235,11 @@ export async function GET(
           total + domain.price * domain.registrationPeriod,
         0
       );
-    const tax = 0;
-    const total = subtotal + tax;
+    
+    // Use GST from order if available, otherwise calculate it
+    const gstRate = order.gstRate || 18;
+    const gstAmount = order.gstAmount || Math.round((subtotal * gstRate) / 100 * 100) / 100;
+    const total = order.amount || (subtotal + gstAmount);
 
     const summaryY = Math.max(currentY + 20, pageHeight - 80);
 
@@ -272,9 +275,9 @@ export async function GET(
       }
     );
 
-    // Tax
-    pdf.text(`Tax:`, summaryX + 5, summaryY + 28);
-    pdf.text(`₹${tax.toFixed(2)}`, summaryX + summaryWidth - 5, summaryY + 28, {
+    // GST
+    pdf.text(`GST (${gstRate}%):`, summaryX + 5, summaryY + 28);
+    pdf.text(`₹${gstAmount.toFixed(2)}`, summaryX + summaryWidth - 5, summaryY + 28, {
       align: "right",
     });
 

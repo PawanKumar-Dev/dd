@@ -20,7 +20,13 @@ export interface IOrder extends Document {
     registrationPeriod: number;
     status: "pending" | "processing" | "registered" | "failed" | "cancelled";
     bookingStatus: {
-      step: "payment_verified" | "customer_created" | "contact_created" | "domain_registering" | "domain_registered" | "domain_failed";
+      step:
+        | "payment_verified"
+        | "customer_created"
+        | "contact_created"
+        | "domain_registering"
+        | "domain_registered"
+        | "domain_failed";
       message: string;
       timestamp: Date;
       progress: number; // 0-100
@@ -80,6 +86,19 @@ const OrderSchema = new Schema<IOrder>(
       type: Number,
       required: true,
     },
+    subtotal: {
+      type: Number,
+      required: true,
+    },
+    gstRate: {
+      type: Number,
+      required: true,
+      default: 18,
+    },
+    gstAmount: {
+      type: Number,
+      required: true,
+    },
     currency: {
       type: String,
       required: true,
@@ -117,7 +136,14 @@ const OrderSchema = new Schema<IOrder>(
           {
             step: {
               type: String,
-              enum: ["payment_verified", "customer_created", "contact_created", "domain_registering", "domain_registered", "domain_failed"],
+              enum: [
+                "payment_verified",
+                "customer_created",
+                "contact_created",
+                "domain_registering",
+                "domain_registered",
+                "domain_failed",
+              ],
               required: true,
             },
             message: {
