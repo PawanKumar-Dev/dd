@@ -103,8 +103,7 @@ export async function POST(request: NextRequest) {
 
     const results = await ResellerClubWrapper.searchDomainWithTlds(
       domainValidation.sanitized || baseDomain,
-      searchTlds,
-      testingMode
+      searchTlds
     );
 
     // Store results in localStorage for persistence
