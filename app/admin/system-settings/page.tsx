@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { Shield, Save, Eye, EyeOff, Settings, TestTube } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayoutNew';
 import AdminPasswordReset from '@/components/AdminPasswordReset';
-import TestingModeToggle from '@/components/admin/TestingModeToggle';
 
 export default function AdminSettings() {
   const [user, setUser] = useState<any>(null);
@@ -116,7 +115,6 @@ export default function AdminSettings() {
 
           {activeTab === 'testing' && (
             <div className="space-y-6">
-              <TestingModeToggle />
             </div>
           )}
 

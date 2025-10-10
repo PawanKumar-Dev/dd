@@ -39,7 +39,6 @@ export default function DNSManagement({ domainName, isOpen, onClose }: DNSManage
   const [nameservers, setNameservers] = useState<string[]>([]);
   const [customNameservers, setCustomNameservers] = useState<string[]>(['', '', '', '']);
   const [showNameserverForm, setShowNameserverForm] = useState(false);
-  const { isTestingMode } = useTestingStore();
 
   const recordTypes = [
     { value: 'A', label: 'A (IPv4 Address)', description: 'Points to an IPv4 address' },
@@ -66,7 +65,6 @@ export default function DNSManagement({ domainName, isOpen, onClose }: DNSManage
       const recordsResponse = await fetch(`/api/domains/dns?domainName=${encodeURIComponent(domainName)}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'x-testing-mode': isTestingMode.toString(),
         },
       });
 
@@ -108,7 +106,6 @@ export default function DNSManagement({ domainName, isOpen, onClose }: DNSManage
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
-          'x-testing-mode': isTestingMode.toString(),
         },
         body: JSON.stringify({
           domainName,
@@ -145,7 +142,6 @@ export default function DNSManagement({ domainName, isOpen, onClose }: DNSManage
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
-          'x-testing-mode': isTestingMode.toString(),
         },
         body: JSON.stringify({
           domainName,
@@ -182,7 +178,6 @@ export default function DNSManagement({ domainName, isOpen, onClose }: DNSManage
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
-          'x-testing-mode': isTestingMode.toString(),
         },
       });
 
@@ -210,7 +205,6 @@ export default function DNSManagement({ domainName, isOpen, onClose }: DNSManage
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
-          'x-testing-mode': isTestingMode.toString(),
         },
         body: JSON.stringify({
           domainName,
@@ -250,7 +244,6 @@ export default function DNSManagement({ domainName, isOpen, onClose }: DNSManage
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
-          'x-testing-mode': isTestingMode.toString(),
         },
         body: JSON.stringify({
           domainName,

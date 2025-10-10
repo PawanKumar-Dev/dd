@@ -9,7 +9,6 @@ interface DomainRenewalModalProps {
   isOpen: boolean;
   onClose: () => void;
   domainName: string;
-  isTestingMode: boolean;
 }
 
 interface RenewalInfo {
@@ -29,8 +28,7 @@ interface RenewalInfo {
 export default function DomainRenewalModal({
   isOpen,
   onClose,
-  domainName,
-  isTestingMode
+  domainName
 }: DomainRenewalModalProps) {
   const [renewalInfo, setRenewalInfo] = useState<RenewalInfo | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -53,7 +51,6 @@ export default function DomainRenewalModal({
       const response = await fetch(`/api/domains/renew?domainName=${encodeURIComponent(domainName)}&years=${selectedYears}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'x-testing-mode': isTestingMode.toString(),
         },
       });
 
@@ -87,7 +84,6 @@ export default function DomainRenewalModal({
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
-          'x-testing-mode': isTestingMode.toString(),
         },
         body: JSON.stringify({
           domainName,

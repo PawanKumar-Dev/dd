@@ -17,14 +17,12 @@ interface DNSManagementModalProps {
   isOpen: boolean;
   onClose: () => void;
   domainName: string;
-  isTestingMode: boolean;
 }
 
 export default function DNSManagementModal({
   isOpen,
   onClose,
-  domainName,
-  isTestingMode
+  domainName
 }: DNSManagementModalProps) {
   const [records, setRecords] = useState<DNSRecord[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -61,7 +59,6 @@ export default function DNSManagementModal({
       const response = await fetch(`/api/domains/dns?domainName=${encodeURIComponent(domainName)}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'x-testing-mode': isTestingMode.toString(),
         },
       });
 
@@ -94,7 +91,6 @@ export default function DNSManagementModal({
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
-          'x-testing-mode': isTestingMode.toString(),
         },
         body: JSON.stringify({
           domainName,
@@ -129,7 +125,6 @@ export default function DNSManagementModal({
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
-          'x-testing-mode': isTestingMode.toString(),
         },
         body: JSON.stringify({
           domainName,
@@ -163,7 +158,6 @@ export default function DNSManagementModal({
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
-          'x-testing-mode': isTestingMode.toString(),
         },
       });
 
