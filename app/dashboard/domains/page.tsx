@@ -10,6 +10,7 @@ import {
 import toast from 'react-hot-toast';
 import UserLayout from '@/components/user/UserLayout';
 import { PageLoading, DataLoading } from '@/components/user/LoadingComponents';
+import DNSManagement from '@/components/user/DNSManagement';
 import ClientOnly from '@/components/ClientOnly';
 
 interface User {
@@ -37,6 +38,8 @@ export default function UserDomains() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [selectedDomain, setSelectedDomain] = useState<Domain | null>(null);
+  const [isDNSModalOpen, setIsDNSModalOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -62,10 +65,10 @@ export default function UserDomains() {
   const loadDomains = async () => {
     try {
       setIsLoading(true);
-      
+
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
+
       // Mock data - replace with actual API call
       const mockDomains: Domain[] = [
         {
@@ -236,7 +239,7 @@ export default function UserDomains() {
                 <Globe className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No domains found</h3>
                 <p className="text-gray-500 mb-4">
-                  {searchTerm || filterStatus !== 'all' 
+                  {searchTerm || filterStatus !== 'all'
                     ? 'Try adjusting your search or filter criteria'
                     : 'You haven\'t registered any domains yet'
                   }
@@ -311,18 +314,24 @@ export default function UserDomains() {
                           {new Date(domain.expiryDate).toLocaleDateString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            domain.autoRenew ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                          }`}>
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${domain.autoRenew ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                            }`}>
                             {domain.autoRenew ? 'Enabled' : 'Disabled'}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex space-x-2">
-                            <button className="text-blue-600 hover:text-blue-900">
+                            <button
+                              onClick={() => {
+                                setSelectedDomain(domain);
+                                setIsDNSModalOpen(true);
+                              }}
+                              className="text-blue-600 hover:text-blue-900"
+                              title="Manage DNS"
+                            >
                               <Settings className="h-4 w-4" />
                             </button>
-                            <button className="text-gray-600 hover:text-gray-900">
+                            <button className="text-gray-600 hover:text-gray-900" title="View Domain">
                               <ExternalLink className="h-4 w-4" />
                             </button>
                           </div>
@@ -348,7 +357,7 @@ export default function UserDomains() {
                 </div>
               </div>
             </div>
-            
+
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
               <div className="flex items-center">
                 <AlertTriangle className="h-8 w-8 text-red-600 mr-3" />
@@ -360,7 +369,7 @@ export default function UserDomains() {
                 </div>
               </div>
             </div>
-            
+
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
               <div className="flex items-center">
                 <Calendar className="h-8 w-8 text-blue-600 mr-3" />
@@ -372,6 +381,18 @@ export default function UserDomains() {
             </div>
           </div>
         </div>
+
+        {/* DNS Management Modal */}
+        {selectedDomain && (
+          <DNSManagement
+            domainName={selectedDomain.name}
+            isOpen={isDNSModalOpen}
+            onClose={() => {
+              setIsDNSModalOpen(false);
+              setSelectedDomain(null);
+            }}
+          />
+        )}
       </UserLayout>
     </ClientOnly>
   );
