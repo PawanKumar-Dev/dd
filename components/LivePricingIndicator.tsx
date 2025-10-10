@@ -133,7 +133,7 @@ export default function LivePricingIndicator({ domainName, tld, onPriceUpdate }:
         )}
 
         <div className="text-xs text-gray-600">
-          <p>Live pricing fetched from domain registrar</p>
+          <p>Live pricing fetched from domain services</p>
           <p>Prices may vary based on current market rates</p>
         </div>
       </div>

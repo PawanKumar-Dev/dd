@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
   Globe, Search, Plus, RefreshCw, Settings, ExternalLink,
-  Calendar, Shield, AlertTriangle, CheckCircle, Clock, Loader2
+  Calendar, Shield, AlertTriangle, CheckCircle, Clock, Loader2, X
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import UserLayout from '@/components/user/UserLayout';
@@ -166,6 +166,13 @@ export default function UserDomains() {
   const canManageDomain = (domain: Domain) => {
     return domain.status === 'active' || domain.status === 'expired';
   };
+
+  // Filter domains based on search term and status
+  const filteredDomains = domains.filter(domain => {
+    const matchesSearch = domain.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = filterStatus === 'all' || domain.status === filterStatus;
+    return matchesSearch && matchesStatus;
+  });
 
   if (!user) {
     return <PageLoading page="domains" />;
@@ -333,16 +340,31 @@ export default function UserDomains() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex space-x-2">
-                            <button
-                              onClick={() => {
-                                setSelectedDomain(domain);
-                                setIsDNSModalOpen(true);
-                              }}
-                              className="text-blue-600 hover:text-blue-900"
-                              title="Manage DNS"
-                            >
-                              <Settings className="h-4 w-4" />
-                            </button>
+                            {domain.status === 'processing' || domain.status === 'pending' ? (
+                              <button
+                                onClick={() => handleViewBookingProgress(domain)}
+                                className="text-blue-600 hover:text-blue-900"
+                                title="View Progress"
+                              >
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              </button>
+                            ) : canManageDomain(domain) ? (
+                              <button
+                                onClick={() => handleManageDomain(domain)}
+                                className="text-blue-600 hover:text-blue-900"
+                                title="Manage DNS"
+                              >
+                                <Settings className="h-4 w-4" />
+                              </button>
+                            ) : (
+                              <button
+                                disabled
+                                className="text-gray-400 cursor-not-allowed"
+                                title="Domain not available for management"
+                              >
+                                <Settings className="h-4 w-4" />
+                              </button>
+                            )}
                             <button className="text-gray-600 hover:text-gray-900" title="View Domain">
                               <ExternalLink className="h-4 w-4" />
                             </button>
@@ -404,6 +426,38 @@ export default function UserDomains() {
               setSelectedDomain(null);
             }}
           />
+        )}
+
+        {/* Domain Booking Progress Modal */}
+        {bookingDomain && bookingDomain.orderId && showBookingProgress && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Domain Registration Progress
+                </h3>
+                <button
+                  onClick={() => {
+                    setShowBookingProgress(false);
+                    setBookingDomain(null);
+                  }}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+              <DomainBookingProgress
+                orderId={bookingDomain.orderId}
+                domainName={bookingDomain.name}
+                autoRefresh={true}
+                onComplete={() => {
+                  setShowBookingProgress(false);
+                  setBookingDomain(null);
+                  loadDomains(); // Refresh the domains list
+                }}
+              />
+            </div>
+          </div>
         )}
       </UserLayout>
     </ClientOnly>

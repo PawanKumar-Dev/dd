@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { connectDB } from "@/lib/mongodb";
+import connectDB from "@/lib/mongodb";
 import Order from "@/models/Order";
 
 export async function GET(request: NextRequest) {
@@ -25,13 +25,13 @@ export async function GET(request: NextRequest) {
       query["domains.domainName"] = domainName;
     }
 
-    const order = await Order.findOne(query).populate("userId", "email firstName lastName");
+    const order = await Order.findOne(query).populate(
+      "userId",
+      "email firstName lastName"
+    );
 
     if (!order) {
-      return NextResponse.json(
-        { error: "Order not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
     // Find the specific domain if domainName was provided
@@ -62,9 +62,16 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { orderId, domainName, step, message, progress } = await request.json();
+    const { orderId, domainName, step, message, progress } =
+      await request.json();
 
-    if (!orderId || !domainName || !step || !message || progress === undefined) {
+    if (
+      !orderId ||
+      !domainName ||
+      !step ||
+      !message ||
+      progress === undefined
+    ) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -75,13 +82,12 @@ export async function POST(request: NextRequest) {
 
     const order = await Order.findOne({ orderId });
     if (!order) {
-      return NextResponse.json(
-        { error: "Order not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
-    const domainIndex = order.domains.findIndex((d: any) => d.domainName === domainName);
+    const domainIndex = order.domains.findIndex(
+      (d: any) => d.domainName === domainName
+    );
     if (domainIndex === -1) {
       return NextResponse.json(
         { error: "Domain not found in order" },

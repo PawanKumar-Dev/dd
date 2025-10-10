@@ -3,7 +3,7 @@
  * 
  * This component provides a comprehensive domain search interface that allows users to:
  * - Search for domain availability across multiple TLDs
- * - View live pricing from domain registrar API
+ * - View live pricing from domain services
  * - Add domains to cart for purchase
  * - Get TLD suggestions based on domain type
  * 

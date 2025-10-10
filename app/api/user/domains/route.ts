@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { connectDB } from "@/lib/mongodb";
+import connectDB from "@/lib/mongodb";
 import Order from "@/models/Order";
 import User from "@/models/User";
 
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
             expiryDate: domain.expiresAt
               ? domain.expiresAt.toISOString().split("T")[0]
               : null,
-            registrar: "Domain Registrar",
+            registrar: "Domain Services",
             nameservers: [], // Will be populated from DNS records if needed
             autoRenew: false,
             bookingStatus: domain.bookingStatus || [],

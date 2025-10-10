@@ -133,7 +133,7 @@ export default function AboutPage() {
           <FeatureCard
             icon={<Globe className="h-8 w-8" />}
             title="Global Integration"
-            description="Seamless integration with domain registrar API for worldwide domain operations"
+            description="Seamless integration with global domain services for worldwide domain operations"
           />
           <FeatureCard
             icon={<Users className="h-8 w-8" />}
