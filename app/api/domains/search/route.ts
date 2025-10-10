@@ -85,11 +85,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if testing mode is enabled
-    const testingMode = request.headers.get("x-testing-mode") === "true";
-    console.log(
-      `🎯 [API-${requestId}] Mode: ${testingMode ? "Testing" : "Production"}`
-    );
+    console.log(`🎯 [API-${requestId}] Mode: Production`);
 
     // Search domain using ResellerClub API with base domain and selected TLDs
     console.log(
