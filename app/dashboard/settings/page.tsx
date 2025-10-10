@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
-  User, Mail, Phone, MapPin, Shield, Bell, Key, Save,
+  User, Mail, Phone, MapPin, Shield, Key, Save,
   Eye, EyeOff, Calendar, Globe, CreditCard, AlertCircle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -79,14 +79,7 @@ export default function UserSettings() {
           setSettings(data.settings || {});
         } else {
           // Use default settings
-          setSettings({
-            notifications: {
-              email: true,
-              sms: false,
-              domainExpiry: true,
-              paymentReminders: true
-            }
-          });
+          setSettings({});
         }
       } catch (error) {
         console.error('Failed to fetch settings:', error);

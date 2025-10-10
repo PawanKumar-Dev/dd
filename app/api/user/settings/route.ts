@@ -23,14 +23,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Return user settings
-    const settings = {
-      notifications: {
-        email: true,
-        sms: false,
-        domainExpiry: true,
-        paymentReminders: true,
-      },
-    };
+    const settings = {};
 
     return NextResponse.json(settings);
   } catch (error) {
