@@ -2,25 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
 import Order from "@/models/Order";
+import { AuthService } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
-    // Get user from Authorization header
-    const authHeader = request.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const token = authHeader.split(" ")[1];
-
-    // For now, we'll use a simple token validation
-    // In production, you should verify the JWT token properly
-    const user = await User.findOne({ email: token }).select("-password");
-
+    // Get user from JWT token
+    const user = await AuthService.getUserFromRequest(request);
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Get user's orders and domains
@@ -56,42 +47,40 @@ export async function GET(request: NextRequest) {
     // Get recent orders
     const recentOrders = orders.slice(0, 5).map((order) => ({
       id: order.orderId,
-      domains: order.domains.map((domain) => domain.domainName),
-      totalAmount: order.totalAmount,
+      domain: order.domains.map((domain) => domain.domainName).join(", "),
+      amount: order.totalAmount,
       status: order.status,
-      createdAt: order.createdAt,
+      date: new Date(order.createdAt).toLocaleDateString(),
     }));
 
-    // Get recent domains
-    const recentDomains = orders
+    // Get upcoming renewals (domains expiring in next 30 days)
+    const upcomingRenewals = orders
       .flatMap((order) =>
-        order.domains.map((domain) => ({
-          name: domain.domainName,
-          status: domain.status,
-          registrationDate: order.createdAt,
-          expiryDate: domain.expiresAt,
-          registrar: "Domain Services",
-        }))
+        order.domains
+          .filter(
+            (domain) => domain.status === "registered" && domain.expiresAt
+          )
+          .map((domain) => ({
+            domain: domain.domainName,
+            expiryDate: new Date(domain.expiresAt).toLocaleDateString(),
+            daysLeft: Math.ceil(
+              (new Date(domain.expiresAt).getTime() - new Date().getTime()) /
+                (1000 * 60 * 60 * 24)
+            ),
+          }))
       )
+      .filter((renewal) => renewal.daysLeft <= 30 && renewal.daysLeft > 0)
+      .sort((a, b) => a.daysLeft - b.daysLeft)
       .slice(0, 5);
 
     const dashboardData = {
-      user: {
-        id: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        role: user.role,
-      },
       stats: {
         totalDomains,
         activeDomains,
-        pendingDomains,
-        totalSpent,
         totalOrders: orders.length,
+        recentOrders,
+        upcomingRenewals,
       },
-      recentOrders,
-      recentDomains,
     };
 
     return NextResponse.json(dashboardData);
