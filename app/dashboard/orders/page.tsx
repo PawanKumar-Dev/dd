@@ -71,57 +71,19 @@ export default function UserOrders() {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1200));
       
-      // Mock data - replace with actual API call
-      const mockOrders: Order[] = [
-        {
-          id: '1',
-          orderNumber: 'ORD-2024-001',
-          date: '2024-01-15',
-          status: 'completed',
-          total: 1200,
-          items: [
-            { domainName: 'example.com', price: 1200, registrationPeriod: 1 }
-          ],
-          paymentMethod: 'Credit Card',
-          invoiceNumber: 'INV-2024-001'
-        },
-        {
-          id: '2',
-          orderNumber: 'ORD-2024-002',
-          date: '2024-01-10',
-          status: 'completed',
-          total: 800,
-          items: [
-            { domainName: 'test.org', price: 800, registrationPeriod: 1 }
-          ],
-          paymentMethod: 'UPI',
-          invoiceNumber: 'INV-2024-002'
-        },
-        {
-          id: '3',
-          orderNumber: 'ORD-2024-003',
-          date: '2024-01-05',
-          status: 'pending',
-          total: 1500,
-          items: [
-            { domainName: 'demo.net', price: 1500, registrationPeriod: 1 }
-          ],
-          paymentMethod: 'Credit Card'
-        },
-        {
-          id: '4',
-          orderNumber: 'ORD-2024-004',
-          date: '2024-01-01',
-          status: 'failed',
-          total: 2000,
-          items: [
-            { domainName: 'sample.com', price: 2000, registrationPeriod: 1 }
-          ],
-          paymentMethod: 'Credit Card'
+      // Fetch actual orders data
+      try {
+        const response = await fetch('/api/user/orders');
+        if (response.ok) {
+          const data = await response.json();
+          setOrders(data.orders || []);
+        } else {
+          setOrders([]);
         }
-      ];
-
-      setOrders(mockOrders);
+      } catch (error) {
+        console.error('Failed to fetch orders:', error);
+        setOrders([]);
+      }
     } catch (error) {
       console.error('Error loading orders:', error);
       toast.error('Failed to load orders');

@@ -284,6 +284,5 @@ function MyPage() {
 - `API.md` - Complete API reference with TLD pricing endpoints
 - `PROJECT_STRUCTURE.md` - This file, project architecture overview
 - `SETUP.md` - Setup and installation instructions
-- `TESTING_MODE.md` - Testing and development guidelines
 
 This component-based architecture makes the project highly maintainable, scalable, and developer-friendly while providing a consistent user experience across all pages.

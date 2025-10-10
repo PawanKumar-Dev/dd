@@ -65,23 +65,35 @@ export default function UserDashboard() {
       // Simulate API calls for dashboard data
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Mock data - replace with actual API calls
-      const mockStats: DashboardStats = {
-        totalDomains: 5,
-        activeDomains: 4,
-        totalOrders: 12,
-        totalSpent: 25000,
-        recentOrders: [
-          { id: '1', domain: 'example.com', amount: 1200, status: 'completed', date: '2024-01-15' },
-          { id: '2', domain: 'test.org', amount: 800, status: 'completed', date: '2024-01-10' },
-        ],
-        upcomingRenewals: [
-          { domain: 'example.com', expiryDate: '2024-12-15', daysLeft: 45 },
-          { domain: 'test.org', expiryDate: '2024-11-20', daysLeft: 20 },
-        ]
-      };
-
-      setStats(mockStats);
+      // Fetch actual dashboard data
+      try {
+        const response = await fetch('/api/user/dashboard');
+        if (response.ok) {
+          const data = await response.json();
+          setStats(data.stats);
+        } else {
+          // Fallback to basic stats if API fails
+          setStats({
+            totalDomains: 0,
+            activeDomains: 0,
+            totalOrders: 0,
+            totalSpent: 0,
+            recentOrders: [],
+            upcomingRenewals: []
+          });
+        }
+      } catch (error) {
+        console.error('Failed to fetch dashboard data:', error);
+        // Fallback to basic stats
+        setStats({
+          totalDomains: 0,
+          activeDomains: 0,
+          totalOrders: 0,
+          totalSpent: 0,
+          recentOrders: [],
+          upcomingRenewals: []
+        });
+      }
     } catch (error) {
       console.error('Error loading dashboard data:', error);
       toast.error('Failed to load dashboard data');

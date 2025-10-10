@@ -7,7 +7,6 @@ import {
   AlertCircle, CheckCircle, Clock, Settings, ExternalLink
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { useTestingStore } from '@/store/testingStore';
 
 interface DNSRecord {
   id?: string;

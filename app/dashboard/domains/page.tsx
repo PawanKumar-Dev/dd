@@ -69,41 +69,19 @@ export default function UserDomains() {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500));
 
-      // Mock data - replace with actual API call
-      const mockDomains: Domain[] = [
-        {
-          id: '1',
-          name: 'example.com',
-          status: 'active',
-          registrationDate: '2023-01-15',
-          expiryDate: '2024-12-15',
-          registrar: 'ResellerClub',
-          nameservers: ['ns1.example.com', 'ns2.example.com'],
-          autoRenew: true
-        },
-        {
-          id: '2',
-          name: 'test.org',
-          status: 'active',
-          registrationDate: '2023-06-20',
-          expiryDate: '2024-11-20',
-          registrar: 'ResellerClub',
-          nameservers: ['ns1.test.org', 'ns2.test.org'],
-          autoRenew: false
-        },
-        {
-          id: '3',
-          name: 'demo.net',
-          status: 'expired',
-          registrationDate: '2022-03-10',
-          expiryDate: '2023-03-10',
-          registrar: 'ResellerClub',
-          nameservers: ['ns1.demo.net', 'ns2.demo.net'],
-          autoRenew: false
+      // Fetch actual domains data
+      try {
+        const response = await fetch('/api/user/domains');
+        if (response.ok) {
+          const data = await response.json();
+          setDomains(data.domains || []);
+        } else {
+          setDomains([]);
         }
-      ];
-
-      setDomains(mockDomains);
+      } catch (error) {
+        console.error('Failed to fetch domains:', error);
+        setDomains([]);
+      }
     } catch (error) {
       console.error('Error loading domains:', error);
       toast.error('Failed to load domains');

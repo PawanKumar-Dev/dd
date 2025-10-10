@@ -80,26 +80,69 @@ export default function UserSettings() {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Mock settings data
-      const mockSettings: UserSettings = {
-        notifications: {
-          email: true,
-          sms: false,
-          domainExpiry: true,
-          paymentReminders: true
-        },
-        security: {
-          twoFactorEnabled: false,
-          loginAlerts: true
-        },
-        preferences: {
-          theme: 'light',
-          language: 'en',
-          timezone: 'Asia/Kolkata'
+      // Fetch actual settings data
+      try {
+        const response = await fetch('/api/user/settings');
+        if (response.ok) {
+          const data = await response.json();
+          setSettings(data.settings || {
+            notifications: {
+              email: true,
+              sms: false,
+              domainExpiry: true,
+              paymentReminders: true
+            },
+            security: {
+              twoFactorEnabled: false,
+              loginAlerts: true
+            },
+            preferences: {
+              theme: 'light',
+              language: 'en',
+              timezone: 'Asia/Kolkata'
+            }
+          });
+        } else {
+          // Use default settings
+          setSettings({
+            notifications: {
+              email: true,
+              sms: false,
+              domainExpiry: true,
+              paymentReminders: true
+            },
+            security: {
+              twoFactorEnabled: false,
+              loginAlerts: true
+            },
+            preferences: {
+              theme: 'light',
+              language: 'en',
+              timezone: 'Asia/Kolkata'
+            }
+          });
         }
-      };
-
-      setSettings(mockSettings);
+      } catch (error) {
+        console.error('Failed to fetch settings:', error);
+        // Use default settings
+        setSettings({
+          notifications: {
+            email: true,
+            sms: false,
+            domainExpiry: true,
+            paymentReminders: true
+          },
+          security: {
+            twoFactorEnabled: false,
+            loginAlerts: true
+          },
+          preferences: {
+            theme: 'light',
+            language: 'en',
+            timezone: 'Asia/Kolkata'
+          }
+        });
+      }
     } catch (error) {
       console.error('Error loading settings:', error);
       toast.error('Failed to load settings');
