@@ -1,29 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
+import { AuthService } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
-    // Get user from Authorization header
-    const authHeader = request.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    // Get user from JWT token
+    const user = await AuthService.getUserFromRequest(request);
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const token = authHeader.split(" ")[1];
-
-    // For now, we'll use a simple token validation
-    // In production, you should verify the JWT token properly
-    const user = await User.findOne({ email: token }).select("-password");
-
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    // Return user settings
-    const settings = {};
+    // Return user data as settings
+    const settings = {
+      profile: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phone: user.phone || "",
+        address: user.address?.line1 || "",
+        city: user.address?.city || "",
+        state: user.address?.state || "",
+        country: user.address?.country || "",
+        zipCode: user.address?.zipcode || "",
+        company: user.companyName || "",
+      },
+    };
 
     return NextResponse.json(settings);
   } catch (error) {
@@ -39,35 +43,52 @@ export async function PUT(request: NextRequest) {
   try {
     await connectDB();
 
-    // Get user from Authorization header
-    const authHeader = request.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const token = authHeader.split(" ")[1];
-
-    // For now, we'll use a simple token validation
-    // In production, you should verify the JWT token properly
-    const user = await User.findOne({ email: token });
-
+    // Get user from JWT token
+    const user = await AuthService.getUserFromRequest(request);
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
 
     // Update user profile if provided
     if (body.profile) {
-      const { firstName, lastName, email, phone, company, address } =
-        body.profile;
+      const {
+        firstName,
+        lastName,
+        email,
+        phone,
+        company,
+        address,
+        city,
+        state,
+        country,
+        zipCode,
+      } = body.profile;
 
       if (firstName) user.firstName = firstName;
       if (lastName) user.lastName = lastName;
       if (email) user.email = email;
       if (phone) user.phone = phone;
-      if (company) user.company = company;
-      if (address) user.address = address;
+      if (company) user.companyName = company;
+
+      // Update nested address object
+      if (address || city || state || country || zipCode) {
+        if (!user.address) {
+          user.address = {
+            line1: "",
+            city: "",
+            state: "",
+            country: "",
+            zipcode: "",
+          };
+        }
+        if (address) user.address.line1 = address;
+        if (city) user.address.city = city;
+        if (state) user.address.state = state;
+        if (country) user.address.country = country;
+        if (zipCode) user.address.zipcode = zipCode;
+      }
     }
 
     // Update password if provided

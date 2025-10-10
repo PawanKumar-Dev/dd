@@ -110,15 +110,15 @@ export default function UserLayout({ children, user, onLogout }: UserLayoutProps
                   key={item.name}
                   href={item.href}
                   className={`flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group ${isActive(item.href)
-                      ? 'bg-green-50 text-green-700 border-r-2 border-green-700'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'bg-green-50 text-green-700 border-r-2 border-green-700'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                     }`}
                   onClick={() => setSidebarOpen(false)}
                 >
                   <Icon
                     className={`h-5 w-5 mr-3 transition-colors ${isActive(item.href)
-                        ? 'text-green-700'
-                        : 'text-gray-400 group-hover:text-gray-600'
+                      ? 'text-green-700'
+                      : 'text-gray-400 group-hover:text-gray-600'
                       }`}
                   />
                   {item.name}
@@ -128,16 +128,6 @@ export default function UserLayout({ children, user, onLogout }: UserLayoutProps
           </div>
         </nav>
 
-        {/* Logout Button */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gray-50 border-t border-gray-200">
-          <button
-            onClick={onLogout}
-            className="flex items-center w-full px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 rounded-xl transition-all duration-200"
-          >
-            <LogOut className="h-5 w-5 mr-3" />
-            Logout
-          </button>
-        </div>
       </div>
 
       {/* Main Content */}
@@ -161,6 +151,13 @@ export default function UserLayout({ children, user, onLogout }: UserLayoutProps
               <div className="text-sm text-gray-500">
                 Welcome back, {user?.firstName}
               </div>
+              <button
+                onClick={onLogout}
+                className="flex items-center px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-all duration-200"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </button>
             </div>
           </div>
         </div>

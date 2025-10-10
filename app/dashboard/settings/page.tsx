@@ -68,15 +68,27 @@ export default function UserSettings() {
 
       // Fetch actual settings data
       try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          console.error('No authentication token available');
+          setSettings({});
+          return;
+        }
+
         const response = await fetch('/api/user/settings', {
           headers: {
-            'Authorization': `Bearer ${user.email}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         });
         if (response.ok) {
           const data = await response.json();
-          setSettings(data.settings || {});
+          setSettings(data);
+
+          // Update user data with profile information
+          if (data.profile) {
+            setUser(prev => prev ? { ...prev, ...data.profile } : null);
+          }
         } else {
           // Use default settings
           setSettings({});
@@ -128,11 +140,30 @@ export default function UserSettings() {
     try {
       setIsSaving(true);
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error('No authentication token available');
+        return;
+      }
 
-      setUser(prev => prev ? { ...prev, ...updatedUser } : null);
-      toast.success('Profile updated successfully');
+      const response = await fetch('/api/user/settings', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          profile: updatedUser
+        })
+      });
+
+      if (response.ok) {
+        setUser(prev => prev ? { ...prev, ...updatedUser } : null);
+        toast.success('Profile updated successfully');
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.error || 'Failed to update profile');
+      }
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error('Failed to update profile');
