@@ -81,7 +81,12 @@ export default function UserDomains() {
 
       // Fetch actual domains data
       try {
-        const response = await fetch('/api/user/domains');
+        const response = await fetch('/api/user/domains', {
+          headers: {
+            'Authorization': `Bearer ${user.email}`,
+            'Content-Type': 'application/json'
+          }
+        });
         if (response.ok) {
           const data = await response.json();
           setDomains(data.domains || []);

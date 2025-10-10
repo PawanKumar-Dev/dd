@@ -149,13 +149,6 @@ export default function UserDashboard() {
       icon: Receipt,
       color: 'purple',
       change: '+3 this month'
-    },
-    {
-      title: 'Total Spent',
-      value: `₹${(stats?.totalSpent || 0).toLocaleString()}`,
-      icon: DollarSign,
-      color: 'orange',
-      change: 'This year'
     }
   ];
 
