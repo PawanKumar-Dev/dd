@@ -320,8 +320,11 @@ export class EmailService {
       (total, domain) => total + domain.price * domain.registrationPeriod,
       0
     );
-    const tax = 0; // No tax for now
-    const total = subtotal + tax;
+    
+    // Calculate GST (18%)
+    const gstRate = 18;
+    const gstAmount = Math.round((subtotal * gstRate) / 100 * 100) / 100;
+    const total = orderData.amount || (subtotal + gstAmount);
 
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; background-color: #ffffff;">
@@ -401,8 +404,8 @@ export class EmailService {
                 )}</td>
               </tr>
               <tr>
-                <td style="padding: 8px 0; color: #6b7280;">Tax:</td>
-                <td style="padding: 8px 0; text-align: right; font-weight: 600; color: #1f2937;">₹${tax.toFixed(
+                <td style="padding: 8px 0; color: #6b7280;">GST (${gstRate}%):</td>
+                <td style="padding: 8px 0; text-align: right; font-weight: 600; color: #1f2937;">₹${gstAmount.toFixed(
                   2
                 )}</td>
               </tr>

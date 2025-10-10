@@ -40,7 +40,8 @@ export default function Invoice({ order, isOpen, onClose }: InvoiceProps) {
 
   if (!isOpen) return null;
 
-  const subtotal = order.domains
+  // Use stored values from order if available, otherwise calculate
+  const subtotal = order.subtotal || order.domains
     .filter(d => d.status === 'registered')
     .reduce((total, domain) => total + (domain.price * domain.registrationPeriod), 0);
 
@@ -216,8 +217,8 @@ export default function Invoice({ order, isOpen, onClose }: InvoiceProps) {
                       <span>₹{subtotal.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-gray-700">
-                      <span>Tax:</span>
-                      <span>₹{tax.toFixed(2)}</span>
+                      <span>GST ({gstRate}%):</span>
+                      <span>₹{gstAmount.toFixed(2)}</span>
                     </div>
                     <div className="border-t border-gray-300 pt-2">
                       <div className="flex justify-between text-lg font-semibold text-gray-900">

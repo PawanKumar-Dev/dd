@@ -227,8 +227,8 @@ export async function GET(
       currentY += 10;
     });
 
-    // Order summary
-    const subtotal = order.domains
+    // Order summary - use stored values from order if available
+    const subtotal = order.subtotal || order.domains
       .filter((d: any) => d.status === "registered")
       .reduce(
         (total: number, domain: any) =>
