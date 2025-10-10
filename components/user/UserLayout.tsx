@@ -38,7 +38,6 @@ export default function UserLayout({ children, user, onLogout }: UserLayoutProps
     { name: 'Domains', href: '/dashboard/domains', icon: Globe },
     { name: 'Orders', href: '/dashboard/orders', icon: Receipt },
     { name: 'Cart', href: '/cart', icon: ShoppingCart },
-    { name: 'Search Domains', href: '/', icon: Search },
     { name: 'Account Settings', href: '/dashboard/settings', icon: Settings },
   ];
 
@@ -61,9 +60,8 @@ export default function UserLayout({ children, user, onLogout }: UserLayoutProps
 
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-50 w-72 shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`fixed inset-y-0 left-0 z-50 w-72 shadow-xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
         style={{
           backgroundColor: '#ffffff',
           borderRight: '1px solid #e5e7eb'
@@ -111,19 +109,17 @@ export default function UserLayout({ children, user, onLogout }: UserLayoutProps
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group ${
-                    isActive(item.href)
+                  className={`flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group ${isActive(item.href)
                       ? 'bg-green-50 text-green-700 border-r-2 border-green-700'
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
+                    }`}
                   onClick={() => setSidebarOpen(false)}
                 >
                   <Icon
-                    className={`h-5 w-5 mr-3 transition-colors ${
-                      isActive(item.href)
+                    className={`h-5 w-5 mr-3 transition-colors ${isActive(item.href)
                         ? 'text-green-700'
                         : 'text-gray-400 group-hover:text-gray-600'
-                    }`}
+                      }`}
                   />
                   {item.name}
                 </Link>
@@ -160,7 +156,7 @@ export default function UserLayout({ children, user, onLogout }: UserLayoutProps
                 {navigation.find(item => isActive(item.href))?.name || 'Dashboard'}
               </h1>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               <div className="text-sm text-gray-500">
                 Welcome back, {user?.firstName}
@@ -180,6 +176,15 @@ export default function UserLayout({ children, user, onLogout }: UserLayoutProps
             {children}
           </motion.div>
         </main>
+
+        {/* Floating Search Button */}
+        <Link
+          href="/"
+          className="fixed bottom-6 right-6 z-50 bg-green-600 hover:bg-green-700 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110"
+          title="Search Domains"
+        >
+          <Search className="h-6 w-6" />
+        </Link>
       </div>
     </div>
   );

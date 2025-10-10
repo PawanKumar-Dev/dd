@@ -29,7 +29,7 @@ export default function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isPaymentInProgress, setIsPaymentInProgress] = useState(false);
   const router = useRouter();
-  const { items: cartItems, getTotalPrice, clearCart, syncWithServer, isLoading } = useCartStore();
+  const { items: cartItems, getTotalPrice, getSubtotalPrice, getGSTAmount, getGSTRate, clearCart, syncWithServer, isLoading } = useCartStore();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -518,11 +518,23 @@ export default function CheckoutPage() {
               ))}
 
               <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-semibold text-gray-900">Total:</span>
-                  <span className="text-2xl font-bold text-blue-600">
-                    ₹{getTotalPrice().toFixed(2)}
-                  </span>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Subtotal</span>
+                    <span className="font-medium">₹{getSubtotalPrice().toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">GST ({getGSTRate()}%)</span>
+                    <span className="font-medium">₹{getGSTAmount().toFixed(2)}</span>
+                  </div>
+                  <div className="border-t border-gray-200 pt-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-lg font-semibold text-gray-900">Total:</span>
+                      <span className="text-2xl font-bold text-blue-600">
+                        ₹{getTotalPrice().toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

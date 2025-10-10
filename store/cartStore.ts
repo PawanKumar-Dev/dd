@@ -11,6 +11,9 @@ interface CartStore {
   updateItem: (domainName: string, updates: Partial<CartItem>) => void;
   clearCart: () => void;
   getTotalPrice: () => number;
+  getSubtotalPrice: () => number;
+  getGSTAmount: () => number;
+  getGSTRate: () => number;
   getItemCount: () => number;
   syncWithServer: () => Promise<void>;
   loadFromServer: () => Promise<void>;
@@ -87,11 +90,27 @@ export const useCartStore = create<CartStore>()(
         }
       },
 
-      getTotalPrice: () => {
+      getSubtotalPrice: () => {
         return get().items.reduce(
           (total, item) => total + item.price * item.registrationPeriod,
           0
         );
+      },
+
+      getGSTRate: () => {
+        return 18; // 18% GST rate
+      },
+
+      getGSTAmount: () => {
+        const subtotal = get().getSubtotalPrice();
+        const gstRate = get().getGSTRate();
+        return Math.round((subtotal * gstRate) / 100 * 100) / 100; // Round to 2 decimal places
+      },
+
+      getTotalPrice: () => {
+        const subtotal = get().getSubtotalPrice();
+        const gstAmount = get().getGSTAmount();
+        return Math.round((subtotal + gstAmount) * 100) / 100; // Round to 2 decimal places
       },
 
       getItemCount: () => {

@@ -92,11 +92,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify payment amount matches expected amount
-    // Note: item.price is already the total price for the registration period
-    const expectedAmount =
-      Math.round(cartItems.reduce((total, item) => total + item.price, 0)) *
-      100; // Convert to paise
+    // Verify payment amount matches expected amount (including GST)
+    const subtotal = cartItems.reduce((total, item) => total + item.price, 0);
+    const gstRate = 18; // 18% GST
+    const gstAmount = Math.round((subtotal * gstRate) / 100 * 100) / 100;
+    const totalAmount = Math.round((subtotal + gstAmount) * 100) / 100;
+    const expectedAmount = Math.round(totalAmount * 100); // Convert to paise
+
+    console.log("💰 [PAYMENT-VERIFY] Amount calculation:");
+    console.log("💰 [PAYMENT-VERIFY] Subtotal:", subtotal);
+    console.log("💰 [PAYMENT-VERIFY] GST (18%):", gstAmount);
+    console.log("💰 [PAYMENT-VERIFY] Total amount:", totalAmount);
+    console.log("💰 [PAYMENT-VERIFY] Expected amount (paise):", expectedAmount);
+    console.log("💰 [PAYMENT-VERIFY] Received amount (paise):", paymentDetails.amount);
 
     if (paymentDetails.amount !== expectedAmount) {
       console.error(
@@ -442,6 +450,9 @@ export async function POST(request: NextRequest) {
       razorpayPaymentId: razorpay_payment_id,
       razorpaySignature: razorpay_signature,
       amount: totalAmount,
+      subtotal: subtotal,
+      gstRate: gstRate,
+      gstAmount: gstAmount,
       currency: "INR",
       status: orderStatus,
       domains: orderDomains,

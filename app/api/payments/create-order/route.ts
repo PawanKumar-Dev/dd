@@ -27,14 +27,16 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Calculate total amount with better precision handling
-    // Note: item.price is already the total price for the registration period
-    const rawTotal = cartItems.reduce((sum, item) => sum + item.price, 0);
-    const totalAmount = Math.round(rawTotal * 100) / 100; // Round to 2 decimal places
+    // Calculate subtotal and GST
+    const subtotal = cartItems.reduce((sum, item) => sum + item.price, 0);
+    const gstRate = 18; // 18% GST
+    const gstAmount = Math.round((subtotal * gstRate) / 100 * 100) / 100;
+    const totalAmount = Math.round((subtotal + gstAmount) * 100) / 100;
 
     console.log("💰 [CREATE-ORDER] Cart items:", cartItems);
-    console.log("💰 [CREATE-ORDER] Raw total:", rawTotal);
-    console.log("💰 [CREATE-ORDER] Rounded total:", totalAmount);
+    console.log("💰 [CREATE-ORDER] Subtotal:", subtotal);
+    console.log("💰 [CREATE-ORDER] GST (18%):", gstAmount);
+    console.log("💰 [CREATE-ORDER] Total amount:", totalAmount);
 
     // Validate total amount
     if (!totalAmount || totalAmount <= 0 || isNaN(totalAmount)) {
@@ -81,6 +83,9 @@ export async function POST(request: NextRequest) {
         razorpayOrderId: razorpayOrder.id,
         amount: totalAmount,
         currency: "INR",
+        subtotal: subtotal,
+        gstRate: gstRate,
+        gstAmount: gstAmount,
         domains: cartItems.map((item) => ({
           domainName: item.domainName,
           price: item.price,

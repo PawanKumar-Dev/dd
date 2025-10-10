@@ -8,6 +8,9 @@ export interface IOrder extends Document {
   razorpayPaymentId: string;
   razorpaySignature: string;
   amount: number;
+  subtotal: number;
+  gstRate: number;
+  gstAmount: number;
   currency: string;
   status: "pending" | "completed" | "failed" | "refunded";
   domains: {
