@@ -27,14 +27,14 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Calculate total amount
+    // Calculate total amount with better precision handling
     // Note: item.price is already the total price for the registration period
-    const totalAmount = Math.round(
-      cartItems.reduce((sum, item) => sum + item.price, 0)
-    );
+    const rawTotal = cartItems.reduce((sum, item) => sum + item.price, 0);
+    const totalAmount = Math.round(rawTotal * 100) / 100; // Round to 2 decimal places
 
     console.log("💰 [CREATE-ORDER] Cart items:", cartItems);
-    console.log("💰 [CREATE-ORDER] Total amount calculated:", totalAmount);
+    console.log("💰 [CREATE-ORDER] Raw total:", rawTotal);
+    console.log("💰 [CREATE-ORDER] Rounded total:", totalAmount);
 
     // Validate total amount
     if (!totalAmount || totalAmount <= 0 || isNaN(totalAmount)) {
@@ -45,32 +45,97 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Additional validation for Razorpay requirements
+    if (totalAmount < 1) {
+      console.error("❌ [CREATE-ORDER] Amount too small:", totalAmount);
+      return NextResponse.json(
+        { error: "Minimum payment amount is ₹1" },
+        { status: 400 }
+      );
+    }
+
+    if (totalAmount > 1000000) {
+      console.error("❌ [CREATE-ORDER] Amount too large:", totalAmount);
+      return NextResponse.json(
+        { error: "Maximum payment amount is ₹10,00,000" },
+        { status: 400 }
+      );
+    }
+
     // Generate order ID (Razorpay receipt must be max 40 characters)
     const orderId = `ord_${Date.now()}_${Math.random()
       .toString(36)
       .substring(2, 8)}`;
 
     // Create Razorpay order
-    const razorpayOrder = await RazorpayService.createOrder(
-      totalAmount,
-      "INR",
-      orderId
-    );
+    try {
+      const razorpayOrder = await RazorpayService.createOrder(
+        totalAmount,
+        "INR",
+        orderId
+      );
 
-    return NextResponse.json({
-      success: true,
-      orderId,
-      razorpayOrderId: razorpayOrder.id,
-      amount: totalAmount,
-      currency: "INR",
-      domains: cartItems.map((item) => ({
-        domainName: item.domainName,
-        price: item.price,
-        registrationPeriod: item.registrationPeriod,
-      })),
-    });
+      return NextResponse.json({
+        success: true,
+        orderId,
+        razorpayOrderId: razorpayOrder.id,
+        amount: totalAmount,
+        currency: "INR",
+        domains: cartItems.map((item) => ({
+          domainName: item.domainName,
+          price: item.price,
+          registrationPeriod: item.registrationPeriod,
+        })),
+      });
+    } catch (razorpayError: any) {
+      console.error(
+        "❌ [CREATE-ORDER] Razorpay order creation failed:",
+        razorpayError
+      );
+
+      // Handle specific Razorpay errors
+      if (razorpayError.message?.includes("Invalid amount")) {
+        return NextResponse.json(
+          { error: "Invalid payment amount. Please refresh and try again." },
+          { status: 400 }
+        );
+      } else if (razorpayError.message?.includes("Amount too small")) {
+        return NextResponse.json(
+          { error: "Payment amount is too small. Minimum amount is ₹1." },
+          { status: 400 }
+        );
+      } else if (razorpayError.message?.includes("Amount too large")) {
+        return NextResponse.json(
+          {
+            error: "Payment amount is too large. Maximum amount is ₹10,00,000.",
+          },
+          { status: 400 }
+        );
+      } else if (razorpayError.message?.includes("Network error")) {
+        return NextResponse.json(
+          {
+            error:
+              "Payment gateway is temporarily unavailable. Please try again in a few minutes.",
+          },
+          { status: 503 }
+        );
+      } else if (razorpayError.message?.includes("Gateway error")) {
+        return NextResponse.json(
+          {
+            error:
+              "Payment gateway error. Please try again or use a different payment method.",
+          },
+          { status: 502 }
+        );
+      } else {
+        return NextResponse.json(
+          { error: "Failed to create payment order. Please try again." },
+          { status: 500 }
+        );
+      }
+    }
   } catch (error) {
-    console.error("Create order error:", error);
+    console.error("❌ [CREATE-ORDER] Create order error:", error);
     return NextResponse.json(
       { error: "Failed to create payment order" },
       { status: 500 }

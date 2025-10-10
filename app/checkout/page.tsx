@@ -104,7 +104,26 @@ export default function CheckoutPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to create payment order');
+        console.error('❌ [CHECKOUT] Create order failed:', data);
+
+        // Handle specific error cases
+        if (data.error?.includes('Invalid payment amount')) {
+          toast.error('Payment amount error. Please refresh the page and try again.');
+        } else if (data.error?.includes('Amount too small')) {
+          toast.error('Payment amount is too small. Minimum amount is ₹1.');
+        } else if (data.error?.includes('Amount too large')) {
+          toast.error('Payment amount is too large. Maximum amount is ₹10,00,000.');
+        } else if (data.error?.includes('temporarily unavailable')) {
+          toast.error('Payment gateway is temporarily unavailable. Please try again in a few minutes.');
+        } else if (data.error?.includes('Gateway error')) {
+          toast.error('Payment gateway error. Please try again or use a different payment method.');
+        } else {
+          toast.error(data.error || 'Failed to create payment order. Please try again.');
+        }
+
+        setIsProcessing(false);
+        setIsPaymentInProgress(false);
+        return;
       }
 
       // Configure Razorpay options
@@ -360,26 +379,54 @@ export default function CheckoutPage() {
       });
 
       rzp.open();
-    } catch (error) {
-      console.error('Payment error:', error);
+    } catch (error: any) {
+      console.error('🚨 [CHECKOUT] Payment initialization error:', error);
       setIsProcessing(false);
       setIsPaymentInProgress(false);
+
+      // Determine error message based on error type
+      let errorMessage = 'Payment initialization failed. Please try again.';
+      let errorType = 'initialization_error';
+
+      if (error.message?.includes('Invalid payment amount')) {
+        errorMessage = 'Payment amount error. Please refresh the page and try again.';
+        errorType = 'amount_error';
+      } else if (error.message?.includes('Amount too small')) {
+        errorMessage = 'Payment amount is too small. Minimum amount is ₹1.';
+        errorType = 'amount_too_small';
+      } else if (error.message?.includes('Amount too large')) {
+        errorMessage = 'Payment amount is too large. Maximum amount is ₹10,00,000.';
+        errorType = 'amount_too_large';
+      } else if (error.message?.includes('temporarily unavailable')) {
+        errorMessage = 'Payment gateway is temporarily unavailable. Please try again in a few minutes.';
+        errorType = 'gateway_unavailable';
+      } else if (error.message?.includes('Gateway error')) {
+        errorMessage = 'Payment gateway error. Please try again or use a different payment method.';
+        errorType = 'gateway_error';
+      } else if (error.message?.includes('Network error')) {
+        errorMessage = 'Network error occurred. Please check your connection and try again.';
+        errorType = 'network_error';
+      }
 
       // Store payment result in session storage for cleaner URL
       const paymentResult = {
         status: 'failed',
-        errorMessage: 'Payment initialization failed. Please try again.',
+        errorMessage: errorMessage,
+        errorType: errorType,
         amount: getTotalPrice(),
         currency: 'INR',
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        supportContact: 'support@exceltechnologies.com'
       };
 
+      console.log('🚨 [CHECKOUT] Storing initialization error result:', paymentResult);
       sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
 
       // Clear cart immediately before redirect
       clearCart();
 
       // Redirect immediately to success page
+      console.log('🚨 [CHECKOUT] Redirecting to payment-success page from initialization error');
       router.push('/payment-success');
     }
   };

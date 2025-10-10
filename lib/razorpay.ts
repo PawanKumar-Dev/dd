@@ -38,18 +38,79 @@ export class RazorpayService {
     receipt: string
   ): Promise<PaymentOrder> {
     try {
+      // Validate amount
+      if (!amount || amount <= 0 || isNaN(amount)) {
+        throw new Error(
+          `Invalid amount: ${amount}. Amount must be a positive number.`
+        );
+      }
+
+      // Ensure amount is an integer (Razorpay requirement)
+      const amountInPaise = Math.round(amount * 100);
+
+      // Validate amount is within Razorpay limits
+      if (amountInPaise < 100) {
+        throw new Error(`Amount too small: ₹${amount}. Minimum amount is ₹1.`);
+      }
+
+      if (amountInPaise > 100000000) {
+        // ₹10,00,000
+        throw new Error(
+          `Amount too large: ₹${amount}. Maximum amount is ₹10,00,000.`
+        );
+      }
+
+      console.log(
+        `💰 [RAZORPAY] Creating order: ₹${amount} (${amountInPaise} paise)`
+      );
+
       const options = {
-        amount: amount * 100, // Razorpay expects amount in paise
+        amount: amountInPaise, // Razorpay expects amount in paise
         currency,
         receipt,
         payment_capture: 1,
       };
 
       const order = await razorpay.orders.create(options);
+      console.log(`✅ [RAZORPAY] Order created successfully: ${order.id}`);
       return order as PaymentOrder;
-    } catch (error) {
-      console.error("Razorpay order creation error:", error);
-      throw new Error("Failed to create payment order");
+    } catch (error: any) {
+      console.error("❌ [RAZORPAY] Order creation error:", error);
+
+      // Handle specific Razorpay errors
+      if (error.error) {
+        const razorpayError = error.error;
+        if (razorpayError.code === "BAD_REQUEST_ERROR") {
+          if (razorpayError.description?.includes("amount")) {
+            throw new Error(
+              `Invalid amount format: ₹${amount}. Amount must be a valid number.`
+            );
+          }
+          throw new Error(
+            `Bad request: ${
+              razorpayError.description || "Invalid payment request"
+            }`
+          );
+        } else if (razorpayError.code === "GATEWAY_ERROR") {
+          throw new Error(
+            `Payment gateway error: ${
+              razorpayError.description || "Gateway temporarily unavailable"
+            }`
+          );
+        }
+      }
+
+      // Handle network/timeout errors
+      if (error.code === "ECONNREFUSED" || error.code === "ETIMEDOUT") {
+        throw new Error(
+          "Network error: Unable to connect to payment gateway. Please try again."
+        );
+      }
+
+      // Generic error fallback
+      throw new Error(
+        `Failed to create payment order: ${error.message || "Unknown error"}`
+      );
     }
   }
 
