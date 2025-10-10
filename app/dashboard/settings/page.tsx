@@ -37,11 +37,6 @@ interface UserSettings {
     twoFactorEnabled: boolean;
     loginAlerts: boolean;
   };
-  preferences: {
-    theme: 'light' | 'dark' | 'auto';
-    language: string;
-    timezone: string;
-  };
 }
 
 export default function UserSettings() {
@@ -95,11 +90,6 @@ export default function UserSettings() {
             security: {
               twoFactorEnabled: false,
               loginAlerts: true
-            },
-            preferences: {
-              theme: 'light',
-              language: 'en',
-              timezone: 'Asia/Kolkata'
             }
           });
         } else {
@@ -114,11 +104,6 @@ export default function UserSettings() {
             security: {
               twoFactorEnabled: false,
               loginAlerts: true
-            },
-            preferences: {
-              theme: 'light',
-              language: 'en',
-              timezone: 'Asia/Kolkata'
             }
           });
         }
@@ -135,11 +120,6 @@ export default function UserSettings() {
           security: {
             twoFactorEnabled: false,
             loginAlerts: true
-          },
-          preferences: {
-            theme: 'light',
-            language: 'en',
-            timezone: 'Asia/Kolkata'
           }
         });
       }
@@ -211,8 +191,7 @@ export default function UserSettings() {
   const tabs = [
     { id: 'profile', name: 'Profile', icon: User },
     { id: 'notifications', name: 'Notifications', icon: Bell },
-    { id: 'security', name: 'Security', icon: Shield },
-    { id: 'preferences', name: 'Preferences', icon: Globe }
+    { id: 'security', name: 'Security', icon: Shield }
   ];
 
   return (
@@ -238,8 +217,8 @@ export default function UserSettings() {
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
                       className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === tab.id
-                          ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700'
-                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                        ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                         }`}
                     >
                       <Icon className="h-5 w-5 mr-3" />
@@ -614,90 +593,6 @@ export default function UserSettings() {
                   </div>
                 )}
 
-                {/* Preferences Tab */}
-                {activeTab === 'preferences' && settings && (
-                  <div className="p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-6">Preferences</h3>
-
-                    <div className="space-y-6">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Theme
-                        </label>
-                        <select
-                          value={settings.preferences.theme}
-                          onChange={(e) => setSettings(prev => prev ? {
-                            ...prev,
-                            preferences: { ...prev.preferences, theme: e.target.value as 'light' | 'dark' | 'auto' }
-                          } : null)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        >
-                          <option value="light">Light</option>
-                          <option value="dark">Dark</option>
-                          <option value="auto">Auto</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Language
-                        </label>
-                        <select
-                          value={settings.preferences.language}
-                          onChange={(e) => setSettings(prev => prev ? {
-                            ...prev,
-                            preferences: { ...prev.preferences, language: e.target.value }
-                          } : null)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        >
-                          <option value="en">English</option>
-                          <option value="hi">Hindi</option>
-                          <option value="es">Spanish</option>
-                          <option value="fr">French</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Timezone
-                        </label>
-                        <select
-                          value={settings.preferences.timezone}
-                          onChange={(e) => setSettings(prev => prev ? {
-                            ...prev,
-                            preferences: { ...prev.preferences, timezone: e.target.value }
-                          } : null)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        >
-                          <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
-                          <option value="UTC">UTC</option>
-                          <option value="America/New_York">America/New_York (EST)</option>
-                          <option value="Europe/London">Europe/London (GMT)</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div className="mt-8 flex justify-end">
-                      <button
-                        onClick={handleSaveSettings}
-                        disabled={isSaving}
-                        className="flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
-                      >
-                        {isSaving ? (
-                          <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                            Saving...
-                          </>
-                        ) : (
-                          <>
-                            <Save className="h-4 w-4 mr-2" />
-                            Save Settings
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           </div>
