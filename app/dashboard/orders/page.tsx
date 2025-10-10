@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
-  Receipt, Search, Download, Eye, Calendar, DollarSign,
+  Receipt, Search, Download, Eye, Calendar,
   CheckCircle, Clock, AlertTriangle, ExternalLink, FileText
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -21,17 +21,24 @@ interface User {
 }
 
 interface Order {
-  id: string;
-  orderNumber: string;
-  date: string;
-  status: 'completed' | 'pending' | 'failed' | 'cancelled';
-  total: number;
-  items: {
+  _id: string;
+  orderId: string;
+  amount: number;
+  subtotal: number;
+  gstRate: number;
+  gstAmount: number;
+  currency: string;
+  status: 'pending' | 'completed' | 'failed' | 'refunded';
+  domains: {
     domainName: string;
     price: number;
+    currency: string;
     registrationPeriod: number;
+    status: 'pending' | 'processing' | 'registered' | 'failed' | 'cancelled';
   }[];
-  paymentMethod: string;
+  successfulDomains: string[];
+  createdAt: string;
+  updatedAt: string;
   invoiceNumber?: string;
 }
 
@@ -67,17 +74,24 @@ export default function UserOrders() {
   const loadOrders = async () => {
     try {
       setIsLoading(true);
-      
+
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1200));
-      
+
       // Fetch actual orders data
       try {
-        const response = await fetch('/api/user/orders');
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/orders', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
         if (response.ok) {
           const data = await response.json();
           setOrders(data.orders || []);
         } else {
+          console.error('Failed to fetch orders:', response.status, response.statusText);
           setOrders([]);
         }
       } catch (error) {
@@ -130,9 +144,9 @@ export default function UserOrders() {
   };
 
   const filteredOrders = orders.filter(order => {
-    const matchesSearch = 
-      order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.items.some(item => item.domainName.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesSearch =
+      order.orderId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.domains.some(domain => domain.domainName.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesFilter = filterStatus === 'all' || order.status === filterStatus;
     return matchesSearch && matchesFilter;
   });
@@ -226,7 +240,7 @@ export default function UserOrders() {
                 <Receipt className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No orders found</h3>
                 <p className="text-gray-500 mb-4">
-                  {searchTerm || filterStatus !== 'all' 
+                  {searchTerm || filterStatus !== 'all'
                     ? 'Try adjusting your search or filter criteria'
                     : 'You haven\'t placed any orders yet'
                   }
@@ -269,7 +283,7 @@ export default function UserOrders() {
                   <tbody className="bg-white divide-y divide-gray-200">
                     {filteredOrders.map((order, index) => (
                       <motion.tr
-                        key={order.id}
+                        key={order._id}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
@@ -280,16 +294,16 @@ export default function UserOrders() {
                             <Receipt className="h-5 w-5 text-gray-400 mr-3" />
                             <div>
                               <div className="text-sm font-medium text-gray-900">
-                                {order.orderNumber}
+                                {order.orderId}
                               </div>
                               <div className="text-sm text-gray-500">
-                                {order.paymentMethod}
+                                {order.invoiceNumber || 'No invoice'}
                               </div>
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {new Date(order.date).toLocaleDateString()}
+                          {new Date(order.createdAt).toLocaleDateString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
@@ -298,10 +312,10 @@ export default function UserOrders() {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {order.items.length} domain{order.items.length !== 1 ? 's' : ''}
+                          {order.domains.length} domain{order.domains.length !== 1 ? 's' : ''}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          ₹{order.total.toLocaleString()}
+                          ₹{order.amount.toLocaleString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex space-x-2">
@@ -331,57 +345,6 @@ export default function UserOrders() {
             )}
           </div>
 
-          {/* Summary Cards */}
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <div className="flex items-center">
-                <CheckCircle className="h-8 w-8 text-green-600 mr-3" />
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Completed</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {orders.filter(o => o.status === 'completed').length}
-                  </p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <div className="flex items-center">
-                <Clock className="h-8 w-8 text-yellow-600 mr-3" />
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Pending</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {orders.filter(o => o.status === 'pending').length}
-                  </p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <div className="flex items-center">
-                <AlertTriangle className="h-8 w-8 text-red-600 mr-3" />
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Failed</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {orders.filter(o => o.status === 'failed').length}
-                  </p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <div className="flex items-center">
-                <DollarSign className="h-8 w-8 text-blue-600 mr-3" />
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Total Spent</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    ₹{orders.reduce((sum, order) => sum + order.total, 0).toLocaleString()}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* Order Details Modal */}
           {selectedOrder && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -389,7 +352,7 @@ export default function UserOrders() {
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900">
-                      Order Details - {selectedOrder.orderNumber}
+                      Order Details - {selectedOrder.orderId}
                     </h3>
                     <button
                       onClick={() => setSelectedOrder(null)}
@@ -398,12 +361,12 @@ export default function UserOrders() {
                       <ExternalLink className="h-6 w-6" />
                     </button>
                   </div>
-                  
+
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <p className="text-sm font-medium text-gray-600">Order Date</p>
-                        <p className="text-sm text-gray-900">{new Date(selectedOrder.date).toLocaleDateString()}</p>
+                        <p className="text-sm text-gray-900">{new Date(selectedOrder.createdAt).toLocaleDateString()}</p>
                       </div>
                       <div>
                         <p className="text-sm font-medium text-gray-600">Status</p>
@@ -413,26 +376,36 @@ export default function UserOrders() {
                         </span>
                       </div>
                     </div>
-                    
+
                     <div>
                       <p className="text-sm font-medium text-gray-600 mb-2">Items</p>
                       <div className="space-y-2">
-                        {selectedOrder.items.map((item, index) => (
+                        {selectedOrder.domains.map((domain, index) => (
                           <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                             <div>
-                              <p className="font-medium text-gray-900">{item.domainName}</p>
-                              <p className="text-sm text-gray-500">{item.registrationPeriod} year registration</p>
+                              <p className="font-medium text-gray-900">{domain.domainName}</p>
+                              <p className="text-sm text-gray-500">{domain.registrationPeriod} year registration</p>
                             </div>
-                            <p className="font-semibold text-gray-900">₹{item.price}</p>
+                            <p className="font-semibold text-gray-900">₹{domain.price}</p>
                           </div>
                         ))}
                       </div>
                     </div>
-                    
+
                     <div className="border-t pt-4">
-                      <div className="flex justify-between items-center">
-                        <span className="text-lg font-semibold text-gray-900">Total</span>
-                        <span className="text-lg font-bold text-gray-900">₹{selectedOrder.total.toLocaleString()}</span>
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">Subtotal</span>
+                          <span className="text-sm text-gray-900">₹{selectedOrder.subtotal.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">GST ({selectedOrder.gstRate}%)</span>
+                          <span className="text-sm text-gray-900">₹{selectedOrder.gstAmount.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between items-center border-t pt-2">
+                          <span className="text-lg font-semibold text-gray-900">Total</span>
+                          <span className="text-lg font-bold text-gray-900">₹{selectedOrder.amount.toLocaleString()}</span>
+                        </div>
                       </div>
                     </div>
                   </div>

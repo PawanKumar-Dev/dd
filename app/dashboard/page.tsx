@@ -54,10 +54,10 @@ export default function UserDashboard() {
     }
 
     setUser(userObj);
-    loadDashboardData();
+    loadDashboardData(userObj);
   }, [router]);
 
-  const loadDashboardData = async () => {
+  const loadDashboardData = async (userObj?: User) => {
     try {
       setIsLoading(true);
 
@@ -66,9 +66,10 @@ export default function UserDashboard() {
 
       // Fetch actual dashboard data
       try {
+        const token = localStorage.getItem('token');
         const response = await fetch('/api/user/dashboard', {
           headers: {
-            'Authorization': `Bearer ${user.email}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         });

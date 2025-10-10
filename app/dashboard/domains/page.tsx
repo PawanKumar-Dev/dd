@@ -81,16 +81,16 @@ export default function UserDomains() {
 
       // Fetch actual domains data
       try {
-        const userEmail = userObj?.email || user?.email;
-        if (!userEmail) {
-          console.error('No user email available for API call');
+        const token = localStorage.getItem('token');
+        if (!token) {
+          console.error('No authentication token available');
           setDomains([]);
           return;
         }
 
         const response = await fetch('/api/user/domains', {
           headers: {
-            'Authorization': `Bearer ${userEmail}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         });

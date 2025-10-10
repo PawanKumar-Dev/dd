@@ -1,27 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
+import { AuthService } from "@/lib/auth";
 import connectDB from "@/lib/mongodb";
 import Order from "@/models/Order";
 import User from "@/models/User";
 
 export async function GET(request: NextRequest) {
   try {
-    await connectDB();
-
-    // Get user from Authorization header
-    const authHeader = request.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    // Check authentication
+    const user = await AuthService.getUserFromRequest(request);
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const token = authHeader.split(" ")[1];
-
-    // For now, we'll use a simple token validation
-    // In production, you should verify the JWT token properly
-    const user = await User.findOne({ email: token }).select("-password");
-
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
+    await connectDB();
 
     // Get all orders for the user
     const orders = await Order.find({ userId: user._id })
