@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Search, Shield, CreditCard, Globe, Star, Users, Clock, Smartphone, Headphones, Mail, Phone, MapPin, ArrowRight, CheckCircle, TrendingUp, Database, Server, Wifi, ChevronDown } from 'lucide-react';
+import { Search, Shield, CreditCard, Globe, Star, Users, Clock, Smartphone, Headphones, Mail, Phone, MapPin, ArrowRight, CheckCircle, TrendingUp, Database, Server, Wifi, ChevronDown, DollarSign } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import HeroSection from '@/components/HeroSection';
 import Section from '@/components/Section';
@@ -195,11 +195,11 @@ export default function HomePage() {
 
             <div className="text-center">
               <div className="bg-gray-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
-                <Wifi className="h-10 w-10 text-primary-600" />
+                <DollarSign className="h-10 w-10 text-primary-600" />
               </div>
-              <h4 className="text-xl font-semibold mb-2">Cloud Infrastructure</h4>
+              <h4 className="text-xl font-semibold mb-2">Best Prices</h4>
               <p className="text-gray-600">
-                MongoDB Atlas provides scalable and reliable database services
+                Competitive pricing with transparent costs and no hidden fees
               </p>
             </div>
           </div>

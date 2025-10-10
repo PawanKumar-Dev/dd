@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Award, Shield, Globe, CheckCircle, Target, Lightbulb, Users } from 'lucide-react';
+import { Award, Shield, Globe, CheckCircle, Target, Lightbulb, Users, TrendingDown } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import HeroSection from '@/components/HeroSection';
 import Section from '@/components/Section';
@@ -126,9 +126,9 @@ export default function AboutPage() {
 
         <div className="grid md:grid-cols-3 gap-8">
           <FeatureCard
-            icon={<Shield className="h-8 w-8" />}
-            title="Enterprise Security"
-            description="Bank-level security with JWT authentication, input validation, and encrypted data transmission"
+            icon={<TrendingDown className="h-8 w-8" />}
+            title="Best Domain Prices"
+            description="Competitive pricing with transparent costs, no hidden fees, and special offers for bulk registrations"
           />
           <FeatureCard
             icon={<Globe className="h-8 w-8" />}
