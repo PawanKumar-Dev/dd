@@ -116,8 +116,10 @@ export default function CheckoutPage() {
         description: `Payment for ${cartItems.length} domain(s)`,
         order_id: data.razorpayOrderId,
         handler: async function (response: any) {
+          console.log('🎉 [CHECKOUT] Payment success callback triggered:', response);
           try {
             // Verify payment
+            console.log('🔍 [CHECKOUT] Starting payment verification...');
             const verifyResponse = await fetch('/api/payments/verify', {
               method: 'POST',
               headers: {
@@ -133,9 +135,12 @@ export default function CheckoutPage() {
               }),
             });
 
+            console.log('🔍 [CHECKOUT] Verification response status:', verifyResponse.status);
             const verifyData = await verifyResponse.json();
+            console.log('🔍 [CHECKOUT] Verification response data:', verifyData);
 
             if (verifyResponse.ok) {
+              console.log('✅ [CHECKOUT] Payment verification successful');
               const {
                 successfulDomains,
                 orderId,
@@ -155,17 +160,20 @@ export default function CheckoutPage() {
                 timestamp: Date.now()
               };
 
+              console.log('✅ [CHECKOUT] Storing success result:', paymentResult);
               sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
 
               // Clear cart immediately before redirect
               clearCart();
 
-              // Reset payment in progress flag
-              setIsPaymentInProgress(false);
-
               // Redirect immediately to success page
+              console.log('✅ [CHECKOUT] Redirecting to payment-success page');
               router.push('/payment-success');
+
+              // Reset payment in progress flag after redirect
+              setTimeout(() => setIsPaymentInProgress(false), 100);
             } else {
+              console.log('❌ [CHECKOUT] Payment verification failed:', verifyData);
               // Handle restricted domains error
               if (verifyData.restrictedDomains) {
                 const restrictedDomainsList = verifyData.restrictedDomains.map((d: any) => d.domainName).join(', ');
@@ -183,8 +191,8 @@ export default function CheckoutPage() {
                 };
 
                 sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
-                setIsPaymentInProgress(false);
                 router.push('/payment-success');
+                setTimeout(() => setIsPaymentInProgress(false), 100);
                 return;
               }
 
@@ -197,19 +205,21 @@ export default function CheckoutPage() {
                 timestamp: Date.now()
               };
 
+              console.log('❌ [CHECKOUT] Storing failure result:', paymentResult);
               sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
 
               // Clear cart immediately before redirect
               clearCart();
 
-              // Reset payment in progress flag
-              setIsPaymentInProgress(false);
-
               // Redirect immediately to success page
+              console.log('❌ [CHECKOUT] Redirecting to payment-success page');
               router.push('/payment-success');
+
+              // Reset payment in progress flag after redirect
+              setTimeout(() => setIsPaymentInProgress(false), 100);
             }
           } catch (error) {
-            console.error('Payment verification error:', error);
+            console.error('🚨 [CHECKOUT] Payment verification error:', error);
 
             // Determine error message based on error type
             let errorMessage = 'Payment verification failed due to a technical error';
@@ -245,16 +255,18 @@ export default function CheckoutPage() {
               supportContact: 'support@exceltechnologies.com'
             };
 
+            console.log('🚨 [CHECKOUT] Storing catch error result:', paymentResult);
             sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
 
             // Clear cart immediately before redirect
             clearCart();
 
-            // Reset payment in progress flag
-            setIsPaymentInProgress(false);
-
             // Redirect immediately to success page
+            console.log('🚨 [CHECKOUT] Redirecting to payment-success page from catch');
             router.push('/payment-success');
+
+            // Reset payment in progress flag after redirect
+            setTimeout(() => setIsPaymentInProgress(false), 100);
           }
         },
         prefill: {
@@ -342,6 +354,9 @@ export default function CheckoutPage() {
         // Redirect immediately to success page
         console.log('🚨 [CHECKOUT] Redirecting to payment-success page');
         router.push('/payment-success');
+
+        // Reset payment in progress flag after redirect
+        setTimeout(() => setIsPaymentInProgress(false), 100);
       });
 
       rzp.open();
