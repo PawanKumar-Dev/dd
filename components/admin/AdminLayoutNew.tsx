@@ -14,9 +14,9 @@ import {
   Menu,
   X,
   Shield,
-  Receipt,
-  DollarSign
+  Receipt
 } from 'lucide-react';
+import RsIcon from '@/components/icons/RsIcon';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -37,7 +37,7 @@ export default function AdminLayoutNew({ children, user, onLogout }: AdminLayout
     { name: 'Users', href: '/admin/user-management', icon: Users },
     { name: 'Orders', href: '/admin/order-management', icon: Receipt },
     { name: 'Payments', href: '/admin/payment-management', icon: CreditCard },
-    { name: 'TLD Pricing', href: '/admin/pricing-management', icon: DollarSign },
+    { name: 'TLD Pricing', href: '/admin/pricing-management', icon: RsIcon },
     { name: 'Settings', href: '/admin/settings', icon: Settings },
   ];
 

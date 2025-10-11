@@ -8,7 +8,6 @@ import {
   LayoutDashboard,
   Globe,
   ShoppingCart,
-  Receipt,
   Settings,
   LogOut,
   Menu,
@@ -18,6 +17,7 @@ import {
   History,
   Search
 } from 'lucide-react';
+import RsIcon from '@/components/icons/RsIcon';
 
 interface UserLayoutProps {
   children: React.ReactNode;
@@ -36,7 +36,7 @@ export default function UserLayout({ children, user, onLogout }: UserLayoutProps
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Domains', href: '/dashboard/domains', icon: Globe },
-    { name: 'Orders', href: '/dashboard/orders', icon: Receipt },
+    { name: 'Orders', href: '/dashboard/orders', icon: RsIcon },
     { name: 'Cart', href: '/cart', icon: ShoppingCart },
     { name: 'Account Settings', href: '/dashboard/settings', icon: Settings },
   ];

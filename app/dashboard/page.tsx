@@ -7,7 +7,7 @@ import {
   Globe, ShoppingCart, TrendingUp, Clock, CheckCircle,
   AlertTriangle, Calendar, ArrowRight, Plus, RefreshCw
 } from 'lucide-react';
-import RsIcon from '@/components/icons/RsIcon';
+import RupeeIcon from '@/components/icons/RupeeIcon';
 import toast from 'react-hot-toast';
 import { useCartStore } from '@/store/cartStore';
 import UserLayout from '@/components/user/UserLayout';
