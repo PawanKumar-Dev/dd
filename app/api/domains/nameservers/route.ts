@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ResellerClubWrapper } from "@/lib/resellerclub-wrapper";
 import { AuthService } from "@/lib/auth";
+import whois from "whois-json";
 
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
     // Check authentication
     const user = await AuthService.getUserFromRequest(request);
@@ -10,72 +10,150 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { domainName, action, nameservers } = await request.json();
+    const { searchParams } = new URL(request.url);
+    const domainName = searchParams.get("domainName");
 
-    if (!domainName || !action) {
+    if (!domainName) {
       return NextResponse.json(
-        { error: "Domain name and action are required" },
+        { error: "Domain name is required" },
         { status: 400 }
       );
     }
 
-    let result;
+    // Validate domain name format
+    const domainRegex =
+      /^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]?\.([a-zA-Z]{2,}|[a-zA-Z]{2,}\.[a-zA-Z]{2,})$/;
+    if (!domainRegex.test(domainName)) {
+      return NextResponse.json(
+        { error: "Invalid domain name format" },
+        { status: 400 }
+      );
+    }
 
-    if (action === "set-default") {
-      // Set default nameservers
-      result = await ResellerClubWrapper.setDefaultNameservers(domainName);
-    } else if (action === "set-custom") {
-      // Set custom nameservers
-      if (
-        !nameservers ||
-        !Array.isArray(nameservers) ||
-        nameservers.length === 0
-      ) {
-        return NextResponse.json(
-          {
-            error: "Nameservers array is required for custom nameserver action",
-          },
-          { status: 400 }
-        );
-      }
+    console.log(`🔍 [WHOIS] Looking up nameservers for: ${domainName}`);
 
-      // Validate nameservers format
-      const nameserverRegex = /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-      for (const ns of nameservers) {
-        if (!nameserverRegex.test(ns)) {
-          return NextResponse.json(
-            { error: `Invalid nameserver format: ${ns}` },
-            { status: 400 }
-          );
+    try {
+      // Query WHOIS data
+      const whoisData = await whois(domainName, {
+        timeout: 10000, // 10 second timeout
+        follow: 3, // Follow up to 3 redirects
+      });
+
+      console.log(`✅ [WHOIS] Received data for: ${domainName}`);
+
+      // Extract nameservers from different possible fields
+      let nameservers: string[] = [];
+
+      // Common nameserver field names in WHOIS data
+      const nameserverFields = [
+        "nameServer",
+        "nameserver",
+        "name_servers",
+        "name_servers_list",
+        "nserver",
+        "Name Server",
+        "NAME SERVER",
+        "nameservers",
+        "dns",
+        "dns_servers",
+      ];
+
+      // Look for nameservers in various fields
+      for (const field of nameserverFields) {
+        if (whoisData[field]) {
+          if (Array.isArray(whoisData[field])) {
+            nameservers = [...nameservers, ...whoisData[field]];
+          } else if (typeof whoisData[field] === "string") {
+            // Split by common separators
+            const nsList = whoisData[field]
+              .split(/[,\n\r\t]+/)
+              .map((ns: string) => ns.trim())
+              .filter((ns: string) => ns.length > 0);
+            nameservers = [...nameservers, ...nsList];
+          }
         }
       }
 
-      result = await ResellerClubWrapper.setCustomNameservers(
-        domainName,
+      // Remove duplicates and clean up
+      nameservers = [...new Set(nameservers)]
+        .map((ns) => ns.toLowerCase().trim())
+        .filter((ns) => {
+          // Basic validation for nameserver format
+          return (
+            ns.length > 0 &&
+            ns.includes(".") &&
+            !ns.includes(" ") &&
+            /^[a-zA-Z0-9.-]+$/.test(ns)
+          );
+        });
+
+      // If no nameservers found in common fields, try to extract from raw text
+      if (nameservers.length === 0 && whoisData.raw) {
+        const rawText = whoisData.raw;
+        const nsRegex = /name\s*server[s]?[:\s]+([^\n\r]+)/gi;
+        let match;
+
+        while ((match = nsRegex.exec(rawText)) !== null) {
+          const nsLine = match[1].trim();
+          const nsList = nsLine
+            .split(/[,\s]+/)
+            .map((ns) => ns.trim())
+            .filter((ns) => ns.length > 0 && ns.includes("."));
+          nameservers = [...nameservers, ...nsList];
+        }
+      }
+
+      // Remove duplicates again
+      nameservers = [...new Set(nameservers)];
+
+      console.log(
+        `📋 [WHOIS] Found ${nameservers.length} nameservers for ${domainName}:`,
         nameservers
       );
-    } else {
-      return NextResponse.json(
-        { error: "Invalid action. Use 'set-default' or 'set-custom'" },
-        { status: 400 }
-      );
-    }
 
-    if (result.status === "error") {
-      return NextResponse.json({ error: result.message }, { status: 500 });
-    }
+      return NextResponse.json({
+        success: true,
+        domainName,
+        nameservers,
+        count: nameservers.length,
+        whoisData: {
+          registrar: whoisData.registrar || whoisData.Registrar || "Unknown",
+          creationDate:
+            whoisData.creationDate ||
+            whoisData.CreationDate ||
+            whoisData.created ||
+            null,
+          expirationDate:
+            whoisData.expirationDate ||
+            whoisData.ExpirationDate ||
+            whoisData.expires ||
+            null,
+          lastUpdated:
+            whoisData.updatedDate ||
+            whoisData.UpdatedDate ||
+            whoisData.updated ||
+            null,
+          status: whoisData.status || whoisData.Status || "Unknown",
+        },
+        lastChecked: new Date().toISOString(),
+      });
+    } catch (whoisError: any) {
+      console.error(`❌ [WHOIS] Error for ${domainName}:`, whoisError.message);
 
-    return NextResponse.json({
-      success: true,
-      message: `Nameservers ${
-        action === "set-default" ? "set to default" : "updated successfully"
-      }`,
-      data: result.data,
-    });
+      return NextResponse.json({
+        success: false,
+        domainName,
+        nameservers: [],
+        count: 0,
+        error: "Failed to retrieve nameserver information",
+        details: whoisError.message,
+        lastChecked: new Date().toISOString(),
+      });
+    }
   } catch (error) {
-    console.error("Nameserver management error:", error);
+    console.error("Nameserver lookup error:", error);
     return NextResponse.json(
-      { error: "Failed to manage nameservers" },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }

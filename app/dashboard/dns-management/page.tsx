@@ -46,8 +46,10 @@ export default function DNSManagementPage() {
   const [domains, setDomains] = useState<Domain[]>([]);
   const [selectedDomain, setSelectedDomain] = useState<string>('');
   const [dnsRecords, setDnsRecords] = useState<DNSRecord[]>([]);
+  const [nameservers, setNameservers] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDNSLoading, setIsDNSLoading] = useState(false);
+  const [isNameserverLoading, setIsNameserverLoading] = useState(false);
   const [showAddRecord, setShowAddRecord] = useState(false);
   const [isActivating, setIsActivating] = useState(false);
   const [newRecord, setNewRecord] = useState<DNSRecord>({
@@ -159,10 +161,50 @@ export default function DNSManagementPage() {
     }
   };
 
+  const loadNameservers = async (domainId: string) => {
+    if (!domainId || domains.length === 0) return;
+    setIsNameserverLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const domain = domains.find(d => d.id === domainId);
+      if (!domain) {
+        console.error('Domain not found for ID:', domainId);
+        setNameservers([]);
+        return;
+      }
+
+      console.log('Loading nameservers for domain:', domain.name);
+
+      const response = await fetch(`/api/domains/nameservers?domainName=${encodeURIComponent(domain.name)}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setNameservers(data.nameservers || []);
+        console.log('Nameservers loaded:', data.nameservers);
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Failed to load nameservers:', errorData);
+        setNameservers([]);
+        toast.error('Failed to load nameserver information');
+      }
+    } catch (error) {
+      console.error('Error loading nameservers:', error);
+      setNameservers([]);
+      toast.error('Failed to load nameserver information');
+    } finally {
+      setIsNameserverLoading(false);
+    }
+  };
+
   const handleDomainSelect = (domainId: string) => {
     setSelectedDomain(domainId);
     if (domainId && domains.length > 0) {
       loadDNSRecords(domainId);
+      loadNameservers(domainId);
     }
   };
 
@@ -452,6 +494,81 @@ export default function DNSManagementPage() {
               </div>
             </motion.div>
 
+            {/* Nameserver Information - Matching Dashboard Style */}
+            {selectedDomain && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">Nameservers</h3>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Current nameservers for {domains.find(d => d.id === selectedDomain)?.name}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => selectedDomain && loadNameservers(selectedDomain)}
+                    disabled={isNameserverLoading}
+                    className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors duration-200 disabled:opacity-50"
+                  >
+                    {isNameserverLoading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600 mr-2"></div>
+                        Loading...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        Refresh
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {isNameserverLoading ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p className="text-gray-500">Loading nameserver information...</p>
+                  </div>
+                ) : nameservers.length > 0 ? (
+                  <div className="space-y-3">
+                    {nameservers.map((ns, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div className="flex items-center">
+                          <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                          <span className="font-mono text-sm text-gray-900">{ns}</span>
+                        </div>
+                        <span className="text-xs text-gray-500">#{index + 1}</span>
+                      </div>
+                    ))}
+                    <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                      <div className="flex items-center">
+                        <svg className="h-5 w-5 text-blue-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p className="text-sm text-blue-800">
+                          <strong>Note:</strong> These nameservers are retrieved from WHOIS data and may not reflect real-time changes.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <svg className="h-12 w-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <h4 className="text-lg font-medium text-gray-900 mb-2">No Nameservers Found</h4>
+                    <p className="text-gray-500">Unable to retrieve nameserver information for this domain</p>
+                  </div>
+                )}
+              </motion.div>
+            )}
+
             {/* DNS Records Management - Matching Dashboard Style */}
             {selectedDomain && (
               <motion.div
@@ -506,8 +623,8 @@ export default function DNSManagementPage() {
                                   onClick={handleActivateDNS}
                                   disabled={isActivating}
                                   className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${isActivating
-                                      ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                                      : 'bg-blue-600 text-white hover:bg-blue-700'
+                                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                    : 'bg-blue-600 text-white hover:bg-blue-700'
                                     }`}
                                 >
                                   {isActivating ? 'Activating...' : 'ACTIVATE DNS MANAGEMENT'}
@@ -545,8 +662,8 @@ export default function DNSManagementPage() {
                     onClick={() => setShowAddRecord(!showAddRecord)}
                     disabled={selectedDomain && domains.find(d => d.id === selectedDomain) && (!domains.find(d => d.id === selectedDomain)?.resellerClubOrderId || !domains.find(d => d.id === selectedDomain)?.dnsActivated)}
                     className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${selectedDomain && domains.find(d => d.id === selectedDomain) && (!domains.find(d => d.id === selectedDomain)?.resellerClubOrderId || !domains.find(d => d.id === selectedDomain)?.dnsActivated)
-                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                      ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                      : 'bg-blue-600 text-white hover:bg-blue-700'
                       }`}
                   >
                     <Plus className="h-4 w-4 mr-2" />
