@@ -1,54 +1,91 @@
-# Domain Management System
+# Excel Technologies - Domain Management System
 
-A comprehensive domain registration and management platform built with Next.js 14, featuring ResellerClub API integration, payment processing, and admin management capabilities.
+A comprehensive, enterprise-grade domain registration and management platform built with Next.js 14, featuring ResellerClub API integration, Razorpay payment processing, and advanced admin management capabilities.
 
-## 🚀 Features
+## 🚀 Core Features
 
-### Core Functionality
+### Domain Management
 
-- **Domain Search & Registration** - Search and register domains across 400+ TLDs
-- **Live Pricing** - Real-time pricing from ResellerClub API with comprehensive TLD mappings
-- **Payment Processing** - Integrated Razorpay payment gateway
-- **User Management** - Registration, authentication, and profile management
-- **Order Management** - Complete order tracking and invoice generation
-- **Admin Panel** - Comprehensive admin dashboard for system management
+- **Domain Search & Registration** - Search and register domains across 400+ TLDs with real-time availability checking
+- **Live Pricing Integration** - Real-time pricing from ResellerClub API with 200+ comprehensive TLD mappings
+- **Multi-stage Registration** - Step-by-step user registration process with geolocation support
+- **DNS Management** - Complete DNS record management with user-friendly interface
+- **Domain Renewal** - Easy domain renewal with automated notifications
+- **Cart System** - Add multiple domains to cart for bulk registration
 
-### Advanced Features
+### Payment & Order System
 
-- **Comprehensive TLD Mappings** - 200+ TLD mappings for accurate pricing across all domain extensions
-- **Multi-stage Registration** - Step-by-step user registration with geolocation
-- **Indian Timezone Support** - All dates and times displayed in IST
-- **Email Notifications** - Automated email notifications for orders and updates
-- **PDF Invoices** - Generate and download PDF invoices
+- **Razorpay Integration** - Secure payment processing with Indian payment gateway
+- **Order Management** - Complete order tracking with real-time status updates
+- **PDF Invoice Generation** - Automated invoice generation and download
+- **Payment Verification** - Secure payment verification and domain registration automation
+- **GST Calculation** - Automatic GST calculation for Indian customers
 
-## 🛠️ Tech Stack
+### User Management & Authentication
 
-### Frontend
+- **JWT Authentication** - Secure token-based authentication with proper expiration
+- **User Registration** - Multi-step registration with email activation
+- **Password Reset** - Secure password reset with email verification
+- **Role-based Access Control** - Admin and user roles with appropriate permissions
+- **Profile Management** - Complete user profile with address and contact information
 
-- **Next.js 14** - React framework with App Router
-- **TypeScript** - Type-safe development
-- **Tailwind CSS** - Utility-first CSS framework
-- **Framer Motion** - Animation library
-- **React Hook Form** - Form handling
-- **React Hot Toast** - Toast notifications
+### Admin Panel
 
-### Backend
+- **User Management** - Complete user administration with role controls
+- **Order Tracking** - Real-time order monitoring and management
+- **Payment Monitoring** - Payment status tracking and management
+- **Pricing Configuration** - TLD pricing management and updates
+- **System Settings** - Application-wide settings management
+- **Analytics Dashboard** - System statistics and performance metrics
 
-- **Next.js API Routes** - Serverless API endpoints
-- **MongoDB** - NoSQL database with Mongoose ODM
-- **JWT Authentication** - Secure token-based authentication
-- **Bcrypt** - Password hashing
+## 🛠️ Technology Stack
 
-### External Services
+### Frontend Technologies
 
-- **ResellerClub API** - Domain registration and pricing
-- **Razorpay** - Payment processing
-- **Nodemailer** - Email sending
-- **Puppeteer** - PDF generation
+- **Next.js 14** - React framework with App Router and server-side rendering
+- **TypeScript 5.3.3** - Type-safe development with strict type checking
+- **Tailwind CSS 3.3.6** - Utility-first CSS framework with custom design system
+- **Framer Motion 12.23.22** - Advanced animation library for smooth transitions
+- **React Hook Form 7.48.2** - Performant form handling with validation
+- **React Hot Toast 2.4.1** - Toast notification system
+- **Lucide React 0.294.0** - Modern icon library with 1000+ icons
+- **Zustand 4.4.7** - Lightweight state management
 
-## 🧪 Testing
+### Backend Technologies
 
-The project includes a comprehensive testing suite organized in the `tests/` directory:
+- **Next.js API Routes** - Serverless API endpoints with middleware support
+- **MongoDB 8.0.3** - NoSQL database with Mongoose ODM
+- **JWT Authentication** - Secure token-based authentication with refresh tokens
+- **Bcrypt 2.4.3** - Password hashing with salt rounds
+- **Axios 1.6.2** - HTTP client for API requests
+- **Nodemailer 6.9.7** - Email sending service
+
+### External Integrations
+
+- **ResellerClub API** - Domain registration, pricing, and management services
+- **Razorpay 2.9.2** - Payment processing and webhook handling
+- **Puppeteer** - PDF generation for invoices and documents
+- **SMTP Services** - Email delivery (Gmail, SendGrid support)
+
+### Development Tools
+
+- **ESLint 8.56.0** - Code linting and quality assurance
+- **PostCSS 8.4.32** - CSS processing and optimization
+- **Autoprefixer 10.4.16** - CSS vendor prefixing
+- **Class Variance Authority** - Component variant management
+
+## 🧪 Comprehensive Testing Suite
+
+The project includes a robust testing framework with multiple test categories and automated test runners:
+
+### Test Categories
+
+- **API Tests** - ResellerClub API integration, TLD pricing, and endpoint testing
+- **Admin Tests** - Admin functionality, user management, and order operations
+- **Payment Tests** - Payment processing, success/failure scenarios, and error handling
+- **Pricing Tests** - TLD pricing accuracy, mapping validation, and AI pricing
+- **Debug Tools** - Troubleshooting utilities and data analysis
+- **System Tests** - End-to-end functionality and integration testing
 
 ### Quick Start
 
@@ -57,25 +94,31 @@ The project includes a comprehensive testing suite organized in the `tests/` dir
 node tests/run-tests.js
 
 # Run specific test categories
-node tests/run-tests.js api      # API tests
-node tests/run-tests.js debug    # Debug tools
+node tests/run-tests.js api      # API integration tests
+node tests/run-tests.js admin    # Admin functionality tests
+node tests/run-tests.js payment  # Payment system tests
+node tests/run-tests.js pricing  # Pricing system tests
+node tests/run-tests.js debug    # Debug and troubleshooting tools
 
 # Run specific tests
-node tests/run-tests.js test-final-promo    # Final promotional pricing test
-node tests/run-tests.js test-eu-pricing     # EU TLD specific test
+node tests/run-tests.js test-final-pricing    # Final pricing verification
+node tests/run-tests.js test-eu-pricing       # EU TLD specific testing
+node tests/run-tests.js test-payment-success  # Payment success testing
 ```
 
-### Test Categories
+### Test Coverage
 
-- **API Tests** - Test ResellerClub API integration and TLD pricing
-- **Debug Tools** - Debug pricing data and TLD mappings
-- **Utility Scripts** - Maintenance and update scripts
+- **200+ TLD Mappings** - Comprehensive TLD mapping validation
+- **API Endpoint Testing** - All ResellerClub API endpoints
+- **Payment Flow Testing** - Complete payment processing validation
+- **Admin Functionality** - User management and system administration
+- **Error Handling** - Comprehensive error scenario testing
 
 For detailed testing documentation, see [tests/README.md](tests/README.md).
 
 ## 🛠️ Utility Scripts
 
-The project includes several utility scripts in the `scripts/` directory for development and maintenance tasks:
+The project includes comprehensive utility scripts for development, maintenance, and deployment:
 
 ### Port Management
 
@@ -97,45 +140,83 @@ node scripts/kill-ports.js --ports 3000,8080,9000
 node scripts/kill-ports.js --help
 ```
 
-### Database Scripts
+### Database Management
 
-- `scripts/init-db.js` - Initialize database with admin user
-- `scripts/recreate-admin.js` - Recreate admin user
-- `scripts/setup.js` - General setup script
+- `scripts/init-db.js` - Initialize database with admin user and default settings
+- `scripts/recreate-admin.js` - Recreate admin user with fresh credentials
+- `scripts/setup.js` - General setup script for environment configuration
 - `scripts/migrate-order-userids.js` - Migrate Order.userId from String to ObjectId references
+
+### Development Scripts
+
+- `scripts/kill-ports.js` - Port management utility
+- `scripts/setup.js` - Environment setup and configuration
+- `scripts/init-db.js` - Database initialization
+- `scripts/recreate-admin.js` - Admin user management
 
 ## 📁 Project Structure
 
 ```
 dd/
-├── app/                          # Next.js App Router
-│   ├── api/                      # API routes
+├── app/                          # Next.js 14 App Router
+│   ├── api/                      # API Routes (20+ endpoints)
 │   │   ├── auth/                 # Authentication endpoints
 │   │   ├── admin/                # Admin-only endpoints
-│   │   ├── domains/              # Domain-related endpoints
-│   │   ├── orders/               # Order management
-│   │   └── payments/             # Payment processing
+│   │   ├── domains/              # Domain management endpoints
+│   │   ├── orders/               # Order management endpoints
+│   │   ├── payments/             # Payment processing endpoints
+│   │   ├── cart/                 # Shopping cart endpoints
+│   │   ├── user/                 # User management endpoints
+│   │   └── webhooks/             # Webhook handlers
 │   ├── admin/                    # Admin panel pages
 │   ├── dashboard/                # User dashboard
+│   ├── checkout/                 # Checkout process
+│   ├── domain-management/        # Domain management interface
+│   ├── dns/                      # DNS management
+│   ├── payment-success/          # Payment success page
 │   └── (auth)/                   # Authentication pages
-├── components/                   # Reusable React components
+├── components/                   # Reusable React Components (30+ components)
 │   ├── admin/                    # Admin-specific components
 │   ├── ui/                       # Base UI components
-│   └── forms/                    # Form components
-├── lib/                          # Utility libraries
-│   ├── auth.ts                   # Authentication service
+│   ├── forms/                    # Form components
+│   └── user/                     # User-specific components
+├── lib/                          # Utility Libraries
+│   ├── auth.ts                   # JWT authentication service
+│   ├── admin-auth.ts             # Admin authentication
 │   ├── resellerclub.ts          # ResellerClub API integration
-│   ├── pricing-service.ts       # Pricing management
+│   ├── pricing-service.ts       # TLD pricing management
 │   ├── settings-service.ts      # Application settings
+│   ├── razorpay.ts              # Razorpay integration
+│   ├── email.ts                 # Email service
+│   ├── validation.ts            # Input validation
+│   ├── security.ts              # Security utilities
 │   └── dateUtils.ts             # Date formatting utilities
-├── models/                       # MongoDB schemas
-├── scripts/                      # Utility and database scripts
+├── models/                       # MongoDB Schemas
+│   ├── User.ts                   # User model with authentication
+│   ├── Order.ts                  # Order model with domain tracking
+│   ├── Payment.ts                # Payment model
+│   ├── Domain.ts                 # Domain model
+│   ├── DNSRecord.ts              # DNS record model
+│   └── Settings.ts               # Application settings model
+├── scripts/                      # Utility Scripts
 │   ├── kill-ports.js            # Port management utility
 │   ├── init-db.js               # Database initialization
 │   ├── recreate-admin.js        # Admin user recreation
 │   ├── setup.js                 # Setup script
 │   └── migrate-order-userids.js # Order userId migration
-└── public/                       # Static assets
+├── tests/                        # Comprehensive Testing Suite
+│   ├── api/                      # API testing scripts
+│   ├── admin/                    # Admin functionality tests
+│   ├── payment/                  # Payment system tests
+│   ├── pricing/                  # Pricing system tests
+│   ├── debug/                    # Debug tools
+│   └── run-tests.js             # Centralized test runner
+├── store/                        # State Management
+│   └── cartStore.ts              # Zustand cart store
+└── public/                       # Static Assets
+    ├── logo-black.png
+    ├── logo-white.png
+    └── favicon.png
 ```
 
 ## 🚀 Getting Started
