@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AuthService } from "@/lib/auth";
-import whois from "whois-json";
+import whois from "whois";
+import dns from "dns2";
 
 export async function GET(request: NextRequest) {
   try {
@@ -32,124 +33,146 @@ export async function GET(request: NextRequest) {
 
     console.log(`🔍 [WHOIS] Looking up nameservers for: ${domainName}`);
 
+    let nameservers: string[] = [];
+    let whoisData: any = {};
+    let method = "unknown";
+
     try {
-      // Query WHOIS data
-      const whoisData = await whois(domainName, {
-        timeout: 10000, // 10 second timeout
-        follow: 3, // Follow up to 3 redirects
+      // First try WHOIS lookup
+      console.log(`🔍 [WHOIS] Trying WHOIS lookup for: ${domainName}`);
+      
+      const whoisResult = await new Promise<string>((resolve, reject) => {
+        whois.lookup(domainName, (err: any, data: string) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(data);
+          }
+        });
       });
 
       console.log(`✅ [WHOIS] Received data for: ${domainName}`);
+      method = "whois";
 
-      // Extract nameservers from different possible fields
-      let nameservers: string[] = [];
-
-      // Common nameserver field names in WHOIS data
-      const nameserverFields = [
-        "nameServer",
-        "nameserver",
-        "name_servers",
-        "name_servers_list",
-        "nserver",
-        "Name Server",
-        "NAME SERVER",
-        "nameservers",
-        "dns",
-        "dns_servers",
+      // Extract nameservers from raw WHOIS text
+      const nsPatterns = [
+        /name\s*server[s]?[:\s]+([^\n\r]+)/gi,
+        /nameserver[s]?[:\s]+([^\n\r]+)/gi,
+        /nserver[s]?[:\s]+([^\n\r]+)/gi,
+        /dns[:\s]+([^\n\r]+)/gi,
       ];
 
-      // Look for nameservers in various fields
-      for (const field of nameserverFields) {
-        if (whoisData[field]) {
-          if (Array.isArray(whoisData[field])) {
-            nameservers = [...nameservers, ...whoisData[field]];
-          } else if (typeof whoisData[field] === "string") {
-            // Split by common separators
-            const nsList = whoisData[field]
-              .split(/[,\n\r\t]+/)
-              .map((ns: string) => ns.trim())
-              .filter((ns: string) => ns.length > 0);
+      for (const pattern of nsPatterns) {
+        let match;
+        while ((match = pattern.exec(whoisResult)) !== null) {
+          const nsLine = match[1] || match[0];
+          if (nsLine) {
+            const nsList = nsLine
+              .split(/[,\s]+/)
+              .map((ns) => ns.trim())
+              .filter((ns) => ns.length > 0 && ns.includes("."));
             nameservers = [...nameservers, ...nsList];
           }
         }
       }
 
-      // Remove duplicates and clean up
-      nameservers = [...new Set(nameservers)]
-        .map((ns) => ns.toLowerCase().trim())
-        .filter((ns) => {
-          // Basic validation for nameserver format
-          return (
-            ns.length > 0 &&
-            ns.includes(".") &&
-            !ns.includes(" ") &&
-            /^[a-zA-Z0-9.-]+$/.test(ns)
-          );
-        });
-
-      // If no nameservers found in common fields, try to extract from raw text
-      if (nameservers.length === 0 && whoisData.raw) {
-        const rawText = whoisData.raw;
-        const nsRegex = /name\s*server[s]?[:\s]+([^\n\r]+)/gi;
-        let match;
-
-        while ((match = nsRegex.exec(rawText)) !== null) {
-          const nsLine = match[1].trim();
-          const nsList = nsLine
-            .split(/[,\s]+/)
-            .map((ns) => ns.trim())
-            .filter((ns) => ns.length > 0 && ns.includes("."));
-          nameservers = [...nameservers, ...nsList];
+      // Also try to find nameservers by looking for common patterns
+      const lines = whoisResult.split('\n');
+      for (const line of lines) {
+        const trimmedLine = line.trim().toLowerCase();
+        if (
+          trimmedLine.includes('name server') ||
+          trimmedLine.includes('nameserver') ||
+          trimmedLine.includes('nserver') ||
+          trimmedLine.includes('dns')
+        ) {
+          const parts = line.split(/[:,\s]+/);
+          for (const part of parts) {
+            const trimmed = part.trim();
+            if (
+              trimmed.includes('.') &&
+              !trimmed.includes(' ') &&
+              /^[a-zA-Z0-9.-]+$/.test(trimmed) &&
+              trimmed.length > 3
+            ) {
+              nameservers.push(trimmed);
+            }
+          }
         }
       }
 
-      // Remove duplicates again
-      nameservers = [...new Set(nameservers)];
+      // Extract additional domain information from WHOIS
+      const registrarMatch = whoisResult.match(/registrar[:\s]+([^\n\r]+)/i);
+      const creationMatch = whoisResult.match(/creation\s+date[:\s]+([^\n\r]+)/i);
+      const expirationMatch = whoisResult.match(/expir[:\s]+([^\n\r]+)/i);
+      const statusMatch = whoisResult.match(/status[:\s]+([^\n\r]+)/i);
 
-      console.log(
-        `📋 [WHOIS] Found ${nameservers.length} nameservers for ${domainName}:`,
-        nameservers
-      );
+      whoisData = {
+        registrar: registrarMatch ? registrarMatch[1].trim() : "Unknown",
+        creationDate: creationMatch ? creationMatch[1].trim() : null,
+        expirationDate: expirationMatch ? expirationMatch[1].trim() : null,
+        lastUpdated: null,
+        status: statusMatch ? statusMatch[1].trim() : "Unknown",
+      };
 
-      return NextResponse.json({
-        success: true,
-        domainName,
-        nameservers,
-        count: nameservers.length,
-        whoisData: {
-          registrar: whoisData.registrar || whoisData.Registrar || "Unknown",
-          creationDate:
-            whoisData.creationDate ||
-            whoisData.CreationDate ||
-            whoisData.created ||
-            null,
-          expirationDate:
-            whoisData.expirationDate ||
-            whoisData.ExpirationDate ||
-            whoisData.expires ||
-            null,
-          lastUpdated:
-            whoisData.updatedDate ||
-            whoisData.UpdatedDate ||
-            whoisData.updated ||
-            null,
-          status: whoisData.status || whoisData.Status || "Unknown",
-        },
-        lastChecked: new Date().toISOString(),
-      });
     } catch (whoisError: any) {
-      console.error(`❌ [WHOIS] Error for ${domainName}:`, whoisError.message);
-
-      return NextResponse.json({
-        success: false,
-        domainName,
-        nameservers: [],
-        count: 0,
-        error: "Failed to retrieve nameserver information",
-        details: whoisError.message,
-        lastChecked: new Date().toISOString(),
-      });
+      console.log(`⚠️ [WHOIS] Failed for ${domainName}: ${whoisError.message}`);
+      console.log(`🔄 [DNS] Trying DNS lookup as fallback...`);
+      
+      try {
+        // Fallback to DNS lookup for NS records
+        const dnsClient = dns();
+        const result = await dnsClient.resolve(domainName, 'NS');
+        
+        if (result.answers && result.answers.length > 0) {
+          nameservers = result.answers.map((answer: any) => answer.data);
+          method = "dns";
+          console.log(`✅ [DNS] Found ${nameservers.length} nameservers via DNS`);
+        }
+        
+        whoisData = {
+          registrar: "Unknown",
+          creationDate: null,
+          expirationDate: null,
+          lastUpdated: null,
+          status: "Unknown",
+        };
+        
+      } catch (dnsError: any) {
+        console.error(`❌ [DNS] Also failed for ${domainName}:`, dnsError.message);
+        throw new Error(`Both WHOIS and DNS lookups failed: ${whoisError.message}, ${dnsError.message}`);
+      }
     }
+
+    // Clean up nameservers
+    nameservers = [...new Set(nameservers)]
+      .map((ns) => ns.toLowerCase().trim())
+      .filter((ns) => {
+        return (
+          ns.length > 0 &&
+          ns.includes(".") &&
+          !ns.includes(" ") &&
+          /^[a-zA-Z0-9.-]+$/.test(ns) &&
+          !ns.includes('name') &&
+          !ns.includes('server') &&
+          !ns.includes('dns')
+        );
+      });
+
+    console.log(
+      `📋 [${method.toUpperCase()}] Found ${nameservers.length} nameservers for ${domainName}:`,
+      nameservers
+    );
+
+    return NextResponse.json({
+      success: true,
+      domainName,
+      nameservers,
+      count: nameservers.length,
+      method,
+      whoisData,
+      lastChecked: new Date().toISOString(),
+    });
   } catch (error) {
     console.error("Nameserver lookup error:", error);
     return NextResponse.json(
