@@ -53,6 +53,7 @@ export default function DNSManagementPage() {
   const [isNameserverLoading, setIsNameserverLoading] = useState(false);
   const [showAddRecord, setShowAddRecord] = useState(false);
   const [isActivating, setIsActivating] = useState(false);
+  const [isUsingMockData, setIsUsingMockData] = useState(false);
   const [newRecord, setNewRecord] = useState<DNSRecord>({
     type: 'A',
     name: '',
@@ -140,6 +141,7 @@ export default function DNSManagementPage() {
       if (response.ok) {
         const data = await response.json();
         setDnsRecords(data.records || []);
+        setIsUsingMockData(false);
       } else {
         const errorData = await response.json().catch(() => ({}));
         console.error('Failed to load DNS records:', errorData);

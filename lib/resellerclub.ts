@@ -1751,6 +1751,9 @@ export class ResellerClubAPI {
       const response = await api.get("/api/domains/dns/get-records.json", {
         params: {
           "domain-name": domainName,
+          "auth-userid": RESELLERCLUB_ID,
+          "api-key": RESELLERCLUB_SECRET,
+          "reseller-id": RESELLERCLUB_ID,
         },
       });
 
@@ -1790,6 +1793,9 @@ export class ResellerClubAPI {
         {
           params: {
             "domain-name": domainName,
+            "auth-userid": RESELLERCLUB_ID,
+            "api-key": RESELLERCLUB_SECRET,
+            "reseller-id": RESELLERCLUB_ID,
             type: recordData.type,
             name: recordData.name,
             value: recordData.value,
@@ -1833,6 +1839,9 @@ export class ResellerClubAPI {
         {
           params: {
             "domain-name": domainName,
+            "auth-userid": RESELLERCLUB_ID,
+            "api-key": RESELLERCLUB_SECRET,
+            "reseller-id": RESELLERCLUB_ID,
             "record-id": recordId,
             type: recordData.type,
             name: recordData.name,
@@ -1870,6 +1879,9 @@ export class ResellerClubAPI {
         {
           params: {
             "domain-name": domainName,
+            "auth-userid": RESELLERCLUB_ID,
+            "api-key": RESELLERCLUB_SECRET,
+            "reseller-id": RESELLERCLUB_ID,
             "record-id": recordId,
           },
         }
@@ -1999,6 +2011,9 @@ export class ResellerClubAPI {
         {
           params: {
             "domain-name": domainName,
+            "auth-userid": RESELLERCLUB_ID,
+            "api-key": RESELLERCLUB_SECRET,
+            "reseller-id": RESELLERCLUB_ID,
             "record-id": recordId,
             type: recordData.type,
             name: recordData.name,
