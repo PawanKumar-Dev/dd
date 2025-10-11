@@ -4,13 +4,11 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
-  Globe, Search, Plus, RefreshCw, Settings, ExternalLink,
-  Shield, Clock, Loader2, X
+  Globe, Search, Plus, RefreshCw, Shield, Clock, Loader2
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import UserLayout from '@/components/user/UserLayout';
 import { PageLoading, DataLoading } from '@/components/user/LoadingComponents';
-import DomainBookingProgress from '@/components/DomainBookingProgress';
 import ClientOnly from '@/components/ClientOnly';
 
 interface User {
@@ -45,8 +43,6 @@ export default function UserDomains() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [showBookingProgress, setShowBookingProgress] = useState(false);
-  const [bookingDomain, setBookingDomain] = useState<Domain | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -154,27 +150,6 @@ export default function UserDomains() {
     }
   };
 
-  const handleViewBookingProgress = (domain: Domain) => {
-    setBookingDomain(domain);
-    setShowBookingProgress(true);
-  };
-
-  const handleManageDomain = (domain: Domain) => {
-    if (domain.status === 'processing' || domain.status === 'pending') {
-      toast.error('Domain is still being processed. Please wait for registration to complete.');
-      return;
-    }
-    if (domain.status === 'failed') {
-      toast.error('Domain registration failed. Please contact support.');
-      return;
-    }
-    // Redirect to standalone DNS management page
-    router.push('/dashboard/dns-management');
-  };
-
-  const canManageDomain = (domain: Domain) => {
-    return domain.status === 'active' || domain.status === 'expired';
-  };
 
   // Filter domains based on search term and status
   const filteredDomains = domains.filter(domain => {
@@ -302,9 +277,6 @@ export default function UserDomains() {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Auto Renew
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                      </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -347,38 +319,6 @@ export default function UserDomains() {
                             {domain.autoRenew ? 'Enabled' : 'Disabled'}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <div className="flex space-x-2">
-                            {domain.status === 'processing' || domain.status === 'pending' ? (
-                              <button
-                                onClick={() => handleViewBookingProgress(domain)}
-                                className="text-blue-600 hover:text-blue-900"
-                                title="View Progress"
-                              >
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              </button>
-                            ) : canManageDomain(domain) ? (
-                              <button
-                                onClick={() => handleManageDomain(domain)}
-                                className="text-blue-600 hover:text-blue-900"
-                                title="Manage DNS"
-                              >
-                                <Settings className="h-4 w-4" />
-                              </button>
-                            ) : (
-                              <button
-                                disabled
-                                className="text-gray-400 cursor-not-allowed"
-                                title="Domain not available for management"
-                              >
-                                <Settings className="h-4 w-4" />
-                              </button>
-                            )}
-                            <button className="text-gray-600 hover:text-gray-900" title="View Domain">
-                              <ExternalLink className="h-4 w-4" />
-                            </button>
-                          </div>
-                        </td>
                       </motion.tr>
                     ))}
                   </tbody>
@@ -389,37 +329,6 @@ export default function UserDomains() {
 
         </div>
 
-        {/* Domain Booking Progress Modal */}
-        {bookingDomain && bookingDomain.orderId && showBookingProgress && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Domain Registration Progress
-                </h3>
-                <button
-                  onClick={() => {
-                    setShowBookingProgress(false);
-                    setBookingDomain(null);
-                  }}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-              <DomainBookingProgress
-                orderId={bookingDomain.orderId}
-                domainName={bookingDomain.name}
-                autoRefresh={true}
-                onComplete={() => {
-                  setShowBookingProgress(false);
-                  setBookingDomain(null);
-                  loadDomains(); // Refresh the domains list
-                }}
-              />
-            </div>
-          </div>
-        )}
       </UserLayout>
     </ClientOnly>
   );

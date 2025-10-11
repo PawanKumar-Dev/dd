@@ -559,10 +559,10 @@ export default function AdminDNSManagementPage() {
         <div className="grid grid-cols-1 xl:grid-cols-5 gap-4 lg:gap-6">
           {/* Domains List */}
           <div className="xl:col-span-2">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-              <div className="mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">All Domains</h3>
-                <div className="space-y-3">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4">
+              <div className="mb-3 sm:mb-4">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 sm:mb-3">All Domains</h3>
+                <div className="space-y-2 sm:space-y-3">
                   <div className="relative">
                     <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                     <input
@@ -588,18 +588,18 @@ export default function AdminDNSManagementPage() {
 
               {/* Bulk Operations */}
               {selectedDomains.length > 0 && (
-                <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <div className="flex items-center justify-between">
+                <div className="mb-3 sm:mb-4 p-3 sm:p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
                     <div className="flex items-center">
-                      <span className="text-sm font-medium text-blue-900">
+                      <span className="text-xs sm:text-sm font-medium text-blue-900">
                         {selectedDomains.length} domain(s) selected
                       </span>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
                       <select
                         value={bulkOperation}
                         onChange={(e) => setBulkOperation(e.target.value as any)}
-                        className="px-3 py-1 text-sm border border-blue-300 rounded focus:ring-2 focus:ring-blue-500"
+                        className="px-3 py-1 text-xs sm:text-sm border border-blue-300 rounded focus:ring-2 focus:ring-blue-500"
                       >
                         <option value="none">Select Action</option>
                         <option value="activate_dns">Activate DNS</option>
@@ -607,7 +607,7 @@ export default function AdminDNSManagementPage() {
                       </select>
                       <button
                         onClick={() => setSelectedDomains([])}
-                        className="px-3 py-1 text-sm text-blue-700 bg-blue-100 rounded hover:bg-blue-200"
+                        className="px-3 py-1 text-xs sm:text-sm text-blue-700 bg-blue-100 rounded hover:bg-blue-200"
                       >
                         Clear
                       </button>
@@ -684,7 +684,7 @@ export default function AdminDNSManagementPage() {
                 </div>
               )}
 
-              <div className="space-y-2 max-h-80 overflow-y-auto">
+              <div className="space-y-1 sm:space-y-2 max-h-60 sm:max-h-80 overflow-y-auto">
                 {/* Select All */}
                 <div className="flex items-center p-2 border-b border-gray-200">
                   <input
@@ -693,28 +693,28 @@ export default function AdminDNSManagementPage() {
                     onChange={(e) => handleSelectAll(e.target.checked)}
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
-                  <label className="ml-2 text-sm text-gray-700">Select All</label>
+                  <label className="ml-2 text-xs sm:text-sm text-gray-700">Select All</label>
                 </div>
 
                 {filteredDomains.map((domain) => (
                   <div
                     key={domain.id}
-                    className={`p-3 rounded-lg border transition-colors ${selectedDomain === domain.id
+                    className={`p-2 sm:p-3 rounded-lg border transition-colors ${selectedDomain === domain.id
                       ? 'border-blue-500 bg-blue-50'
                       : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                       }`}
                   >
-                    <div className="flex items-start space-x-3">
+                    <div className="flex items-start space-x-2 sm:space-x-3">
                       <input
                         type="checkbox"
                         checked={selectedDomains.includes(domain.id)}
                         onChange={(e) => handleDomainSelect(domain.id, e.target.checked)}
                         onClick={(e) => e.stopPropagation()}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-0.5 sm:mt-1"
                       />
                       <div className="flex-1 min-w-0">
                         <p
-                          className="text-sm font-medium text-gray-900 truncate cursor-pointer"
+                          className="text-xs sm:text-sm font-medium text-gray-900 truncate cursor-pointer"
                           onClick={() => handleDomainClick(domain.id)}
                         >
                           {domain.name}
@@ -726,27 +726,27 @@ export default function AdminDNSManagementPage() {
                           {domain.customerEmail}
                         </p>
                         <div className="flex items-center justify-between mt-1">
-                          <p className="text-xs text-gray-400">
+                          <p className="text-xs text-gray-400 truncate max-w-[120px] sm:max-w-none">
                             {domain.orderId}
                           </p>
                           {domain.dnsActivated ? (
-                            <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                            <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 flex-shrink-0" />
                           ) : (
-                            <AlertCircle className="h-4 w-4 text-yellow-500 flex-shrink-0" />
+                            <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-500 flex-shrink-0" />
                           )}
                         </div>
                       </div>
                     </div>
 
                     {!domain.dnsActivated && domain.resellerClubOrderId && (
-                      <div className="mt-2 ml-7">
+                      <div className="mt-2 ml-6 sm:ml-7">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleActivateDNS(domain.id);
                           }}
                           disabled={isActivating}
-                          className="w-full px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="w-full px-2 sm:px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {isActivating ? 'Activating...' : 'Activate DNS'}
                         </button>
@@ -761,17 +761,17 @@ export default function AdminDNSManagementPage() {
           {/* DNS Management */}
           <div className="xl:col-span-3">
             {selectedDomain ? (
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 {/* Nameservers */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">Nameservers</h3>
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-3 sm:mb-4">
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900">Nameservers</h3>
                     <button
                       onClick={() => loadNameservers(selectedDomain)}
                       disabled={isNameserverLoading}
-                      className="flex items-center px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50"
+                      className="flex items-center justify-center px-3 py-1 text-xs sm:text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50 w-full sm:w-auto"
                     >
-                      <RefreshCw className={`h-4 w-4 mr-1 ${isNameserverLoading ? 'animate-spin' : ''}`} />
+                      <RefreshCw className={`h-3 w-3 sm:h-4 sm:w-4 mr-1 ${isNameserverLoading ? 'animate-spin' : ''}`} />
                       Refresh
                     </button>
                   </div>
@@ -801,11 +801,11 @@ export default function AdminDNSManagementPage() {
                 </div>
 
                 {/* DNS Records */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                  <div className="flex items-center justify-between mb-6">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">DNS Records</h3>
-                      <p className="text-sm text-gray-500 mt-1">
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-4 sm:mb-6">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900">DNS Records</h3>
+                      <p className="text-xs sm:text-sm text-gray-500 mt-1 truncate">
                         Managing DNS for {domains.find(d => d.id === selectedDomain)?.name}
                       </p>
 
@@ -853,9 +853,9 @@ export default function AdminDNSManagementPage() {
                     <button
                       onClick={() => setShowAddRecord(true)}
                       disabled={dnsPropagationStatus !== 'ready'}
-                      className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex items-center justify-center px-3 sm:px-4 py-2 bg-blue-600 text-white text-xs sm:text-sm rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
                     >
-                      <Plus className="h-4 w-4 mr-2" />
+                      <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                       Add Record
                     </button>
                   </div>
@@ -869,38 +869,38 @@ export default function AdminDNSManagementPage() {
                       <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                           <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Value</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">TTL</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            <th className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                            <th className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                            <th className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Value</th>
+                            <th className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">TTL</th>
+                            <th className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
+                            <th className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
                           {dnsRecords.map((record) => (
                             <tr key={record.id}>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                              <td className="px-2 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900">
                                 {record.type}
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              <td className="px-2 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
                                 {record.name}
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              <td className="px-2 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900 max-w-[100px] sm:max-w-none truncate">
                                 {record.value}
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              <td className="px-2 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
                                 {record.ttl}
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                              <td className="px-2 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
                                 {record.priority || '-'}
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                              <td className="px-2 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium">
                                 <button
                                   onClick={() => handleDeleteRecord(record.id)}
                                   className="text-red-600 hover:text-red-900"
                                 >
-                                  <Trash2 className="h-4 w-4" />
+                                  <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                                 </button>
                               </td>
                             </tr>
@@ -969,10 +969,10 @@ export default function AdminDNSManagementPage() {
                 </div>
               </div>
             ) : (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
-                <Globe className="h-10 w-10 text-gray-400 mx-auto mb-3" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Select a Domain</h3>
-                <p className="text-sm text-gray-500">Choose a domain from the list to manage its DNS records</p>
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sm:p-8 text-center">
+                <Globe className="h-8 w-8 sm:h-10 sm:w-10 text-gray-400 mx-auto mb-3" />
+                <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">Select a Domain</h3>
+                <p className="text-xs sm:text-sm text-gray-500">Choose a domain from the list to manage its DNS records</p>
               </div>
             )}
           </div>
