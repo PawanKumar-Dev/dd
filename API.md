@@ -1,11 +1,12 @@
-# API Documentation
+# API Documentation - Excel Technologies Domain Management System
 
-This document provides comprehensive documentation for all API endpoints in the Domain Management System.
+This document provides comprehensive documentation for all API endpoints in the Excel Technologies Domain Management System.
 
 ## Base URL
 
-- Development: `http://35.209.122.24:3000`
-- Production: `https://yourdomain.com`
+- **Development**: `http://35.209.122.24:3000`
+- **Production**: `https://yourdomain.com`
+- **Local Development**: `http://localhost:3000`
 
 ## Authentication
 
@@ -15,18 +16,34 @@ Most endpoints require authentication via JWT tokens. Include the token in the A
 Authorization: Bearer <your-jwt-token>
 ```
 
+### Token Management
+
+- **Access Token**: Valid for 24 hours
+- **Refresh Token**: Valid for 7 days
+- **Admin Tokens**: Enhanced permissions for admin operations
+
 ## Response Format
 
-All API responses follow this format:
+All API responses follow this standardized format:
 
 ```json
 {
-"success": true|false,
-"data": {...},
-"error": "error message",
-"message": "status message"
+  "success": true|false,
+  "data": {...},
+  "error": "error message",
+  "message": "status message",
+  "timestamp": "2024-01-01T00:00:00.000Z"
 }
 ```
+
+## Rate Limiting
+
+API endpoints are rate-limited to prevent abuse:
+
+- **Authentication endpoints**: 5 requests per minute
+- **Domain search**: 10 requests per minute
+- **Payment endpoints**: 15 requests per minute
+- **Other endpoints**: 20 requests per minute
 
 ---
 
@@ -584,6 +601,7 @@ The system implements a comprehensive TLD pricing solution with 200+ TLD mapping
 4. **Live Pricing**: Real-time pricing from ResellerClub customer and reseller APIs
 5. **Performance Optimized**: Intelligent caching with 5-minute TTL
 6. **Error Handling**: Robust fallback mechanisms for missing TLD data
+7. **GST Calculation**: Automatic GST calculation for Indian customers (18% default)
 
 ### TLD Mapping Examples
 
@@ -598,7 +616,11 @@ The system implements a comprehensive TLD pricing solution with 200+ TLD mapping
   "in": "thirdleveldotin",
   "eu": "doteu",
   "uk": "dotuk",
-  "us": "domus"
+  "us": "domus",
+  "io": "dotio",
+  "ai": "dotai",
+  "app": "dotapp",
+  "asia": "dotasia"
 }
 ```
 
@@ -613,9 +635,19 @@ Domain search response includes:
   "price": 1198.8,
   "currency": "INR",
   "registrationPeriod": 1,
-  "pricingSource": "live"
+  "pricingSource": "live",
+  "gstRate": 18,
+  "gstAmount": 215.78,
+  "totalAmount": 1414.58
 }
 ```
+
+### Supported TLD Categories
+
+- **Generic TLDs**: .com, .net, .org, .info, .biz
+- **Country TLDs**: .co, .au, .ca, .cc, .eu, .uk, .us
+- **New TLDs**: .io, .ai, .app, .asia, .shop, .store
+- **Tech TLDs**: .dev, .tech, .digital, .cloud, .host
 
 ---
 
@@ -707,7 +739,12 @@ Remove item from cart.
 ```json
 {
   "success": false,
-  "error": "Validation error message"
+  "error": "Validation error message",
+  "details": {
+    "field": "email",
+    "message": "Invalid email format"
+  },
+  "timestamp": "2024-01-01T00:00:00.000Z"
 }
 ```
 
@@ -716,7 +753,9 @@ Remove item from cart.
 ```json
 {
   "success": false,
-  "error": "Unauthorized access"
+  "error": "Unauthorized access",
+  "message": "Invalid or expired token",
+  "timestamp": "2024-01-01T00:00:00.000Z"
 }
 ```
 
@@ -725,7 +764,9 @@ Remove item from cart.
 ```json
 {
   "success": false,
-  "error": "Access forbidden"
+  "error": "Access forbidden",
+  "message": "Insufficient permissions",
+  "timestamp": "2024-01-01T00:00:00.000Z"
 }
 ```
 
@@ -734,7 +775,21 @@ Remove item from cart.
 ```json
 {
   "success": false,
-  "error": "Resource not found"
+  "error": "Resource not found",
+  "message": "The requested resource was not found",
+  "timestamp": "2024-01-01T00:00:00.000Z"
+}
+```
+
+### 429 Too Many Requests
+
+```json
+{
+  "success": false,
+  "error": "Rate limit exceeded",
+  "message": "Too many requests, please try again later",
+  "retryAfter": 60,
+  "timestamp": "2024-01-01T00:00:00.000Z"
 }
 ```
 
@@ -743,34 +798,93 @@ Remove item from cart.
 ```json
 {
   "success": false,
-  "error": "Internal server error"
+  "error": "Internal server error",
+  "message": "An unexpected error occurred",
+  "timestamp": "2024-01-01T00:00:00.000Z"
 }
 ```
-
----
-
-## Rate Limiting
-
-API endpoints are rate-limited to prevent abuse:
-
-- Authentication endpoints: 5 requests per minute
-- Domain search: 10 requests per minute
-- Other endpoints: 20 requests per minute
 
 ## Webhooks
 
 ### Razorpay Webhook
 
-Endpoint: `/api/webhooks/razorpay`
+**Endpoint**: `/api/webhooks/razorpay`
 
 Handles Razorpay payment events for order updates and payment confirmations.
 
----
+**Supported Events**:
 
-## Testing
+- `payment.captured` - Payment successfully captured
+- `payment.failed` - Payment failed
+- `order.paid` - Order payment completed
+- `refund.created` - Refund initiated
 
-Use the provided Postman collection or curl commands to test the API endpoints. Ensure you have valid JWT tokens for authenticated endpoints.
+### Webhook Security
+
+- **Signature Verification**: All webhooks are verified using Razorpay signatures
+- **Idempotency**: Duplicate webhook events are handled gracefully
+- **Retry Logic**: Failed webhook processing is retried with exponential backoff
+
+## API Testing
+
+### Test Environment
+
+Use the provided testing suite for comprehensive API testing:
+
+```bash
+# Run all API tests
+node tests/run-tests.js api
+
+# Run specific API tests
+node tests/api/test-all-endpoints.js
+node tests/api/test-pricing.js
+node tests/api/test-tld-mappings.js
+```
+
+### Postman Collection
+
+A Postman collection is available for manual API testing with pre-configured requests and environment variables.
+
+### cURL Examples
+
+```bash
+# Domain search
+curl -X GET "http://35.209.122.24:3000/api/domains/search?domain=example.com" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+
+# Create payment order
+curl -X POST "http://35.209.122.24:3000/api/payments/create-order" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{"domains":[{"domainName":"example.com","price":1198.8,"currency":"INR","registrationPeriod":1}]}'
+```
+
+## API Monitoring
+
+### Health Check
+
+**Endpoint**: `/api/health`
+
+Returns system health status including database connectivity and external service status.
+
+### Metrics
+
+- **Response Times**: Average response time per endpoint
+- **Error Rates**: Error rate by endpoint and error type
+- **Rate Limiting**: Rate limit usage and violations
+- **API Usage**: Request volume and patterns
 
 ## Support
 
-For API support and questions, please refer to the main README.md or create an issue in the repository.
+For API support and questions:
+
+- **Documentation**: Refer to this API documentation
+- **Issues**: Create an issue in the repository
+- **Email**: support@exceltechnologies.com
+- **Testing**: Use the comprehensive testing suite
+
+---
+
+**Last Updated**: 2024-12-19  
+**Version**: 2.0.0  
+**Author**: Excel Technologies

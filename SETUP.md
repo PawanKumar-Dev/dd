@@ -213,21 +213,25 @@ npm start
 ### 10. Verify Setup
 
 1. **Check Database Connection:**
+
    - Visit `/api/health` endpoint
    - Check console logs for MongoDB connection
    - Verify admin user creation
 
 2. **Test ResellerClub API:**
+
    - Check console logs for API connection
    - Test domain search functionality
    - Run pricing tests: `node tests/run-tests.js test-final-pricing`
 
 3. **Test Payment Integration:**
+
    - Use Razorpay test mode
    - Complete a test transaction
    - Verify webhook handling
 
 4. **Test Email Notifications:**
+
    - Register a new user
    - Check email delivery
    - Test password reset functionality
@@ -265,12 +269,12 @@ npm start
 
 ### Feature Flags
 
-| Variable                     | Default | Description                |
-| ---------------------------- | ------- | -------------------------- |
-| `ENABLE_EMAIL_NOTIFICATIONS` | `true`  | Enable email notifications |
-| `ENABLE_ADMIN_NOTIFICATIONS` | `true`  | Enable admin notifications |
-| `NODE_ENV`                   | `development` | Environment mode      |
-| `PORT`                       | `3000`  | Application port           |
+| Variable                     | Default       | Description                |
+| ---------------------------- | ------------- | -------------------------- |
+| `ENABLE_EMAIL_NOTIFICATIONS` | `true`        | Enable email notifications |
+| `ENABLE_ADMIN_NOTIFICATIONS` | `true`        | Enable admin notifications |
+| `NODE_ENV`                   | `development` | Environment mode           |
+| `PORT`                       | `3000`        | Application port           |
 
 ## 🚨 Security Checklist
 
@@ -294,30 +298,35 @@ npm start
 ### Common Issues
 
 1. **MongoDB Connection Failed**
+
    - Check if MongoDB is running
    - Verify connection string
    - Check network connectivity
    - Run: `npm run init-db` to test connection
 
 2. **ResellerClub API Errors**
+
    - Verify credentials in `.env.local`
    - Check API key permissions
    - Ensure correct Reseller ID
    - Run: `node tests/run-tests.js test-final-pricing`
 
 3. **Razorpay Payment Issues**
+
    - Verify API keys
    - Check webhook configuration
    - Ensure correct currency settings
    - Test with Razorpay test mode
 
 4. **Email Not Sending**
+
    - Check SMTP credentials
    - Verify app password for Gmail
    - Check firewall settings
    - Test with: `node tests/run-tests.js payment`
 
 5. **Port Already in Use**
+
    - Kill existing processes: `node scripts/kill-ports.js`
    - Use different port: `PORT=3001 npm run dev`
 
@@ -384,11 +393,13 @@ npm start
 ### Production Deployment
 
 1. **Environment Setup**
+
    - Configure production environment variables
    - Set up production database
    - Configure production email service
 
 2. **Build and Deploy**
+
    ```bash
    npm run build
    npm start
