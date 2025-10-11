@@ -24,6 +24,13 @@ export async function GET(request: NextRequest) {
     const result = await ResellerClubWrapper.getDNSRecords(domainName);
 
     if (result.status === "error") {
+      // Check if it's a 404 error (domain not found in ResellerClub)
+      if (result.message && result.message.includes("404")) {
+        return NextResponse.json(
+          { error: "Domain not found in ResellerClub" },
+          { status: 404 }
+        );
+      }
       return NextResponse.json({ error: result.message }, { status: 500 });
     }
 

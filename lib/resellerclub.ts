@@ -1758,11 +1758,14 @@ export class ResellerClubAPI {
         status: "success",
         data: response.data,
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error("ResellerClub DNS records error:", error);
       return {
         status: "error",
-        message: "Failed to get DNS records",
+        message:
+          error.response?.status === 404
+            ? "Request failed with status code 404"
+            : "Failed to get DNS records",
       };
     }
   }
