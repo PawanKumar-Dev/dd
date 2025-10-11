@@ -50,6 +50,7 @@ interface Domain {
 
 
 export default function DNSPage() {
+  const [user, setUser] = useState<any>(null);
   const [domains, setDomains] = useState<Domain[]>([]);
   const [selectedDomain, setSelectedDomain] = useState<string>('');
   const [dnsRecords, setDnsRecords] = useState<DNSRecord[]>([]);
@@ -65,8 +66,30 @@ export default function DNSPage() {
   const router = useRouter();
 
   useEffect(() => {
-    loadDomains();
-  }, []);
+    // Check authentication
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+
+    if (!token || !userData) {
+      router.push('/login');
+      return;
+    }
+
+    try {
+      const userObj = JSON.parse(userData);
+      setUser(userObj);
+
+      if (userObj.role === 'admin') {
+        router.push('/admin/dashboard');
+        return;
+      }
+
+      loadDomains();
+    } catch (error) {
+      console.error('Error parsing user data:', error);
+      router.push('/login');
+    }
+  }, [router]);
 
   useEffect(() => {
     if (selectedDomain) {
@@ -317,6 +340,25 @@ export default function DNSPage() {
 
   const selectedDomainData = domains.find(d => d.id === selectedDomain);
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    router.push('/login');
+    toast.success('Logged out successfully');
+  };
+
+  // Show loading while checking authentication
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       {/* Enhanced Header */}
@@ -352,6 +394,15 @@ export default function DNSPage() {
                 <Globe className="h-4 w-4 mr-2" />
                 Dashboard
               </Link>
+              <div className="flex items-center space-x-2 text-sm text-gray-600">
+                <span>Welcome, {user.firstName}</span>
+                <button
+                  onClick={handleLogout}
+                  className="px-3 py-1 text-xs font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors duration-200"
+                >
+                  Logout
+                </button>
+              </div>
             </div>
           </div>
         </div>

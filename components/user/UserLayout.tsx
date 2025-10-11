@@ -15,7 +15,8 @@ import {
   User,
   CreditCard,
   History,
-  Search
+  Search,
+  Server
 } from 'lucide-react';
 import RupeeIcon from '@/components/icons/RupeeIcon';
 
@@ -36,6 +37,7 @@ export default function UserLayout({ children, user, onLogout }: UserLayoutProps
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Domains', href: '/dashboard/domains', icon: Globe },
+    { name: 'DNS Management', href: '/domain-management', icon: Server },
     { name: 'Orders', href: '/dashboard/orders', icon: RupeeIcon },
     { name: 'Cart', href: '/cart', icon: ShoppingCart },
     { name: 'Account Settings', href: '/dashboard/settings', icon: Settings },
