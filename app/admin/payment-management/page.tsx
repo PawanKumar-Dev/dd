@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { CreditCard, Search, Filter, MoreVertical, Eye, CheckCircle, XCircle, Clock, DollarSign } from 'lucide-react';
+import { CreditCard, Search, Filter, MoreVertical, Eye, CheckCircle, XCircle, Clock, RotateCcw } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayoutNew';
 import AdminDataTable from '@/components/admin/AdminDataTable';
 import { formatIndianDate, formatIndianTime, formatIndianDateTime, formatIndianCurrency } from '@/lib/dateUtils';
@@ -147,7 +147,7 @@ export default function AdminPayments() {
       case 'pending':
         return <Clock className="h-4 w-4 text-yellow-500" />;
       case 'refunded':
-        return <DollarSign className="h-4 w-4 text-blue-500" />;
+        return <RotateCcw className="h-4 w-4 text-blue-500" />;
       default:
         return null;
     }
