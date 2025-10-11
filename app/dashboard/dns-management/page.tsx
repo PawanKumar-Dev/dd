@@ -185,6 +185,8 @@ export default function DNSManagementPage() {
         const data = await response.json();
         setNameservers(data.nameservers || []);
         console.log('Nameservers loaded:', data.nameservers);
+        console.log('Method used:', data.method);
+        console.log('Full response:', data);
       } else {
         const errorData = await response.json().catch(() => ({}));
         console.error('Failed to load nameservers:', errorData);

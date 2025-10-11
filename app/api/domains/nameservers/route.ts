@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AuthService } from "@/lib/auth";
 import whois from "whois";
-import dns from "dns2";
+import { promisify } from "util";
+import dns from "dns";
 
 export async function GET(request: NextRequest) {
   try {
@@ -40,7 +41,7 @@ export async function GET(request: NextRequest) {
     try {
       // First try WHOIS lookup
       console.log(`🔍 [WHOIS] Trying WHOIS lookup for: ${domainName}`);
-      
+
       const whoisResult = await new Promise<string>((resolve, reject) => {
         whois.lookup(domainName, (err: any, data: string) => {
           if (err) {
@@ -77,21 +78,21 @@ export async function GET(request: NextRequest) {
       }
 
       // Also try to find nameservers by looking for common patterns
-      const lines = whoisResult.split('\n');
+      const lines = whoisResult.split("\n");
       for (const line of lines) {
         const trimmedLine = line.trim().toLowerCase();
         if (
-          trimmedLine.includes('name server') ||
-          trimmedLine.includes('nameserver') ||
-          trimmedLine.includes('nserver') ||
-          trimmedLine.includes('dns')
+          trimmedLine.includes("name server") ||
+          trimmedLine.includes("nameserver") ||
+          trimmedLine.includes("nserver") ||
+          trimmedLine.includes("dns")
         ) {
           const parts = line.split(/[:,\s]+/);
           for (const part of parts) {
             const trimmed = part.trim();
             if (
-              trimmed.includes('.') &&
-              !trimmed.includes(' ') &&
+              trimmed.includes(".") &&
+              !trimmed.includes(" ") &&
               /^[a-zA-Z0-9.-]+$/.test(trimmed) &&
               trimmed.length > 3
             ) {
@@ -103,7 +104,9 @@ export async function GET(request: NextRequest) {
 
       // Extract additional domain information from WHOIS
       const registrarMatch = whoisResult.match(/registrar[:\s]+([^\n\r]+)/i);
-      const creationMatch = whoisResult.match(/creation\s+date[:\s]+([^\n\r]+)/i);
+      const creationMatch = whoisResult.match(
+        /creation\s+date[:\s]+([^\n\r]+)/i
+      );
       const expirationMatch = whoisResult.match(/expir[:\s]+([^\n\r]+)/i);
       const statusMatch = whoisResult.match(/status[:\s]+([^\n\r]+)/i);
 
@@ -114,22 +117,23 @@ export async function GET(request: NextRequest) {
         lastUpdated: null,
         status: statusMatch ? statusMatch[1].trim() : "Unknown",
       };
-
     } catch (whoisError: any) {
       console.log(`⚠️ [WHOIS] Failed for ${domainName}: ${whoisError.message}`);
       console.log(`🔄 [DNS] Trying DNS lookup as fallback...`);
-      
+
       try {
-        // Fallback to DNS lookup for NS records
-        const dnsClient = dns();
-        const result = await dnsClient.resolve(domainName, 'NS');
-        
-        if (result.answers && result.answers.length > 0) {
-          nameservers = result.answers.map((answer: any) => answer.data);
+        // Fallback to DNS lookup for NS records using Node.js built-in DNS
+        const resolveNs = promisify(dns.resolveNs);
+        const nsRecords = await resolveNs(domainName);
+
+        if (nsRecords && nsRecords.length > 0) {
+          nameservers = nsRecords;
           method = "dns";
-          console.log(`✅ [DNS] Found ${nameservers.length} nameservers via DNS`);
+          console.log(
+            `✅ [DNS] Found ${nameservers.length} nameservers via DNS`
+          );
         }
-        
+
         whoisData = {
           registrar: "Unknown",
           creationDate: null,
@@ -137,10 +141,14 @@ export async function GET(request: NextRequest) {
           lastUpdated: null,
           status: "Unknown",
         };
-        
       } catch (dnsError: any) {
-        console.error(`❌ [DNS] Also failed for ${domainName}:`, dnsError.message);
-        throw new Error(`Both WHOIS and DNS lookups failed: ${whoisError.message}, ${dnsError.message}`);
+        console.error(
+          `❌ [DNS] Also failed for ${domainName}:`,
+          dnsError.message
+        );
+        throw new Error(
+          `Both WHOIS and DNS lookups failed: ${whoisError.message}, ${dnsError.message}`
+        );
       }
     }
 
@@ -153,14 +161,16 @@ export async function GET(request: NextRequest) {
           ns.includes(".") &&
           !ns.includes(" ") &&
           /^[a-zA-Z0-9.-]+$/.test(ns) &&
-          !ns.includes('name') &&
-          !ns.includes('server') &&
-          !ns.includes('dns')
+          !ns.includes("name") &&
+          !ns.includes("server") &&
+          !ns.includes("dns")
         );
       });
 
     console.log(
-      `📋 [${method.toUpperCase()}] Found ${nameservers.length} nameservers for ${domainName}:`,
+      `📋 [${method.toUpperCase()}] Found ${
+        nameservers.length
+      } nameservers for ${domainName}:`,
       nameservers
     );
 
