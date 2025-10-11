@@ -54,6 +54,7 @@
     "uuid": "9.0.1",
     "validator": "^13.15.15",
     "whois": "^2.15.0",
+    "whois-api": "^1.0.2",
     "whois-json": "^2.0.4",
     "zustand": "4.4.7"
   },
