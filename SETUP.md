@@ -1,4 +1,4 @@
-# 🚀 Domain Management System - Setup Guide
+# 🚀 Excel Technologies - Domain Management System Setup Guide
 
 ## Quick Start
 
@@ -6,7 +6,7 @@
 
 ```bash
 git clone <your-repo-url>
-cd domain-management-system
+cd dd
 npm install
 ```
 
@@ -15,8 +15,8 @@ npm install
 #### Option A: Quick Setup (Development)
 
 ```bash
-# Copy the minimal environment file
-cp env.local.example .env.local
+# Copy the environment template
+cp env.example .env.local
 
 # Edit with your actual values
 nano .env.local
@@ -32,7 +32,17 @@ cp env.example .env.local
 nano .env.local
 ```
 
-### 3. Required Environment Variables
+### 3. Database Setup
+
+```bash
+# Initialize database with admin user
+npm run init-db
+
+# Or recreate admin user if needed
+npm run recreate-admin
+```
+
+### 4. Required Environment Variables
 
 #### 🔑 Essential Variables (Must Configure)
 
@@ -65,9 +75,25 @@ SMTP_PORT=587
 SMTP_USER=your-email@gmail.com
 SMTP_PASS=your-app-password
 ADMIN_EMAIL=admin@yourdomain.com
+SUPPORT_EMAIL=support@yourdomain.com
+
+# Admin User (for recreation script)
+ADMIN_PASSWORD=your-secure-admin-password
+ADMIN_FIRST_NAME=Admin
+ADMIN_LAST_NAME=User
+
+# Application
+NODE_ENV=development
+PORT=3000
+
+# DNS
+DEFAULT_NAMESERVER_1=ns1.yourdomain.com
+DEFAULT_NAMESERVER_2=ns2.yourdomain.com
+DEFAULT_NAMESERVER_3=ns3.yourdomain.com
+DEFAULT_NAMESERVER_4=ns4.yourdomain.com
 ```
 
-### 4. Generate Secrets
+### 5. Generate Secrets
 
 #### JWT Secret
 
@@ -83,7 +109,7 @@ openssl rand -base64 32
 openssl rand -base64 32
 ```
 
-### 5. Database Setup
+### 6. Database Setup
 
 #### Local MongoDB
 
@@ -166,36 +192,51 @@ SENDGRID_API_KEY=your-sendgrid-api-key
 #### Development
 
 ```bash
+# Start development server
 npm run dev
+
+# The application will be available at:
+# http://localhost:3000
+# http://35.209.122.24:3000
 ```
 
 #### Production Build
 
 ```bash
+# Build for production
 npm run build
+
+# Start production server
 npm start
 ```
 
 ### 10. Verify Setup
 
 1. **Check Database Connection:**
-
    - Visit `/api/health` endpoint
    - Check console logs for MongoDB connection
+   - Verify admin user creation
 
 2. **Test ResellerClub API:**
-
    - Check console logs for API connection
    - Test domain search functionality
+   - Run pricing tests: `node tests/run-tests.js test-final-pricing`
 
 3. **Test Payment Integration:**
-
    - Use Razorpay test mode
    - Complete a test transaction
+   - Verify webhook handling
 
 4. **Test Email Notifications:**
    - Register a new user
    - Check email delivery
+   - Test password reset functionality
+
+5. **Test Admin Panel:**
+   - Login with admin credentials
+   - Verify user management
+   - Check order management
+   - Test settings configuration
 
 ## 🔧 Configuration Details
 
@@ -212,10 +253,15 @@ npm start
 | `RESELLERCLUB_RESELLER_ID` | ✅       | Your ResellerClub ID      | `123456`                        |
 | `RAZORPAY_KEY_ID`          | ✅       | Razorpay key ID           | `rzp_test_xxxxx`                |
 | `RAZORPAY_KEY_SECRET`      | ✅       | Razorpay secret           | `your-secret`                   |
+| `RAZORPAY_WEBHOOK_SECRET`  | ✅       | Razorpay webhook secret   | `your-webhook-secret`           |
 | `SMTP_HOST`                | ✅       | SMTP server host          | `smtp.gmail.com`                |
 | `SMTP_USER`                | ✅       | SMTP username             | `your-email@gmail.com`          |
 | `SMTP_PASS`                | ✅       | SMTP password             | `your-app-password`             |
 | `ADMIN_EMAIL`              | ✅       | Admin notification email  | `admin@yourdomain.com`          |
+| `SUPPORT_EMAIL`            | ✅       | Support email address     | `support@yourdomain.com`        |
+| `ADMIN_PASSWORD`           | ✅       | Admin user password       | `your-secure-password`          |
+| `ADMIN_FIRST_NAME`         | ✅       | Admin first name          | `Admin`                         |
+| `ADMIN_LAST_NAME`          | ✅       | Admin last name           | `User`                          |
 
 ### Feature Flags
 
@@ -223,44 +269,61 @@ npm start
 | ---------------------------- | ------- | -------------------------- |
 | `ENABLE_EMAIL_NOTIFICATIONS` | `true`  | Enable email notifications |
 | `ENABLE_ADMIN_NOTIFICATIONS` | `true`  | Enable admin notifications |
+| `NODE_ENV`                   | `development` | Environment mode      |
+| `PORT`                       | `3000`  | Application port           |
 
 ## 🚨 Security Checklist
 
 - [ ] Change all default passwords and secrets
-- [ ] Use strong, unique JWT secrets
+- [ ] Use strong, unique JWT secrets (32+ characters)
 - [ ] Enable HTTPS in production
 - [ ] Set up proper CORS policies
 - [ ] Configure rate limiting
 - [ ] Enable request logging
 - [ ] Set up monitoring and alerts
 - [ ] Regular security updates
+- [ ] Validate all input data
+- [ ] Implement proper error handling
+- [ ] Use environment variables for sensitive data
+- [ ] Regular backup of database
+- [ ] Monitor API usage and abuse
+- [ ] Implement proper session management
 
 ## 🐛 Troubleshooting
 
 ### Common Issues
 
 1. **MongoDB Connection Failed**
-
    - Check if MongoDB is running
    - Verify connection string
    - Check network connectivity
+   - Run: `npm run init-db` to test connection
 
 2. **ResellerClub API Errors**
-
-   - Verify credentials
+   - Verify credentials in `.env.local`
    - Check API key permissions
    - Ensure correct Reseller ID
+   - Run: `node tests/run-tests.js test-final-pricing`
 
 3. **Razorpay Payment Issues**
-
    - Verify API keys
    - Check webhook configuration
    - Ensure correct currency settings
+   - Test with Razorpay test mode
 
 4. **Email Not Sending**
    - Check SMTP credentials
    - Verify app password for Gmail
    - Check firewall settings
+   - Test with: `node tests/run-tests.js payment`
+
+5. **Port Already in Use**
+   - Kill existing processes: `node scripts/kill-ports.js`
+   - Use different port: `PORT=3001 npm run dev`
+
+6. **Admin User Issues**
+   - Recreate admin: `npm run recreate-admin`
+   - Check admin credentials in `.env.local`
 
 ### Debug Mode
 
@@ -269,25 +332,72 @@ Enable debug logging:
 ```env
 LOG_LEVEL=debug
 ENABLE_API_LOGGING=true
+NODE_ENV=development
+```
+
+### Testing and Validation
+
+```bash
+# Run all tests
+node tests/run-tests.js
+
+# Test specific functionality
+node tests/run-tests.js api
+node tests/run-tests.js payment
+node tests/run-tests.js admin
+
+# Debug pricing issues
+node tests/debug/debug-pricing.js
 ```
 
 ## 📞 Support
 
 For additional help:
 
-- Check the logs in console
-- Review API documentation
-- Contact support: support@yourdomain.com
+- **Documentation**: Check README.md and API.md
+- **Testing**: Use the comprehensive testing suite
+- **Logs**: Check console logs for detailed error messages
+- **Issues**: Create an issue in the repository
+- **Email**: support@exceltechnologies.com
 
 ## 🔄 Updates
 
 To update the system:
 
 ```bash
+# Pull latest changes
 git pull origin main
+
+# Install new dependencies
 npm install
+
+# Run database migrations if needed
+npm run init-db
+
+# Build and start
 npm run build
+npm start
 ```
+
+## 🚀 Deployment
+
+### Production Deployment
+
+1. **Environment Setup**
+   - Configure production environment variables
+   - Set up production database
+   - Configure production email service
+
+2. **Build and Deploy**
+   ```bash
+   npm run build
+   npm start
+   ```
+
+3. **Post-Deployment**
+   - Run health checks
+   - Test all functionality
+   - Monitor logs and performance
 
 ---
 

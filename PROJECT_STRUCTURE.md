@@ -2,91 +2,190 @@
 
 ## Project Structure
 
-This document outlines the comprehensive component-based architecture of the Excel Technologies domain management system.
+This document outlines the comprehensive component-based architecture of the Excel Technologies domain management system, built with Next.js 14 and modern web technologies.
 
 ## 📁 Directory Structure
 
 ```
 dd/
-├── app/                          # Next.js App Router
-│   ├── api/                      # API Routes
+├── app/                          # Next.js 14 App Router
+│   ├── api/                      # API Routes (20+ endpoints)
 │   │   ├── auth/                 # Authentication endpoints
+│   │   │   ├── register/         # User registration
+│   │   │   ├── login/            # User login
+│   │   │   ├── activate/         # Account activation
+│   │   │   ├── forgot-password/  # Password reset
+│   │   │   └── reset-password/   # Password reset completion
 │   │   ├── admin/                # Admin-only endpoints
+│   │   │   ├── users/            # User management
+│   │   │   ├── orders/           # Order management
+│   │   │   ├── payments/         # Payment monitoring
+│   │   │   ├── settings/         # System settings
+│   │   │   └── tld-pricing/      # TLD pricing management
 │   │   ├── domains/              # Domain management
+│   │   │   ├── search/           # Domain search
+│   │   │   └── renew/            # Domain renewal
+│   │   ├── orders/               # Order management
+│   │   │   ├── [id]/             # Specific order details
+│   │   │   └── [id]/invoice/     # Order invoice download
 │   │   ├── payments/             # Payment processing
-│   │   └── contact/              # Contact form
+│   │   │   ├── create-order/     # Create payment order
+│   │   │   └── verify/           # Payment verification
+│   │   ├── cart/                 # Shopping cart
+│   │   ├── user/                 # User management
+│   │   ├── contact/              # Contact form
+│   │   ├── check-ip/             # IP checking
+│   │   └── webhooks/             # Webhook handlers
+│   │       └── razorpay/         # Razorpay webhooks
 │   ├── dashboard/                # User dashboard
 │   ├── admin/                    # Admin panel
+│   ├── domain-management/        # Domain management interface
 │   ├── dns/                      # DNS management
 │   ├── checkout/                 # Checkout process
+│   ├── payment-success/          # Payment success page
 │   ├── login/                    # Login page
 │   ├── register/                 # Registration page
+│   ├── activate/                 # Account activation
 │   ├── forgot-password/          # Password reset
+│   ├── reset-password/           # Password reset completion
 │   ├── about/                    # About Us page
 │   ├── contact/                  # Contact Us page
+│   ├── privacy/                  # Privacy policy
+│   ├── terms-and-conditions/     # Terms and conditions
+│   ├── cancellation-refund/      # Cancellation and refund policy
+│   ├── debug/                    # Debug pages
 │   ├── globals.css               # Global styles
 │   ├── layout.tsx                # Root layout
-│   └── page.tsx                  # Homepage
-├── components/                    # Reusable Components
-│   ├── Layout/                   # Layout components
-│   │   ├── Header.tsx
-│   │   ├── Navigation.tsx
-│   │   └── Footer.tsx
-│   ├── Forms/                    # Form components
-│   │   ├── Button.tsx
-│   │   ├── Input.tsx
-│   │   ├── Textarea.tsx
-│   │   ├── LoginForm.tsx
-│   │   ├── RegisterForm.tsx
-│   │   ├── ForgotPasswordForm.tsx
-│   │   └── ContactForm.tsx
-│   ├── Cards/                    # Card components
-│   │   ├── Card.tsx
-│   │   ├── FeatureCard.tsx
-│   │   └── StatsCard.tsx
-│   ├── Sections/                 # Section components
-│   │   ├── HeroSection.tsx
-│   │   └── Section.tsx
-│   ├── Content/                  # Content components
-│   │   ├── Logo.tsx
-│   │   ├── FAQItem.tsx
-│   │   └── ContactInfo.tsx
+│   ├── page.tsx                  # Homepage
+│   ├── loading.tsx               # Loading component
+│   ├── error.tsx                 # Error boundary
+│   └── not-found.tsx             # 404 page
+├── components/                    # Reusable Components (30+ components)
+│   ├── admin/                    # Admin-specific components
+│   │   ├── AdminCard.tsx         # Admin card component
+│   │   ├── AdminTable.tsx        # Admin data table
+│   │   ├── AdminTabs.tsx         # Admin tab navigation
+│   │   └── AdminPasswordReset.tsx # Admin password reset
+│   ├── ui/                       # Base UI components
+│   │   ├── Button.tsx            # Button component with variants
+│   │   ├── Input.tsx             # Input component with validation
+│   │   ├── Textarea.tsx          # Textarea component
+│   │   ├── Card.tsx              # Card container component
+│   │   ├── Modal.tsx             # Modal dialog component
+│   │   ├── LoadingSpinner.tsx    # Loading spinner
+│   │   └── EmptyState.tsx        # Empty state component
+│   ├── forms/                    # Form components
+│   │   ├── LoginForm.tsx         # Login form with validation
+│   │   ├── RegisterForm.tsx      # Registration form
+│   │   ├── MultiStageRegisterForm.tsx # Multi-step registration
+│   │   ├── ForgotPasswordForm.tsx # Password reset form
+│   │   └── ContactForm.tsx       # Contact form
+│   ├── domain/                   # Domain-specific components
+│   │   ├── DomainSearch.tsx      # Domain search interface
+│   │   ├── DomainBookingProgress.tsx # Domain booking progress
+│   │   ├── DomainRenewalModal.tsx # Domain renewal modal
+│   │   ├── DomainRequirementsModal.tsx # Domain requirements
+│   │   ├── DNSManagementModal.tsx # DNS management modal
+│   │   └── NameServerManagement.tsx # Nameserver management
+│   ├── payment/                  # Payment components
+│   │   ├── Invoice.tsx           # Invoice generation
+│   │   └── LivePricingIndicator.tsx # Live pricing indicator
+│   ├── layout/                   # Layout components
+│   │   ├── Header.tsx            # Site header
+│   │   ├── Navigation.tsx        # Navigation bar
+│   │   ├── Footer.tsx            # Site footer
+│   │   └── PageTransition.tsx    # Page transition animations
+│   ├── content/                  # Content components
+│   │   ├── Logo.tsx              # Logo component
+│   │   ├── FAQItem.tsx           # FAQ accordion item
+│   │   ├── ContactInfo.tsx       # Contact information
+│   │   ├── FeatureCard.tsx       # Feature display card
+│   │   ├── StatsCard.tsx         # Statistics card
+│   │   ├── HeroSection.tsx       # Hero section component
+│   │   ├── Section.tsx           # Generic section wrapper
+│   │   └── LoadingPage.tsx       # Loading page component
+│   ├── utility/                  # Utility components
+│   │   ├── ClientOnly.tsx        # Client-side only rendering
+│   │   └── OutboundIPBadge.tsx   # Outbound IP display
 │   ├── index.ts                  # Component exports
 │   └── README.md                 # Component documentation
 ├── lib/                          # Utility Libraries
-│   ├── auth.ts                   # JWT authentication
-│   ├── admin-auth.ts             # Admin authentication
-│   ├── mongodb.ts                # Database connection
-│   ├── resellerclub.ts           # ResellerClub API
-│   ├── razorpay.ts               # Razorpay integration
-│   ├── email.ts                  # Email service
-│   ├── validation.ts             # Input validation
+│   ├── auth.ts                   # JWT authentication service
+│   ├── admin-auth.ts             # Admin authentication middleware
+│   ├── mongodb.ts                # MongoDB connection management
+│   ├── mongoose.ts               # Mongoose ODM configuration
+│   ├── resellerclub.ts           # ResellerClub API integration
+│   ├── resellerclub-wrapper.ts   # ResellerClub API wrapper
+│   ├── pricing-service.ts        # TLD pricing management
+│   ├── settings-service.ts       # Application settings
+│   ├── razorpay.ts               # Razorpay payment integration
+│   ├── razorpay-payments.ts      # Razorpay payment service
+│   ├── email.ts                  # Email service (Nodemailer)
+│   ├── validation.ts             # Input validation utilities
 │   ├── security.ts               # Security utilities
 │   ├── security-middleware.ts    # Security middleware
-│   ├── rate-limit.ts             # Rate limiting
+│   ├── rate-limit.ts             # Rate limiting middleware
+│   ├── domainRequirements.ts     # Domain requirements validation
+│   ├── dateUtils.ts              # Date formatting utilities
 │   ├── utils.ts                  # General utilities
-│   └── types.ts                  # TypeScript types
-├── models/                       # Database Models
-│   ├── User.ts
-│   ├── Domain.ts
-│   ├── Payment.ts
-│   └── DNSRecord.ts
+│   └── types.ts                  # TypeScript type definitions
+├── models/                       # MongoDB Schemas
+│   ├── User.ts                   # User model with authentication
+│   ├── Order.ts                  # Order model with domain tracking
+│   ├── Payment.ts                # Payment model
+│   ├── Domain.ts                 # Domain model
+│   ├── DNSRecord.ts              # DNS record model
+│   ├── Settings.ts               # Application settings model
+│   └── IPCheck.ts                # IP check model
 ├── store/                        # State Management
 │   └── cartStore.ts              # Zustand cart store
+├── tests/                        # Comprehensive Testing Suite
+│   ├── api/                      # API testing scripts
+│   │   ├── test-pricing.js       # Pricing service testing
+│   │   ├── test-tld-mappings.js  # TLD mapping testing
+│   │   ├── test-all-endpoints.js # API endpoint testing
+│   │   ├── test-simple-pricing.js # Simple pricing verification
+│   │   ├── test-final-pricing.js # Final pricing verification
+│   │   └── test-eu-pricing.js    # EU TLD testing
+│   ├── admin/                    # Admin functionality tests
+│   │   ├── test-ip-check.js      # IP check testing
+│   │   └── test-delete-order.js  # Order deletion testing
+│   ├── payment/                  # Payment system tests
+│   │   ├── test-payment-success.js # Payment success testing
+│   │   └── test-error-handling.js # Error handling testing
+│   ├── pricing/                  # Pricing system tests
+│   │   ├── test-ai-pricing.js    # AI pricing testing
+│   │   └── test-pricing-debug.js # Pricing debug testing
+│   ├── debug/                    # Debug tools
+│   │   ├── debug-pricing.js      # Pricing debugging
+│   │   └── debug-ai-pricing.js   # AI pricing debugging
+│   ├── scripts/                  # Utility scripts
+│   │   └── update_pricing.js     # Pricing update utility
+│   ├── run-tests.js              # Centralized test runner
+│   └── README.md                 # Testing documentation
 ├── public/                       # Static Assets
-│   ├── logo-black.png
-│   ├── logo-white.png
-│   └── favicon.png
-├── scripts/                      # Setup Scripts
-│   ├── setup.js
-│   └── init-db.js
+│   ├── logo-black.png            # Black logo
+│   ├── logo-white.png            # White logo
+│   └── favicon.png               # Site favicon
+├── scripts/                      # Utility Scripts
+│   ├── setup.js                  # General setup script
+│   ├── init-db.js                # Database initialization
+│   ├── recreate-admin.js         # Admin user recreation
+│   ├── kill-ports.js             # Port management utility
+│   └── migrate-order-userids.js  # Order userId migration
 ├── middleware.ts                 # Next.js middleware
 ├── next.config.js                # Next.js configuration
-├── package.json                  # Dependencies
-├── .env.example                  # Environment variables template
-├── .gitignore                    # Git ignore rules
+├── tailwind.config.js            # Tailwind CSS configuration
+├── postcss.config.js             # PostCSS configuration
+├── tsconfig.json                 # TypeScript configuration
+├── package.json                  # Dependencies and scripts
+├── package-lock.json             # Dependency lock file
+├── env.example                   # Environment variables template
+├── next-env.d.ts                 # Next.js type definitions
+├── test-payment-failure.js       # Payment failure testing
 ├── README.md                     # Project documentation
 ├── API.md                        # API documentation
+├── SETUP.md                      # Setup guide
 └── PROJECT_STRUCTURE.md          # This file
 ```
 
@@ -94,62 +193,109 @@ dd/
 
 ### 1. Layout Components
 
-- **Header**: Basic header wrapper
-- **Navigation**: Complete navigation with mobile menu
-- **Footer**: Site footer with links
+- **Header**: Site header with navigation and user menu
+- **Navigation**: Complete navigation bar with mobile menu support
+- **Footer**: Site footer with links and company information
+- **PageTransition**: Smooth page transition animations
 
-### 2. Form Components
+### 2. UI Components
 
-- **Button**: Comprehensive button with variants
-- **Input**: Form input with validation
-- **Textarea**: Textarea with validation
-- **LoginForm**: Complete login functionality
-- **RegisterForm**: Complete registration
-- **ForgotPasswordForm**: Password reset
-- **ContactForm**: Contact form with submission
+- **Button**: Comprehensive button with multiple variants (primary, secondary, outline, ghost, danger)
+- **Input**: Form input with label, error handling, and icon support
+- **Textarea**: Textarea input with validation and character counting
+- **Card**: Card container with hover effects and variants
+- **Modal**: Modal dialog with backdrop and close functionality
+- **LoadingSpinner**: Loading spinner with customizable size and color
+- **EmptyState**: Empty state component for no-data scenarios
 
-### 3. Card Components
+### 3. Form Components
 
-- **Card**: Basic card container
-- **FeatureCard**: Feature display card
-- **StatsCard**: Statistics display card
+- **LoginForm**: Complete login functionality with validation
+- **RegisterForm**: User registration form with multi-step support
+- **MultiStageRegisterForm**: Multi-step registration with progress tracking
+- **ForgotPasswordForm**: Password reset form with email validation
+- **ContactForm**: Contact form with submission handling and validation
 
-### 4. Section Components
+### 4. Domain Components
 
-- **HeroSection**: Hero sections with variants
-- **Section**: Generic section wrapper
+- **DomainSearch**: Domain search interface with real-time pricing
+- **DomainBookingProgress**: Domain booking progress tracking
+- **DomainRenewalModal**: Domain renewal modal with pricing
+- **DomainRequirementsModal**: Domain requirements and validation
+- **DNSManagementModal**: DNS record management interface
+- **NameServerManagement**: Nameserver configuration and management
 
-### 5. Content Components
+### 5. Payment Components
 
-- **Logo**: Reusable logo component
-- **FAQItem**: Accordion FAQ item
-- **ContactInfo**: Contact information display
+- **Invoice**: PDF invoice generation and display
+- **LivePricingIndicator**: Real-time pricing indicator with updates
+
+### 6. Admin Components
+
+- **AdminCard**: Admin-specific card component
+- **AdminTable**: Data table for admin interfaces
+- **AdminTabs**: Tab navigation for admin sections
+- **AdminPasswordReset**: Admin password reset functionality
+
+### 7. Content Components
+
+- **Logo**: Reusable logo component with size and variant options
+- **FAQItem**: Accordion-style FAQ item component
+- **ContactInfo**: Contact information display component
+- **FeatureCard**: Feature display card with icons and descriptions
+- **StatsCard**: Statistics display card with trend indicators
+- **HeroSection**: Hero section component with customizable backgrounds
+- **Section**: Generic section wrapper with background and padding options
+- **LoadingPage**: Full-page loading component
+
+### 8. Utility Components
+
+- **ClientOnly**: Client-side only rendering component
+- **OutboundIPBadge**: Outbound IP address display badge
 
 ## 🔧 Key Features
 
 ### Security
 
-- JWT authentication with proper expiration
-- Input validation and sanitization
-- Rate limiting on API endpoints
-- Admin-only route protection
-- XSS and injection protection
+- **JWT Authentication**: Secure token-based authentication with proper expiration
+- **Input Validation**: Comprehensive input validation and sanitization
+- **Rate Limiting**: API endpoint protection with configurable limits
+- **Admin-only Routes**: Role-based access control for admin functions
+- **XSS Protection**: Cross-site scripting prevention
+- **SQL Injection Protection**: NoSQL injection prevention
+- **CSRF Protection**: Cross-site request forgery protection
+- **Password Hashing**: Bcrypt with salt rounds for secure password storage
 
 ### User Experience
 
-- Responsive design (mobile-first)
-- Fixed navigation with backdrop blur
-- Smooth animations and transitions
-- Loading states and error handling
-- Toast notifications
+- **Responsive Design**: Mobile-first approach with breakpoint optimization
+- **Fixed Navigation**: Sticky navigation with backdrop blur effect
+- **Smooth Animations**: Framer Motion animations for enhanced UX
+- **Loading States**: Comprehensive loading indicators and skeleton screens
+- **Error Handling**: User-friendly error messages and recovery options
+- **Toast Notifications**: Real-time feedback with React Hot Toast
+- **Accessibility**: ARIA attributes and keyboard navigation support
+- **Progressive Enhancement**: Graceful degradation for older browsers
 
 ### Developer Experience
 
-- TypeScript throughout
-- Component-based architecture
-- Reusable components
-- Comprehensive documentation
-- Consistent code style
+- **TypeScript**: Full type safety with strict configuration
+- **Component Architecture**: Modular, reusable component system
+- **Comprehensive Documentation**: Detailed documentation for all components
+- **Consistent Code Style**: ESLint and Prettier for code consistency
+- **Testing Suite**: Comprehensive testing framework with multiple test categories
+- **Utility Scripts**: Development and maintenance automation scripts
+- **Hot Reloading**: Fast development with Next.js hot reloading
+- **Error Boundaries**: React error boundaries for graceful error handling
+
+### Performance
+
+- **Code Splitting**: Automatic code splitting with Next.js
+- **Image Optimization**: Next.js Image component for optimized images
+- **Caching**: Intelligent caching with 5-minute TTL for API responses
+- **Bundle Optimization**: Optimized bundle size with tree shaking
+- **Lazy Loading**: Component lazy loading for better performance
+- **CDN Ready**: Static asset optimization for CDN deployment
 
 ## 📱 Page Structure
 
