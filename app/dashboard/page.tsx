@@ -257,20 +257,33 @@ export default function UserDashboard() {
                 </button>
               </div>
               <div className="space-y-3">
-                {stats?.upcomingRenewals.map((renewal, index) => (
-                  <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
-                    <div>
-                      <p className="font-medium text-gray-900">{renewal.domain}</p>
-                      <p className="text-sm text-gray-500">Expires: {renewal.expiryDate}</p>
+                {stats?.upcomingRenewals && stats.upcomingRenewals.length > 0 ? (
+                  stats.upcomingRenewals.map((renewal, index) => (
+                    <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
+                      <div>
+                        <p className="font-medium text-gray-900">{renewal.domain}</p>
+                        <p className="text-sm text-gray-500">Expires: {renewal.expiryDate}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-medium text-orange-600">{renewal.daysLeft} days left</p>
+                        <button className="text-xs text-blue-600 hover:text-blue-700">
+                          Renew
+                        </button>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium text-orange-600">{renewal.daysLeft} days left</p>
-                      <button className="text-xs text-blue-600 hover:text-blue-700">
-                        Renew
-                      </button>
-                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h4 className="text-lg font-medium text-gray-900 mb-2">No Upcoming Renewals</h4>
+                    <p className="text-gray-500 text-sm">
+                      {stats?.activeDomains > 0
+                        ? "Your domains are not expiring in the next 30 days"
+                        : "You don't have any registered domains yet"
+                      }
+                    </p>
                   </div>
-                ))}
+                )}
               </div>
             </motion.div>
           </div>

@@ -39,16 +39,13 @@ export async function GET(request: NextRequest) {
         ).length,
       0
     );
-    const totalSpent = orders.reduce(
-      (sum, order) => sum + order.totalAmount,
-      0
-    );
+    const totalSpent = orders.reduce((sum, order) => sum + order.amount, 0);
 
     // Get recent orders
     const recentOrders = orders.slice(0, 5).map((order) => ({
       id: order.orderId,
       domain: order.domains.map((domain) => domain.domainName).join(", "),
-      amount: order.totalAmount,
+      amount: order.amount,
       status: order.status,
       date: new Date(order.createdAt).toLocaleDateString(),
     }));
@@ -60,14 +57,17 @@ export async function GET(request: NextRequest) {
           .filter(
             (domain) => domain.status === "registered" && domain.expiresAt
           )
-          .map((domain) => ({
-            domain: domain.domainName,
-            expiryDate: new Date(domain.expiresAt).toLocaleDateString(),
-            daysLeft: Math.ceil(
+          .map((domain) => {
+            const daysLeft = Math.ceil(
               (new Date(domain.expiresAt).getTime() - new Date().getTime()) /
                 (1000 * 60 * 60 * 24)
-            ),
-          }))
+            );
+            return {
+              domain: domain.domainName,
+              expiryDate: new Date(domain.expiresAt).toLocaleDateString(),
+              daysLeft,
+            };
+          })
       )
       .filter((renewal) => renewal.daysLeft <= 30 && renewal.daysLeft > 0)
       .sort((a, b) => a.daysLeft - b.daysLeft)
