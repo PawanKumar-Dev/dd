@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, DollarSign, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { RefreshCw, TrendingUp, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 import { formatIndianDate } from '@/lib/dateUtils';
 
 interface LivePricingIndicatorProps {
@@ -79,7 +79,7 @@ export default function LivePricingIndicator({ domainName, tld, onPriceUpdate }:
     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center space-x-2">
-          <DollarSign className="h-5 w-5 text-blue-600" />
+          <TrendingUp className="h-5 w-5 text-blue-600" />
           <h3 className="text-sm font-semibold text-blue-900">Live Pricing</h3>
           {livePrice && (
             <div className="flex items-center space-x-1">

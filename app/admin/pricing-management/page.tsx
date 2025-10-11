@@ -21,7 +21,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { DollarSign, RefreshCw, Search, Filter, Globe } from 'lucide-react';
+import { TrendingUp, RefreshCw, Search, Filter, Globe } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayoutNew';
 import AdminDataTable from '@/components/admin/AdminDataTable';
 import { formatIndianCurrency, formatIndianNumber, formatIndianDateTime } from '@/lib/dateUtils';
@@ -220,7 +220,7 @@ export default function AdminTLDPricing() {
       sortable: true,
       render: (value: number, row: TLDPricing) => (
         <div className="flex items-center">
-          <DollarSign className="h-4 w-4 text-green-500 mr-1" />
+          <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
           <span className="font-semibold text-gray-900">
             {formatIndianCurrency(value)}
           </span>
@@ -234,7 +234,7 @@ export default function AdminTLDPricing() {
       sortable: true,
       render: (value: number, row: TLDPricing) => (
         <div className="flex items-center">
-          <DollarSign className="h-4 w-4 text-blue-500 mr-1" />
+          <TrendingUp className="h-4 w-4 text-blue-500 mr-1" />
           <span className="font-semibold text-gray-900">
             {formatIndianCurrency(value)}
           </span>
