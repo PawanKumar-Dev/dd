@@ -85,7 +85,7 @@ dd/
 │   │   ├── DomainBookingProgress.tsx # Domain booking progress
 │   │   ├── DomainRenewalModal.tsx # Domain renewal modal
 │   │   ├── DomainRequirementsModal.tsx # Domain requirements
-│   │   └── NameServerManagement.tsx # Nameserver management
+│   │   └── NameServerManagement.tsx # RDAP nameserver lookup
 │   ├── payment/                  # Payment components
 │   │   ├── Invoice.tsx           # Invoice generation
 │   │   └── LivePricingIndicator.tsx # Live pricing indicator
@@ -221,7 +221,7 @@ dd/
 - **DomainBookingProgress**: Domain booking progress tracking
 - **DomainRenewalModal**: Domain renewal modal with pricing
 - **DomainRequirementsModal**: Domain requirements and validation
-- **NameServerManagement**: Nameserver configuration and management
+- **NameServerManagement**: RDAP nameserver lookup and management
 
 ### 5. Payment Components
 

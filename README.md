@@ -9,7 +9,7 @@ A comprehensive, enterprise-grade domain registration and management platform bu
 - **Domain Search & Registration** - Search and register domains across 400+ TLDs with real-time availability checking
 - **Live Pricing Integration** - Real-time pricing from ResellerClub API with 200+ comprehensive TLD mappings
 - **Multi-stage Registration** - Step-by-step user registration process with geolocation support
-- **DNS Management** - Complete DNS record management with user-friendly interface
+- **DNS Management** - Complete DNS record management with RDAP nameserver lookup
 - **Domain Renewal** - Easy domain renewal with automated notifications
 - **Cart System** - Add multiple domains to cart for bulk registration
 

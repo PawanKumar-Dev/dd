@@ -230,6 +230,56 @@ Search for domain availability and pricing.
 }
 ```
 
+### GET /api/domains/nameservers
+
+Get nameserver information for a domain using RDAP (Registration Data Access Protocol).
+
+**Query Parameters:**
+
+- `domainName` (string, required): Domain name to lookup
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "domainName": "string",
+  "nameservers": ["string"],
+  "count": number,
+  "method": "rdap|dns",
+  "whoisData": {
+    "registrar": "string",
+    "creationDate": "string",
+    "expirationDate": "string",
+    "lastUpdated": "string",
+    "status": "string"
+  },
+  "lastChecked": "2024-01-01T00:00:00.000Z"
+}
+```
+
+**Error Response:**
+
+```json
+{
+  "success": false,
+  "error": "Nameserver lookup failed",
+  "message": "Unable to retrieve nameserver information for domain.com. Both RDAP and DNS lookups failed",
+  "domainName": "string",
+  "nameservers": [],
+  "count": 0,
+  "lastChecked": "2024-01-01T00:00:00.000Z"
+}
+```
+
+**Features:**
+
+- **RDAP Primary**: Uses modern RDAP protocol for accurate nameserver data
+- **DNS Fallback**: Falls back to DNS NS record lookup if RDAP fails
+- **TLD-Specific**: Automatically finds correct RDAP server for each TLD
+- **Structured Data**: Returns clean JSON with nameservers and domain info
+- **No API Keys**: Completely free service with no authentication required
+
 ### POST /api/domains/renew
 
 Renew a domain.

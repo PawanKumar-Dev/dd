@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AuthService } from "@/lib/auth";
-import whois from "whois";
-import whoisJson from "whois-json";
 import { promisify } from "util";
 import dns from "dns";
 
@@ -33,236 +31,176 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log(`🔍 [WHOIS] Looking up nameservers for: ${domainName}`);
+    console.log(`🔍 [RDAP] Looking up nameservers for: ${domainName}`);
 
     let nameservers: string[] = [];
     let whoisData: any = {};
     let method = "unknown";
 
-    // Method 1: Try WHOIS-JSON (best for structured data)
+    // Method 1: Try RDAP (Registration Data Access Protocol)
     try {
-      console.log(
-        `🔍 [WHOIS-JSON] Trying WHOIS-JSON lookup for: ${domainName}`
-      );
+      console.log(`🔍 [RDAP] Trying RDAP lookup for: ${domainName}`);
 
-      const whoisJsonResult = await whoisJson(domainName, {
-        timeout: 10000,
-        follow: 3,
-      });
+      // Extract TLD from domain
+      const tld = domainName.split(".").slice(-2).join(".");
 
-      console.log(`✅ [WHOIS-JSON] Received data for: ${domainName}`);
-      method = "whois-json";
+      // Try RDAP bootstrap service first
+      let rdapData = null;
+      let rdapServer = "";
 
-      // Extract nameservers from WHOIS-JSON data
-      const nameserverFields = [
-        "nameServer",
-        "nameserver",
-        "name_servers",
-        "name_servers_list",
-        "nserver",
-        "Name Server",
-        "NAME SERVER",
-        "nameservers",
-        "dns",
-        "dns_servers",
-      ];
-
-      for (const field of nameserverFields) {
-        if (whoisJsonResult[field]) {
-          if (Array.isArray(whoisJsonResult[field])) {
-            nameservers = [...nameservers, ...whoisJsonResult[field]];
-          } else if (typeof whoisJsonResult[field] === "string") {
-            const nsList = whoisJsonResult[field]
-              .split(/[,\n\r\t]+/)
-              .map((ns) => ns.trim())
-              .filter((ns) => ns.length > 0);
-            nameservers = [...nameservers, ...nsList];
-          }
-        }
-      }
-
-      // Extract additional domain information
-      whoisData = {
-        registrar:
-          whoisJsonResult.registrar || whoisJsonResult.Registrar || "Unknown",
-        creationDate:
-          whoisJsonResult.creationDate ||
-          whoisJsonResult.CreationDate ||
-          whoisJsonResult.created ||
-          null,
-        expirationDate:
-          whoisJsonResult.expirationDate ||
-          whoisJsonResult.ExpirationDate ||
-          whoisJsonResult.expires ||
-          null,
-        lastUpdated:
-          whoisJsonResult.updatedDate ||
-          whoisJsonResult.UpdatedDate ||
-          whoisJsonResult.updated ||
-          null,
-        status: whoisJsonResult.status || whoisJsonResult.Status || "Unknown",
-      };
-    } catch (whoisJsonError) {
-      console.log(`⚠️ [WHOIS-JSON] Failed: ${whoisJsonError.message}`);
-
-      // Method 2: Try public WHOIS API
       try {
-        console.log(
-          `🔍 [WHOIS-API] Trying public WHOIS API for: ${domainName}`
-        );
-        const apiResponse = await fetch(
-          `https://api.whoisjson.com/v1/whois?domain=${domainName}`,
+        // Try IANA RDAP bootstrap
+        const bootstrapResponse = await fetch(
+          `https://data.iana.org/rdap/dns.json`,
           {
             headers: {
+              Accept: "application/json",
               "User-Agent": "Mozilla/5.0 (compatible; DomainManager/1.0)",
             },
           }
         );
 
-        if (apiResponse.ok) {
-          const apiData = await apiResponse.json();
-          console.log(`✅ [WHOIS-API] Received data for: ${domainName}`);
-          method = "whois-api";
+        if (bootstrapResponse.ok) {
+          const bootstrapData = await bootstrapResponse.json();
+          console.log(`✅ [RDAP] Bootstrap data loaded`);
 
-          // Extract nameservers from API response
-          if (apiData.nameservers && Array.isArray(apiData.nameservers)) {
-            nameservers = apiData.nameservers;
-          } else if (
-            apiData.nameServers &&
-            Array.isArray(apiData.nameServers)
-          ) {
-            nameservers = apiData.nameServers;
-          }
-
-          whoisData = {
-            registrar: apiData.registrar || "Unknown",
-            creationDate: apiData.creationDate || apiData.created || null,
-            expirationDate: apiData.expirationDate || apiData.expires || null,
-            lastUpdated: apiData.updatedDate || apiData.updated || null,
-            status: apiData.status || "Unknown",
-          };
-        } else {
-          throw new Error(`API returned ${apiResponse.status}`);
-        }
-      } catch (apiError) {
-        console.log(`⚠️ [WHOIS-API] Failed: ${apiError.message}`);
-
-        // Method 3: Try regular WHOIS lookup
-        try {
-          console.log(
-            `🔍 [WHOIS] Trying regular WHOIS lookup for: ${domainName}`
+          // Find RDAP server for this TLD
+          const tldEntry = bootstrapData.services?.find((service: any) =>
+            service[0]?.some(
+              (pattern: string) =>
+                pattern === tld ||
+                pattern === `*.${tld}` ||
+                domainName.endsWith(pattern)
+            )
           );
 
-          const whoisResult = await new Promise<string>((resolve, reject) => {
-            whois.lookup(domainName, (err: any, data: string) => {
-              if (err) {
-                reject(err);
-              } else {
-                resolve(data);
+          if (tldEntry && tldEntry[1]?.length > 0) {
+            const rdapUrl = tldEntry[1][0];
+            console.log(`🔍 [RDAP] Found server for ${tld}: ${rdapUrl}`);
+
+            const rdapResponse = await fetch(
+              `${rdapUrl}/domain/${domainName}`,
+              {
+                headers: {
+                  Accept: "application/rdap+json",
+                  "User-Agent": "Mozilla/5.0 (compatible; DomainManager/1.0)",
+                },
               }
-            });
-          });
-
-          console.log(`✅ [WHOIS] Received data for: ${domainName}`);
-          method = "whois";
-
-          // Extract nameservers from raw WHOIS text
-          const nsPatterns = [
-            /name\s*server[s]?[:\s]+([^\n\r]+)/gi,
-            /nameserver[s]?[:\s]+([^\n\r]+)/gi,
-            /nserver[s]?[:\s]+([^\n\r]+)/gi,
-            /dns[:\s]+([^\n\r]+)/gi,
-          ];
-
-          for (const pattern of nsPatterns) {
-            let match;
-            while ((match = pattern.exec(whoisResult)) !== null) {
-              const nsLine = match[1] || match[0];
-              if (nsLine) {
-                const nsList = nsLine
-                  .split(/[,\s]+/)
-                  .map((ns) => ns.trim())
-                  .filter((ns) => ns.length > 0 && ns.includes("."));
-                nameservers = [...nameservers, ...nsList];
-              }
-            }
-          }
-
-          // Also try to find nameservers by looking for common patterns
-          const lines = whoisResult.split("\n");
-          for (const line of lines) {
-            const trimmedLine = line.trim().toLowerCase();
-            if (
-              trimmedLine.includes("name server") ||
-              trimmedLine.includes("nameserver") ||
-              trimmedLine.includes("nserver") ||
-              trimmedLine.includes("dns")
-            ) {
-              const parts = line.split(/[:,\s]+/);
-              for (const part of parts) {
-                const trimmed = part.trim();
-                if (
-                  trimmed.includes(".") &&
-                  !trimmed.includes(" ") &&
-                  /^[a-zA-Z0-9.-]+$/.test(trimmed) &&
-                  trimmed.length > 3
-                ) {
-                  nameservers.push(trimmed);
-                }
-              }
-            }
-          }
-
-          // Extract additional domain information from WHOIS
-          const registrarMatch = whoisResult.match(
-            /registrar[:\s]+([^\n\r]+)/i
-          );
-          const creationMatch = whoisResult.match(
-            /creation\s+date[:\s]+([^\n\r]+)/i
-          );
-          const expirationMatch = whoisResult.match(/expir[:\s]+([^\n\r]+)/i);
-          const statusMatch = whoisResult.match(/status[:\s]+([^\n\r]+)/i);
-
-          whoisData = {
-            registrar: registrarMatch ? registrarMatch[1].trim() : "Unknown",
-            creationDate: creationMatch ? creationMatch[1].trim() : null,
-            expirationDate: expirationMatch ? expirationMatch[1].trim() : null,
-            lastUpdated: null,
-            status: statusMatch ? statusMatch[1].trim() : "Unknown",
-          };
-        } catch (whoisError) {
-          console.log(`⚠️ [WHOIS] Failed: ${whoisError.message}`);
-
-          // Method 4: Try DNS lookup as fallback
-          try {
-            console.log(`🔄 [DNS] Trying DNS lookup as fallback...`);
-            const resolveNs = promisify(dns.resolveNs);
-            const nsRecords = await resolveNs(domainName);
-
-            if (nsRecords && nsRecords.length > 0) {
-              nameservers = nsRecords;
-              method = "dns";
-              console.log(
-                `✅ [DNS] Found ${nameservers.length} nameservers via DNS`
-              );
-            }
-
-            whoisData = {
-              registrar: "Unknown",
-              creationDate: null,
-              expirationDate: null,
-              lastUpdated: null,
-              status: "Unknown",
-            };
-          } catch (dnsError) {
-            console.error(`❌ [DNS] Also failed: ${dnsError.message}`);
-
-            // All lookup methods failed - throw error
-            throw new Error(
-              `Unable to retrieve nameserver information for ${domainName}. All lookup methods failed: WHOIS-JSON (${whoisJsonError.message}), WHOIS-API (${apiError.message}), WHOIS (${whoisError.message}), DNS (${dnsError.message})`
             );
+
+            if (rdapResponse.ok) {
+              rdapData = await rdapResponse.json();
+              rdapServer = rdapUrl;
+              console.log(`✅ [RDAP] Received data from ${rdapUrl}`);
+            }
           }
         }
+      } catch (bootstrapError) {
+        console.log(`⚠️ [RDAP] Bootstrap failed: ${bootstrapError.message}`);
+      }
+
+      // Fallback to direct RDAP servers if bootstrap fails
+      if (!rdapData) {
+        const directServers = [
+          `https://rdap.verisign.com/domain/${domainName}`,
+          `https://rdap.arin.net/registry/domain/${domainName}`,
+          `https://rdap.afilias.net/rdap/domain/${domainName}`,
+          `https://rdap.nic.in/domain/${domainName}`,
+          `https://rdap.registry.in/domain/${domainName}`,
+        ];
+
+        for (const server of directServers) {
+          try {
+            const rdapResponse = await fetch(server, {
+              headers: {
+                Accept: "application/rdap+json",
+                "User-Agent": "Mozilla/5.0 (compatible; DomainManager/1.0)",
+              },
+            });
+
+            if (rdapResponse.ok) {
+              rdapData = await rdapResponse.json();
+              rdapServer = server;
+              console.log(`✅ [RDAP] Received data from ${server}`);
+              break;
+            }
+          } catch (serverError) {
+            console.log(
+              `⚠️ [RDAP] Server ${server} failed: ${serverError.message}`
+            );
+            continue;
+          }
+        }
+      }
+
+      if (rdapData) {
+        method = "rdap";
+
+        // Extract nameservers from RDAP data
+        if (rdapData.nameservers && Array.isArray(rdapData.nameservers)) {
+          nameservers = rdapData.nameservers
+            .map((ns: any) => {
+              if (typeof ns === "string") return ns;
+              if (ns.ldhName) return ns.ldhName;
+              if (ns.name) return ns.name;
+              return ns;
+            })
+            .filter((ns: string) => ns && ns.includes("."));
+        }
+
+        // Extract additional domain information from RDAP
+        whoisData = {
+          registrar:
+            rdapData.registrar?.name || rdapData.registrar?.value || "Unknown",
+          creationDate:
+            rdapData.events?.find((e: any) => e.eventAction === "registration")
+              ?.eventDate || null,
+          expirationDate:
+            rdapData.events?.find((e: any) => e.eventAction === "expiration")
+              ?.eventDate || null,
+          lastUpdated:
+            rdapData.events?.find((e: any) => e.eventAction === "last changed")
+              ?.eventDate || null,
+          status: rdapData.status?.join(", ") || "Unknown",
+        };
+
+        console.log(
+          `📋 [RDAP] Found ${nameservers.length} nameservers from ${rdapServer}`
+        );
+      } else {
+        throw new Error("No RDAP server responded successfully");
+      }
+    } catch (rdapError) {
+      console.log(`⚠️ [RDAP] Failed: ${rdapError.message}`);
+
+      // Method 2: Try DNS lookup as fallback
+      try {
+        console.log(`🔄 [DNS] Trying DNS lookup as fallback...`);
+        const resolveNs = promisify(dns.resolveNs);
+        const nsRecords = await resolveNs(domainName);
+
+        if (nsRecords && nsRecords.length > 0) {
+          nameservers = nsRecords;
+          method = "dns";
+          console.log(
+            `✅ [DNS] Found ${nameservers.length} nameservers via DNS`
+          );
+        }
+
+        whoisData = {
+          registrar: "Unknown",
+          creationDate: null,
+          expirationDate: null,
+          lastUpdated: null,
+          status: "Unknown",
+        };
+      } catch (dnsError) {
+        console.error(`❌ [DNS] Also failed: ${dnsError.message}`);
+
+        // All lookup methods failed - throw error
+        throw new Error(
+          `Unable to retrieve nameserver information for ${domainName}. Both RDAP and DNS lookups failed: RDAP (${rdapError.message}), DNS (${dnsError.message})`
+        );
       }
     }
 
