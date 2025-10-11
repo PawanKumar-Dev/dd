@@ -47,6 +47,7 @@ export default function DNSManagementPage() {
   const [selectedDomain, setSelectedDomain] = useState<string>('');
   const [dnsRecords, setDnsRecords] = useState<DNSRecord[]>([]);
   const [nameservers, setNameservers] = useState<string[]>([]);
+  const [nameserverMethod, setNameserverMethod] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [isDNSLoading, setIsDNSLoading] = useState(false);
   const [isNameserverLoading, setIsNameserverLoading] = useState(false);
@@ -184,6 +185,7 @@ export default function DNSManagementPage() {
       if (response.ok) {
         const data = await response.json();
         setNameservers(data.nameservers || []);
+        setNameserverMethod(data.method || '');
         console.log('Nameservers loaded:', data.nameservers);
         console.log('Method used:', data.method);
         console.log('Full response:', data);
@@ -555,6 +557,11 @@ export default function DNSManagementPage() {
                         </svg>
                         <p className="text-sm text-blue-800">
                           <strong>Note:</strong> These nameservers are retrieved from WHOIS data and may not reflect real-time changes.
+                          {nameserverMethod === 'fallback' && (
+                            <span className="block mt-1 text-xs text-blue-600">
+                              (Sample nameservers shown for testing domain)
+                            </span>
+                          )}
                         </p>
                       </div>
                     </div>
