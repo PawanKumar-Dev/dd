@@ -10,7 +10,6 @@ import {
 import toast from 'react-hot-toast';
 import UserLayout from '@/components/user/UserLayout';
 import { PageLoading, DataLoading } from '@/components/user/LoadingComponents';
-import DNSManagement from '@/components/user/DNSManagement';
 import DomainBookingProgress from '@/components/DomainBookingProgress';
 import ClientOnly from '@/components/ClientOnly';
 
@@ -46,8 +45,6 @@ export default function UserDomains() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [selectedDomain, setSelectedDomain] = useState<Domain | null>(null);
-  const [isDNSModalOpen, setIsDNSModalOpen] = useState(false);
   const [showBookingProgress, setShowBookingProgress] = useState(false);
   const [bookingDomain, setBookingDomain] = useState<Domain | null>(null);
   const router = useRouter();
@@ -171,8 +168,8 @@ export default function UserDomains() {
       toast.error('Domain registration failed. Please contact support.');
       return;
     }
-    setSelectedDomain(domain);
-    setIsDNSModalOpen(true);
+    // Redirect to standalone DNS management page
+    router.push('/domain-management');
   };
 
   const canManageDomain = (domain: Domain) => {
@@ -391,18 +388,6 @@ export default function UserDomains() {
           </div>
 
         </div>
-
-        {/* DNS Management Modal */}
-        {selectedDomain && (
-          <DNSManagement
-            domainName={selectedDomain.name}
-            isOpen={isDNSModalOpen}
-            onClose={() => {
-              setIsDNSModalOpen(false);
-              setSelectedDomain(null);
-            }}
-          />
-        )}
 
         {/* Domain Booking Progress Modal */}
         {bookingDomain && bookingDomain.orderId && showBookingProgress && (

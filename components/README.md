@@ -35,7 +35,6 @@ This directory contains all reusable React components for the Excel Technologies
 - **DomainBookingProgress**: Domain booking progress tracking
 - **DomainRenewalModal**: Domain renewal modal with pricing
 - **DomainRequirementsModal**: Domain requirements and validation
-- **DNSManagementModal**: DNS record management interface
 - **NameServerManagement**: Nameserver configuration and management
 
 ### Payment Components
