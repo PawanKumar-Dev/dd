@@ -166,7 +166,7 @@ export class EmailService {
         <ul>
           ${domainList}
         </ul>
-        <p>You can now manage your DNS records and domain settings from your <a href="${process.env.NEXTAUTH_URL}/domain-management" style="color: #3b82f6;">domain management panel</a>.</p>
+        <p>You can now manage your DNS records and domain settings from your <a href="${process.env.NEXTAUTH_URL}/dashboard/domain-management" style="color: #3b82f6;">domain management panel</a>.</p>
         <p>If you need any assistance with your domains, our support team is here to help!</p>
         <br>
         <p>Best regards,<br>Excel Technologies Team</p>

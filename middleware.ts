@@ -19,7 +19,11 @@ export async function middleware(request: NextRequest) {
   const adminRoutes = ["/admin"];
 
   // Protected routes
-  const protectedRoutes = ["/dashboard", "/checkout", "/domain-management"];
+  const protectedRoutes = [
+    "/dashboard",
+    "/checkout",
+    "/dashboard/domain-management",
+  ];
 
   // Check if the current path is public
   if (publicRoutes.includes(pathname)) {
