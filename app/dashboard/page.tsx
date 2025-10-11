@@ -278,10 +278,15 @@ export default function UserDashboard() {
                     <h4 className="text-lg font-medium text-gray-900 mb-2">No Upcoming Renewals</h4>
                     <p className="text-gray-500 text-sm">
                       {stats?.activeDomains > 0
-                        ? "Your domains are not expiring in the next 30 days"
+                        ? "No domains are expiring in the next 30 days"
                         : "You don't have any registered domains yet"
                       }
                     </p>
+                    {stats?.activeDomains > 0 && (
+                      <p className="text-gray-400 text-xs mt-2">
+                        We'll notify you when your domains are approaching expiration
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
