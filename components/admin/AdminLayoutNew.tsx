@@ -16,7 +16,7 @@ import {
   Shield,
   Receipt
 } from 'lucide-react';
-import RsIcon from '@/components/icons/RsIcon';
+import RupeeIcon from '@/components/icons/RupeeIcon';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -37,7 +37,7 @@ export default function AdminLayoutNew({ children, user, onLogout }: AdminLayout
     { name: 'Users', href: '/admin/user-management', icon: Users },
     { name: 'Orders', href: '/admin/order-management', icon: Receipt },
     { name: 'Payments', href: '/admin/payment-management', icon: CreditCard },
-    { name: 'TLD Pricing', href: '/admin/pricing-management', icon: RsIcon },
+    { name: 'TLD Pricing', href: '/admin/pricing-management', icon: RupeeIcon },
     { name: 'Settings', href: '/admin/settings', icon: Settings },
   ];
 

@@ -146,7 +146,7 @@ export default function UserDashboard() {
     {
       title: 'Total Orders',
       value: stats?.totalOrders || 0,
-      icon: RsIcon,
+      icon: RupeeIcon,
       color: 'purple',
       change: '+3 this month'
     }
