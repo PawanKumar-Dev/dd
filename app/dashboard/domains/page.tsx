@@ -169,7 +169,7 @@ export default function UserDomains() {
       return;
     }
     // Redirect to standalone DNS management page
-    router.push('/dashboard/domain-management');
+    router.push('/dashboard/dns-management');
   };
 
   const canManageDomain = (domain: Domain) => {

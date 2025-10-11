@@ -171,7 +171,7 @@ dd/
 │   ├── admin/                    # Admin panel pages
 │   ├── dashboard/                # User dashboard
 │   ├── checkout/                 # Checkout process
-│   ├── domain-management/        # Domain management interface
+│   ├── dns-management/           # DNS management interface
 │   ├── dns/                      # DNS management
 │   ├── payment-success/          # Payment success page
 │   └── (auth)/                   # Authentication pages

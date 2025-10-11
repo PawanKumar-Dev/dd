@@ -22,7 +22,7 @@ export async function middleware(request: NextRequest) {
   const protectedRoutes = [
     "/dashboard",
     "/checkout",
-    "/dashboard/domain-management",
+    "/dashboard/dns-management",
   ];
 
   // Check if the current path is public

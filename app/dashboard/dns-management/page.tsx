@@ -38,7 +38,7 @@ interface Domain {
   lastUpdated?: string;
 }
 
-export default function DomainManagementPage() {
+export default function DNSManagementPage() {
   const [user, setUser] = useState<User | null>(null);
   const [domains, setDomains] = useState<Domain[]>([]);
   const [selectedDomain, setSelectedDomain] = useState<string>('');
@@ -212,7 +212,7 @@ export default function DomainManagementPage() {
   };
 
   if (!user) {
-    return <PageLoading page="domain-management" />;
+    return <PageLoading page="dns-management" />;
   }
 
   if (isLoading) {
@@ -375,10 +375,10 @@ export default function DomainManagementPage() {
                     </label>
                     <div className="flex items-center px-3 py-2 bg-gray-50 rounded-lg">
                       <div className={`w-2 h-2 rounded-full mr-2 ${selectedDomain
-                          ? domains.find(d => d.id === selectedDomain)?.status === 'active'
-                            ? 'bg-green-500'
-                            : 'bg-yellow-500'
-                          : 'bg-gray-400'
+                        ? domains.find(d => d.id === selectedDomain)?.status === 'active'
+                          ? 'bg-green-500'
+                          : 'bg-yellow-500'
+                        : 'bg-gray-400'
                         }`}></div>
                       <span className="text-sm font-medium text-gray-900">
                         {selectedDomain

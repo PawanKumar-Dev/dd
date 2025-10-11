@@ -39,7 +39,7 @@ dd/
 │   │       └── razorpay/         # Razorpay webhooks
 │   ├── dashboard/                # User dashboard
 │   ├── admin/                    # Admin panel
-│   ├── domain-management/        # Domain management interface
+│   ├── dns-management/           # DNS management interface
 │   ├── dns/                      # DNS management
 │   ├── checkout/                 # Checkout process
 │   ├── payment-success/          # Payment success page
