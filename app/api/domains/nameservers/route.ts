@@ -257,48 +257,10 @@ export async function GET(request: NextRequest) {
           } catch (dnsError) {
             console.error(`❌ [DNS] Also failed: ${dnsError.message}`);
 
-            // Method 5: Provide real nameservers for known domains
-            if (domainName.includes("anutechpvtltd.co.in")) {
-              console.log(
-                `🔄 [FALLBACK] Providing real ResellerClub nameservers for: ${domainName}`
-              );
-              nameservers = [
-                "deepak1299294.earth.orderbox-dns.com",
-                "deepak1299294.venus.orderbox-dns.com",
-                "deepak1299294.mars.orderbox-dns.com",
-                "deepak1299294.mercury.orderbox-dns.com",
-              ];
-              method = "resellerclub";
-              whoisData = {
-                registrar: "ResellerClub",
-                creationDate: "2025-10-09",
-                expirationDate: "2026-10-09",
-                lastUpdated: "2025-10-09",
-                status: "clientTransferProhibited, addPeriod",
-              };
-            } else if (domainName.includes("test")) {
-              console.log(
-                `🔄 [FALLBACK] Providing sample nameservers for testing domain: ${domainName}`
-              );
-              nameservers = [
-                "ns1.example.com",
-                "ns2.example.com",
-                "ns3.example.com",
-                "ns4.example.com",
-              ];
-              method = "fallback";
-              whoisData = {
-                registrar: "Sample Registrar",
-                creationDate: "2024-01-01",
-                expirationDate: "2025-01-01",
-                lastUpdated: null,
-                status: "Active (Test Domain)",
-              };
-            } else {
-              throw new Error(
-                `All lookup methods failed: ${whoisJsonError.message}, ${apiError.message}, ${whoisError.message}, ${dnsError.message}`
-              );
-            }
+            // All lookup methods failed - throw error
+            throw new Error(
+              `Unable to retrieve nameserver information for ${domainName}. All lookup methods failed: WHOIS-JSON (${whoisJsonError.message}), WHOIS-API (${apiError.message}), WHOIS (${whoisError.message}), DNS (${dnsError.message})`
+            );
           }
         }
       }
@@ -335,10 +297,39 @@ export async function GET(request: NextRequest) {
       whoisData,
       lastChecked: new Date().toISOString(),
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Nameserver lookup error:", error);
+
+    // Check if it's a nameserver lookup failure
+    if (
+      error.message &&
+      error.message.includes("Unable to retrieve nameserver information")
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Nameserver lookup failed",
+          message: error.message,
+          domainName: domainName,
+          nameservers: [],
+          count: 0,
+          lastChecked: new Date().toISOString(),
+        },
+        { status: 404 }
+      );
+    }
+
+    // Generic server error
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        success: false,
+        error: "Internal server error",
+        message: error.message || "An unexpected error occurred",
+        domainName: domainName,
+        nameservers: [],
+        count: 0,
+        lastChecked: new Date().toISOString(),
+      },
       { status: 500 }
     );
   }

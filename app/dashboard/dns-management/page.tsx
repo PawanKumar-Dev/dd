@@ -184,16 +184,33 @@ export default function DNSManagementPage() {
 
       if (response.ok) {
         const data = await response.json();
-        setNameservers(data.nameservers || []);
-        setNameserverMethod(data.method || '');
-        console.log('Nameservers loaded:', data.nameservers);
-        console.log('Method used:', data.method);
-        console.log('Full response:', data);
+        if (data.success) {
+          setNameservers(data.nameservers || []);
+          setNameserverMethod(data.method || '');
+          console.log('Nameservers loaded:', data.nameservers);
+          console.log('Method used:', data.method);
+          console.log('Full response:', data);
+        } else {
+          // Handle API success but lookup failure
+          setNameservers([]);
+          setNameserverMethod('');
+          console.error('Nameserver lookup failed:', data.message);
+          toast.error(data.message || 'Failed to retrieve nameserver information');
+        }
       } else {
         const errorData = await response.json().catch(() => ({}));
         console.error('Failed to load nameservers:', errorData);
         setNameservers([]);
-        toast.error('Failed to load nameserver information');
+        setNameserverMethod('');
+
+        // Show specific error message based on status
+        if (response.status === 404) {
+          toast.error(errorData.message || 'Nameserver information not available for this domain');
+        } else if (response.status === 500) {
+          toast.error('Server error occurred while fetching nameserver information');
+        } else {
+          toast.error(errorData.message || 'Failed to load nameserver information');
+        }
       }
     } catch (error) {
       console.error('Error loading nameservers:', error);
@@ -557,22 +574,28 @@ export default function DNSManagementPage() {
                         </svg>
                         <p className="text-sm text-blue-800">
                           <strong>Note:</strong> These nameservers are retrieved from WHOIS data and may not reflect real-time changes.
-                          {nameserverMethod === 'fallback' && (
-                            <span className="block mt-1 text-xs text-blue-600">
-                              (Sample nameservers shown for testing domain)
-                            </span>
-                          )}
                         </p>
                       </div>
                     </div>
                   </div>
                 ) : (
                   <div className="text-center py-8">
-                    <svg className="h-12 w-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    <svg className="h-12 w-12 text-red-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                     </svg>
-                    <h4 className="text-lg font-medium text-gray-900 mb-2">No Nameservers Found</h4>
-                    <p className="text-gray-500">Unable to retrieve nameserver information for this domain</p>
+                    <h4 className="text-lg font-medium text-gray-900 mb-2">Nameserver Information Unavailable</h4>
+                    <p className="text-gray-500 mb-4">Unable to retrieve nameserver information for this domain</p>
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                      <p className="text-sm text-red-800">
+                        <strong>Possible reasons:</strong>
+                      </p>
+                      <ul className="text-sm text-red-700 mt-1 list-disc list-inside">
+                        <li>Domain is not registered or expired</li>
+                        <li>WHOIS servers are temporarily unavailable</li>
+                        <li>Domain uses private registration</li>
+                        <li>Network connectivity issues</li>
+                      </ul>
+                    </div>
                   </div>
                 )}
               </motion.div>
