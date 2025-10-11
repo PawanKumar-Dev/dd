@@ -22,6 +22,7 @@ import {
   CheckCircle,
   Clock
 } from 'lucide-react';
+import AdminLayoutNew from '@/components/admin/AdminLayoutNew';
 
 interface Domain {
   id: string;
@@ -92,6 +93,7 @@ export default function AdminDNSManagementPage() {
     ttl: 3600,
     priority: undefined,
   });
+  const [user, setUser] = useState<{ firstName: string; lastName: string; role: string } | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -103,11 +105,12 @@ export default function AdminDNSManagementPage() {
     }
 
     try {
-      const user = JSON.parse(userData);
-      if (user.role !== 'admin') {
+      const parsedUser = JSON.parse(userData);
+      if (parsedUser.role !== 'admin') {
         window.location.href = '/dashboard';
         return;
       }
+      setUser(parsedUser);
     } catch (error) {
       console.error('Error parsing user data:', error);
       window.location.href = '/login';
@@ -493,6 +496,12 @@ export default function AdminDNSManagementPage() {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = '/login';
+  };
+
   const filteredDomains = domains.filter(domain => {
     const matchesSearch = domain.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       domain.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -515,17 +524,19 @@ export default function AdminDNSManagementPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading domains...</p>
+      <AdminLayoutNew user={user} onLogout={handleLogout}>
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading domains...</p>
+          </div>
         </div>
-      </div>
+      </AdminLayoutNew>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <AdminLayoutNew user={user} onLogout={handleLogout}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
@@ -1113,6 +1124,6 @@ export default function AdminDNSManagementPage() {
           </div>
         )}
       </div>
-    </div>
+    </AdminLayoutNew>
   );
 }
