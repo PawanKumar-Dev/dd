@@ -58,6 +58,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Ensure required fields exist (for legacy orders that might be missing them)
+    if (!order.subtotal && order.amount) {
+      // Calculate subtotal from amount and GST
+      const gstRate = order.gstRate || 18;
+      order.subtotal = Math.round(order.amount / (1 + gstRate / 100));
+    }
+
+    if (!order.gstAmount && order.subtotal) {
+      const gstRate = order.gstRate || 18;
+      order.gstAmount = Math.round(order.subtotal * (gstRate / 100));
+    }
+
     // Activate DNS management
     domain.dnsActivated = true;
     domain.dnsActivatedAt = new Date();
