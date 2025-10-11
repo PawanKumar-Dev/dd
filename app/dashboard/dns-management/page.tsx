@@ -54,6 +54,8 @@ export default function DNSManagementPage() {
   const [showAddRecord, setShowAddRecord] = useState(false);
   const [isActivating, setIsActivating] = useState(false);
   const [isUsingMockData, setIsUsingMockData] = useState(false);
+  const [dnsPropagationStatus, setDnsPropagationStatus] = useState<'checking' | 'propagating' | 'ready' | 'error'>('checking');
+  const [propagationRetryCount, setPropagationRetryCount] = useState(0);
   const [newRecord, setNewRecord] = useState<DNSRecord>({
     type: 'A',
     name: '',
@@ -118,9 +120,14 @@ export default function DNSManagementPage() {
     }
   };
 
-  const loadDNSRecords = async (domainId: string) => {
+  const loadDNSRecords = async (domainId: string, isRetry: boolean = false) => {
     if (!domainId || domains.length === 0) return;
     setIsDNSLoading(true);
+
+    if (!isRetry) {
+      setDnsPropagationStatus('checking');
+    }
+
     try {
       const token = localStorage.getItem('token');
       const domain = domains.find(d => d.id === domainId);
@@ -142,6 +149,8 @@ export default function DNSManagementPage() {
         const data = await response.json();
         setDnsRecords(data.records || []);
         setIsUsingMockData(false);
+        setDnsPropagationStatus('ready');
+        setPropagationRetryCount(0);
       } else {
         const errorData = await response.json().catch(() => ({}));
         console.error('Failed to load DNS records:', errorData);
@@ -149,15 +158,32 @@ export default function DNSManagementPage() {
         // Check if it's a 404 error (domain not found in ResellerClub)
         if (response.status === 404) {
           setDnsRecords([]);
-          // Show a specific message for domains not accessible via ResellerClub API
-          toast.error('DNS management is not available for this domain. The domain is registered through ResellerClub but DNS management is not accessible via API. Please contact support for assistance.');
+
+          // Check if this is a propagation issue
+          if (propagationRetryCount < 3) {
+            setDnsPropagationStatus('propagating');
+            setPropagationRetryCount(prev => prev + 1);
+
+            // Wait and retry after 30 seconds
+            setTimeout(() => {
+              console.log(`Retrying DNS records load (attempt ${propagationRetryCount + 1}/3)...`);
+              loadDNSRecords(domainId, true);
+            }, 30000);
+
+            toast.info(`DNS zone is still propagating. Retrying in 30 seconds... (Attempt ${propagationRetryCount + 1}/3)`);
+          } else {
+            setDnsPropagationStatus('error');
+            toast.error('DNS management API is currently unavailable. The domain is registered and DNS management is activated, but the API endpoints are not responding. Please contact support for assistance.');
+          }
         } else {
           setDnsRecords([]);
+          setDnsPropagationStatus('error');
           toast.error('Failed to load DNS records');
         }
       }
     } catch (error) {
       console.error('Error loading DNS records:', error);
+      setDnsPropagationStatus('error');
       toast.error('Failed to load DNS records');
     } finally {
       setIsDNSLoading(false);
@@ -617,6 +643,47 @@ export default function DNSManagementPage() {
                     <p className="text-sm text-gray-500 mt-1">
                       Managing DNS for {domains.find(d => d.id === selectedDomain)?.name}
                     </p>
+
+                    {/* DNS Propagation Status */}
+                    {dnsPropagationStatus === 'checking' && (
+                      <div className="mt-2 flex items-center text-sm text-blue-600">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                        Checking DNS zone status...
+                      </div>
+                    )}
+
+                    {dnsPropagationStatus === 'propagating' && (
+                      <div className="mt-2 flex items-center text-sm text-orange-600">
+                        <div className="animate-pulse rounded-full h-4 w-4 bg-orange-600 mr-2"></div>
+                        DNS zone is propagating... Retrying in 30 seconds (Attempt {propagationRetryCount}/3)
+                      </div>
+                    )}
+
+                    {dnsPropagationStatus === 'ready' && (
+                      <div className="mt-2 flex items-center text-sm text-green-600">
+                        <div className="rounded-full h-4 w-4 bg-green-600 mr-2"></div>
+                        DNS zone is ready and accessible
+                      </div>
+                    )}
+
+                    {dnsPropagationStatus === 'error' && (
+                      <div className="mt-2 flex items-center justify-between text-sm text-red-600">
+                        <div className="flex items-center">
+                          <div className="rounded-full h-4 w-4 bg-red-600 mr-2"></div>
+                          DNS zone is not accessible - please contact support
+                        </div>
+                        <button
+                          onClick={() => {
+                            setPropagationRetryCount(0);
+                            setDnsPropagationStatus('checking');
+                            loadDNSRecords(selectedDomain);
+                          }}
+                          className="ml-4 px-3 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors"
+                        >
+                          Retry
+                        </button>
+                      </div>
+                    )}
                     {selectedDomain && domains.find(d => d.id === selectedDomain) && (
                       (() => {
                         const domain = domains.find(d => d.id === selectedDomain);
@@ -808,20 +875,63 @@ export default function DNSManagementPage() {
                     <Server className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                     <h4 className="text-lg font-medium text-gray-900 mb-2">No DNS Records</h4>
                     <p className="text-gray-500 mb-4">No DNS records found for this domain</p>
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 max-w-md mx-auto">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0">
-                          <svg className="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                          </svg>
-                        </div>
-                        <div className="ml-3">
-                          <p className="text-sm text-yellow-700">
-                            <strong>DNS Management Unavailable:</strong> This domain is registered through ResellerClub but DNS management is not accessible via API. Please contact support for assistance.
-                          </p>
+
+                    {dnsPropagationStatus === 'propagating' && (
+                      <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 max-w-md mx-auto">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0">
+                            <div className="animate-pulse rounded-full h-5 w-5 bg-orange-400"></div>
+                          </div>
+                          <div className="ml-3">
+                            <p className="text-sm text-orange-700">
+                              <strong>DNS Zone Propagating:</strong> The DNS zone is still propagating through OrderBox's system. This usually takes 10-30 minutes after activation.
+                            </p>
+                            <div className="mt-2 text-xs text-orange-600">
+                              <p>• Automatic retry in progress...</p>
+                              <p>• Attempt {propagationRetryCount}/3</p>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )}
+
+                    {dnsPropagationStatus === 'error' && (
+                      <div className="bg-red-50 border border-red-200 rounded-lg p-4 max-w-md mx-auto">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0">
+                            <svg className="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                          <div className="ml-3">
+                            <p className="text-sm text-red-700">
+                              <strong>DNS Management Unavailable:</strong> The DNS zone is not accessible via API. This may be due to API configuration or domain setup issues.
+                            </p>
+                            <div className="mt-2 text-xs text-red-600">
+                              <p>• Domain: anutechpvtltd.co.in</p>
+                              <p>• Order ID: 122709027</p>
+                              <p>• Customer ID: 32262841</p>
+                              <p>• DNS Zone: Activated but not accessible</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {dnsPropagationStatus === 'checking' && (
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md mx-auto">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0">
+                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-400"></div>
+                          </div>
+                          <div className="ml-3">
+                            <p className="text-sm text-blue-700">
+                              <strong>Checking DNS Zone:</strong> Verifying DNS zone status and accessibility...
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </motion.div>

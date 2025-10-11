@@ -1742,18 +1742,47 @@ export class ResellerClubAPI {
   }
 
   /**
+   * Activate DNS management for a domain
+   */
+  static async activateDNSManagement(
+    domainName: string,
+    orderId: string
+  ): Promise<ResellerClubResponse> {
+    try {
+      const response = await api.post("/api/dns/activate.json", null, {
+        params: {
+          "domain-name": domainName,
+          "order-id": orderId,
+          "auth-userid": RESELLERCLUB_ID,
+          "api-key": RESELLERCLUB_SECRET,
+        },
+      });
+
+      return {
+        status: "success",
+        data: response.data,
+      };
+    } catch (error: any) {
+      console.error("ResellerClub DNS activation error:", error);
+      return {
+        status: "error",
+        message: "Failed to activate DNS management",
+      };
+    }
+  }
+
+  /**
    * Get DNS records for a domain
    */
   static async getDNSRecords(
     domainName: string
   ): Promise<ResellerClubResponse> {
     try {
-      const response = await api.get("/api/domains/dns/get-records.json", {
+      const response = await api.get("/api/dns/manage/list-records.json", {
         params: {
           "domain-name": domainName,
           "auth-userid": RESELLERCLUB_ID,
           "api-key": RESELLERCLUB_SECRET,
-          "reseller-id": RESELLERCLUB_ID,
         },
       });
 
@@ -1787,23 +1816,18 @@ export class ResellerClubAPI {
     }
   ): Promise<ResellerClubResponse> {
     try {
-      const response = await api.post(
-        "/api/domains/dns/add-record.json",
-        null,
-        {
-          params: {
-            "domain-name": domainName,
-            "auth-userid": RESELLERCLUB_ID,
-            "api-key": RESELLERCLUB_SECRET,
-            "reseller-id": RESELLERCLUB_ID,
-            type: recordData.type,
-            name: recordData.name,
-            value: recordData.value,
-            ttl: recordData.ttl,
-            priority: recordData.priority,
-          },
-        }
-      );
+      const response = await api.post("/api/dns/manage/add-record.json", null, {
+        params: {
+          "domain-name": domainName,
+          "auth-userid": RESELLERCLUB_ID,
+          "api-key": RESELLERCLUB_SECRET,
+          type: recordData.type,
+          host: recordData.name,
+          value: recordData.value,
+          ttl: recordData.ttl,
+          priority: recordData.priority,
+        },
+      });
 
       return {
         status: "success",
@@ -1834,17 +1858,16 @@ export class ResellerClubAPI {
   ): Promise<ResellerClubResponse> {
     try {
       const response = await api.post(
-        "/api/domains/dns/modify-record.json",
+        "/api/dns/manage/modify-record.json",
         null,
         {
           params: {
             "domain-name": domainName,
             "auth-userid": RESELLERCLUB_ID,
             "api-key": RESELLERCLUB_SECRET,
-            "reseller-id": RESELLERCLUB_ID,
             "record-id": recordId,
             type: recordData.type,
-            name: recordData.name,
+            host: recordData.name,
             value: recordData.value,
             ttl: recordData.ttl,
             priority: recordData.priority,
@@ -1874,14 +1897,13 @@ export class ResellerClubAPI {
   ): Promise<ResellerClubResponse> {
     try {
       const response = await api.post(
-        "/api/domains/dns/delete-record.json",
+        "/api/dns/manage/delete-record.json",
         null,
         {
           params: {
             "domain-name": domainName,
             "auth-userid": RESELLERCLUB_ID,
             "api-key": RESELLERCLUB_SECRET,
-            "reseller-id": RESELLERCLUB_ID,
             "record-id": recordId,
           },
         }
@@ -2006,17 +2028,16 @@ export class ResellerClubAPI {
   ): Promise<ResellerClubResponse> {
     try {
       const response = await api.post(
-        "/api/domains/dns/modify-record.json",
+        "/api/dns/manage/modify-record.json",
         null,
         {
           params: {
             "domain-name": domainName,
             "auth-userid": RESELLERCLUB_ID,
             "api-key": RESELLERCLUB_SECRET,
-            "reseller-id": RESELLERCLUB_ID,
             "record-id": recordId,
             type: recordData.type,
-            name: recordData.name,
+            host: recordData.name,
             value: recordData.value,
             ttl: recordData.ttl,
             priority: recordData.priority,
