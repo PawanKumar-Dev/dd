@@ -12,7 +12,6 @@ import {
   AlertTriangle,
   Copy,
   ExternalLink,
-  DollarSign,
   ArrowRight
 } from 'lucide-react';
 import AdminLayoutNew from '@/components/admin/AdminLayoutNew';

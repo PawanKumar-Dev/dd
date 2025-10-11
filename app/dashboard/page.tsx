@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
-  Globe, ShoppingCart, Receipt, TrendingUp, Clock, CheckCircle,
+  Globe, ShoppingCart, TrendingUp, Clock, CheckCircle,
   AlertTriangle, Calendar, ArrowRight, Plus, RefreshCw
 } from 'lucide-react';
+import RsIcon from '@/components/icons/RsIcon';
 import toast from 'react-hot-toast';
 import { useCartStore } from '@/store/cartStore';
 import UserLayout from '@/components/user/UserLayout';
@@ -145,7 +146,7 @@ export default function UserDashboard() {
     {
       title: 'Total Orders',
       value: stats?.totalOrders || 0,
-      icon: Receipt,
+      icon: RsIcon,
       color: 'purple',
       change: '+3 this month'
     }
