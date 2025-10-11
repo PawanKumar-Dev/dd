@@ -145,7 +145,7 @@ export async function GET(request: NextRequest) {
               if (ns.name) return ns.name;
               return ns;
             })
-            .filter((ns: string) => ns && ns.includes("."));
+            .filter((ns: string) => ns && ns.includes(".") && ns.length > 3);
         }
 
         // Extract additional domain information from RDAP
@@ -213,9 +213,7 @@ export async function GET(request: NextRequest) {
           ns.includes(".") &&
           !ns.includes(" ") &&
           /^[a-zA-Z0-9.-]+$/.test(ns) &&
-          !ns.includes("name") &&
-          !ns.includes("server") &&
-          !ns.includes("dns")
+          !ns.includes("name")
         );
       });
 
