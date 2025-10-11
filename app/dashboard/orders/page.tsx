@@ -60,15 +60,20 @@ export default function UserOrders() {
       return;
     }
 
-    const userObj = JSON.parse(userData);
+    try {
+      const userObj = JSON.parse(userData);
 
-    if (userObj.role === 'admin') {
-      router.push('/admin/dashboard');
-      return;
+      if (userObj.role === 'admin') {
+        router.push('/admin/dashboard');
+        return;
+      }
+
+      setUser(userObj);
+      loadOrders();
+    } catch (error) {
+      console.error('Error parsing user data:', error);
+      router.push('/login');
     }
-
-    setUser(userObj);
-    loadOrders();
   }, [router]);
 
   const loadOrders = async () => {
@@ -145,8 +150,8 @@ export default function UserOrders() {
 
   const filteredOrders = orders.filter(order => {
     const matchesSearch =
-      order.orderId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.domains.some(domain => domain.domainName.toLowerCase().includes(searchTerm.toLowerCase()));
+      order.orderId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (order.domains || []).some(domain => domain.domainName?.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesFilter = filterStatus === 'all' || order.status === filterStatus;
     return matchesSearch && matchesFilter;
   });
@@ -303,7 +308,7 @@ export default function UserOrders() {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {new Date(order.createdAt).toLocaleDateString()}
+                          {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
@@ -312,10 +317,10 @@ export default function UserOrders() {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {order.domains.length} domain{order.domains.length !== 1 ? 's' : ''}
+                          {(order.domains || []).length} domain{(order.domains || []).length !== 1 ? 's' : ''}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          ₹{order.amount.toLocaleString()}
+                          ₹{(order.amount || 0).toLocaleString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex space-x-2">
@@ -346,7 +351,7 @@ export default function UserOrders() {
           </div>
 
           {/* Order Details Modal */}
-          {selectedOrder && (
+          {selectedOrder && selectedOrder.orderId && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
               <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
                 <div className="p-6">
@@ -366,7 +371,7 @@ export default function UserOrders() {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <p className="text-sm font-medium text-gray-600">Order Date</p>
-                        <p className="text-sm text-gray-900">{new Date(selectedOrder.createdAt).toLocaleDateString()}</p>
+                        <p className="text-sm text-gray-900">{selectedOrder.createdAt ? new Date(selectedOrder.createdAt).toLocaleDateString() : 'N/A'}</p>
                       </div>
                       <div>
                         <p className="text-sm font-medium text-gray-600">Status</p>
@@ -380,13 +385,13 @@ export default function UserOrders() {
                     <div>
                       <p className="text-sm font-medium text-gray-600 mb-2">Items</p>
                       <div className="space-y-2">
-                        {selectedOrder.domains.map((domain, index) => (
+                        {(selectedOrder.domains || []).map((domain, index) => (
                           <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                             <div>
-                              <p className="font-medium text-gray-900">{domain.domainName}</p>
-                              <p className="text-sm text-gray-500">{domain.registrationPeriod} year registration</p>
+                              <p className="font-medium text-gray-900">{domain.domainName || 'Unknown Domain'}</p>
+                              <p className="text-sm text-gray-500">{(domain.registrationPeriod || 1)} year registration</p>
                             </div>
-                            <p className="font-semibold text-gray-900">₹{domain.price}</p>
+                            <p className="font-semibold text-gray-900">₹{(domain.price || 0).toLocaleString()}</p>
                           </div>
                         ))}
                       </div>
@@ -396,15 +401,15 @@ export default function UserOrders() {
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
                           <span className="text-sm text-gray-600">Subtotal</span>
-                          <span className="text-sm text-gray-900">₹{selectedOrder.subtotal.toLocaleString()}</span>
+                          <span className="text-sm text-gray-900">₹{(selectedOrder.subtotal || 0).toLocaleString()}</span>
                         </div>
                         <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">GST ({selectedOrder.gstRate}%)</span>
-                          <span className="text-sm text-gray-900">₹{selectedOrder.gstAmount.toLocaleString()}</span>
+                          <span className="text-sm text-gray-600">GST ({(selectedOrder.gstRate || 0)}%)</span>
+                          <span className="text-sm text-gray-900">₹{(selectedOrder.gstAmount || 0).toLocaleString()}</span>
                         </div>
                         <div className="flex justify-between items-center border-t pt-2">
                           <span className="text-lg font-semibold text-gray-900">Total</span>
-                          <span className="text-lg font-bold text-gray-900">₹{selectedOrder.amount.toLocaleString()}</span>
+                          <span className="text-lg font-bold text-gray-900">₹{(selectedOrder.amount || 0).toLocaleString()}</span>
                         </div>
                       </div>
                     </div>
