@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ResellerClubWrapper } from "@/lib/resellerclub-wrapper";
 import { AuthService } from "@/lib/auth";
+import connectDB from "@/lib/mongodb";
+import Order from "@/models/Order";
 
 export async function GET(request: NextRequest) {
   try {
@@ -20,8 +22,35 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    await connectDB(); // Connect to DB
+
+    // Find the domain in the database to get resellerClubCustomerId
+    const order = await Order.findOne({
+      "domains.name": domainName, // Assuming 'name' is the field for domain name
+      userId: user._id,
+    });
+
+    if (!order) {
+      return NextResponse.json(
+        { error: "Domain not found for this user" },
+        { status: 404 }
+      );
+    }
+
+    const domain = order.domains.find((d) => d.name === domainName);
+
+    if (!domain || !domain.resellerClubCustomerId) {
+      return NextResponse.json(
+        { error: "ResellerClub Customer ID not found for this domain" },
+        { status: 404 }
+      );
+    }
+
     // Get DNS records
-    const result = await ResellerClubWrapper.getDNSRecords(domainName);
+    const result = await ResellerClubWrapper.getDNSRecords(
+      domainName,
+      domain.resellerClubCustomerId // Pass the customer ID
+    );
 
     if (result.status === "error") {
       // Check if it's a 404 error (domain not found in ResellerClub)

@@ -21,7 +21,9 @@ export class ResellerClubWrapper {
     tlds: string[]
   ): Promise<DomainSearchResult[]> {
     console.log(
-      `🌐 [PRODUCTION] ResellerClub Wrapper: Initiating domain search for "${domainName}" with TLDs: ${tlds.join(", ")}`
+      `🌐 [PRODUCTION] ResellerClub Wrapper: Initiating domain search for "${domainName}" with TLDs: ${tlds.join(
+        ", "
+      )}`
     );
     return ResellerClubAPI.searchDomainWithTlds(domainName, tlds);
   }
@@ -55,28 +57,39 @@ export class ResellerClubWrapper {
   /**
    * Get domain details
    */
-  static async getDomainDetails(domainName: string): Promise<ResellerClubResponse> {
+  static async getDomainDetails(
+    domainName: string
+  ): Promise<ResellerClubResponse> {
     return ResellerClubAPI.getDomainDetails(domainName);
   }
 
   /**
    * Get DNS records for a domain
    */
-  static async getDNSRecords(domainName: string): Promise<ResellerClubResponse> {
-    return ResellerClubAPI.getDNSRecords(domainName);
+  static async getDNSRecords(
+    domainName: string,
+    customerId: string
+  ): Promise<ResellerClubResponse> {
+    return ResellerClubAPI.getDNSRecords(domainName, customerId);
   }
 
   /**
    * Renew a domain
    */
-  static async renewDomain(domainName: string, years: number): Promise<ResellerClubResponse> {
+  static async renewDomain(
+    domainName: string,
+    years: number
+  ): Promise<ResellerClubResponse> {
     return ResellerClubAPI.renewDomain(domainName, years);
   }
 
   /**
    * Transfer a domain
    */
-  static async transferDomain(domainName: string, authCode: string): Promise<ResellerClubResponse> {
+  static async transferDomain(
+    domainName: string,
+    authCode: string
+  ): Promise<ResellerClubResponse> {
     return ResellerClubAPI.transferDomain(domainName, authCode);
   }
 
@@ -122,7 +135,10 @@ export class ResellerClubWrapper {
   /**
    * Delete DNS record
    */
-  static async deleteDNSRecord(domainName: string, recordId: string): Promise<ResellerClubResponse> {
+  static async deleteDNSRecord(
+    domainName: string,
+    recordId: string
+  ): Promise<ResellerClubResponse> {
     console.log(
       `🌐 [PRODUCTION] ResellerClub Wrapper: Deleting DNS record for "${domainName}"`
     );
@@ -132,7 +148,9 @@ export class ResellerClubWrapper {
   /**
    * Set default nameservers
    */
-  static async setDefaultNameservers(domainName: string): Promise<ResellerClubResponse> {
+  static async setDefaultNameservers(
+    domainName: string
+  ): Promise<ResellerClubResponse> {
     console.log(
       `🌐 [PRODUCTION] ResellerClub Wrapper: Setting default nameservers for "${domainName}"`
     );

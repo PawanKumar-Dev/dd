@@ -1775,13 +1775,14 @@ export class ResellerClubAPI {
    * Get DNS records for a domain
    */
   static async getDNSRecords(
-    domainName: string
+    domainName: string,
+    customerId: string
   ): Promise<ResellerClubResponse> {
     try {
       const response = await api.get("/api/dns/manage/list-records.json", {
         params: {
           "domain-name": domainName,
-          "auth-userid": RESELLERCLUB_ID,
+          "auth-userid": customerId,
           "api-key": RESELLERCLUB_SECRET,
         },
       });

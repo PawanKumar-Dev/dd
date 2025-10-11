@@ -246,7 +246,7 @@ export default function AdminDNSManagementPage() {
     }
   };
 
-  const handleDomainSelect = (domainId: string) => {
+  const handleDomainClick = (domainId: string) => {
     setSelectedDomain(domainId);
     if (domainId && domains.length > 0) {
       loadDNSRecords(domainId);
@@ -741,8 +741,8 @@ export default function AdminDNSManagementPage() {
                   <div
                     key={domain.id}
                     className={`p-4 rounded-lg border transition-colors ${selectedDomain === domain.id
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                       }`}
                   >
                     <div className="flex items-center justify-between">
@@ -757,7 +757,7 @@ export default function AdminDNSManagementPage() {
                         <div className="flex-1 min-w-0">
                           <p
                             className="text-sm font-medium text-gray-900 truncate cursor-pointer"
-                            onClick={() => handleDomainSelect(domain.id, !selectedDomains.includes(domain.id))}
+                            onClick={() => handleDomainClick(domain.id)}
                           >
                             {domain.name}
                           </p>
