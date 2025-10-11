@@ -89,6 +89,14 @@ export default function UserDashboard() {
     loadDashboardData(userObj);
   }, [router]);
 
+  // Handle hash navigation to domain management section
+  useEffect(() => {
+    if (window.location.hash === '#domain-management') {
+      setShowDomainManagement(true);
+      loadDomains();
+    }
+  }, []);
+
   const loadDashboardData = async (userObj?: User) => {
     try {
       setIsLoading(true);
@@ -502,6 +510,7 @@ export default function UserDashboard() {
 
           {/* Domain Management Section */}
           <motion.div
+            id="domain-management"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
