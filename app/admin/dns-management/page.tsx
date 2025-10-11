@@ -537,84 +537,32 @@ export default function AdminDNSManagementPage() {
 
   return (
     <AdminLayoutNew user={user} onLogout={handleLogout}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="p-3 sm:p-4 lg:p-6">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
+        <div className="mb-4 lg:mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">DNS Management</h1>
-              <p className="text-gray-600 mt-2">Manage DNS records for all customer domains</p>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">DNS Management</h1>
+              <p className="text-xs sm:text-sm text-gray-600 mt-1">Manage DNS records for all customer domains</p>
             </div>
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={loadAllDomains}
-                className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Refresh
-              </button>
-            </div>
+            <button
+              onClick={loadAllDomains}
+              className="flex items-center justify-center px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors w-full sm:w-auto"
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Refresh
+            </button>
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Globe className="h-6 w-6 text-blue-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Domains</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalDomains}</p>
-              </div>
-            </div>
-          </div>
 
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <CheckCircle className="h-6 w-6 text-green-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">DNS Activated</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.dnsActivated}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-yellow-100 rounded-lg">
-                <Clock className="h-6 w-6 text-yellow-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Not Activated</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.notActivated}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Shield className="h-6 w-6 text-purple-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Registered</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.registered}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-5 gap-4 lg:gap-6">
           {/* Domains List */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900">All Domains</h3>
-                <div className="flex items-center space-x-2">
+          <div className="xl:col-span-2">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">All Domains</h3>
+                <div className="space-y-3">
                   <div className="relative">
                     <Search className="h-4 w-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                     <input
@@ -622,13 +570,13 @@ export default function AdminDNSManagementPage() {
                       placeholder="Search domains..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
                   <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                     <option value="all">All Status</option>
                     <option value="dns_activated">DNS Activated</option>
@@ -736,7 +684,7 @@ export default function AdminDNSManagementPage() {
                 </div>
               )}
 
-              <div className="space-y-2 max-h-96 overflow-y-auto">
+              <div className="space-y-2 max-h-80 overflow-y-auto">
                 {/* Select All */}
                 <div className="flex items-center p-2 border-b border-gray-200">
                   <input
@@ -751,41 +699,42 @@ export default function AdminDNSManagementPage() {
                 {filteredDomains.map((domain) => (
                   <div
                     key={domain.id}
-                    className={`p-4 rounded-lg border transition-colors ${selectedDomain === domain.id
+                    className={`p-3 rounded-lg border transition-colors ${selectedDomain === domain.id
                       ? 'border-blue-500 bg-blue-50'
                       : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                       }`}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3 flex-1 min-w-0">
-                        <input
-                          type="checkbox"
-                          checked={selectedDomains.includes(domain.id)}
-                          onChange={(e) => handleDomainSelect(domain.id, e.target.checked)}
-                          onClick={(e) => e.stopPropagation()}
-                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p
-                            className="text-sm font-medium text-gray-900 truncate cursor-pointer"
-                            onClick={() => handleDomainClick(domain.id)}
-                          >
-                            {domain.name}
+                    <div className="flex items-start space-x-3">
+                      <input
+                        type="checkbox"
+                        checked={selectedDomains.includes(domain.id)}
+                        onChange={(e) => handleDomainSelect(domain.id, e.target.checked)}
+                        onClick={(e) => e.stopPropagation()}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p
+                          className="text-sm font-medium text-gray-900 truncate cursor-pointer"
+                          onClick={() => handleDomainClick(domain.id)}
+                        >
+                          {domain.name}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">
+                          {domain.customerName}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">
+                          {domain.customerEmail}
+                        </p>
+                        <div className="flex items-center justify-between mt-1">
+                          <p className="text-xs text-gray-400">
+                            {domain.orderId}
                           </p>
-                          <p className="text-xs text-gray-500">
-                            {domain.customerName} ({domain.customerEmail})
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            Order: {domain.orderId}
-                          </p>
+                          {domain.dnsActivated ? (
+                            <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                          ) : (
+                            <AlertCircle className="h-4 w-4 text-yellow-500 flex-shrink-0" />
+                          )}
                         </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        {domain.dnsActivated ? (
-                          <CheckCircle className="h-4 w-4 text-green-500" />
-                        ) : (
-                          <AlertCircle className="h-4 w-4 text-yellow-500" />
-                        )}
                       </div>
                     </div>
 
@@ -810,11 +759,11 @@ export default function AdminDNSManagementPage() {
           </div>
 
           {/* DNS Management */}
-          <div className="lg:col-span-2">
+          <div className="xl:col-span-3">
             {selectedDomain ? (
               <div className="space-y-6">
                 {/* Nameservers */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900">Nameservers</h3>
                     <button
@@ -852,7 +801,7 @@ export default function AdminDNSManagementPage() {
                 </div>
 
                 {/* DNS Records */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                   <div className="flex items-center justify-between mb-6">
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900">DNS Records</h3>
@@ -1020,10 +969,10 @@ export default function AdminDNSManagementPage() {
                 </div>
               </div>
             ) : (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-                <Globe className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+                <Globe className="h-10 w-10 text-gray-400 mx-auto mb-3" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">Select a Domain</h3>
-                <p className="text-gray-500">Choose a domain from the list to manage its DNS records</p>
+                <p className="text-sm text-gray-500">Choose a domain from the list to manage its DNS records</p>
               </div>
             )}
           </div>
