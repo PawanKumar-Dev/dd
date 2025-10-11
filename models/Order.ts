@@ -26,7 +26,8 @@ export interface IOrder extends Document {
         | "contact_created"
         | "domain_registering"
         | "domain_registered"
-        | "domain_failed";
+        | "domain_failed"
+        | "dns_activated";
       message: string;
       timestamp: Date;
       progress: number; // 0-100
@@ -37,6 +38,8 @@ export interface IOrder extends Document {
     resellerClubOrderId?: string;
     resellerClubCustomerId?: string;
     resellerClubContactId?: string;
+    dnsActivated?: boolean;
+    dnsActivatedAt?: Date;
   }[];
   successfulDomains: string[];
   paymentVerification?: {

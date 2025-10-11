@@ -19,23 +19,13 @@ export async function GET(request: NextRequest) {
       .sort({ createdAt: -1 })
       .populate("userId", "email firstName lastName");
 
-    console.log(
-      `[DOMAINS-API] Found ${orders.length} orders for user ${user.email}`
-    );
-
     // Extract domains from orders
     const domains = [];
     const domainMap = new Map();
 
     orders.forEach((order) => {
-      console.log(
-        `[DOMAINS-API] Processing order ${order.orderId} with ${order.domains.length} domains`
-      );
       order.domains.forEach((domain) => {
         const domainKey = domain.domainName;
-        console.log(
-          `[DOMAINS-API] Processing domain: ${domainKey} with status: ${domain.status}`
-        );
 
         // Only add if not already processed or if this is a more recent status
         if (
@@ -59,6 +49,8 @@ export async function GET(request: NextRequest) {
             resellerClubOrderId: domain.resellerClubOrderId,
             resellerClubCustomerId: domain.resellerClubCustomerId,
             resellerClubContactId: domain.resellerClubContactId,
+            dnsActivated: domain.dnsActivated || false,
+            dnsActivatedAt: domain.dnsActivatedAt,
             error: domain.error,
           });
         }
@@ -67,10 +59,6 @@ export async function GET(request: NextRequest) {
 
     // Convert map to array
     const domainArray = Array.from(domainMap.values());
-
-    console.log(
-      `[DOMAINS-API] Returning ${domainArray.length} domains for user ${user.email}`
-    );
 
     return NextResponse.json({
       success: true,

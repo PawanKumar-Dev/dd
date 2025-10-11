@@ -32,10 +32,13 @@ interface DNSRecord {
 
 interface Domain {
   id: string;
-  domainName: string;
+  name: string;
   status: string;
-  creationDate?: string;
-  lastUpdated?: string;
+  registrationDate?: string;
+  expiryDate?: string;
+  resellerClubOrderId?: string;
+  dnsActivated?: boolean;
+  dnsActivatedAt?: string;
 }
 
 export default function DNSManagementPage() {
@@ -46,6 +49,7 @@ export default function DNSManagementPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isDNSLoading, setIsDNSLoading] = useState(false);
   const [showAddRecord, setShowAddRecord] = useState(false);
+  const [isActivating, setIsActivating] = useState(false);
   const [newRecord, setNewRecord] = useState<DNSRecord>({
     type: 'A',
     name: '',
@@ -122,9 +126,9 @@ export default function DNSManagementPage() {
         return;
       }
 
-      console.log('Loading DNS records for domain:', domain.domainName);
+      console.log('Loading DNS records for domain:', domain.name);
 
-      const response = await fetch(`/api/domains/dns?domainName=${encodeURIComponent(domain.domainName)}`, {
+      const response = await fetch(`/api/domains/dns?domainName=${encodeURIComponent(domain.name)}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -134,8 +138,18 @@ export default function DNSManagementPage() {
         const data = await response.json();
         setDnsRecords(data.records || []);
       } else {
-        console.error('Failed to load DNS records');
-        setDnsRecords([]);
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Failed to load DNS records:', errorData);
+
+        // Check if it's a 404 error (domain not found in ResellerClub)
+        if (response.status === 404) {
+          setDnsRecords([]);
+          // Show a specific message for domains not registered in ResellerClub
+          toast.error('This domain is not registered through ResellerClub. DNS management is only available for domains registered through our platform.');
+        } else {
+          setDnsRecords([]);
+          toast.error('Failed to load DNS records');
+        }
       }
     } catch (error) {
       console.error('Error loading DNS records:', error);
@@ -170,7 +184,7 @@ export default function DNSManagementPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          domainName: domain.domainName,
+          domainName: domain.name,
           record: newRecord,
         }),
       });
@@ -205,7 +219,7 @@ export default function DNSManagementPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          domainName: domain.domainName,
+          domainName: domain.name,
           recordId,
         }),
       });
@@ -220,6 +234,53 @@ export default function DNSManagementPage() {
     } catch (error) {
       console.error('Error deleting DNS record:', error);
       toast.error('Failed to delete DNS record');
+    }
+  };
+
+  const handleActivateDNS = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    const domain = domains.find(d => d.id === selectedDomain);
+    if (!domain) return;
+
+    setIsActivating(true);
+    try {
+      const response = await fetch('/api/domains/activate-dns', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          domainName: domain.name,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        toast.success('DNS management activated successfully!');
+
+        // Update the domain in the local state
+        setDomains(prevDomains =>
+          prevDomains.map(d =>
+            d.id === selectedDomain
+              ? { ...d, dnsActivated: true, dnsActivatedAt: data.dnsActivatedAt }
+              : d
+          )
+        );
+
+        // Reload domains to get updated data
+        loadDomains();
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.error || 'Failed to activate DNS management');
+      }
+    } catch (error) {
+      console.error('Error activating DNS:', error);
+      toast.error('Failed to activate DNS management');
+    } finally {
+      setIsActivating(false);
     }
   };
 
@@ -362,7 +423,7 @@ export default function DNSManagementPage() {
                     <option value="">Choose a domain...</option>
                     {domains.map((domain) => (
                       <option key={domain.id} value={domain.id}>
-                        {domain.domainName} ({domain.status})
+                        {domain.name} ({domain.status})
                       </option>
                     ))}
                   </select>
@@ -403,12 +464,90 @@ export default function DNSManagementPage() {
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900">DNS Records</h3>
                     <p className="text-sm text-gray-500 mt-1">
-                      Managing DNS for {domains.find(d => d.id === selectedDomain)?.domainName}
+                      Managing DNS for {domains.find(d => d.id === selectedDomain)?.name}
                     </p>
+                    {selectedDomain && domains.find(d => d.id === selectedDomain) && (
+                      (() => {
+                        const domain = domains.find(d => d.id === selectedDomain);
+                        if (!domain?.resellerClubOrderId) {
+                          return (
+                            <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                              <div className="flex items-center">
+                                <div className="flex-shrink-0">
+                                  <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                  </svg>
+                                </div>
+                                <div className="ml-3">
+                                  <p className="text-sm text-yellow-800">
+                                    <strong>DNS Management Not Available:</strong> This domain was not registered through ResellerClub. DNS management is only available for domains registered through our platform.
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        } else if (!domain?.dnsActivated) {
+                          return (
+                            <div className="mt-2 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center">
+                                  <div className="flex-shrink-0">
+                                    <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                                    </svg>
+                                  </div>
+                                  <div className="ml-3">
+                                    <p className="text-sm text-blue-800">
+                                      <strong>Activate DNS Management:</strong> DNS management is available for this domain. Click the button to activate it and start managing your DNS records.
+                                    </p>
+                                  </div>
+                                </div>
+                                <button
+                                  onClick={handleActivateDNS}
+                                  disabled={isActivating}
+                                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${isActivating
+                                      ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                                      : 'bg-blue-600 text-white hover:bg-blue-700'
+                                    }`}
+                                >
+                                  {isActivating ? 'Activating...' : 'ACTIVATE DNS MANAGEMENT'}
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        } else {
+                          return (
+                            <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-lg">
+                              <div className="flex items-center">
+                                <div className="flex-shrink-0">
+                                  <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                  </svg>
+                                </div>
+                                <div className="ml-3">
+                                  <p className="text-sm text-green-800">
+                                    <strong>DNS Management Active:</strong> DNS management is activated for this domain. You can now manage your DNS records.
+                                    {domain.dnsActivatedAt && (
+                                      <span className="block text-xs text-green-600 mt-1">
+                                        Activated on {new Date(domain.dnsActivatedAt).toLocaleDateString()}
+                                      </span>
+                                    )}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        }
+                      })()
+                    )}
                   </div>
                   <button
                     onClick={() => setShowAddRecord(!showAddRecord)}
-                    className="flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                    disabled={selectedDomain && domains.find(d => d.id === selectedDomain) && (!domains.find(d => d.id === selectedDomain)?.resellerClubOrderId || !domains.find(d => d.id === selectedDomain)?.dnsActivated)}
+                    className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${selectedDomain && domains.find(d => d.id === selectedDomain) && (!domains.find(d => d.id === selectedDomain)?.resellerClubOrderId || !domains.find(d => d.id === selectedDomain)?.dnsActivated)
+                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                      }`}
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Add Record
