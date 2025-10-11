@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import {
   Globe, Plus, Edit3, Trash2, Save, X, RefreshCw, Server,
   AlertCircle, CheckCircle, Clock, Settings, ExternalLink,
-  Database, ArrowLeft, ArrowRight
+  Database
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import UserLayout from '@/components/user/UserLayout';
@@ -74,6 +74,16 @@ export default function DNSManagementPage() {
     }
   }, [router]);
 
+  // Load DNS records when domains are loaded and a domain is selected
+  useEffect(() => {
+    if (selectedDomain && domains.length > 0) {
+      const domain = domains.find(d => d.id === selectedDomain);
+      if (domain) {
+        loadDNSRecords(selectedDomain);
+      }
+    }
+  }, [domains, selectedDomain]);
+
   const loadDomains = async () => {
     setIsLoading(true);
     try {
@@ -86,6 +96,7 @@ export default function DNSManagementPage() {
       });
       if (response.ok) {
         const data = await response.json();
+        console.log('Loaded domains:', data.domains);
         setDomains(data.domains || []);
       } else {
         console.error('Failed to load domains');
@@ -100,12 +111,18 @@ export default function DNSManagementPage() {
   };
 
   const loadDNSRecords = async (domainId: string) => {
-    if (!domainId) return;
+    if (!domainId || domains.length === 0) return;
     setIsDNSLoading(true);
     try {
       const token = localStorage.getItem('token');
       const domain = domains.find(d => d.id === domainId);
-      if (!domain) return;
+      if (!domain) {
+        console.error('Domain not found for ID:', domainId);
+        setDnsRecords([]);
+        return;
+      }
+
+      console.log('Loading DNS records for domain:', domain.domainName);
 
       const response = await fetch(`/api/domains/dns?domainName=${encodeURIComponent(domain.domainName)}`, {
         headers: {
@@ -130,7 +147,9 @@ export default function DNSManagementPage() {
 
   const handleDomainSelect = (domainId: string) => {
     setSelectedDomain(domainId);
-    loadDNSRecords(domainId);
+    if (domainId && domains.length > 0) {
+      loadDNSRecords(domainId);
+    }
   };
 
   const handleAddRecord = async () => {
@@ -231,45 +250,25 @@ export default function DNSManagementPage() {
     <ClientOnly>
       <UserLayout user={user} onLogout={handleLogout}>
         <div className="min-h-screen bg-gray-50">
-          {/* Header - Matching Dashboard Style */}
-          <div className="bg-white border-b border-gray-200">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex items-center justify-between py-6">
-                <div className="flex items-center">
-                  <button
-                    onClick={() => router.back()}
-                    className="flex items-center text-gray-600 hover:text-gray-900 mr-6 transition-colors duration-200"
-                  >
-                    <ArrowLeft className="h-5 w-5 mr-2" />
-                    Back
-                  </button>
-                  <div>
-                    <h1 className="text-2xl font-bold text-gray-900">DNS Management</h1>
-                    <p className="text-gray-600 mt-1">Manage DNS records for your domains</p>
-                  </div>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {/* Page Header - Simple Dashboard Style */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900">DNS Management</h1>
+                  <p className="text-gray-600 mt-1">Manage DNS records for your domains</p>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <button
-                    onClick={() => loadDomains()}
-                    disabled={isLoading}
-                    className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors duration-200"
-                  >
-                    <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-                    Refresh
-                  </button>
-                  <button
-                    onClick={() => router.push('/dashboard')}
-                    className="flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200"
-                  >
-                    <Globe className="h-4 w-4 mr-2" />
-                    Dashboard
-                  </button>
-                </div>
+                <button
+                  onClick={() => loadDomains()}
+                  disabled={isLoading}
+                  className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors duration-200"
+                >
+                  <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                  Refresh
+                </button>
               </div>
             </div>
-          </div>
 
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* Stats Cards - Matching Dashboard Style */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <motion.div
