@@ -277,30 +277,32 @@ Get nameserver information for a domain using RDAP (Registration Data Access Pro
 
 ### GET /api/domains/dns
 
-⚠️ **Known Issue**: Currently experiencing 404 errors with ResellerClub DNS API endpoints.
+✅ **RESOLVED**: DNS Management API is now fully functional using ResellerClub's specific DNS endpoints.
 
-Get DNS records for a domain.
+Get DNS records for a domain using ResellerClub's specific DNS search endpoints.
 
 **Query Parameters:**
 
 - `domainName` (string, required): Domain name to get DNS records for
+- `customerId` (string, required): ResellerClub customer ID
 
 **Response:**
 
 ```json
 {
   "success": true,
-  "domainName": "string",
-  "records": [
-    {
-      "id": "string",
-      "type": "string",
-      "name": "string",
-      "value": "string",
-      "ttl": number,
-      "priority": number
-    }
-  ]
+  "data": {
+    "records": [
+      {
+        "timetolive": "7200",
+        "status": "Active",
+        "type": "A",
+        "host": "www",
+        "value": "192.168.1.1"
+      }
+    ],
+    "total": 1
+  }
 }
 ```
 
@@ -309,9 +311,12 @@ Get DNS records for a domain.
 ```json
 {
   "success": false,
-  "error": "Domain not found for this user"
+  "error": "Failed to get DNS records",
+  "message": "string"
 }
 ```
+
+**Note**: This endpoint searches all DNS record types (A, AAAA, CNAME, MX, NS, TXT, SRV) and combines the results. Uses ResellerClub's `/api/dns/manage/search-records.json` endpoint with proper pagination.
 
 ### POST /api/domains/renew
 
@@ -969,6 +974,6 @@ For API support and questions:
 ---
 
 **Last Updated**: October 13, 2025  
-**Version**: 2.1.0  
+**Version**: 2.2.0  
 **Author**: Excel Technologies  
-**Status**: Production-ready with known DNS API issues
+**Status**: Production-ready with fully functional DNS Management API
