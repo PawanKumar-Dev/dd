@@ -318,15 +318,13 @@ export default function DNSManagementPage() {
       const domain = domains.find(d => d.id === selectedDomain);
       if (!domain) return;
 
-      const response = await fetch('/api/domains/dns', {
+      const response = await fetch(`/api/domains/dns?domainName=${encodeURIComponent(domain.name)}&recordId=${encodeURIComponent(recordId)}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          domainName: domain.name,
-          recordId,
           recordData: record,
         }),
       });
@@ -379,15 +377,13 @@ export default function DNSManagementPage() {
       const recordId = originalRecord.id || dnsRecords.indexOf(originalRecord).toString();
 
       // First delete the original record
-      const deleteResponse = await fetch('/api/domains/dns', {
+      const deleteResponse = await fetch(`/api/domains/dns?domainName=${encodeURIComponent(domain.name)}&recordId=${encodeURIComponent(recordId)}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          domainName: domain.name,
-          recordId: recordId,
           recordData: originalRecord,
         }),
       });
