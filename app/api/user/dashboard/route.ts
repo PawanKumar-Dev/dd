@@ -43,8 +43,8 @@ export async function GET(request: NextRequest) {
 
     // Get recent orders
     const recentOrders = orders.slice(0, 5).map((order) => ({
-      id: order.orderId,
-      domain: order.domains.map((domain) => domain.domainName).join(", "),
+      orderId: order.orderId,
+      domains: order.domains.length,
       amount: order.amount,
       status: order.status,
       date: new Date(order.createdAt).toLocaleDateString(),
