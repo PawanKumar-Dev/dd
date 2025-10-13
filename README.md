@@ -11,7 +11,7 @@ A comprehensive, enterprise-grade domain registration and management platform bu
 - **Domain Search & Registration** - Search and register domains across 400+ TLDs with real-time availability checking
 - **Live Pricing Integration** - Real-time pricing from ResellerClub API with 200+ comprehensive TLD mappings
 - **Multi-stage Registration** - Step-by-step user registration process with geolocation support
-- **DNS Management** - Complete DNS record management with RDAP nameserver lookup and full CRUD operations
+- **DNS Management** - Complete DNS record management with RDAP nameserver lookup, full CRUD operations, and priority field support for MX/SRV records
 - **Domain Renewal** - Easy domain renewal with automated notifications
 - **Cart System** - Add multiple domains to cart for bulk registration
 
@@ -484,3 +484,6 @@ For support and questions:
 - ✅ Inline DNS record editing with real-time updates
 - ✅ Simplified pricing model without GST calculations
 - ✅ Enhanced DNS record deletion with proper ResellerClub API parameters
+- ✅ Optional Priority field support for DNS records with validation for MX/SRV records
+- ✅ Enhanced security with client-side console log removal
+- ✅ SRV record type support for service discovery

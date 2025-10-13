@@ -430,5 +430,8 @@ npm start
 - ✅ Inline DNS record editing with real-time updates
 - ✅ Enhanced DNS record deletion with proper ResellerClub API parameters
 - ✅ Simplified pricing model without GST calculations
+- ✅ Optional Priority field support for DNS records with validation for MX/SRV records
+- ✅ Enhanced security with client-side console log removal
+- ✅ SRV record type support for service discovery
 
 **Note:** Always test in a development environment before deploying to production!

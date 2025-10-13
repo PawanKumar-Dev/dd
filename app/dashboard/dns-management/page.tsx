@@ -114,7 +114,6 @@ export default function DNSManagementPage() {
       });
       if (response.ok) {
         const data = await response.json();
-        console.log('Loaded domains:', data.domains);
         setDomains(data.domains || []);
       } else {
         console.error('Failed to load domains');
@@ -145,7 +144,6 @@ export default function DNSManagementPage() {
         return;
       }
 
-      console.log('Loading DNS records for domain:', domain.name);
 
       const response = await fetch(`/api/domains/dns?domainName=${encodeURIComponent(domain.name)}`, {
         headers: {
@@ -174,7 +172,6 @@ export default function DNSManagementPage() {
 
             // Wait and retry after 30 seconds
             setTimeout(() => {
-              console.log(`Retrying DNS records load (attempt ${propagationRetryCount + 1}/3)...`);
               loadDNSRecords(domainId, true);
             }, 30000);
 
@@ -210,7 +207,6 @@ export default function DNSManagementPage() {
         return;
       }
 
-      console.log('Loading nameservers for domain:', domain.name);
 
       const response = await fetch(`/api/domains/nameservers?domainName=${encodeURIComponent(domain.name)}`, {
         headers: {
@@ -223,9 +219,6 @@ export default function DNSManagementPage() {
         if (data.success) {
           setNameservers(data.nameservers || []);
           setNameserverMethod(data.method || '');
-          console.log('Nameservers loaded:', data.nameservers);
-          console.log('Method used:', data.method);
-          console.log('Full response:', data);
         } else {
           // Handle API success but lookup failure
           setNameservers([]);
@@ -268,6 +261,12 @@ export default function DNSManagementPage() {
   const handleAddRecord = async () => {
     if (!selectedDomain || !newRecord.name || !newRecord.value) {
       toast.error('Please fill in all required fields');
+      return;
+    }
+
+    // Validate priority for MX and SRV records
+    if ((newRecord.type === 'MX' || newRecord.type === 'SRV') && (!newRecord.priority || newRecord.priority < 0)) {
+      toast.error('Priority is required for MX and SRV records');
       return;
     }
 
@@ -356,6 +355,12 @@ export default function DNSManagementPage() {
 
   const handleSaveEdit = async () => {
     if (!selectedDomain || !editingRecord) return;
+
+    // Validate priority for MX and SRV records
+    if ((editRecord.type === 'MX' || editRecord.type === 'SRV') && (!editRecord.priority || editRecord.priority < 0)) {
+      toast.error('Priority is required for MX and SRV records');
+      return;
+    }
 
     const domain = domains.find(d => d.id === selectedDomain);
     if (!domain) return;
@@ -892,12 +897,12 @@ export default function DNSManagementPage() {
                 {showAddRecord && (
                   <div className="bg-gray-50 rounded-lg p-4 mb-6">
                     <h4 className="text-sm font-medium text-gray-900 mb-3">Add New DNS Record</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-6 gap-3">
                       <div>
                         <label className="block text-xs font-medium text-gray-700 mb-1">Type</label>
                         <select
                           value={newRecord.type}
-                          onChange={(e) => setNewRecord({ ...newRecord, type: e.target.value })}
+                          onChange={(e) => setNewRecord({ ...newRecord, type: e.target.value, priority: undefined })}
                           className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
                         >
                           <option value="A">A</option>
@@ -906,6 +911,7 @@ export default function DNSManagementPage() {
                           <option value="MX">MX</option>
                           <option value="TXT">TXT</option>
                           <option value="NS">NS</option>
+                          <option value="SRV">SRV</option>
                         </select>
                       </div>
                       <div>
@@ -925,6 +931,34 @@ export default function DNSManagementPage() {
                           value={newRecord.value}
                           onChange={(e) => setNewRecord({ ...newRecord, value: e.target.value })}
                           placeholder="e.g., 192.168.1.1"
+                          className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">TTL</label>
+                        <input
+                          type="number"
+                          value={newRecord.ttl}
+                          onChange={(e) => setNewRecord({ ...newRecord, ttl: parseInt(e.target.value) || 3600 })}
+                          min="300"
+                          max="86400"
+                          className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                          Priority
+                          {(newRecord.type === 'MX' || newRecord.type === 'SRV') && (
+                            <span className="text-red-500 ml-1">*</span>
+                          )}
+                        </label>
+                        <input
+                          type="number"
+                          value={newRecord.priority || ''}
+                          onChange={(e) => setNewRecord({ ...newRecord, priority: e.target.value ? parseInt(e.target.value) : undefined })}
+                          placeholder={(newRecord.type === 'MX' || newRecord.type === 'SRV') ? "Required" : "Optional"}
+                          min="0"
+                          max="65535"
                           className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
                         />
                       </div>

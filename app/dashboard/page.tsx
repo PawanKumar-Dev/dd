@@ -132,29 +132,6 @@ export default function UserDashboard() {
     );
   }
 
-  const statCards = [
-    {
-      title: 'Total Domains',
-      value: stats?.totalDomains || 0,
-      icon: Globe,
-      color: 'blue',
-      change: '+2 this month'
-    },
-    {
-      title: 'Active Domains',
-      value: stats?.activeDomains || 0,
-      icon: CheckCircle,
-      color: 'green',
-      change: 'All healthy'
-    },
-    {
-      title: 'Total Orders',
-      value: stats?.totalOrders || 0,
-      icon: RupeeIcon,
-      color: 'purple',
-      change: '+3 this month'
-    }
-  ];
 
   return (
     <ClientOnly>
@@ -170,45 +147,6 @@ export default function UserDashboard() {
             </p>
           </div>
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {statCards.map((card, index) => {
-              const Icon = card.icon;
-              const colorClasses = {
-                blue: 'bg-blue-50 text-blue-600',
-                green: 'bg-green-50 text-green-600',
-                purple: 'bg-purple-50 text-purple-600',
-                orange: 'bg-orange-50 text-orange-600'
-              };
-
-              return (
-                <motion.div
-                  key={card.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-gray-600 mb-1">
-                        {card.title}
-                      </p>
-                      <p className="text-2xl font-bold text-gray-900">
-                        {card.value}
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {card.change}
-                      </p>
-                    </div>
-                    <div className={`p-3 rounded-lg ${colorClasses[card.color as keyof typeof colorClasses]}`}>
-                      <Icon className="h-6 w-6" />
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
 
           {/* Quick Actions */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">

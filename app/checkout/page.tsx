@@ -140,10 +140,8 @@ export default function CheckoutPage() {
         description: `Payment for ${cartItems.length} domain(s)`,
         order_id: data.razorpayOrderId,
         handler: async function (response: any) {
-          console.log('🎉 [CHECKOUT] Payment success callback triggered:', response);
           try {
             // Verify payment
-            console.log('🔍 [CHECKOUT] Starting payment verification...');
             const verifyResponse = await fetch('/api/payments/verify', {
               method: 'POST',
               headers: {
@@ -158,12 +156,9 @@ export default function CheckoutPage() {
               }),
             });
 
-            console.log('🔍 [CHECKOUT] Verification response status:', verifyResponse.status);
             const verifyData = await verifyResponse.json();
-            console.log('🔍 [CHECKOUT] Verification response data:', verifyData);
 
             if (verifyResponse.ok) {
-              console.log('✅ [CHECKOUT] Payment verification successful');
               const {
                 successfulDomains,
                 orderId,
@@ -183,20 +178,17 @@ export default function CheckoutPage() {
                 timestamp: Date.now()
               };
 
-              console.log('✅ [CHECKOUT] Storing success result:', paymentResult);
               sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
 
               // Clear cart immediately before redirect
               clearCart();
 
               // Redirect immediately to success page
-              console.log('✅ [CHECKOUT] Redirecting to payment-success page');
               router.push('/payment-success');
 
               // Reset payment in progress flag after redirect
               setTimeout(() => setIsPaymentInProgress(false), 100);
             } else {
-              console.log('❌ [CHECKOUT] Payment verification failed:', verifyData);
               // Handle restricted domains error
               if (verifyData.restrictedDomains) {
                 const restrictedDomainsList = verifyData.restrictedDomains.map((d: any) => d.domainName).join(', ');
@@ -228,14 +220,12 @@ export default function CheckoutPage() {
                 timestamp: Date.now()
               };
 
-              console.log('❌ [CHECKOUT] Storing failure result:', paymentResult);
               sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
 
               // Clear cart immediately before redirect
               clearCart();
 
               // Redirect immediately to success page
-              console.log('❌ [CHECKOUT] Redirecting to payment-success page');
               router.push('/payment-success');
 
               // Reset payment in progress flag after redirect
@@ -278,14 +268,12 @@ export default function CheckoutPage() {
               supportContact: 'support@exceltechnologies.com'
             };
 
-            console.log('🚨 [CHECKOUT] Storing catch error result:', paymentResult);
             sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
 
             // Clear cart immediately before redirect
             clearCart();
 
             // Redirect immediately to success page
-            console.log('🚨 [CHECKOUT] Redirecting to payment-success page from catch');
             router.push('/payment-success');
 
             // Reset payment in progress flag after redirect
@@ -330,7 +318,6 @@ export default function CheckoutPage() {
       const rzp = new window.Razorpay(options);
 
       rzp.on('payment.failed', function (response: any) {
-        console.log('🚨 [CHECKOUT] Payment failed:', response);
         setIsProcessing(false);
         setIsPaymentInProgress(false);
 
@@ -339,7 +326,6 @@ export default function CheckoutPage() {
         let errorType = 'payment_failed';
 
         if (response.error) {
-          console.log('🚨 [CHECKOUT] Error details:', response.error);
           if (response.error.code === 'BAD_REQUEST_ERROR') {
             errorMessage = 'Invalid payment request. Please try again.';
             errorType = 'invalid_request';
@@ -368,14 +354,12 @@ export default function CheckoutPage() {
           supportContact: 'support@exceltechnologies.com'
         };
 
-        console.log('🚨 [CHECKOUT] Storing payment failure result:', paymentResult);
         sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
 
         // Clear cart immediately before redirect
         clearCart();
 
         // Redirect immediately to success page
-        console.log('🚨 [CHECKOUT] Redirecting to payment-success page');
         router.push('/payment-success');
 
         // Reset payment in progress flag after redirect
@@ -423,14 +407,12 @@ export default function CheckoutPage() {
         supportContact: 'support@exceltechnologies.com'
       };
 
-      console.log('🚨 [CHECKOUT] Storing initialization error result:', paymentResult);
       sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
 
       // Clear cart immediately before redirect
       clearCart();
 
       // Redirect immediately to success page
-      console.log('🚨 [CHECKOUT] Redirecting to payment-success page from initialization error');
       router.push('/payment-success');
     }
   };
@@ -478,8 +460,8 @@ export default function CheckoutPage() {
               onClick={() => router.back()}
               disabled={isPaymentInProgress}
               className={`flex items-center mr-4 ${isPaymentInProgress
-                  ? 'text-gray-400 cursor-not-allowed'
-                  : 'text-gray-600 hover:text-gray-900'
+                ? 'text-gray-400 cursor-not-allowed'
+                : 'text-gray-600 hover:text-gray-900'
                 }`}
             >
               <ArrowLeft className="h-5 w-5 mr-1" />

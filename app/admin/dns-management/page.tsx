@@ -171,7 +171,6 @@ export default function AdminDNSManagementPage() {
         return;
       }
 
-      console.log('Loading DNS records for domain:', domain.name);
 
       const response = await fetch(`/api/domains/dns?domainName=${encodeURIComponent(domain.name)}`, {
         headers: {
@@ -196,7 +195,6 @@ export default function AdminDNSManagementPage() {
             setPropagationRetryCount(prev => prev + 1);
 
             setTimeout(() => {
-              console.log(`Retrying DNS records load (attempt ${propagationRetryCount + 1}/3)...`);
               loadDNSRecords(domainId, true);
             }, 30000);
 
@@ -292,36 +290,66 @@ export default function AdminDNSManagementPage() {
   };
 
   const handleAddRecord = async () => {
-    if (!selectedDomain || !newRecord.name || !newRecord.value) {
+    if (selectedDomains.length === 0) {
+      toast.error('Please select at least one domain');
+      return;
+    }
+
+    if (!newRecord.name || !newRecord.value) {
       toast.error('Please fill in all required fields');
+      return;
+    }
+
+    // Validate priority for MX and SRV records
+    if ((newRecord.type === 'MX' || newRecord.type === 'SRV') && (!newRecord.priority || newRecord.priority < 0)) {
+      toast.error('Priority is required for MX and SRV records');
       return;
     }
 
     try {
       const token = localStorage.getItem('token');
-      const domain = domains.find(d => d.id === selectedDomain);
-      if (!domain) return;
+      let successCount = 0;
+      let errorCount = 0;
 
-      const response = await fetch('/api/domains/dns', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          domainName: domain.name,
-          record: newRecord,
-        }),
-      });
+      // Add record to all selected domains
+      for (const domainId of selectedDomains) {
+        const domain = domains.find(d => d.id === domainId);
+        if (!domain) continue;
 
-      if (response.ok) {
-        toast.success('DNS record added successfully');
+        try {
+          const response = await fetch('/api/domains/dns', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              domainName: domain.name,
+              recordData: newRecord,
+            }),
+          });
+
+          if (response.ok) {
+            successCount++;
+          } else {
+            const error = await response.json();
+            console.error(`Failed to add record to ${domain.name}:`, error);
+            errorCount++;
+          }
+        } catch (error) {
+          console.error(`Error adding record to ${domain.name}:`, error);
+          errorCount++;
+        }
+      }
+
+      if (successCount > 0) {
+        toast.success(`DNS record added to ${successCount} domain(s)${errorCount > 0 ? ` (${errorCount} failed)` : ''}`);
         setNewRecord({ type: 'A', name: '', value: '', ttl: 3600, priority: undefined });
         setShowAddRecord(false);
-        loadDNSRecords(selectedDomain);
+        setBulkOperation('none');
+        setSelectedDomains([]);
       } else {
-        const error = await response.json();
-        toast.error(error.error || 'Failed to add DNS record');
+        toast.error('Failed to add DNS record to any domain');
       }
     } catch (error) {
       console.error('Error adding DNS record:', error);
@@ -714,10 +742,15 @@ export default function AdminDNSManagementPage() {
                       />
                       <div className="flex-1 min-w-0">
                         <p
-                          className="text-xs sm:text-sm font-medium text-gray-900 truncate cursor-pointer"
+                          className="text-xs sm:text-sm font-medium text-gray-900 truncate cursor-pointer hover:text-blue-600 transition-colors"
                           onClick={() => handleDomainClick(domain.id)}
                         >
                           {domain.name}
+                          {selectedDomain === domain.id && (
+                            <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                              Selected
+                            </span>
+                          )}
                         </p>
                         <p className="text-xs text-gray-500 truncate">
                           {domain.customerName}
@@ -971,9 +1004,63 @@ export default function AdminDNSManagementPage() {
               </div>
             ) : (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sm:p-8 text-center">
-                <Globe className="h-8 w-8 sm:h-10 sm:w-10 text-gray-400 mx-auto mb-3" />
-                <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">Select a Domain</h3>
-                <p className="text-xs sm:text-sm text-gray-500">Choose a domain from the list to manage its DNS records</p>
+                <div className="mb-6">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
+                    <Globe className="h-8 w-8 text-blue-600" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Select a Domain</h3>
+                  <p className="text-sm text-gray-600 mb-4">Choose a domain from the list to view and manage its DNS records</p>
+                </div>
+
+                <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                  <h4 className="text-sm font-medium text-gray-900 mb-2">How to get started:</h4>
+                  <div className="text-left space-y-2 text-sm text-gray-600">
+                    <div className="flex items-start">
+                      <div className="flex-shrink-0 w-5 h-5 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-medium mr-3 mt-0.5">1</div>
+                      <span>Click on a domain from the list on the left</span>
+                    </div>
+                    <div className="flex items-start">
+                      <div className="flex-shrink-0 w-5 h-5 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-medium mr-3 mt-0.5">2</div>
+                      <span>View existing DNS records for that domain</span>
+                    </div>
+                    <div className="flex items-start">
+                      <div className="flex-shrink-0 w-5 h-5 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-medium mr-3 mt-0.5">3</div>
+                      <span>Add, edit, or delete DNS records as needed</span>
+                    </div>
+                  </div>
+                </div>
+
+                {domains.length === 0 ? (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <div className="w-5 h-5 bg-yellow-400 rounded-full flex items-center justify-center">
+                          <span className="text-yellow-800 text-xs font-bold">!</span>
+                        </div>
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-sm text-yellow-800">
+                          No domains found. Make sure domains are registered and active.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <div className="w-5 h-5 bg-blue-400 rounded-full flex items-center justify-center">
+                          <span className="text-blue-800 text-xs font-bold">i</span>
+                        </div>
+                      </div>
+                      <div className="ml-3">
+                        <p className="text-sm text-blue-800">
+                          {domains.length} domain{domains.length !== 1 ? 's' : ''} available for DNS management
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -998,7 +1085,7 @@ export default function AdminDNSManagementPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
                   <select
                     value={newRecord.type}
-                    onChange={(e) => setNewRecord({ ...newRecord, type: e.target.value })}
+                    onChange={(e) => setNewRecord({ ...newRecord, type: e.target.value, priority: undefined })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                     <option value="A">A</option>
@@ -1045,11 +1132,16 @@ export default function AdminDNSManagementPage() {
 
                 {(newRecord.type === 'MX' || newRecord.type === 'SRV') && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Priority <span className="text-red-500">*</span>
+                    </label>
                     <input
                       type="number"
                       value={newRecord.priority || ''}
                       onChange={(e) => setNewRecord({ ...newRecord, priority: parseInt(e.target.value) })}
+                      placeholder="Required for MX/SRV records"
+                      min="0"
+                      max="65535"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>

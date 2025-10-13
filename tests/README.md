@@ -372,8 +372,11 @@ node tests/debug/debug-pricing.js
 - DNS record editing with inline updates
 - DNS record deletion with proper parameters
 - ResellerClub API integration for DNS operations
-- TTL and priority field handling
+- TTL and priority field handling with validation
+- Priority field validation for MX and SRV records
+- Optional priority support for other record types
 - Error handling and rollback mechanisms
+- Security testing (console log removal verification)
 
 ## 💰 Pricing System Tests
 

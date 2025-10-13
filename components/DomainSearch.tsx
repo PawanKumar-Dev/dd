@@ -210,7 +210,6 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
       if (searchMode === 'single' || validation.suggestedTld) {
         // Single domain search
         const domainToSearch = searchTerm;
-        console.log('🔍 [FRONTEND] Single domain search:', domainToSearch);
 
         const response = await fetch('/api/domains/search', {
           method: 'POST',

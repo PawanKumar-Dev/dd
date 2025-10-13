@@ -336,6 +336,12 @@ Add a new DNS record to a domain.
 }
 ```
 
+**Priority Field Rules:**
+- **Required for**: MX and SRV records
+- **Optional for**: A, AAAA, CNAME, TXT, NS records
+- **Range**: 0-65535
+- **Validation**: Server validates priority requirements based on record type
+
 **Response:**
 
 ```json
@@ -409,10 +415,12 @@ Delete a DNS record from a domain.
 - ✅ **Full CRUD Operations**: Create, Read, Update, Delete DNS records
 - ✅ **Inline Editing**: Edit records directly in the management interface
 - ✅ **Record Type Support**: A, AAAA, CNAME, MX, NS, TXT, SRV records
-- ✅ **Priority Support**: MX and SRV records with priority values
+- ✅ **Priority Support**: Optional priority field with validation for MX and SRV records
 - ✅ **TTL Management**: Configurable TTL values (minimum 300 seconds)
 - ✅ **Real-time Updates**: Immediate reflection of changes
 - ✅ **Error Handling**: Comprehensive error handling with rollback
+- ✅ **Smart Validation**: Priority required for MX/SRV, optional for other record types
+- ✅ **Enhanced Security**: Client-side console logs removed for production security
 
 ### POST /api/domains/renew
 
