@@ -1773,23 +1773,44 @@ export class ResellerClubAPI {
 
   /**
    * Get DNS records for a domain
+   * Uses the correct ResellerClub DNS search endpoint
    */
   static async getDNSRecords(
     domainName: string,
     customerId: string
   ): Promise<ResellerClubResponse> {
     try {
-      const response = await api.get("/api/dns/manage/list-records.json", {
-        params: {
-          "domain-name": domainName,
-          "auth-userid": customerId,
-          "api-key": RESELLERCLUB_SECRET,
-        },
-      });
+      // Search for all record types
+      const recordTypes = ['A', 'AAAA', 'CNAME', 'MX', 'NS', 'TXT', 'SRV'];
+      const allRecords = [];
+
+      for (const recordType of recordTypes) {
+        try {
+          const response = await api.get("/api/dns/manage/search-records.json", {
+            params: {
+              "domain-name": domainName,
+              "customer-id": customerId,
+              type: recordType,
+              "no-of-records": 50, // Maximum allowed by ResellerClub
+              "page-no": 1, // Required parameter for pagination
+            },
+          });
+
+          if (response.data && response.data.records) {
+            allRecords.push(...response.data.records);
+          }
+        } catch (typeError) {
+          // Continue with other record types if one fails
+          console.log(`No ${recordType} records found for ${domainName}`);
+        }
+      }
 
       return {
         status: "success",
-        data: response.data,
+        data: {
+          records: allRecords,
+          total: allRecords.length,
+        },
       };
     } catch (error: any) {
       console.error("ResellerClub DNS records error:", error);
@@ -1804,7 +1825,7 @@ export class ResellerClubAPI {
   }
 
   /**
-   * Add DNS record
+   * Add DNS record using the correct endpoint based on record type
    */
   static async addDNSRecord(
     domainName: string,
@@ -1817,28 +1838,62 @@ export class ResellerClubAPI {
     }
   ): Promise<ResellerClubResponse> {
     try {
-      const response = await api.post("/api/dns/manage/add-record.json", null, {
-        params: {
-          "domain-name": domainName,
-          "auth-userid": RESELLERCLUB_ID,
-          "api-key": RESELLERCLUB_SECRET,
-          type: recordData.type,
-          host: recordData.name,
-          value: recordData.value,
-          ttl: recordData.ttl,
-          priority: recordData.priority,
-        },
-      });
+      // Ensure TTL is at least 7200 (ResellerClub requirement)
+      const ttl = Math.max(recordData.ttl, 7200);
+      
+      let endpoint = "";
+      let params: any = {
+        "domain-name": domainName,
+        host: recordData.name,
+        value: recordData.value,
+        ttl: ttl,
+      };
+
+      // Use specific endpoint based on record type
+      switch (recordData.type.toUpperCase()) {
+        case 'A':
+          endpoint = "/api/dns/manage/add-ipv4-record.json";
+          break;
+        case 'AAAA':
+          endpoint = "/api/dns/manage/add-ipv6-record.json";
+          break;
+        case 'CNAME':
+          endpoint = "/api/dns/manage/add-cname-record.json";
+          break;
+        case 'MX':
+          endpoint = "/api/dns/manage/add-mx-record.json";
+          params.priority = recordData.priority || 10;
+          break;
+        case 'NS':
+          endpoint = "/api/dns/manage/add-ns-record.json";
+          break;
+        case 'TXT':
+          endpoint = "/api/dns/manage/add-txt-record.json";
+          break;
+        case 'SRV':
+          endpoint = "/api/dns/manage/add-srv-record.json";
+          params.priority = recordData.priority || 10;
+          params.weight = 10; // Default weight
+          params.port = 443; // Default port
+          break;
+        default:
+          return {
+            status: "error",
+            message: `Unsupported DNS record type: ${recordData.type}`,
+          };
+      }
+
+      const response = await api.post(endpoint, null, { params });
 
       return {
         status: "success",
         data: response.data,
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error("ResellerClub add DNS record error:", error);
       return {
         status: "error",
-        message: "Failed to add DNS record",
+        message: error.response?.data?.msg || "Failed to add DNS record",
       };
     }
   }
