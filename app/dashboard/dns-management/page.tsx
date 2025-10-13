@@ -549,12 +549,12 @@ export default function DNSManagementPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
+                className="bg-white rounded-lg shadow-sm border border-gray-200 p-4"
               >
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center justify-between mb-4">
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900">Nameservers</h3>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-gray-500 mt-0.5">
                       Current nameservers for {domains.find(d => d.id === selectedDomain)?.name}
                     </p>
                   </div>
@@ -580,27 +580,27 @@ export default function DNSManagementPage() {
                 </div>
 
                 {isNameserverLoading ? (
-                  <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                    <p className="text-gray-500">Loading nameserver information...</p>
+                  <div className="text-center py-4">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                    <p className="text-gray-500 text-sm">Loading nameserver information...</p>
                   </div>
                 ) : nameservers.length > 0 ? (
-                  <div className="space-y-3">
+                  <div className="space-y-1.5">
                     {nameservers.map((ns, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div key={index} className="flex items-center justify-between px-3 py-2 bg-gray-50 rounded-md">
                         <div className="flex items-center">
-                          <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                          <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2.5"></div>
                           <span className="font-mono text-sm text-gray-900">{ns}</span>
                         </div>
-                        <span className="text-xs text-gray-500">#{index + 1}</span>
+                        <span className="text-xs text-gray-500 font-medium">#{index + 1}</span>
                       </div>
                     ))}
-                    <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                      <div className="flex items-center">
-                        <svg className="h-5 w-5 text-blue-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="mt-2 p-2 bg-blue-50 rounded-md">
+                      <div className="flex items-start">
+                        <svg className="h-4 w-4 text-blue-400 mr-1.5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <p className="text-sm text-blue-800">
+                        <p className="text-xs text-blue-800 leading-relaxed">
                           <strong>Note:</strong> These nameservers are retrieved from RDAP data and may not reflect real-time changes.
                         </p>
                       </div>

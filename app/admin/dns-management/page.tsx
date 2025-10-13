@@ -763,8 +763,8 @@ export default function AdminDNSManagementPage() {
             {selectedDomain ? (
               <div className="space-y-4 sm:space-y-6">
                 {/* Nameservers */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-3 sm:mb-4">
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-3">
                     <h3 className="text-base sm:text-lg font-semibold text-gray-900">Nameservers</h3>
                     <button
                       onClick={() => loadNameservers(selectedDomain)}
@@ -777,18 +777,19 @@ export default function AdminDNSManagementPage() {
                   </div>
 
                   {isNameserverLoading ? (
-                    <div className="flex items-center justify-center py-4">
-                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                    <div className="flex items-center justify-center py-3">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
                     </div>
                   ) : nameservers.length > 0 ? (
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                       {nameservers.map((ns, index) => (
-                        <div key={index} className="flex items-center text-sm">
-                          <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
-                          <span className="text-gray-900">{ns}</span>
+                        <div key={index} className="flex items-center text-sm px-2 py-1.5 bg-gray-50 rounded-md">
+                          <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-2.5"></div>
+                          <span className="text-gray-900 font-mono">{ns}</span>
+                          <span className="ml-auto text-xs text-gray-500 font-medium">#{index + 1}</span>
                         </div>
                       ))}
-                      <p className="text-xs text-blue-600 mt-2">
+                      <p className="text-xs text-blue-600 mt-1.5 px-2">
                         <strong>Note:</strong> These nameservers are retrieved from RDAP data and may not reflect real-time changes.
                       </p>
                     </div>
