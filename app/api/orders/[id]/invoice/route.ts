@@ -226,19 +226,14 @@ export async function GET(
       currentY += 10;
     });
 
-    // Order summary - use stored values from order if available
-    const subtotal = order.subtotal || order.domains
+    // Order total - use stored values from order if available
+    const total = order.amount || order.domains
       .filter((d: any) => d.status === "registered")
       .reduce(
         (total: number, domain: any) =>
           total + domain.price * domain.registrationPeriod,
         0
       );
-    
-    // Use GST from order if available, otherwise calculate it
-    const gstRate = order.gstRate || 18;
-    const gstAmount = order.gstAmount || Math.round((subtotal * gstRate) / 100 * 100) / 100;
-    const total = order.amount || (subtotal + gstAmount);
 
     const summaryY = Math.max(currentY + 20, pageHeight - 80);
 
@@ -263,40 +258,14 @@ export async function GET(
     pdf.setFontSize(10);
     pdf.setFont("helvetica", "normal");
 
-    // Subtotal
-    pdf.text(`Subtotal:`, summaryX + 5, summaryY + 20);
-    pdf.text(
-      `₹${subtotal.toFixed(2)}`,
-      summaryX + summaryWidth - 5,
-      summaryY + 20,
-      {
-        align: "right",
-      }
-    );
-
-    // GST
-    pdf.text(`GST (${gstRate}%):`, summaryX + 5, summaryY + 28);
-    pdf.text(`₹${gstAmount.toFixed(2)}`, summaryX + summaryWidth - 5, summaryY + 28, {
-      align: "right",
-    });
-
-    // Total line
-    pdf.setDrawColor(lightGray[0], lightGray[1], lightGray[2]);
-    pdf.line(
-      summaryX + 5,
-      summaryY + 32,
-      summaryX + summaryWidth - 5,
-      summaryY + 32
-    );
-
     // Total
     pdf.setFontSize(12);
     pdf.setFont("helvetica", "bold");
-    pdf.text(`Total:`, summaryX + 5, summaryY + 40);
+    pdf.text(`Total:`, summaryX + 5, summaryY + 20);
     pdf.text(
       `₹${total.toFixed(2)} ${order.currency}`,
       summaryX + summaryWidth - 5,
-      summaryY + 40,
+      summaryY + 20,
       { align: "right" }
     );
 
