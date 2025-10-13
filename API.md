@@ -1,7 +1,3 @@
-# API Documentation - Excel Technologies Domain Management System
-
-This document provides comprehensive documentation for all API endpoints in the Excel Technologies Domain Management System.
-
 ## Base URL
 
 - **Local Development**: `http://localhost:3000`
