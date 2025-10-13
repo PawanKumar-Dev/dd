@@ -138,12 +138,19 @@ export class ResellerClubWrapper {
    */
   static async deleteDNSRecord(
     domainName: string,
-    recordId: string
+    recordId: string,
+    recordData: {
+      type: string;
+      name: string;
+      value: string;
+      ttl: number;
+      priority?: number;
+    }
   ): Promise<ResellerClubResponse> {
     console.log(
       `🌐 [PRODUCTION] ResellerClub Wrapper: Deleting DNS record for "${domainName}"`
     );
-    return ResellerClubAPI.deleteDNSRecord(domainName, recordId);
+    return ResellerClubAPI.deleteDNSRecord(domainName, recordId, recordData);
   }
 
   /**

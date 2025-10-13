@@ -1974,7 +1974,14 @@ export class ResellerClubAPI {
    */
   static async deleteDNSRecord(
     domainName: string,
-    recordId: string
+    recordId: string,
+    recordData: {
+      type: string;
+      name: string;
+      value: string;
+      ttl: number;
+      priority?: number;
+    }
   ): Promise<ResellerClubResponse> {
     try {
       const response = await api.post(
@@ -1986,6 +1993,9 @@ export class ResellerClubAPI {
             "auth-userid": RESELLERCLUB_ID,
             "api-key": RESELLERCLUB_SECRET,
             "record-id": recordId,
+            host: recordData.name,
+            value: recordData.value,
+            type: recordData.type,
           },
         }
       );

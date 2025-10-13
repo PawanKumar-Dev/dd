@@ -212,10 +212,21 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
+    // Get record data from request body
+    const { recordData } = await request.json().catch(() => ({}));
+
+    if (!recordData) {
+      return NextResponse.json(
+        { error: "Record data is required for deletion" },
+        { status: 400 }
+      );
+    }
+
     // Delete DNS record
     const result = await ResellerClubWrapper.deleteDNSRecord(
       domainName,
-      recordId
+      recordId,
+      recordData
     );
 
     if (result.status === "error") {

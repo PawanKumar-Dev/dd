@@ -306,6 +306,13 @@ export default function DNSManagementPage() {
   const handleDeleteRecord = async (recordId: string) => {
     if (!selectedDomain) return;
 
+    // Find the record to get its data
+    const record = dnsRecords[parseInt(recordId)];
+    if (!record) {
+      toast.error('Record not found');
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
       const domain = domains.find(d => d.id === selectedDomain);
@@ -320,6 +327,7 @@ export default function DNSManagementPage() {
         body: JSON.stringify({
           domainName: domain.name,
           recordId,
+          recordData: record,
         }),
       });
 
@@ -360,11 +368,17 @@ export default function DNSManagementPage() {
       const originalRecord = dnsRecords[parseInt(editingRecord)];
 
       // First delete the original record
-      const deleteResponse = await fetch(`/api/domains/dns?domainName=${encodeURIComponent(domain.name)}&recordId=${editingRecord}`, {
+      const deleteResponse = await fetch('/api/domains/dns', {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          domainName: domain.name,
+          recordId: editingRecord,
+          recordData: originalRecord,
+        }),
       });
 
       if (!deleteResponse.ok) {
