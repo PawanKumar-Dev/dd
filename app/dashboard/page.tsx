@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
   Globe, ShoppingCart, TrendingUp, Clock, CheckCircle,
-  AlertTriangle, Calendar, ArrowRight, Plus, RefreshCw
+  AlertTriangle, Calendar, ArrowRight, Plus, RefreshCw, Server
 } from 'lucide-react';
 import RupeeIcon from '@/components/icons/RupeeIcon';
 import toast from 'react-hot-toast';
@@ -36,7 +36,7 @@ export default function UserDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const { items: cartItems, getItemCount } = useCartStore();
+  const { items: cartItems } = useCartStore();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -318,13 +318,13 @@ export default function UserDashboard() {
               </button>
 
               <button
-                onClick={() => router.push('/cart')}
+                onClick={() => router.push('/dashboard/dns-management')}
                 className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                <ShoppingCart className="h-5 w-5 text-green-600 mr-3" />
+                <Server className="h-5 w-5 text-green-600 mr-3" />
                 <div className="text-left">
-                  <p className="font-medium text-gray-900">View Cart</p>
-                  <p className="text-sm text-gray-500">{getItemCount()} items</p>
+                  <p className="font-medium text-gray-900">DNS Management</p>
+                  <p className="text-sm text-gray-500">Manage your domain DNS records</p>
                 </div>
               </button>
 
