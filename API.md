@@ -4,9 +4,8 @@ This document provides comprehensive documentation for all API endpoints in the 
 
 ## Base URL
 
-- **Development**: `http://35.209.122.24:3000`
-- **Production**: `https://yourdomain.com`
 - **Local Development**: `http://localhost:3000`
+- **Production**: `https://yourdomain.com`
 
 ## Authentication
 
@@ -279,6 +278,44 @@ Get nameserver information for a domain using RDAP (Registration Data Access Pro
 - **TLD-Specific**: Automatically finds correct RDAP server for each TLD
 - **Structured Data**: Returns clean JSON with nameservers and domain info
 - **No API Keys**: Completely free service with no authentication required
+
+### GET /api/domains/dns
+
+⚠️ **Known Issue**: Currently experiencing 404 errors with ResellerClub DNS API endpoints.
+
+Get DNS records for a domain.
+
+**Query Parameters:**
+
+- `domainName` (string, required): Domain name to get DNS records for
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "domainName": "string",
+  "records": [
+    {
+      "id": "string",
+      "type": "string",
+      "name": "string",
+      "value": "string",
+      "ttl": number,
+      "priority": number
+    }
+  ]
+}
+```
+
+**Error Response:**
+
+```json
+{
+  "success": false,
+  "error": "Domain not found for this user"
+}
+```
 
 ### POST /api/domains/renew
 
@@ -899,11 +936,11 @@ A Postman collection is available for manual API testing with pre-configured req
 
 ```bash
 # Domain search
-curl -X GET "http://35.209.122.24:3000/api/domains/search?domain=example.com" \
+curl -X GET "http://localhost:3000/api/domains/search?domain=example.com" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 
 # Create payment order
-curl -X POST "http://35.209.122.24:3000/api/payments/create-order" \
+curl -X POST "http://localhost:3000/api/payments/create-order" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -d '{"domains":[{"domainName":"example.com","price":1198.8,"currency":"INR","registrationPeriod":1}]}'
@@ -935,6 +972,7 @@ For API support and questions:
 
 ---
 
-**Last Updated**: 2024-12-19  
-**Version**: 2.0.0  
-**Author**: Excel Technologies
+**Last Updated**: October 13, 2025  
+**Version**: 2.1.0  
+**Author**: Excel Technologies  
+**Status**: Production-ready with known DNS API issues
