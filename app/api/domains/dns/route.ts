@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
 
     // Find the domain in the database to get resellerClubCustomerId
     const order = await Order.findOne({
-      "domains.name": domainName, // Assuming 'name' is the field for domain name
+      "domains.domainName": domainName, // Correct field name is 'domainName'
       userId: user._id,
     });
 
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const domain = order.domains.find((d) => d.name === domainName);
+    const domain = order.domains.find((d) => d.domainName === domainName);
 
     if (!domain || !domain.resellerClubCustomerId) {
       return NextResponse.json(
