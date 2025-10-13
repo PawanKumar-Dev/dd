@@ -50,6 +50,25 @@ export async function GET(request: NextRequest) {
       date: new Date(order.createdAt).toLocaleDateString(),
     }));
 
+    // Get recent domains (from all orders, sorted by registration date)
+    const recentDomains = orders
+      .flatMap((order) =>
+        order.domains.map((domain) => ({
+          name: domain.domainName,
+          status: domain.status,
+          registeredDate: new Date(order.createdAt).toLocaleDateString(),
+          expiryDate: domain.expiresAt
+            ? new Date(domain.expiresAt).toLocaleDateString()
+            : "N/A",
+        }))
+      )
+      .sort(
+        (a, b) =>
+          new Date(b.registeredDate).getTime() -
+          new Date(a.registeredDate).getTime()
+      )
+      .slice(0, 5);
+
     // Get upcoming renewals (domains expiring in next 30 days)
     const upcomingRenewals = orders
       .flatMap((order) =>
@@ -79,6 +98,7 @@ export async function GET(request: NextRequest) {
         activeDomains,
         totalOrders: orders.length,
         recentOrders,
+        recentDomains,
         upcomingRenewals,
       },
     };

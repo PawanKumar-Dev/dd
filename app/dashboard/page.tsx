@@ -27,6 +27,7 @@ interface DashboardStats {
   activeDomains: number;
   totalOrders: number;
   recentOrders: any[];
+  recentDomains: any[];
   upcomingRenewals: any[];
 }
 
@@ -211,7 +212,7 @@ export default function UserDashboard() {
 
           {/* Quick Actions */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            {/* Recent Orders */}
+            {/* Recent Domains */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -219,14 +220,48 @@ export default function UserDashboard() {
               className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Recent Orders</h3>
+                <h3 className="text-lg font-semibold text-gray-900">Recent Domains</h3>
                 <button
-                  onClick={() => router.push('/dashboard/orders')}
+                  onClick={() => router.push('/dashboard/domains')}
                   className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center"
                 >
                   View All
                   <ArrowRight className="h-4 w-4 ml-1" />
                 </button>
+              </div>
+              <div className="space-y-3">
+                {stats?.recentDomains && stats.recentDomains.length > 0 ? (
+                  stats.recentDomains.map((domain, index) => (
+                    <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
+                      <div>
+                        <p className="font-medium text-gray-900">{domain.name}</p>
+                        <p className="text-sm text-gray-500">Registered {domain.registeredDate}</p>
+                      </div>
+                      <div className="text-right">
+                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${domain.status === 'registered' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                          }`}>
+                          {domain.status}
+                        </span>
+                        <p className="text-xs text-gray-500 mt-1">Expires {domain.expiryDate}</p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <Globe className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h4 className="text-lg font-medium text-gray-900 mb-2">No Recent Domains</h4>
+                    <p className="text-gray-500 text-sm">
+                      You haven't registered any domains yet
+                    </p>
+                    <button
+                      onClick={() => router.push('/')}
+                      className="mt-3 inline-flex items-center px-3 py-2 text-sm font-medium text-blue-600 hover:text-blue-700"
+                    >
+                      <Plus className="h-4 w-4 mr-1" />
+                      Search Domains
+                    </button>
+                  </div>
+                )}
               </div>
             </motion.div>
 
