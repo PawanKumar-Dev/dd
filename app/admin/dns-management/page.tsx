@@ -460,17 +460,15 @@ export default function AdminDNSManagementPage() {
                 {filteredDomains.map((domain) => (
                   <div
                     key={domain.id}
-                    className={`p-2 sm:p-3 rounded-lg border transition-colors ${selectedDomain === domain.id
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                    className={`p-2 sm:p-3 rounded-lg border transition-all duration-200 cursor-pointer ${selectedDomain === domain.id
+                      ? 'border-blue-500 bg-blue-50 shadow-sm'
+                      : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50 hover:shadow-sm'
                       }`}
+                    onClick={() => handleDomainClick(domain.id)}
                   >
                     <div className="flex items-start space-x-2 sm:space-x-3">
                       <div className="flex-1 min-w-0">
-                        <p
-                          className="text-xs sm:text-sm font-medium text-gray-900 truncate cursor-pointer hover:text-blue-600 transition-colors"
-                          onClick={() => handleDomainClick(domain.id)}
-                        >
+                        <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">
                           {domain.name}
                           {selectedDomain === domain.id && (
                             <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">

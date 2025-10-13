@@ -251,6 +251,74 @@ export class EmailService {
   }
 
   /**
+   * Send password reset notification email (when admin resets user password)
+   */
+  static async sendPasswordResetNotificationEmail(
+    userEmail: string,
+    userName: string,
+    newPassword: string
+  ): Promise<boolean> {
+    const subject = "Your Password Has Been Reset";
+
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+          <h1 style="margin: 0; font-size: 24px; font-weight: bold;">Password Reset Notification</h1>
+        </div>
+        
+        <!-- Content -->
+        <div style="padding: 30px; background-color: #ffffff;">
+          <p style="font-size: 16px; color: #374151; margin-bottom: 20px;">Hello ${userName},</p>
+          
+          <div style="background-color: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 20px; margin: 20px 0;">
+            <h3 style="color: #92400e; margin: 0 0 10px 0; font-size: 18px;">🔐 Password Reset by Administrator</h3>
+            <p style="color: #92400e; margin: 0; font-size: 14px;">Your password has been reset by an administrator. Please use the new password below to log in.</p>
+          </div>
+          
+          <div style="background-color: #f3f4f6; border-radius: 8px; padding: 20px; margin: 20px 0;">
+            <h4 style="color: #374151; margin: 0 0 10px 0; font-size: 16px;">Your New Password:</h4>
+            <div style="background-color: #ffffff; border: 2px solid #3b82f6; border-radius: 6px; padding: 15px; font-family: 'Courier New', monospace; font-size: 18px; font-weight: bold; color: #1f2937; text-align: center; letter-spacing: 1px;">
+              ${newPassword}
+            </div>
+          </div>
+          
+          <div style="background-color: #fef2f2; border: 1px solid #f87171; border-radius: 8px; padding: 20px; margin: 20px 0;">
+            <h4 style="color: #dc2626; margin: 0 0 10px 0; font-size: 16px;">⚠️ Important Security Notice</h4>
+            <ul style="color: #dc2626; margin: 0; padding-left: 20px; font-size: 14px;">
+              <li>Please log in immediately and change your password to something secure</li>
+              <li>Do not share this password with anyone</li>
+              <li>Consider using a password manager for better security</li>
+            </ul>
+          </div>
+          
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${process.env.NEXTAUTH_URL}/login" style="background-color: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">Log In Now</a>
+          </div>
+          
+          <p style="font-size: 14px; color: #6b7280; margin-top: 30px;">
+            If you have any questions or concerns, please contact our support team immediately.
+          </p>
+        </div>
+        
+        <!-- Footer -->
+        <div style="background-color: #f9fafb; padding: 20px; text-align: center; border-radius: 0 0 8px 8px; border-top: 1px solid #e5e7eb;">
+          <p style="margin: 0; font-size: 14px; color: #6b7280;">
+            Best regards,<br>
+            <strong>Excel Technologies Team</strong>
+          </p>
+        </div>
+      </div>
+    `;
+
+    return this.sendEmail({
+      to: userEmail,
+      subject,
+      html,
+    });
+  }
+
+  /**
    * Send order confirmation email with invoice
    */
   static async sendOrderConfirmationEmail(
