@@ -84,6 +84,14 @@ export default function AdminDNSManagementPage() {
     ttl: 3600,
     priority: undefined,
   });
+  const [editingRecord, setEditingRecord] = useState<string | null>(null);
+  const [editRecord, setEditRecord] = useState<Omit<DNSRecord, 'id'>>({
+    type: 'A',
+    name: '',
+    value: '',
+    ttl: 3600,
+    priority: undefined,
+  });
   const [user, setUser] = useState<{ firstName: string; lastName: string; role: string } | null>(null);
 
   useEffect(() => {
@@ -370,6 +378,99 @@ export default function AdminDNSManagementPage() {
     window.location.href = '/login';
   };
 
+  const handleEditRecord = (record: DNSRecord) => {
+    const uniqueId = `${record.type}-${record.id}-${record.name}-${record.value}`;
+    setEditingRecord(uniqueId);
+    setEditRecord({
+      type: record.type,
+      name: record.name,
+      value: record.value,
+      ttl: record.ttl,
+      priority: record.priority,
+    });
+  };
+
+  const handleSaveEdit = async () => {
+    if (!selectedDomain || !editingRecord) return;
+
+    // Validate priority for MX and SRV records
+    if ((editRecord.type === 'MX' || editRecord.type === 'SRV') && (!editRecord.priority || editRecord.priority < 0)) {
+      toast.error('Priority is required for MX and SRV records');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const domain = domains.find(d => d.id === selectedDomain);
+      if (!domain) return;
+
+      // Find the original record to get its ID
+      const originalRecord = dnsRecords.find(r => {
+        const uniqueId = `${r.type}-${r.id}-${r.name}-${r.value}`;
+        return uniqueId === editingRecord;
+      });
+
+      if (!originalRecord) {
+        toast.error('Original record not found');
+        return;
+      }
+
+      // Delete the old record first
+      const deleteResponse = await fetch(`/api/admin/domains/dns?domainName=${encodeURIComponent(domain.name)}&recordId=${encodeURIComponent(originalRecord.id)}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          recordData: originalRecord,
+        }),
+      });
+
+      if (!deleteResponse.ok) {
+        const error = await deleteResponse.json();
+        toast.error(`Failed to delete old record: ${error.error || 'Unknown error'}`);
+        return;
+      }
+
+      // Add the new record
+      const addResponse = await fetch('/api/admin/domains/dns', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          domainName: domain.name,
+          recordData: editRecord,
+        }),
+      });
+
+      if (addResponse.ok) {
+        toast.success('DNS record updated successfully');
+        setEditingRecord(null);
+        loadDNSRecords(selectedDomain);
+      } else {
+        const error = await addResponse.json();
+        toast.error(`Failed to add updated record: ${error.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error updating DNS record:', error);
+      toast.error('Failed to update DNS record');
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingRecord(null);
+    setEditRecord({
+      type: 'A',
+      name: '',
+      value: '',
+      ttl: 3600,
+      priority: undefined,
+    });
+  };
+
   const filteredDomains = domains.filter(domain => {
     const matchesSearch = domain.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       domain.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -636,33 +737,126 @@ export default function AdminDNSManagementPage() {
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                          {dnsRecords.map((record) => (
-                            <tr key={record.id}>
-                              <td className="px-2 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900">
-                                {record.type}
-                              </td>
-                              <td className="px-2 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
-                                {record.name}
-                              </td>
-                              <td className="px-2 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900 max-w-[100px] sm:max-w-none truncate">
-                                {record.value}
-                              </td>
-                              <td className="px-2 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
-                                {record.ttl}
-                              </td>
-                              <td className="px-2 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
-                                {record.priority || '-'}
-                              </td>
-                              <td className="px-2 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium">
-                                <button
-                                  onClick={() => handleDeleteRecord(record.id)}
-                                  className="text-red-600 hover:text-red-900"
-                                >
-                                  <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
+                          {dnsRecords.map((record) => {
+                            const uniqueId = `${record.type}-${record.id}-${record.name}-${record.value}`;
+                            const isEditing = editingRecord === uniqueId;
+
+                            return (
+                              <tr key={uniqueId}>
+                                <td className="px-2 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900">
+                                  {isEditing ? (
+                                    <select
+                                      value={editRecord.type}
+                                      onChange={(e) => setEditRecord({ ...editRecord, type: e.target.value, priority: undefined })}
+                                      className="w-full px-2 py-1 text-xs sm:text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                                    >
+                                      <option value="A">A</option>
+                                      <option value="AAAA">AAAA</option>
+                                      <option value="CNAME">CNAME</option>
+                                      <option value="MX">MX</option>
+                                      <option value="TXT">TXT</option>
+                                      <option value="NS">NS</option>
+                                      <option value="SRV">SRV</option>
+                                    </select>
+                                  ) : (
+                                    record.type
+                                  )}
+                                </td>
+                                <td className="px-2 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
+                                  {isEditing ? (
+                                    <input
+                                      type="text"
+                                      value={editRecord.name}
+                                      onChange={(e) => setEditRecord({ ...editRecord, name: e.target.value })}
+                                      className="w-full px-2 py-1 text-xs sm:text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                                    />
+                                  ) : (
+                                    record.name
+                                  )}
+                                </td>
+                                <td className="px-2 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900 max-w-[100px] sm:max-w-none truncate">
+                                  {isEditing ? (
+                                    <input
+                                      type="text"
+                                      value={editRecord.value}
+                                      onChange={(e) => setEditRecord({ ...editRecord, value: e.target.value })}
+                                      className="w-full px-2 py-1 text-xs sm:text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                                    />
+                                  ) : (
+                                    record.value
+                                  )}
+                                </td>
+                                <td className="px-2 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
+                                  {isEditing ? (
+                                    <input
+                                      type="number"
+                                      value={editRecord.ttl}
+                                      onChange={(e) => setEditRecord({ ...editRecord, ttl: parseInt(e.target.value) || 3600 })}
+                                      min="300"
+                                      className="w-full px-2 py-1 text-xs sm:text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                                    />
+                                  ) : (
+                                    record.ttl
+                                  )}
+                                </td>
+                                <td className="px-2 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
+                                  {isEditing ? (
+                                    (editRecord.type === 'MX' || editRecord.type === 'SRV') ? (
+                                      <input
+                                        type="number"
+                                        value={editRecord.priority || ''}
+                                        onChange={(e) => setEditRecord({ ...editRecord, priority: e.target.value ? parseInt(e.target.value) : undefined })}
+                                        min="0"
+                                        max="65535"
+                                        className="w-full px-2 py-1 text-xs sm:text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
+                                      />
+                                    ) : (
+                                      <span className="text-gray-400">-</span>
+                                    )
+                                  ) : (
+                                    record.priority || '-'
+                                  )}
+                                </td>
+                                <td className="px-2 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium">
+                                  {isEditing ? (
+                                    <div className="flex items-center space-x-2">
+                                      <button
+                                        onClick={handleSaveEdit}
+                                        className="text-green-600 hover:text-green-900"
+                                        title="Save changes"
+                                      >
+                                        <Save className="h-3 w-3 sm:h-4 sm:w-4" />
+                                      </button>
+                                      <button
+                                        onClick={handleCancelEdit}
+                                        className="text-gray-600 hover:text-gray-900"
+                                        title="Cancel editing"
+                                      >
+                                        <X className="h-3 w-3 sm:h-4 sm:w-4" />
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <div className="flex items-center space-x-2">
+                                      <button
+                                        onClick={() => handleEditRecord(record)}
+                                        className="text-blue-600 hover:text-blue-900"
+                                        title="Edit record"
+                                      >
+                                        <Edit3 className="h-3 w-3 sm:h-4 sm:w-4" />
+                                      </button>
+                                      <button
+                                        onClick={() => handleDeleteRecord(record.id)}
+                                        className="text-red-600 hover:text-red-900"
+                                        title="Delete record"
+                                      >
+                                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                                      </button>
+                                    </div>
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })}
                         </tbody>
                       </table>
                     </div>

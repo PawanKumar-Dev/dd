@@ -56,18 +56,22 @@ export async function GET(request: NextRequest) {
       domain.resellerClubCustomerId
     );
 
-    if (result.success) {
-      return NextResponse.json({
-        success: true,
-        records: result.data || [],
-        message: "DNS records retrieved successfully",
-      });
-    } else {
-      return NextResponse.json(
-        { error: result.error || "Failed to retrieve DNS records" },
-        { status: 500 }
-      );
+    if (result.status === "error") {
+      // Check if it's a 404 error (domain not found in ResellerClub)
+      if (result.message && result.message.includes("404")) {
+        return NextResponse.json(
+          { error: "Domain not found in ResellerClub" },
+          { status: 404 }
+        );
+      }
+      return NextResponse.json({ error: result.message }, { status: 500 });
     }
+
+    return NextResponse.json({
+      success: true,
+      domainName,
+      records: result.data?.records || [],
+    });
   } catch (error: any) {
     console.error("Error in admin DNS GET:", error);
     return NextResponse.json(

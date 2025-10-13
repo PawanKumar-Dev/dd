@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Filter, MoreVertical, Trash2, Eye, RefreshCw } from 'lucide-react';
+import { Search, Filter, MoreVertical, Trash2, Eye, RefreshCw, Key } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayoutNew';
 import AdminDataTable from '@/components/admin/AdminDataTable';
 import Modal from '@/components/Modal';
@@ -24,6 +24,12 @@ export default function AdminUsers() {
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isPasswordResetModalOpen, setIsPasswordResetModalOpen] = useState(false);
+  const [passwordResetUser, setPasswordResetUser] = useState<User | null>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
+  const [sendEmailNotification, setSendEmailNotification] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -105,6 +111,87 @@ export default function AdminUsers() {
       setSelectedUser(userToView);
       setIsModalOpen(true);
     }
+  };
+
+  const handleResetPassword = (userId: string) => {
+    const userToReset = users.find(u => u._id === userId);
+    if (userToReset) {
+      setPasswordResetUser(userToReset);
+      setNewPassword('');
+      setConfirmPassword('');
+      setSendEmailNotification(true);
+      setIsPasswordResetModalOpen(true);
+    }
+  };
+
+  const handlePasswordResetSubmit = async () => {
+    if (!passwordResetUser) return;
+
+    if (!newPassword || !confirmPassword) {
+      alert('Please fill in all fields');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      alert('Passwords do not match');
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      alert('Password must be at least 6 characters long');
+      return;
+    }
+
+    setIsResettingPassword(true);
+
+    try {
+      const getCookieValue = (name: string) => {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop()?.split(';').shift();
+        return null;
+      };
+
+      const token = getCookieValue('token') || localStorage.getItem('token');
+
+      const response = await fetch('/api/admin/users/reset-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          userId: passwordResetUser._id,
+          newPassword,
+          sendEmail: sendEmailNotification,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert(`Password reset successfully! ${data.emailSent ? 'Email notification sent to user.' : 'Email notification was not sent.'}`);
+        setIsPasswordResetModalOpen(false);
+        setPasswordResetUser(null);
+        setNewPassword('');
+        setConfirmPassword('');
+      } else {
+        const error = await response.json();
+        alert(`Failed to reset password: ${error.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      alert('Failed to reset password');
+    } finally {
+      setIsResettingPassword(false);
+    }
+  };
+
+  const handlePasswordResetCancel = () => {
+    setIsPasswordResetModalOpen(false);
+    setPasswordResetUser(null);
+    setNewPassword('');
+    setConfirmPassword('');
+    setSendEmailNotification(true);
   };
 
 
@@ -216,6 +303,13 @@ export default function AdminUsers() {
             <Eye className="h-4 w-4" />
           </button>
           <button
+            onClick={() => handleResetPassword(row._id)}
+            className="text-gray-400 hover:text-blue-600"
+            title="Reset Password"
+          >
+            <Key className="h-4 w-4" />
+          </button>
+          <button
             onClick={() => handleDeleteUser(row._id)}
             className="text-gray-400 hover:text-red-600"
             title="Delete User"
@@ -322,6 +416,97 @@ export default function AdminUsers() {
                 className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 Close
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="text-center py-4">
+            <p className="text-gray-500">No user selected</p>
+          </div>
+        )}
+      </Modal>
+
+      {/* Password Reset Modal */}
+      <Modal
+        isOpen={isPasswordResetModalOpen}
+        onClose={handlePasswordResetCancel}
+        title="Reset User Password"
+      >
+        {passwordResetUser ? (
+          <div className="space-y-4">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <div className="w-5 h-5 bg-yellow-400 rounded-full flex items-center justify-center">
+                    <span className="text-yellow-800 text-xs font-bold">!</span>
+                  </div>
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-yellow-800">
+                    Reset Password for {passwordResetUser.firstName} {passwordResetUser.lastName}
+                  </h3>
+                  <p className="text-sm text-yellow-700 mt-1">
+                    This will change the user's password and optionally send them an email notification.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  New Password
+                </label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Enter new password (min 6 characters)"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Confirm Password
+                </label>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm new password"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="sendEmail"
+                  checked={sendEmailNotification}
+                  onChange={(e) => setSendEmailNotification(e.target.checked)}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label htmlFor="sendEmail" className="ml-2 block text-sm text-gray-700">
+                  Send email notification to user with new password
+                </label>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end space-x-3">
+              <button
+                onClick={handlePasswordResetCancel}
+                disabled={isResettingPassword}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handlePasswordResetSubmit}
+                disabled={isResettingPassword || !newPassword || !confirmPassword}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isResettingPassword ? 'Resetting...' : 'Reset Password'}
               </button>
             </div>
           </div>
