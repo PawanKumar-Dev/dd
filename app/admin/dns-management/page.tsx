@@ -77,16 +77,7 @@ export default function AdminDNSManagementPage() {
   const [propagationRetryCount, setPropagationRetryCount] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [newRecord, setNewRecord] = useState<DNSRecord>({
-    type: 'A',
-    name: '',
-    value: '',
-    ttl: 3600,
-    priority: undefined,
-  });
-  const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
-  const [bulkOperation, setBulkOperation] = useState<'activate_dns' | 'add_record' | 'none'>('none');
-  const [bulkRecord, setBulkRecord] = useState<DNSRecord>({
+  const [newRecord, setNewRecord] = useState<Omit<DNSRecord, 'id'>>({
     type: 'A',
     name: '',
     value: '',
@@ -172,7 +163,7 @@ export default function AdminDNSManagementPage() {
       }
 
 
-      const response = await fetch(`/api/domains/dns?domainName=${encodeURIComponent(domain.name)}`, {
+      const response = await fetch(`/api/admin/domains/dns?domainName=${encodeURIComponent(domain.name)}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -198,7 +189,7 @@ export default function AdminDNSManagementPage() {
               loadDNSRecords(domainId, true);
             }, 30000);
 
-            toast.info(`DNS zone is still propagating. Retrying in 30 seconds... (Attempt ${propagationRetryCount + 1}/3)`);
+            toast(`DNS zone is still propagating. Retrying in 30 seconds... (Attempt ${propagationRetryCount + 1}/3)`);
           } else {
             setDnsPropagationStatus('error');
             toast.error('DNS management API is currently unavailable. Please contact support for assistance.');
@@ -262,7 +253,7 @@ export default function AdminDNSManagementPage() {
     setIsActivating(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/domains/activate-dns', {
+      const response = await fetch('/api/admin/domains/activate-dns', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -290,8 +281,8 @@ export default function AdminDNSManagementPage() {
   };
 
   const handleAddRecord = async () => {
-    if (selectedDomains.length === 0) {
-      toast.error('Please select at least one domain');
+    if (!selectedDomain) {
+      toast.error('Please select a domain first');
       return;
     }
 
@@ -308,48 +299,29 @@ export default function AdminDNSManagementPage() {
 
     try {
       const token = localStorage.getItem('token');
-      let successCount = 0;
-      let errorCount = 0;
+      const domain = domains.find(d => d.id === selectedDomain);
+      if (!domain) return;
 
-      // Add record to all selected domains
-      for (const domainId of selectedDomains) {
-        const domain = domains.find(d => d.id === domainId);
-        if (!domain) continue;
+      const response = await fetch('/api/admin/domains/dns', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          domainName: domain.name,
+          recordData: newRecord,
+        }),
+      });
 
-        try {
-          const response = await fetch('/api/domains/dns', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              domainName: domain.name,
-              recordData: newRecord,
-            }),
-          });
-
-          if (response.ok) {
-            successCount++;
-          } else {
-            const error = await response.json();
-            console.error(`Failed to add record to ${domain.name}:`, error);
-            errorCount++;
-          }
-        } catch (error) {
-          console.error(`Error adding record to ${domain.name}:`, error);
-          errorCount++;
-        }
-      }
-
-      if (successCount > 0) {
-        toast.success(`DNS record added to ${successCount} domain(s)${errorCount > 0 ? ` (${errorCount} failed)` : ''}`);
+      if (response.ok) {
+        toast.success('DNS record added successfully');
         setNewRecord({ type: 'A', name: '', value: '', ttl: 3600, priority: undefined });
         setShowAddRecord(false);
-        setBulkOperation('none');
-        setSelectedDomains([]);
+        loadDNSRecords(selectedDomain);
       } else {
-        toast.error('Failed to add DNS record to any domain');
+        const error = await response.json();
+        toast.error(error.error || 'Failed to add DNS record');
       }
     } catch (error) {
       console.error('Error adding DNS record:', error);
@@ -365,15 +337,14 @@ export default function AdminDNSManagementPage() {
       const domain = domains.find(d => d.id === selectedDomain);
       if (!domain) return;
 
-      const response = await fetch('/api/domains/dns', {
+      const response = await fetch(`/api/admin/domains/dns?domainName=${encodeURIComponent(domain.name)}&recordId=${encodeURIComponent(recordId)}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
-          domainName: domain.name,
-          recordId: recordId,
+          recordData: dnsRecords.find(r => r.id === recordId),
         }),
       });
 
@@ -390,139 +361,8 @@ export default function AdminDNSManagementPage() {
     }
   };
 
-  const handleBulkActivateDNS = async () => {
-    if (selectedDomains.length === 0) {
-      toast.error('Please select domains to activate DNS');
-      return;
-    }
 
-    setIsActivating(true);
-    let successCount = 0;
-    let errorCount = 0;
 
-    try {
-      const token = localStorage.getItem('token');
-
-      for (const domainId of selectedDomains) {
-        const domain = domains.find(d => d.id === domainId);
-        if (!domain || domain.dnsActivated) continue;
-
-        try {
-          const response = await fetch('/api/domains/activate-dns', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({ domainName: domain.name }),
-          });
-
-          if (response.ok) {
-            successCount++;
-          } else {
-            errorCount++;
-          }
-        } catch (error) {
-          errorCount++;
-        }
-      }
-
-      if (successCount > 0) {
-        toast.success(`DNS activated for ${successCount} domain(s)`);
-        loadAllDomains();
-      }
-
-      if (errorCount > 0) {
-        toast.error(`Failed to activate DNS for ${errorCount} domain(s)`);
-      }
-
-      setSelectedDomains([]);
-      setBulkOperation('none');
-    } catch (error) {
-      console.error('Error in bulk DNS activation:', error);
-      toast.error('Failed to activate DNS for selected domains');
-    } finally {
-      setIsActivating(false);
-    }
-  };
-
-  const handleBulkAddRecord = async () => {
-    if (selectedDomains.length === 0 || !bulkRecord.name || !bulkRecord.value) {
-      toast.error('Please select domains and fill in record details');
-      return;
-    }
-
-    setIsActivating(true);
-    let successCount = 0;
-    let errorCount = 0;
-
-    try {
-      const token = localStorage.getItem('token');
-
-      for (const domainId of selectedDomains) {
-        const domain = domains.find(d => d.id === domainId);
-        if (!domain || !domain.dnsActivated) continue;
-
-        try {
-          const response = await fetch('/api/domains/dns', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              domainName: domain.name,
-              record: bulkRecord,
-            }),
-          });
-
-          if (response.ok) {
-            successCount++;
-          } else {
-            errorCount++;
-          }
-        } catch (error) {
-          errorCount++;
-        }
-      }
-
-      if (successCount > 0) {
-        toast.success(`DNS record added to ${successCount} domain(s)`);
-        if (selectedDomain) {
-          loadDNSRecords(selectedDomain);
-        }
-      }
-
-      if (errorCount > 0) {
-        toast.error(`Failed to add DNS record to ${errorCount} domain(s)`);
-      }
-
-      setSelectedDomains([]);
-      setBulkOperation('none');
-      setBulkRecord({ type: 'A', name: '', value: '', ttl: 3600, priority: undefined });
-    } catch (error) {
-      console.error('Error in bulk DNS record addition:', error);
-      toast.error('Failed to add DNS record to selected domains');
-    } finally {
-      setIsActivating(false);
-    }
-  };
-
-  const handleDomainSelect = (domainId: string, checked: boolean) => {
-    if (checked) {
-      setSelectedDomains([...selectedDomains, domainId]);
-    } else {
-      setSelectedDomains(selectedDomains.filter(id => id !== domainId));
-    }
-  };
-
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedDomains(filteredDomains.map(d => d.id));
-    } else {
-      setSelectedDomains([]);
-    }
-  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -614,115 +454,8 @@ export default function AdminDNSManagementPage() {
                 </div>
               </div>
 
-              {/* Bulk Operations */}
-              {selectedDomains.length > 0 && (
-                <div className="mb-3 sm:mb-4 p-3 sm:p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
-                    <div className="flex items-center">
-                      <span className="text-xs sm:text-sm font-medium text-blue-900">
-                        {selectedDomains.length} domain(s) selected
-                      </span>
-                    </div>
-                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
-                      <select
-                        value={bulkOperation}
-                        onChange={(e) => setBulkOperation(e.target.value as any)}
-                        className="px-3 py-1 text-xs sm:text-sm border border-blue-300 rounded focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="none">Select Action</option>
-                        <option value="activate_dns">Activate DNS</option>
-                        <option value="add_record">Add DNS Record</option>
-                      </select>
-                      <button
-                        onClick={() => setSelectedDomains([])}
-                        className="px-3 py-1 text-xs sm:text-sm text-blue-700 bg-blue-100 rounded hover:bg-blue-200"
-                      >
-                        Clear
-                      </button>
-                    </div>
-                  </div>
-
-                  {bulkOperation === 'activate_dns' && (
-                    <div className="mt-3 flex items-center space-x-2">
-                      <button
-                        onClick={handleBulkActivateDNS}
-                        disabled={isActivating}
-                        className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 disabled:opacity-50"
-                      >
-                        {isActivating ? 'Activating...' : 'Activate DNS for Selected'}
-                      </button>
-                    </div>
-                  )}
-
-                  {bulkOperation === 'add_record' && (
-                    <div className="mt-3 space-y-3">
-                      <div className="grid grid-cols-2 gap-3">
-                        <select
-                          value={bulkRecord.type}
-                          onChange={(e) => setBulkRecord({ ...bulkRecord, type: e.target.value })}
-                          className="px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-                        >
-                          <option value="A">A</option>
-                          <option value="AAAA">AAAA</option>
-                          <option value="CNAME">CNAME</option>
-                          <option value="MX">MX</option>
-                          <option value="TXT">TXT</option>
-                        </select>
-                        <input
-                          type="text"
-                          placeholder="Name (e.g., www, mail)"
-                          value={bulkRecord.name}
-                          onChange={(e) => setBulkRecord({ ...bulkRecord, name: e.target.value })}
-                          className="px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <input
-                          type="text"
-                          placeholder="Value (e.g., 192.168.1.1)"
-                          value={bulkRecord.value}
-                          onChange={(e) => setBulkRecord({ ...bulkRecord, value: e.target.value })}
-                          className="px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-                        />
-                        <input
-                          type="number"
-                          placeholder="TTL"
-                          value={bulkRecord.ttl}
-                          onChange={(e) => setBulkRecord({ ...bulkRecord, ttl: parseInt(e.target.value) })}
-                          className="px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={handleBulkAddRecord}
-                          disabled={isActivating}
-                          className="px-4 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700 disabled:opacity-50"
-                        >
-                          {isActivating ? 'Adding...' : 'Add Record to Selected'}
-                        </button>
-                        <button
-                          onClick={() => setBulkOperation('none')}
-                          className="px-4 py-2 bg-gray-500 text-white text-sm rounded hover:bg-gray-600"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
 
               <div className="space-y-1 sm:space-y-2 max-h-60 sm:max-h-80 overflow-y-auto">
-                {/* Select All */}
-                <div className="flex items-center p-2 border-b border-gray-200">
-                  <input
-                    type="checkbox"
-                    checked={selectedDomains.length === filteredDomains.length && filteredDomains.length > 0}
-                    onChange={(e) => handleSelectAll(e.target.checked)}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                  />
-                  <label className="ml-2 text-xs sm:text-sm text-gray-700">Select All</label>
-                </div>
 
                 {filteredDomains.map((domain) => (
                   <div
@@ -733,13 +466,6 @@ export default function AdminDNSManagementPage() {
                       }`}
                   >
                     <div className="flex items-start space-x-2 sm:space-x-3">
-                      <input
-                        type="checkbox"
-                        checked={selectedDomains.includes(domain.id)}
-                        onChange={(e) => handleDomainSelect(domain.id, e.target.checked)}
-                        onClick={(e) => e.stopPropagation()}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-0.5 sm:mt-1"
-                      />
                       <div className="flex-1 min-w-0">
                         <p
                           className="text-xs sm:text-sm font-medium text-gray-900 truncate cursor-pointer hover:text-blue-600 transition-colors"
@@ -1012,23 +738,6 @@ export default function AdminDNSManagementPage() {
                   <p className="text-sm text-gray-600 mb-4">Choose a domain from the list to view and manage its DNS records</p>
                 </div>
 
-                <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                  <h4 className="text-sm font-medium text-gray-900 mb-2">How to get started:</h4>
-                  <div className="text-left space-y-2 text-sm text-gray-600">
-                    <div className="flex items-start">
-                      <div className="flex-shrink-0 w-5 h-5 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-medium mr-3 mt-0.5">1</div>
-                      <span>Click on a domain from the list on the left</span>
-                    </div>
-                    <div className="flex items-start">
-                      <div className="flex-shrink-0 w-5 h-5 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-medium mr-3 mt-0.5">2</div>
-                      <span>View existing DNS records for that domain</span>
-                    </div>
-                    <div className="flex items-start">
-                      <div className="flex-shrink-0 w-5 h-5 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs font-medium mr-3 mt-0.5">3</div>
-                      <span>Add, edit, or delete DNS records as needed</span>
-                    </div>
-                  </div>
-                </div>
 
                 {domains.length === 0 ? (
                   <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
