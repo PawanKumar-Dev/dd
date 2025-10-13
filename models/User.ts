@@ -19,6 +19,8 @@ export interface IUser extends Document {
   role: "admin" | "user";
   isActive: boolean;
   isActivated: boolean;
+  isDeleted?: boolean;
+  deletedAt?: Date;
   activationToken?: string;
   activationTokenExpiry?: Date;
   resetToken?: string;
@@ -111,6 +113,13 @@ const UserSchema = new Schema<IUser>(
     isActivated: {
       type: Boolean,
       default: false,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    deletedAt: {
+      type: Date,
     },
     activationToken: {
       type: String,

@@ -14,8 +14,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Get user's orders and domains
-    const orders = await Order.find({ userId: user._id })
+    // Get user's orders and domains (excluding soft-deleted)
+    const orders = await Order.find({
+      userId: user._id,
+      isDeleted: { $ne: true },
+    })
       .populate("userId", "firstName lastName email")
       .sort({ createdAt: -1 });
 

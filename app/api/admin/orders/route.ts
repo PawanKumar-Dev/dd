@@ -15,8 +15,8 @@ export async function GET(request: NextRequest) {
     // Connect to database
     await connectDB();
 
-    // Fetch all orders with user details
-    const orders = await Order.find()
+    // Fetch all orders with user details (excluding soft-deleted)
+    const orders = await Order.find({ isDeleted: { $ne: true } })
       .sort({ createdAt: -1 })
       .limit(100) // Limit to last 100 orders
       .populate("userId", "firstName lastName email", User);

@@ -35,6 +35,7 @@ export async function GET(request: NextRequest) {
     // Find the domain in the database (admin can access any domain)
     const order = await Order.findOne({
       "domains.domainName": domainName,
+      isDeleted: { $ne: true },
     });
 
     if (!order) {
@@ -111,6 +112,7 @@ export async function POST(request: NextRequest) {
     // Find the domain in the database (admin can access any domain)
     const order = await Order.findOne({
       "domains.domainName": domainName,
+      isDeleted: { $ne: true },
     });
 
     if (!order) {
@@ -196,6 +198,7 @@ export async function DELETE(request: NextRequest) {
     // Find the domain in the database (admin can access any domain)
     const order = await Order.findOne({
       "domains.domainName": domainName,
+      isDeleted: { $ne: true },
     });
 
     if (!order) {

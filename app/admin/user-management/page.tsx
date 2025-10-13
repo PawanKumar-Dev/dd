@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Filter, MoreVertical, Trash2, Eye, RefreshCw, Key } from 'lucide-react';
+import { Search, Filter, MoreVertical, Trash2, Eye, RefreshCw, Key, UserCheck } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayoutNew';
 import AdminDataTable from '@/components/admin/AdminDataTable';
 import Modal from '@/components/Modal';
@@ -21,6 +21,8 @@ interface User {
 export default function AdminUsers() {
   const [user, setUser] = useState<User | null>(null);
   const [users, setUsers] = useState<User[]>([]);
+  const [deactivatedUsers, setDeactivatedUsers] = useState<User[]>([]);
+  const [activeTab, setActiveTab] = useState<'active' | 'deactivated'>('active');
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -72,7 +74,8 @@ export default function AdminUsers() {
 
       const token = getCookieValue('token') || localStorage.getItem('token');
 
-      const response = await fetch('/api/admin/users', {
+      // Load active users
+      const activeResponse = await fetch('/api/admin/users', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -80,17 +83,34 @@ export default function AdminUsers() {
         },
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        setUsers(data.users || []);
+      // Load deactivated users
+      const deactivatedResponse = await fetch('/api/admin/users/deactivated', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (activeResponse.ok) {
+        const activeData = await activeResponse.json();
+        setUsers(activeData.users || []);
       } else {
-        const errorData = await response.json();
-        console.error('Failed to fetch users:', errorData);
+        console.error('Failed to fetch active users');
         setUsers([]);
+      }
+
+      if (deactivatedResponse.ok) {
+        const deactivatedData = await deactivatedResponse.json();
+        setDeactivatedUsers(deactivatedData.users || []);
+      } else {
+        console.error('Failed to fetch deactivated users');
+        setDeactivatedUsers([]);
       }
     } catch (error) {
       console.error('Error loading users:', error);
       setUsers([]);
+      setDeactivatedUsers([]);
     } finally {
       setIsLoading(false);
     }
@@ -196,7 +216,7 @@ export default function AdminUsers() {
 
 
   const handleDeleteUser = async (userId: string) => {
-    if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+    if (!confirm('Are you sure you want to deactivate this user? They will not be able to log in but their data will be preserved.')) {
       return;
     }
 
@@ -223,18 +243,57 @@ export default function AdminUsers() {
       if (response.ok) {
         // Reload users to reflect changes
         loadUsers();
-        alert('User deleted successfully');
+        alert('User deactivated successfully');
       } else {
         const error = await response.json();
-        alert(`Failed to delete user: ${error.message || 'Unknown error'}`);
+        alert(`Failed to deactivate user: ${error.message || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Error deleting user:', error);
-      alert('Failed to delete user');
+      alert('Failed to deactivate user');
     }
   };
 
-  const columns = [
+  const handleReactivateUser = async (userId: string) => {
+    if (!confirm('Are you sure you want to reactivate this user? They will be able to log in again.')) {
+      return;
+    }
+
+    try {
+      // Get token
+      const getCookieValue = (name: string) => {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop()?.split(';').shift();
+        return null;
+      };
+
+      const token = getCookieValue('token') || localStorage.getItem('token');
+
+      const response = await fetch('/api/admin/users/reactivate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ userId }),
+      });
+
+      if (response.ok) {
+        // Reload users to reflect changes
+        loadUsers();
+        alert('User reactivated successfully');
+      } else {
+        const error = await response.json();
+        alert(`Failed to reactivate user: ${error.message || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error reactivating user:', error);
+      alert('Failed to reactivate user');
+    }
+  };
+
+  const activeColumns = [
     {
       key: 'name',
       label: 'Name',
@@ -294,27 +353,111 @@ export default function AdminUsers() {
       key: 'actions',
       label: 'Actions',
       render: (value: any, row: User) => (
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-3">
           <button
             onClick={() => handleViewUser(row._id)}
-            className="text-gray-400 hover:text-gray-600"
-            title="View User"
+            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200 group"
+            title="View user details and information"
           >
-            <Eye className="h-4 w-4" />
+            <Eye className="h-5 w-5" />
+            <span className="sr-only">View User Details</span>
           </button>
           <button
             onClick={() => handleResetPassword(row._id)}
-            className="text-gray-400 hover:text-blue-600"
-            title="Reset Password"
+            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 group"
+            title="Reset user password and send email notification"
           >
-            <Key className="h-4 w-4" />
+            <Key className="h-5 w-5" />
+            <span className="sr-only">Reset Password</span>
           </button>
           <button
             onClick={() => handleDeleteUser(row._id)}
-            className="text-gray-400 hover:text-red-600"
-            title="Delete User"
+            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 group"
+            title="Deactivate user account (preserves all data)"
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className="h-5 w-5" />
+            <span className="sr-only">Deactivate User</span>
+          </button>
+        </div>
+      )
+    }
+  ];
+
+  const deactivatedColumns = [
+    {
+      key: 'name',
+      label: 'Name',
+      sortable: true,
+      render: (value: any, row: User) => (
+        <div>
+          <div className="text-sm font-medium text-gray-900">
+            {row.firstName} {row.lastName}
+          </div>
+          <div className="text-sm text-gray-500">{row.email}</div>
+        </div>
+      )
+    },
+    {
+      key: 'role',
+      label: 'Role',
+      sortable: true,
+      render: (value: string) => (
+        <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+          user
+        </span>
+      )
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      sortable: true,
+      render: (value: any, row: User) => (
+        <span className="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
+          deactivated
+        </span>
+      )
+    },
+    {
+      key: 'createdAt',
+      label: 'Joined',
+      sortable: true,
+      render: (value: string) => {
+        if (!value) {
+          return <span className="text-sm text-gray-400">-</span>;
+        }
+
+        const date = new Date(value);
+        if (isNaN(date.getTime())) {
+          return <span className="text-sm text-gray-400">-</span>;
+        }
+
+        return (
+          <span className="text-sm text-gray-900">
+            {formatIndianDate(date)}
+          </span>
+        );
+      }
+    },
+    {
+      key: 'actions',
+      label: 'Actions',
+      render: (value: any, row: User) => (
+        <div className="flex items-center space-x-3">
+          <button
+            onClick={() => handleViewUser(row._id)}
+            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200 group"
+            title="View user details and information"
+          >
+            <Eye className="h-5 w-5" />
+            <span className="sr-only">View User Details</span>
+          </button>
+          <button
+            onClick={() => handleReactivateUser(row._id)}
+            className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all duration-200 group"
+            title="Reactivate user account (restore login access)"
+          >
+            <UserCheck className="h-5 w-5" />
+            <span className="sr-only">Reactivate User</span>
           </button>
         </div>
       )
@@ -353,15 +496,55 @@ export default function AdminUsers() {
           </div>
         </div>
 
-        {/* Users Table */}
-        <AdminDataTable
-          title="All Users"
-          columns={columns}
-          data={users}
-          searchable={true}
-          pagination={true}
-          pageSize={10}
-        />
+        {/* Users Tabs */}
+        <div className="bg-white rounded-lg shadow">
+          {/* Tab Navigation */}
+          <div className="border-b border-gray-200">
+            <nav className="-mb-px flex space-x-8 px-6">
+              <button
+                onClick={() => setActiveTab('active')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'active'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+              >
+                Active Users ({users.length})
+              </button>
+              <button
+                onClick={() => setActiveTab('deactivated')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'deactivated'
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+              >
+                Deactivated Users ({deactivatedUsers.length})
+              </button>
+            </nav>
+          </div>
+
+          {/* Tab Content */}
+          <div className="p-6">
+            {activeTab === 'active' ? (
+              <AdminDataTable
+                title=""
+                columns={activeColumns}
+                data={users}
+                searchable={true}
+                pagination={true}
+                pageSize={10}
+              />
+            ) : (
+              <AdminDataTable
+                title=""
+                columns={deactivatedColumns}
+                data={deactivatedUsers}
+                searchable={true}
+                pagination={true}
+                pageSize={10}
+              />
+            )}
+          </div>
+        </div>
       </div>
 
       {/* User Details Modal */}

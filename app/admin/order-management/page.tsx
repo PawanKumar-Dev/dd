@@ -197,7 +197,7 @@ export default function AdminOrdersPage() {
 
       if (response.ok) {
         const data = await response.json();
-        toast.success(`Order ${data.deletedOrderId} deleted successfully!`);
+        toast.success(`Order ${data.deletedOrderId} archived successfully!`);
 
         // Remove the order from the local state
         setOrders(orders.filter(order => order._id !== orderToDelete._id));
@@ -207,11 +207,11 @@ export default function AdminOrdersPage() {
         setOrderToDelete(null);
       } else {
         const errorData = await response.json();
-        toast.error(errorData.error || 'Failed to delete order');
+        toast.error(errorData.error || 'Failed to archive order');
       }
     } catch (error) {
       console.error('Error deleting order:', error);
-      toast.error('Failed to delete order');
+      toast.error('Failed to archive order');
     } finally {
       setIsDeleting(false);
     }
@@ -312,34 +312,38 @@ export default function AdminOrdersPage() {
       label: 'Actions',
       sortable: false,
       render: (value: any, row: Order) => (
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-3">
           <button
             onClick={() => handleViewOrder(row)}
-            className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
-            title="View Details"
+            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 group"
+            title="View order details, domains, and payment information"
           >
-            <Eye className="h-4 w-4" />
+            <Eye className="h-5 w-5" />
+            <span className="sr-only">View Order Details</span>
           </button>
           <button
             onClick={() => handleViewInvoice(row)}
-            className="p-1 text-gray-400 hover:text-purple-600 transition-colors"
-            title="View Invoice"
+            className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all duration-200 group"
+            title="View invoice details and billing information"
           >
-            <FileText className="h-4 w-4" />
+            <FileText className="h-5 w-5" />
+            <span className="sr-only">View Invoice</span>
           </button>
           <button
             onClick={() => handleDownloadInvoice(row._id)}
-            className="p-1 text-gray-400 hover:text-green-600 transition-colors"
-            title="Download Invoice PDF"
+            className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all duration-200 group"
+            title="Download invoice as PDF file"
           >
-            <Download className="h-4 w-4" />
+            <Download className="h-5 w-5" />
+            <span className="sr-only">Download Invoice PDF</span>
           </button>
           <button
             onClick={() => handleDeleteOrder(row)}
-            className="p-1 text-gray-400 hover:text-red-600 transition-colors"
-            title="Delete Order"
+            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 group"
+            title="Archive order (hides from list but preserves all data)"
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className="h-5 w-5" />
+            <span className="sr-only">Archive Order</span>
           </button>
         </div>
       )
@@ -549,10 +553,10 @@ export default function AdminOrdersPage() {
                   </div>
                   <div className="ml-3">
                     <h3 className="text-lg font-semibold text-gray-900">
-                      Delete Order
+                      Archive Order
                     </h3>
                     <p className="text-sm text-gray-500">
-                      This action cannot be undone
+                      This will hide the order from the list but preserve all data
                     </p>
                   </div>
                 </div>
@@ -600,7 +604,7 @@ export default function AdminOrdersPage() {
                     ) : (
                       <>
                         <Trash2 className="h-4 w-4 mr-2" />
-                        Delete Order
+                        Archive Order
                       </>
                     )}
                   </button>

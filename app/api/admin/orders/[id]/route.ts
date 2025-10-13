@@ -23,11 +23,14 @@ export async function DELETE(
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
-    // Delete the order
-    await Order.findByIdAndDelete(params.id);
+    // Soft delete the order
+    await Order.findByIdAndUpdate(params.id, {
+      isDeleted: true,
+      deletedAt: new Date(),
+    });
 
     console.log(
-      `✅ [ADMIN] Order deleted: ${order.orderId} by admin: ${user.email}`
+      `✅ [ADMIN] Order soft deleted: ${order.orderId} by admin: ${user.email}`
     );
 
     return NextResponse.json({

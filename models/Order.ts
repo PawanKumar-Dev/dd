@@ -49,6 +49,8 @@ export interface IOrder extends Document {
   createdAt: Date;
   updatedAt: Date;
   invoiceNumber?: string;
+  isDeleted?: boolean;
+  deletedAt?: Date;
 }
 
 const OrderSchema = new Schema<IOrder>(
@@ -190,6 +192,13 @@ const OrderSchema = new Schema<IOrder>(
       type: String,
       unique: true,
       sparse: true,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    deletedAt: {
+      type: Date,
     },
   },
   {

@@ -131,11 +131,16 @@ export async function DELETE(
       }
     }
 
-    await User.findByIdAndDelete(params.id);
+    // Soft delete user by deactivating
+    await User.findByIdAndUpdate(params.id, {
+      isActive: false,
+      isDeleted: true,
+      deletedAt: new Date(),
+    });
 
     return NextResponse.json({
       success: true,
-      message: "User deleted successfully",
+      message: "User deactivated successfully",
     });
   } catch (error) {
     console.error("Delete user error:", error);

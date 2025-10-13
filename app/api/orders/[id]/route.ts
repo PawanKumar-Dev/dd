@@ -17,10 +17,11 @@ export async function GET(
     // Connect to database
     await connectDB();
 
-    // Fetch specific order
+    // Fetch specific order (excluding soft-deleted)
     const order = await Order.findOne({
       _id: params.id,
       userId: user._id,
+      isDeleted: { $ne: true },
     });
 
     if (!order) {

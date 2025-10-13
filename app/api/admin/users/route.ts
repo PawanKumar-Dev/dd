@@ -15,9 +15,12 @@ export async function GET(request: NextRequest) {
 
     await connectDB();
 
-    // Fetch only regular users (exclude admin users for security)
+    // Fetch only regular users (exclude admin users for security and soft-deleted users)
     const users = await User.find(
-      { role: { $ne: "admin" } }, // Exclude admin users
+      {
+        role: { $ne: "admin" }, // Exclude admin users
+        isDeleted: { $ne: true }, // Exclude soft-deleted users
+      },
       {
         firstName: 1,
         lastName: 1,
@@ -25,6 +28,8 @@ export async function GET(request: NextRequest) {
         role: 1,
         createdAt: 1,
         isActive: 1,
+        isDeleted: 1,
+        deletedAt: 1,
       }
     ).sort({ createdAt: -1 });
 
@@ -162,16 +167,24 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Delete user
-    const deletedUser = await User.findByIdAndDelete(userId);
+    // Soft delete user by deactivating
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        isActive: false,
+        isDeleted: true,
+        deletedAt: new Date(),
+      },
+      { new: true }
+    );
 
-    if (!deletedUser) {
+    if (!updatedUser) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     return NextResponse.json({
       success: true,
-      message: "User deleted successfully",
+      message: "User deactivated successfully",
     });
   } catch (error) {
     console.error("Error deleting user:", error);
