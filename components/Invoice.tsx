@@ -41,14 +41,9 @@ export default function Invoice({ order, isOpen, onClose }: InvoiceProps) {
   if (!isOpen) return null;
 
   // Use stored values from order if available, otherwise calculate
-  const subtotal = order.subtotal || order.domains
+  const total = order.amount || order.domains
     .filter(d => d.status === 'registered')
     .reduce((total, domain) => total + (domain.price * domain.registrationPeriod), 0);
-
-  // Use GST from order if available, otherwise calculate it
-  const gstRate = order.gstRate || 18;
-  const gstAmount = order.gstAmount || Math.round((subtotal * gstRate) / 100 * 100) / 100;
-  const total = order.amount || (subtotal + gstAmount);
 
   const handleDownloadPDF = async () => {
     setIsGeneratingPDF(true);
@@ -212,14 +207,6 @@ export default function Invoice({ order, isOpen, onClose }: InvoiceProps) {
                 <div className="bg-gray-50 p-6 rounded-lg">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
                   <div className="space-y-2">
-                    <div className="flex justify-between text-gray-700">
-                      <span>Subtotal:</span>
-                      <span>₹{subtotal.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between text-gray-700">
-                      <span>GST ({gstRate}%):</span>
-                      <span>₹{gstAmount.toFixed(2)}</span>
-                    </div>
                     <div className="border-t border-gray-300 pt-2">
                       <div className="flex justify-between text-lg font-semibold text-gray-900">
                         <span>Total:</span>

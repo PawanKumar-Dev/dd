@@ -97,20 +97,9 @@ export const useCartStore = create<CartStore>()(
         );
       },
 
-      getGSTRate: () => {
-        return 18; // 18% GST rate
-      },
-
-      getGSTAmount: () => {
-        const subtotal = get().getSubtotalPrice();
-        const gstRate = get().getGSTRate();
-        return Math.round((subtotal * gstRate) / 100 * 100) / 100; // Round to 2 decimal places
-      },
-
       getTotalPrice: () => {
         const subtotal = get().getSubtotalPrice();
-        const gstAmount = get().getGSTAmount();
-        return Math.round((subtotal + gstAmount) * 100) / 100; // Round to 2 decimal places
+        return Math.round(subtotal * 100) / 100; // Round to 2 decimal places
       },
 
       getItemCount: () => {
