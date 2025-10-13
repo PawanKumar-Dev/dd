@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
   Receipt, Search, Download, Eye, Calendar,
-  CheckCircle, Clock, AlertTriangle, ExternalLink, FileText
+  CheckCircle, Clock, AlertTriangle, ExternalLink, FileText, RefreshCw
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import UserLayout from '@/components/user/UserLayout';
@@ -197,7 +197,7 @@ export default function UserOrders() {
                   onClick={loadOrders}
                   className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  <Receipt className="h-4 w-4 mr-2" />
+                  <RefreshCw className="h-4 w-4 mr-2" />
                   Refresh
                 </button>
               </div>

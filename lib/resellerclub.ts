@@ -1809,6 +1809,7 @@ export class ResellerClubAPI {
                   // Map ResellerClub field names to standard field names
                   return {
                     ...record,
+                    id: key, // Preserve the record ID from ResellerClub
                     ttl: record.timetolive || record.ttl, // Map timetolive to ttl
                     name: record.host || record.name, // Map host to name
                     priority: record.priority || undefined, // Ensure priority is included

@@ -178,7 +178,7 @@ export default function DNSManagementPage() {
               loadDNSRecords(domainId, true);
             }, 30000);
 
-            toast.info(`DNS zone is still propagating. Retrying in 30 seconds... (Attempt ${propagationRetryCount + 1}/3)`);
+            toast(`DNS zone is still propagating. Retrying in 30 seconds... (Attempt ${propagationRetryCount + 1}/3)`);
           } else {
             setDnsPropagationStatus('error');
             toast.error('DNS management API is currently unavailable. The domain is registered and DNS management is activated, but the API endpoints are not responding. Please contact support for assistance.');
@@ -307,7 +307,7 @@ export default function DNSManagementPage() {
     if (!selectedDomain) return;
 
     // Find the record to get its data
-    const record = dnsRecords[parseInt(recordId)];
+    const record = dnsRecords.find(r => r.id === recordId) || dnsRecords[parseInt(recordId)];
     if (!record) {
       toast.error('Record not found');
       return;
@@ -345,7 +345,8 @@ export default function DNSManagementPage() {
   };
 
   const handleEditRecord = (record: DNSRecord, index: number) => {
-    setEditingRecord(index.toString());
+    const uniqueId = `${record.type}-${record.id || index}-${record.name}-${record.value}`;
+    setEditingRecord(uniqueId);
     setEditRecord({
       type: record.type,
       name: record.name,
@@ -364,8 +365,18 @@ export default function DNSManagementPage() {
     try {
       const token = localStorage.getItem('token');
 
-      // Get the original record to delete
-      const originalRecord = dnsRecords[parseInt(editingRecord)];
+      // Get the original record to delete - find by unique identifier
+      const originalRecord = dnsRecords.find(r => {
+        const uniqueId = `${r.type}-${r.id || dnsRecords.indexOf(r)}-${r.name}-${r.value}`;
+        return uniqueId === editingRecord;
+      });
+
+      if (!originalRecord) {
+        toast.error('Record not found');
+        return;
+      }
+
+      const recordId = originalRecord.id || dnsRecords.indexOf(originalRecord).toString();
 
       // First delete the original record
       const deleteResponse = await fetch('/api/domains/dns', {
@@ -376,7 +387,7 @@ export default function DNSManagementPage() {
         },
         body: JSON.stringify({
           domainName: domain.name,
-          recordId: editingRecord,
+          recordId: recordId,
           recordData: originalRecord,
         }),
       });
@@ -870,7 +881,7 @@ export default function DNSManagementPage() {
                   </div>
                   <button
                     onClick={() => setShowAddRecord(!showAddRecord)}
-                    disabled={selectedDomain && domains.find(d => d.id === selectedDomain) && (!domains.find(d => d.id === selectedDomain)?.resellerClubOrderId || !domains.find(d => d.id === selectedDomain)?.dnsActivated)}
+                    disabled={!!(selectedDomain && domains.find(d => d.id === selectedDomain) && (!domains.find(d => d.id === selectedDomain)?.resellerClubOrderId || !domains.find(d => d.id === selectedDomain)?.dnsActivated))}
                     className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${selectedDomain && domains.find(d => d.id === selectedDomain) && (!domains.find(d => d.id === selectedDomain)?.resellerClubOrderId || !domains.find(d => d.id === selectedDomain)?.dnsActivated)
                       ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
                       : 'bg-blue-600 text-white hover:bg-blue-700'
@@ -960,9 +971,9 @@ export default function DNSManagementPage() {
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
                         {dnsRecords.map((record, index) => (
-                          <tr key={record.id || index} className="hover:bg-gray-50">
+                          <tr key={`${record.type}-${record.id || index}-${record.name}-${record.value}`} className="hover:bg-gray-50">
                             <td className="px-4 py-4 text-sm font-medium text-gray-900">
-                              {editingRecord === index.toString() ? (
+                              {editingRecord === `${record.type}-${record.id || index}-${record.name}-${record.value}` ? (
                                 <select
                                   value={editRecord.type}
                                   onChange={(e) => setEditRecord({ ...editRecord, type: e.target.value })}
@@ -981,7 +992,7 @@ export default function DNSManagementPage() {
                               )}
                             </td>
                             <td className="px-4 py-4 text-sm text-gray-900">
-                              {editingRecord === index.toString() ? (
+                              {editingRecord === `${record.type}-${record.id || index}-${record.name}-${record.value}` ? (
                                 <input
                                   type="text"
                                   value={editRecord.name}
@@ -993,7 +1004,7 @@ export default function DNSManagementPage() {
                               )}
                             </td>
                             <td className="px-4 py-4 text-sm text-gray-900">
-                              {editingRecord === index.toString() ? (
+                              {editingRecord === `${record.type}-${record.id || index}-${record.name}-${record.value}` ? (
                                 <input
                                   type="text"
                                   value={editRecord.value}
@@ -1005,7 +1016,7 @@ export default function DNSManagementPage() {
                               )}
                             </td>
                             <td className="px-4 py-4 text-sm text-gray-900">
-                              {editingRecord === index.toString() ? (
+                              {editingRecord === `${record.type}-${record.id || index}-${record.name}-${record.value}` ? (
                                 <div className="flex space-x-2">
                                   <input
                                     type="number"
@@ -1038,7 +1049,7 @@ export default function DNSManagementPage() {
                             </td>
                             <td className="px-4 py-4 text-sm text-gray-900">
                               <div className="flex items-center space-x-2">
-                                {editingRecord === index.toString() ? (
+                                {editingRecord === `${record.type}-${record.id || index}-${record.name}-${record.value}` ? (
                                   <>
                                     <button
                                       onClick={handleSaveEdit}
