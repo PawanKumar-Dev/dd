@@ -24,9 +24,6 @@ interface Order {
   _id: string;
   orderId: string;
   amount: number;
-  subtotal: number;
-  gstRate: number;
-  gstAmount: number;
   currency: string;
   status: 'pending' | 'completed' | 'failed' | 'refunded';
   domains: {
@@ -399,14 +396,6 @@ export default function UserOrders() {
 
                     <div className="border-t pt-4">
                       <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">Subtotal</span>
-                          <span className="text-sm text-gray-900">₹{(selectedOrder.subtotal || 0).toLocaleString()}</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-600">GST ({(selectedOrder.gstRate || 0)}%)</span>
-                          <span className="text-sm text-gray-900">₹{(selectedOrder.gstAmount || 0).toLocaleString()}</span>
-                        </div>
                         <div className="flex justify-between items-center border-t pt-2">
                           <span className="text-lg font-semibold text-gray-900">Total</span>
                           <span className="text-lg font-bold text-gray-900">₹{(selectedOrder.amount || 0).toLocaleString()}</span>

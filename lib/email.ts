@@ -260,9 +260,6 @@ export class EmailService {
       orderId: string;
       invoiceNumber: string;
       amount: number;
-      subtotal?: number;
-      gstRate?: number;
-      gstAmount?: number;
       currency: string;
       successfulDomains: Array<{
         domainName: string;
@@ -319,19 +316,8 @@ export class EmailService {
       )
       .join("");
 
-    const subtotal =
-      orderData.subtotal ||
-      orderData.successfulDomains.reduce(
-        (total, domain) => total + domain.price * domain.registrationPeriod,
-        0
-      );
-
-    // Use GST from order if available, otherwise calculate it
-    const gstRate = orderData.gstRate || 18;
-    const gstAmount =
-      orderData.gstAmount ||
-      Math.round(((subtotal * gstRate) / 100) * 100) / 100;
-    const total = orderData.amount || subtotal + gstAmount;
+    // Use total amount from order
+    const total = orderData.amount;
 
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; background-color: #ffffff;">
@@ -404,18 +390,6 @@ export class EmailService {
           <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
             <h3 style="color: #1f2937; margin: 0 0 15px 0;">Order Summary</h3>
             <table style="width: 100%; border-collapse: collapse;">
-              <tr>
-                <td style="padding: 8px 0; color: #6b7280;">Subtotal:</td>
-                <td style="padding: 8px 0; text-align: right; font-weight: 600; color: #1f2937;">₹${subtotal.toFixed(
-                  2
-                )}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; color: #6b7280;">GST (${gstRate}%):</td>
-                <td style="padding: 8px 0; text-align: right; font-weight: 600; color: #1f2937;">₹${gstAmount.toFixed(
-                  2
-                )}</td>
-              </tr>
               <tr style="border-top: 2px solid #e5e7eb;">
                 <td style="padding: 12px 0; font-size: 18px; font-weight: 700; color: #1f2937;">Total:</td>
                 <td style="padding: 12px 0; text-align: right; font-size: 18px; font-weight: 700; color: #1f2937;">₹${total.toFixed(

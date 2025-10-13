@@ -259,40 +259,14 @@ export async function GET(
     pdf.setFontSize(10);
     pdf.setFont("helvetica", "normal");
 
-    // Subtotal
-    pdf.text(`Subtotal:`, summaryX + 5, summaryY + 20);
-    pdf.text(
-      `₹${subtotal.toFixed(2)}`,
-      summaryX + summaryWidth - 5,
-      summaryY + 20,
-      {
-        align: "right",
-      }
-    );
-
-    // GST
-    pdf.text(`GST (${gstRate}%):`, summaryX + 5, summaryY + 28);
-    pdf.text(`₹${gstAmount.toFixed(2)}`, summaryX + summaryWidth - 5, summaryY + 28, {
-      align: "right",
-    });
-
-    // Total line
-    pdf.setDrawColor(lightGray[0], lightGray[1], lightGray[2]);
-    pdf.line(
-      summaryX + 5,
-      summaryY + 32,
-      summaryX + summaryWidth - 5,
-      summaryY + 32
-    );
-
     // Total
     pdf.setFontSize(12);
     pdf.setFont("helvetica", "bold");
-    pdf.text(`Total:`, summaryX + 5, summaryY + 40);
+    pdf.text(`Total:`, summaryX + 5, summaryY + 20);
     pdf.text(
       `₹${total.toFixed(2)} ${order.currency}`,
       summaryX + summaryWidth - 5,
-      summaryY + 40,
+      summaryY + 20,
       { align: "right" }
     );
 

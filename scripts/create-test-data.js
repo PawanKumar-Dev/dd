@@ -38,9 +38,6 @@ const orderSchema = new mongoose.Schema({
   razorpayPaymentId: { type: String, required: true },
   razorpaySignature: { type: String, required: true },
   amount: { type: Number, required: true },
-  subtotal: { type: Number, required: true },
-  gstRate: { type: Number, required: true, default: 18 },
-  gstAmount: { type: Number, required: true },
   currency: { type: String, required: true, default: 'INR' },
   status: { type: String, enum: ['pending', 'completed', 'failed', 'refunded'], default: 'pending' },
   domains: [{
@@ -123,10 +120,7 @@ async function createTestData() {
             }],
           }
         ],
-        amount: 1416,
-        subtotal: 1200,
-        gstRate: 18,
-        gstAmount: 216,
+        amount: 1200,
         currency: 'INR',
         successfulDomains: ['example.com'],
         paymentVerification: {
@@ -157,10 +151,7 @@ async function createTestData() {
             }],
           }
         ],
-        amount: 1180,
-        subtotal: 1000,
-        gstRate: 18,
-        gstAmount: 180,
+        amount: 1000,
         currency: 'INR',
         successfulDomains: ['testdomain.net'],
         paymentVerification: {
@@ -191,10 +182,7 @@ async function createTestData() {
             }],
           }
         ],
-        amount: 1770,
-        subtotal: 1500,
-        gstRate: 18,
-        gstAmount: 270,
+        amount: 1500,
         currency: 'INR',
         successfulDomains: ['longterm.org'],
         paymentVerification: {

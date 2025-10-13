@@ -8,9 +8,6 @@ export interface IOrder extends Document {
   razorpayPaymentId: string;
   razorpaySignature: string;
   amount: number;
-  subtotal: number;
-  gstRate: number;
-  gstAmount: number;
   currency: string;
   status: "pending" | "completed" | "failed" | "refunded";
   domains: {
@@ -86,19 +83,6 @@ const OrderSchema = new Schema<IOrder>(
       required: true,
     },
     amount: {
-      type: Number,
-      required: true,
-    },
-    subtotal: {
-      type: Number,
-      required: true,
-    },
-    gstRate: {
-      type: Number,
-      required: true,
-      default: 18,
-    },
-    gstAmount: {
       type: Number,
       required: true,
     },
