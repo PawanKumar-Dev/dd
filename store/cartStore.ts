@@ -12,8 +12,6 @@ interface CartStore {
   clearCart: () => void;
   getTotalPrice: () => number;
   getSubtotalPrice: () => number;
-  getGSTAmount: () => number;
-  getGSTRate: () => number;
   getItemCount: () => number;
   syncWithServer: () => Promise<void>;
   loadFromServer: () => Promise<void>;

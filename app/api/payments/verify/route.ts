@@ -448,9 +448,6 @@ export async function POST(request: NextRequest) {
       razorpayPaymentId: razorpay_payment_id,
       razorpaySignature: razorpay_signature,
       amount: totalAmount,
-      subtotal: subtotal,
-      gstRate: gstRate,
-      gstAmount: gstAmount,
       currency: "INR",
       status: orderStatus,
       domains: orderDomains,
@@ -480,8 +477,6 @@ export async function POST(request: NextRequest) {
           invoiceNumber: order.invoiceNumber || "",
           amount: order.amount,
           subtotal: order.subtotal,
-          gstRate: order.gstRate,
-          gstAmount: order.gstAmount,
           currency: order.currency,
           successfulDomains: orderDomains
             .filter((d) => d.status === "registered")

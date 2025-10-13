@@ -126,7 +126,7 @@ async function createTestData() {
         paymentVerification: {
           verifiedAt: new Date(),
           paymentStatus: 'success',
-          paymentAmount: 1416,
+          paymentAmount: 1200,
           paymentCurrency: 'INR',
           razorpayOrderId: 'rzp_test_001',
         },
@@ -157,7 +157,7 @@ async function createTestData() {
         paymentVerification: {
           verifiedAt: new Date(),
           paymentStatus: 'success',
-          paymentAmount: 1180,
+          paymentAmount: 1000,
           paymentCurrency: 'INR',
           razorpayOrderId: 'rzp_test_002',
         },
@@ -188,7 +188,7 @@ async function createTestData() {
         paymentVerification: {
           verifiedAt: new Date(),
           paymentStatus: 'success',
-          paymentAmount: 1770,
+          paymentAmount: 1500,
           paymentCurrency: 'INR',
           razorpayOrderId: 'rzp_test_003',
         },

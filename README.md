@@ -21,7 +21,6 @@ A comprehensive, enterprise-grade domain registration and management platform bu
 - **Order Management** - Complete order tracking with real-time status updates
 - **PDF Invoice Generation** - Automated invoice generation and download
 - **Payment Verification** - Secure payment verification and domain registration automation
-- **GST Calculation** - Automatic GST calculation for Indian customers
 
 ### User Management & Authentication
 

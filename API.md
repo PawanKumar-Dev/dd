@@ -689,7 +689,6 @@ The system implements a comprehensive TLD pricing solution with 200+ TLD mapping
 4. **Live Pricing**: Real-time pricing from ResellerClub customer and reseller APIs
 5. **Performance Optimized**: Intelligent caching with 5-minute TTL
 6. **Error Handling**: Robust fallback mechanisms for missing TLD data
-7. **GST Calculation**: Automatic GST calculation for Indian customers (18% default)
 
 ### TLD Mapping Examples
 
@@ -724,9 +723,7 @@ Domain search response includes:
   "currency": "INR",
   "registrationPeriod": 1,
   "pricingSource": "live",
-  "gstRate": 18,
-  "gstAmount": 215.78,
-  "totalAmount": 1414.58
+  "totalAmount": 1198.80
 }
 ```
 

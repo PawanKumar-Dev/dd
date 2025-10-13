@@ -78,9 +78,6 @@ export async function POST(request: NextRequest) {
         razorpayOrderId: razorpayOrder.id,
         amount: totalAmount,
         currency: "INR",
-        subtotal: subtotal,
-        gstRate: gstRate,
-        gstAmount: gstAmount,
         domains: cartItems.map((item) => ({
           domainName: item.domainName,
           price: item.price,
