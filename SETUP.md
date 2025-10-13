@@ -251,8 +251,8 @@ npm start
 | -------------------------- | -------- | ------------------------- | ------------------------------- |
 | `MONGODB_URI`              | ✅       | MongoDB connection string | `mongodb://localhost:27017/dms` |
 | `JWT_SECRET`               | ✅       | JWT signing secret        | `your-secret-key`               |
-| `NEXTAUTH_URL`             | ✅       | Application base URL      | `http://localhost:3000`     |
-| `APP_URL`                  | ✅       | Email links base URL      | `http://localhost:3000`     |
+| `NEXTAUTH_URL`             | ✅       | Application base URL      | `http://localhost:3000`         |
+| `APP_URL`                  | ✅       | Email links base URL      | `http://localhost:3000`         |
 | `RESELLERCLUB_ID`          | ✅       | ResellerClub ID           | `your-resellerclub-id`          |
 | `RESELLERCLUB_SECRET`      | ✅       | ResellerClub Secret       | `your-resellerclub-secret`      |
 | `RESELLERCLUB_RESELLER_ID` | ✅       | Your ResellerClub ID      | `123456`                        |
@@ -426,5 +426,9 @@ npm start
 - ✅ Enhanced error handling and logging
 - ✅ Improved user experience and interface
 - ✅ DNS Management API fully functional with ResellerClub integration
+- ✅ Complete DNS record CRUD operations (Create, Read, Update, Delete)
+- ✅ Inline DNS record editing with real-time updates
+- ✅ Enhanced DNS record deletion with proper ResellerClub API parameters
+- ✅ Simplified pricing model without GST calculations
 
 **Note:** Always test in a development environment before deploying to production!

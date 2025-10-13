@@ -26,7 +26,10 @@ dd/
 │   │   │   └── tld-pricing/      # TLD pricing management
 │   │   ├── domains/              # Domain management
 │   │   │   ├── search/           # Domain search
-│   │   │   └── renew/            # Domain renewal
+│   │   │   ├── renew/            # Domain renewal
+│   │   │   ├── dns/              # DNS record management (CRUD)
+│   │   │   ├── nameservers/      # Nameserver lookup
+│   │   │   └── activate-dns/     # DNS activation
 │   │   ├── orders/               # Order management
 │   │   │   ├── [id]/             # Specific order details
 │   │   │   └── [id]/invoice/     # Order invoice download
@@ -444,5 +447,9 @@ function MyPage() {
 - ✅ Enhanced error handling and logging
 - ✅ Improved user experience and interface
 - ✅ DNS Management API fully functional with ResellerClub integration
+- ✅ Complete DNS record CRUD operations (Create, Read, Update, Delete)
+- ✅ Inline DNS record editing with real-time updates
+- ✅ Enhanced DNS record deletion with proper ResellerClub API parameters
+- ✅ Simplified pricing model without GST calculations
 
 This component-based architecture makes the project highly maintainable, scalable, and developer-friendly while providing a consistent user experience across all pages.

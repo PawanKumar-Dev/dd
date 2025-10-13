@@ -284,7 +284,6 @@ Get DNS records for a domain using ResellerClub's specific DNS search endpoints.
 **Query Parameters:**
 
 - `domainName` (string, required): Domain name to get DNS records for
-- `customerId` (string, required): ResellerClub customer ID
 
 **Response:**
 
@@ -317,6 +316,103 @@ Get DNS records for a domain using ResellerClub's specific DNS search endpoints.
 ```
 
 **Note**: This endpoint searches all DNS record types (A, AAAA, CNAME, MX, NS, TXT, SRV) and combines the results. Uses ResellerClub's `/api/dns/manage/search-records.json` endpoint with proper pagination.
+
+### POST /api/domains/dns
+
+Add a new DNS record to a domain.
+
+**Request Body:**
+
+```json
+{
+  "domainName": "example.com",
+  "recordData": {
+    "type": "A",
+    "name": "www",
+    "value": "192.168.1.1",
+    "ttl": 7200,
+    "priority": 10
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "DNS record added successfully",
+  "recordId": "12345"
+}
+```
+
+### PUT /api/domains/dns
+
+Update an existing DNS record (implemented as delete + add for ResellerClub compatibility).
+
+**Request Body:**
+
+```json
+{
+  "domainName": "example.com",
+  "recordId": "12345",
+  "recordData": {
+    "type": "A",
+    "name": "www",
+    "value": "192.168.1.2",
+    "ttl": 3600,
+    "priority": 10
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "DNS record updated successfully"
+}
+```
+
+### DELETE /api/domains/dns
+
+Delete a DNS record from a domain.
+
+**Request Body:**
+
+```json
+{
+  "domainName": "example.com",
+  "recordId": "12345",
+  "recordData": {
+    "type": "A",
+    "name": "www",
+    "value": "192.168.1.1",
+    "ttl": 7200,
+    "priority": 10
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "DNS record deleted successfully"
+}
+```
+
+**DNS Management Features:**
+
+- ✅ **Full CRUD Operations**: Create, Read, Update, Delete DNS records
+- ✅ **Inline Editing**: Edit records directly in the management interface
+- ✅ **Record Type Support**: A, AAAA, CNAME, MX, NS, TXT, SRV records
+- ✅ **Priority Support**: MX and SRV records with priority values
+- ✅ **TTL Management**: Configurable TTL values (minimum 300 seconds)
+- ✅ **Real-time Updates**: Immediate reflection of changes
+- ✅ **Error Handling**: Comprehensive error handling with rollback
 
 ### POST /api/domains/renew
 
@@ -723,7 +819,7 @@ Domain search response includes:
   "currency": "INR",
   "registrationPeriod": 1,
   "pricingSource": "live",
-  "totalAmount": 1198.80
+  "totalAmount": 1198.8
 }
 ```
 

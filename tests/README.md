@@ -30,7 +30,8 @@ tests/
 ├── system/                   # System integration tests
 │   ├── test-database.js      # Database connectivity testing
 │   ├── test-email.js         # Email service testing
-│   └── test-integration.js   # End-to-end integration testing
+│   ├── test-integration.js   # End-to-end integration testing
+│   └── test-dns-management.js # DNS management CRUD operations testing
 └── scripts/                  # Utility and maintenance scripts
     └── update_pricing.js     # Pricing data update utility
 ```
@@ -173,7 +174,7 @@ node tests/run-tests.js help
 - **Payment Tests**: Payment processing, success/failure scenarios, error handling
 - **Pricing Tests**: TLD pricing accuracy, mapping validation, AI pricing
 - **Debug Tools**: Troubleshooting utilities, data analysis, debugging
-- **System Tests**: Database connectivity, email service, end-to-end integration
+- **System Tests**: Database connectivity, email service, end-to-end integration, DNS management
 
 #### Test All TLD Pricing
 
@@ -211,6 +212,9 @@ node tests/payment/test-error-handling.js
 # Test pricing system
 node tests/pricing/test-ai-pricing.js
 node tests/pricing/test-pricing-debug.js
+
+# Test DNS management
+node tests/system/test-dns-management.js
 ```
 
 #### Debug Issues
@@ -290,7 +294,7 @@ node tests/debug/debug-pricing.js
    Payment Tests: 2 tests
    Pricing Tests: 2 tests
    Debug Tools: 2 tests
-   System Tests: 3 tests
+   System Tests: 4 tests
 
 📈 Coverage:
    TLD Mappings: 200+ TLDs tested
@@ -299,6 +303,7 @@ node tests/debug/debug-pricing.js
    Admin Functions: User and order management
    Database: Connection and operations
    Email Service: SMTP configuration and sending
+   DNS Management: CRUD operations and ResellerClub integration
 
 🏆 Overall Status:
    ✅ All tests passing
@@ -353,6 +358,22 @@ node tests/debug/debug-pricing.js
 - Error message display
 - User guidance and actions
 - Error recovery mechanisms
+
+## 🌐 DNS Management Tests
+
+### `test-dns-management.js`
+
+**Purpose**: Test DNS management CRUD operations
+**Usage**: `node tests/system/test-dns-management.js`
+**What it tests**:
+
+- DNS record creation (A, AAAA, CNAME, MX, NS, TXT, SRV)
+- DNS record retrieval and display
+- DNS record editing with inline updates
+- DNS record deletion with proper parameters
+- ResellerClub API integration for DNS operations
+- TTL and priority field handling
+- Error handling and rollback mechanisms
 
 ## 💰 Pricing System Tests
 

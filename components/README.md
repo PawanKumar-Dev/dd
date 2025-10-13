@@ -36,6 +36,9 @@ This directory contains all reusable React components for the Excel Technologies
 - **DomainRenewalModal**: Domain renewal modal with pricing
 - **DomainRequirementsModal**: Domain requirements and validation
 - **NameServerManagement**: RDAP nameserver lookup and management
+- **DNSManagement**: Complete DNS record management with CRUD operations
+- **DNSRecordEditor**: Inline DNS record editing component
+- **DNSRecordTable**: DNS records display with edit/delete functionality
 
 ### Payment Components
 
@@ -290,6 +293,6 @@ When adding new components:
 ---
 
 **Last Updated**: October 13, 2025  
-**Version**: 2.1.0  
+**Version**: 2.2.0  
 **Author**: Excel Technologies  
-**Status**: Production-ready with comprehensive component library
+**Status**: Production-ready with comprehensive component library and DNS management features
