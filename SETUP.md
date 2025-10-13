@@ -1,5 +1,7 @@
 # 🚀 Excel Technologies - Domain Management System Setup Guide
 
+**Current Status**: Production-ready system with comprehensive testing suite.
+
 ## Quick Start
 
 ### 1. Clone and Install Dependencies
@@ -53,10 +55,10 @@ MONGODB_URI=mongodb://localhost:27017/domain-management-system
 # Authentication
 JWT_SECRET=your-super-secret-jwt-key-here
 NEXTAUTH_SECRET=your-nextauth-secret-here
-NEXTAUTH_URL=http://35.209.122.24:3000
+NEXTAUTH_URL=http://localhost:3000
 
 # Application URL (for email links)
-APP_URL=http://35.209.122.24:3000
+APP_URL=http://localhost:3000
 
 # ResellerClub API
 RESELLERCLUB_ID=your-resellerclub-id
@@ -197,7 +199,6 @@ npm run dev
 
 # The application will be available at:
 # http://localhost:3000
-# http://35.209.122.24:3000
 ```
 
 #### Production Build
@@ -250,8 +251,8 @@ npm start
 | -------------------------- | -------- | ------------------------- | ------------------------------- |
 | `MONGODB_URI`              | ✅       | MongoDB connection string | `mongodb://localhost:27017/dms` |
 | `JWT_SECRET`               | ✅       | JWT signing secret        | `your-secret-key`               |
-| `NEXTAUTH_URL`             | ✅       | Application base URL      | `http://35.209.122.24:3000`     |
-| `APP_URL`                  | ✅       | Email links base URL      | `http://35.209.122.24:3000`     |
+| `NEXTAUTH_URL`             | ✅       | Application base URL      | `http://localhost:3000`     |
+| `APP_URL`                  | ✅       | Email links base URL      | `http://localhost:3000`     |
 | `RESELLERCLUB_ID`          | ✅       | ResellerClub ID           | `your-resellerclub-id`          |
 | `RESELLERCLUB_SECRET`      | ✅       | ResellerClub Secret       | `your-resellerclub-secret`      |
 | `RESELLERCLUB_RESELLER_ID` | ✅       | Your ResellerClub ID      | `123456`                        |
@@ -411,5 +412,19 @@ npm start
    - Monitor logs and performance
 
 ---
+
+## ⚠️ Known Issues
+
+- **DNS Management API**: Currently experiencing 404 errors with ResellerClub DNS endpoints
+- **Status**: Under investigation with ResellerClub support
+- **Impact**: DNS record management functionality temporarily unavailable
+
+## 🔄 Recent Updates
+
+- ✅ Comprehensive testing suite with 20+ test categories
+- ✅ Production-ready deployment configuration
+- ✅ Enhanced error handling and logging
+- ✅ Improved user experience and interface
+- ⚠️ DNS Management API issues (under investigation)
 
 **Note:** Always test in a development environment before deploying to production!
