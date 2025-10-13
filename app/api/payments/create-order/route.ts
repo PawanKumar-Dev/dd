@@ -27,15 +27,10 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Calculate subtotal and GST
-    const subtotal = cartItems.reduce((sum, item) => sum + item.price, 0);
-    const gstRate = 18; // 18% GST
-    const gstAmount = Math.round((subtotal * gstRate) / 100 * 100) / 100;
-    const totalAmount = Math.round((subtotal + gstAmount) * 100) / 100;
+    // Calculate total amount
+    const totalAmount = cartItems.reduce((sum, item) => sum + item.price, 0);
 
     console.log("💰 [CREATE-ORDER] Cart items:", cartItems);
-    console.log("💰 [CREATE-ORDER] Subtotal:", subtotal);
-    console.log("💰 [CREATE-ORDER] GST (18%):", gstAmount);
     console.log("💰 [CREATE-ORDER] Total amount:", totalAmount);
 
     // Validate total amount

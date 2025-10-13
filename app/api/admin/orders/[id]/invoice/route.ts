@@ -227,19 +227,14 @@ export async function GET(
       currentY += 10;
     });
 
-    // Order summary - use stored values from order if available
-    const subtotal = order.subtotal || order.domains
+    // Order total - use stored values from order if available
+    const total = order.amount || order.domains
       .filter((d: any) => d.status === "registered")
       .reduce(
         (total: number, domain: any) =>
           total + domain.price * domain.registrationPeriod,
         0
       );
-    
-    // Use GST from order if available, otherwise calculate it
-    const gstRate = order.gstRate || 18;
-    const gstAmount = order.gstAmount || Math.round((subtotal * gstRate) / 100 * 100) / 100;
-    const total = order.amount || (subtotal + gstAmount);
 
     const summaryY = Math.max(currentY + 20, pageHeight - 80);
 
