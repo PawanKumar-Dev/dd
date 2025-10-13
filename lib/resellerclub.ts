@@ -1781,23 +1781,34 @@ export class ResellerClubAPI {
   ): Promise<ResellerClubResponse> {
     try {
       // Search for all record types
-      const recordTypes = ['A', 'AAAA', 'CNAME', 'MX', 'NS', 'TXT', 'SRV'];
+      const recordTypes = ["A", "AAAA", "CNAME", "MX", "NS", "TXT", "SRV"];
       const allRecords = [];
 
       for (const recordType of recordTypes) {
         try {
-          const response = await api.get("/api/dns/manage/search-records.json", {
-            params: {
-              "domain-name": domainName,
-              "customer-id": customerId,
-              type: recordType,
-              "no-of-records": 50, // Maximum allowed by ResellerClub
-              "page-no": 1, // Required parameter for pagination
-            },
-          });
+          const response = await api.get(
+            "/api/dns/manage/search-records.json",
+            {
+              params: {
+                "domain-name": domainName,
+                "customer-id": customerId,
+                type: recordType,
+                "no-of-records": 50, // Maximum allowed by ResellerClub
+                "page-no": 1, // Required parameter for pagination
+              },
+            }
+          );
 
-          if (response.data && response.data.records) {
-            allRecords.push(...response.data.records);
+          if (response.data) {
+            // ResellerClub returns records as numbered keys (1, 2, 3, etc.)
+            const records = Object.keys(response.data)
+              .filter((key) => key !== "recsonpage" && key !== "recsindb")
+              .map((key) => response.data[key])
+              .filter((record) => record && record.type);
+
+            if (records.length > 0) {
+              allRecords.push(...records);
+            }
           }
         } catch (typeError) {
           // Continue with other record types if one fails
@@ -1829,6 +1840,7 @@ export class ResellerClubAPI {
    */
   static async addDNSRecord(
     domainName: string,
+    customerId: string,
     recordData: {
       type: string;
       name: string;
@@ -1840,10 +1852,11 @@ export class ResellerClubAPI {
     try {
       // Ensure TTL is at least 7200 (ResellerClub requirement)
       const ttl = Math.max(recordData.ttl, 7200);
-      
+
       let endpoint = "";
       let params: any = {
         "domain-name": domainName,
+        "customer-id": customerId,
         host: recordData.name,
         value: recordData.value,
         ttl: ttl,
@@ -1851,26 +1864,26 @@ export class ResellerClubAPI {
 
       // Use specific endpoint based on record type
       switch (recordData.type.toUpperCase()) {
-        case 'A':
+        case "A":
           endpoint = "/api/dns/manage/add-ipv4-record.json";
           break;
-        case 'AAAA':
+        case "AAAA":
           endpoint = "/api/dns/manage/add-ipv6-record.json";
           break;
-        case 'CNAME':
+        case "CNAME":
           endpoint = "/api/dns/manage/add-cname-record.json";
           break;
-        case 'MX':
+        case "MX":
           endpoint = "/api/dns/manage/add-mx-record.json";
           params.priority = recordData.priority || 10;
           break;
-        case 'NS':
+        case "NS":
           endpoint = "/api/dns/manage/add-ns-record.json";
           break;
-        case 'TXT':
+        case "TXT":
           endpoint = "/api/dns/manage/add-txt-record.json";
           break;
-        case 'SRV':
+        case "SRV":
           endpoint = "/api/dns/manage/add-srv-record.json";
           params.priority = recordData.priority || 10;
           params.weight = 10; // Default weight

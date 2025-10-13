@@ -98,6 +98,7 @@ export class ResellerClubWrapper {
    */
   static async addDNSRecord(
     domainName: string,
+    customerId: string,
     recordData: {
       type: string;
       name: string;
@@ -109,7 +110,7 @@ export class ResellerClubWrapper {
     console.log(
       `🌐 [PRODUCTION] ResellerClub Wrapper: Adding DNS record for "${domainName}"`
     );
-    return ResellerClubAPI.addDNSRecord(domainName, recordData);
+    return ResellerClubAPI.addDNSRecord(domainName, customerId, recordData);
   }
 
   /**

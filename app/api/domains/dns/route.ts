@@ -103,9 +103,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    await connectDB(); // Connect to DB
+
+    // Find the domain in the database to get resellerClubCustomerId
+    const order = await Order.findOne({
+      "domains.domainName": domainName,
+      userId: user._id,
+    });
+
+    if (!order) {
+      return NextResponse.json(
+        { error: "Domain not found for this user" },
+        { status: 404 }
+      );
+    }
+
+    const domain = order.domains.find((d) => d.domainName === domainName);
+
+    if (!domain || !domain.resellerClubCustomerId) {
+      return NextResponse.json(
+        { error: "ResellerClub Customer ID not found for this domain" },
+        { status: 404 }
+      );
+    }
+
     // Add DNS record
     const result = await ResellerClubWrapper.addDNSRecord(
       domainName,
+      domain.resellerClubCustomerId,
       recordData
     );
 
