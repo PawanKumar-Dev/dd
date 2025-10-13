@@ -1803,8 +1803,20 @@ export class ResellerClubAPI {
             // ResellerClub returns records as numbered keys (1, 2, 3, etc.)
             const records = Object.keys(response.data)
               .filter((key) => key !== "recsonpage" && key !== "recsindb")
-              .map((key) => response.data[key])
-              .filter((record) => record && record.type);
+              .map((key) => {
+                const record = response.data[key];
+                if (record && record.type) {
+                  // Map ResellerClub field names to standard field names
+                  return {
+                    ...record,
+                    ttl: record.timetolive || record.ttl, // Map timetolive to ttl
+                    name: record.host || record.name, // Map host to name
+                    priority: record.priority || undefined, // Ensure priority is included
+                  };
+                }
+                return null;
+              })
+              .filter((record) => record !== null);
 
             if (records.length > 0) {
               allRecords.push(...records);

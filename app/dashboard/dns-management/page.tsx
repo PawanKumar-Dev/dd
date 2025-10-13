@@ -63,6 +63,14 @@ export default function DNSManagementPage() {
     ttl: 3600,
     priority: undefined,
   });
+  const [editingRecord, setEditingRecord] = useState<string | null>(null);
+  const [editRecord, setEditRecord] = useState<DNSRecord>({
+    type: 'A',
+    name: '',
+    value: '',
+    ttl: 3600,
+    priority: undefined,
+  });
   const router = useRouter();
 
   useEffect(() => {
@@ -326,6 +334,93 @@ export default function DNSManagementPage() {
       console.error('Error deleting DNS record:', error);
       toast.error('Failed to delete DNS record');
     }
+  };
+
+  const handleEditRecord = (record: DNSRecord, index: number) => {
+    setEditingRecord(index.toString());
+    setEditRecord({
+      type: record.type,
+      name: record.name,
+      value: record.value,
+      ttl: record.ttl,
+      priority: record.priority,
+    });
+  };
+
+  const handleSaveEdit = async () => {
+    if (!selectedDomain || !editingRecord) return;
+
+    const domain = domains.find(d => d.id === selectedDomain);
+    if (!domain) return;
+
+    try {
+      const token = localStorage.getItem('token');
+
+      // Get the original record to delete
+      const originalRecord = dnsRecords[parseInt(editingRecord)];
+
+      // First delete the original record
+      const deleteResponse = await fetch(`/api/domains/dns?domainName=${encodeURIComponent(domain.name)}&recordId=${editingRecord}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!deleteResponse.ok) {
+        const error = await deleteResponse.json();
+        toast.error(error.error || 'Failed to delete original record');
+        return;
+      }
+
+      // Then add the updated record
+      const addResponse = await fetch('/api/domains/dns', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          domainName: domain.name,
+          recordData: editRecord,
+        }),
+      });
+
+      if (addResponse.ok) {
+        toast.success('DNS record updated successfully');
+        setEditingRecord(null);
+        loadDNSRecords(selectedDomain);
+      } else {
+        const error = await addResponse.json();
+        toast.error(error.error || 'Failed to add updated record');
+        // Try to restore the original record
+        await fetch('/api/domains/dns', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            domainName: domain.name,
+            recordData: originalRecord,
+          }),
+        });
+      }
+    } catch (error) {
+      console.error('Error updating DNS record:', error);
+      toast.error('Failed to update DNS record');
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingRecord(null);
+    setEditRecord({
+      type: 'A',
+      name: '',
+      value: '',
+      ttl: 3600,
+      priority: undefined,
+    });
   };
 
   const handleActivateDNS = async () => {
@@ -845,25 +940,126 @@ export default function DNSManagementPage() {
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Value</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">TTL</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">TTL / Priority</th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
                         {dnsRecords.map((record, index) => (
                           <tr key={record.id || index} className="hover:bg-gray-50">
-                            <td className="px-4 py-4 text-sm font-medium text-gray-900">{record.type}</td>
-                            <td className="px-4 py-4 text-sm text-gray-900">{record.name}</td>
-                            <td className="px-4 py-4 text-sm text-gray-900">{record.value}</td>
-                            <td className="px-4 py-4 text-sm text-gray-900">{record.ttl}</td>
+                            <td className="px-4 py-4 text-sm font-medium text-gray-900">
+                              {editingRecord === index.toString() ? (
+                                <select
+                                  value={editRecord.type}
+                                  onChange={(e) => setEditRecord({ ...editRecord, type: e.target.value })}
+                                  className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                                >
+                                  <option value="A">A</option>
+                                  <option value="AAAA">AAAA</option>
+                                  <option value="CNAME">CNAME</option>
+                                  <option value="MX">MX</option>
+                                  <option value="NS">NS</option>
+                                  <option value="TXT">TXT</option>
+                                  <option value="SRV">SRV</option>
+                                </select>
+                              ) : (
+                                record.type
+                              )}
+                            </td>
                             <td className="px-4 py-4 text-sm text-gray-900">
-                              <button
-                                onClick={() => handleDeleteRecord(record.id || index.toString())}
-                                className="text-red-600 hover:text-red-900 transition-colors"
-                                title="Delete Record"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </button>
+                              {editingRecord === index.toString() ? (
+                                <input
+                                  type="text"
+                                  value={editRecord.name}
+                                  onChange={(e) => setEditRecord({ ...editRecord, name: e.target.value })}
+                                  className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                                />
+                              ) : (
+                                record.name
+                              )}
+                            </td>
+                            <td className="px-4 py-4 text-sm text-gray-900">
+                              {editingRecord === index.toString() ? (
+                                <input
+                                  type="text"
+                                  value={editRecord.value}
+                                  onChange={(e) => setEditRecord({ ...editRecord, value: e.target.value })}
+                                  className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                                />
+                              ) : (
+                                record.value
+                              )}
+                            </td>
+                            <td className="px-4 py-4 text-sm text-gray-900">
+                              {editingRecord === index.toString() ? (
+                                <div className="flex space-x-2">
+                                  <input
+                                    type="number"
+                                    value={editRecord.ttl}
+                                    onChange={(e) => setEditRecord({ ...editRecord, ttl: parseInt(e.target.value) || 3600 })}
+                                    className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                                    min="300"
+                                    placeholder="TTL"
+                                  />
+                                  {(editRecord.type === 'MX' || editRecord.type === 'SRV') && (
+                                    <input
+                                      type="number"
+                                      value={editRecord.priority || 10}
+                                      onChange={(e) => setEditRecord({ ...editRecord, priority: parseInt(e.target.value) || 10 })}
+                                      className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
+                                      min="0"
+                                      max="65535"
+                                      placeholder="Priority"
+                                    />
+                                  )}
+                                </div>
+                              ) : (
+                                <div>
+                                  {record.ttl}
+                                  {(record.type === 'MX' || record.type === 'SRV') && record.priority && (
+                                    <span className="text-gray-500 ml-2">(Priority: {record.priority})</span>
+                                  )}
+                                </div>
+                              )}
+                            </td>
+                            <td className="px-4 py-4 text-sm text-gray-900">
+                              <div className="flex items-center space-x-2">
+                                {editingRecord === index.toString() ? (
+                                  <>
+                                    <button
+                                      onClick={handleSaveEdit}
+                                      className="text-green-600 hover:text-green-900 transition-colors"
+                                      title="Save Changes"
+                                    >
+                                      <Save className="h-4 w-4" />
+                                    </button>
+                                    <button
+                                      onClick={handleCancelEdit}
+                                      className="text-gray-600 hover:text-gray-900 transition-colors"
+                                      title="Cancel"
+                                    >
+                                      <X className="h-4 w-4" />
+                                    </button>
+                                  </>
+                                ) : (
+                                  <>
+                                    <button
+                                      onClick={() => handleEditRecord(record, index)}
+                                      className="text-blue-600 hover:text-blue-900 transition-colors"
+                                      title="Edit Record"
+                                    >
+                                      <Edit3 className="h-4 w-4" />
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeleteRecord(record.id || index.toString())}
+                                      className="text-red-600 hover:text-red-900 transition-colors"
+                                      title="Delete Record"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </button>
+                                  </>
+                                )}
+                              </div>
                             </td>
                           </tr>
                         ))}
