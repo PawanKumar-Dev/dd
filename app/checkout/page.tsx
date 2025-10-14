@@ -449,7 +449,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navigation user={user} />
 
       {/* Header */}
@@ -472,8 +472,8 @@ export default function CheckoutPage() {
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid lg:grid-cols-2 gap-8">
+      <div className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid lg:grid-cols-2 gap-8 min-h-[50vh]">
           {/* Order Summary */}
           <div>
             <h2 className="text-lg font-semibold text-gray-900 mb-6">Order Summary</h2>
