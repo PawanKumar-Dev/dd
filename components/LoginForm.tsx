@@ -118,6 +118,24 @@ export default function LoginForm({ className = '' }: LoginFormProps) {
           setTimeout(() => {
             router.push(`/activate?email=${encodeURIComponent(formData.email)}&message=${encodeURIComponent(data.message || 'Account not activated')}`);
           }, 1000);
+        } else if (data.isDeactivated) {
+          // Show a more detailed error for deactivated accounts
+          toast.error(
+            <div className="text-left">
+              <div className="font-semibold text-red-800 mb-1">Account Deactivated</div>
+              <div className="text-sm text-red-700">
+                Your account has been deactivated. Please contact our support team at{' '}
+                <a
+                  href={`mailto:${data.supportEmail}`}
+                  className="underline hover:text-red-900 font-medium"
+                >
+                  {data.supportEmail}
+                </a>{' '}
+                for assistance.
+              </div>
+            </div>,
+            { duration: 8000 }
+          );
         } else {
           toast.error(data.error || 'Login failed');
         }
