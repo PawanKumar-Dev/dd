@@ -71,7 +71,7 @@ export default function UserSettings() {
         const token = localStorage.getItem('token');
         if (!token) {
           console.error('No authentication token available');
-          setSettings({});
+          setSettings({} as any);
           return;
         }
 
@@ -91,7 +91,7 @@ export default function UserSettings() {
           }
         } else {
           // Use default settings
-          setSettings({});
+          setSettings({} as any);
         }
       } catch (error) {
         console.error('Failed to fetch settings:', error);
@@ -103,7 +103,7 @@ export default function UserSettings() {
             domainExpiry: true,
             paymentReminders: true
           }
-        });
+        } as any);
       }
     } catch (error) {
       console.error('Error loading settings:', error);
