@@ -12,14 +12,15 @@ import {
   AlertTriangle,
   Copy,
   ExternalLink,
-  ArrowRight
+  ArrowRight,
+  Loader2
 } from 'lucide-react';
 import AdminLayoutNew from '@/components/admin/AdminLayoutNew';
 import { formatIndianTime } from '@/lib/dateUtils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import toast from 'react-hot-toast';
+import { showSuccessToast, showErrorToast } from '@/lib/toast';
 
 interface IPData {
   success: boolean;
@@ -49,6 +50,7 @@ export default function AdminSettings() {
   const router = useRouter();
   const [ipData, setIpData] = useState<IPData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [lastChecked, setLastChecked] = useState<Date | null>(null);
   const [user, setUser] = useState<{ firstName: string; lastName: string; role: string } | null>(null);
 
@@ -81,8 +83,12 @@ export default function AdminSettings() {
 
   const loadSavedIPData = async () => {
     try {
+      setIsInitialLoading(true);
       const token = localStorage.getItem('token');
-      if (!token) return;
+      if (!token) {
+        setIsInitialLoading(false);
+        return;
+      }
 
       const response = await fetch('/api/admin/ip-status', {
         headers: {
@@ -99,6 +105,8 @@ export default function AdminSettings() {
       }
     } catch (error) {
       console.error('Error loading saved IP data:', error);
+    } finally {
+      setIsInitialLoading(false);
     }
   };
 
@@ -119,13 +127,13 @@ export default function AdminSettings() {
       setLastChecked(new Date());
 
       if (data.success) {
-        toast.success('Outbound IP checked and saved successfully');
+        showSuccessToast('Outbound IP checked and saved successfully');
       } else {
-        toast.error('Failed to check outbound IP');
+        showErrorToast('Failed to check outbound IP');
       }
     } catch (error) {
       console.error('Error fetching IP:', error);
-      toast.error('Network error while checking IP');
+      showErrorToast('Network error while checking IP');
     } finally {
       setIsLoading(false);
     }
@@ -133,7 +141,7 @@ export default function AdminSettings() {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success('IP address copied to clipboard');
+    showSuccessToast('IP address copied to clipboard');
   };
 
   const handleLogout = () => {
@@ -154,19 +162,21 @@ export default function AdminSettings() {
   };
 
   const getStatusIcon = () => {
-    if (isLoading) return <RefreshCw className="h-4 w-4 animate-spin" />;
+    if (isLoading) return <Loader2 className="h-4 w-4 animate-spin" />;
     if (!ipData?.success) return <AlertTriangle className="h-4 w-4" />;
     if (ipData?.data?.allIPs && ipData.data.allIPs.length > 1) return <AlertTriangle className="h-4 w-4" />;
     return <CheckCircle className="h-4 w-4" />;
   };
 
   // Don't render anything until user is loaded
-  if (!user) {
+  if (!user || isInitialLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <p className="text-gray-600">
+            {!user ? 'Loading...' : 'Loading IP data from database...'}
+          </p>
         </div>
       </div>
     );
@@ -217,16 +227,29 @@ export default function AdminSettings() {
                 </Badge>
                 <div>
                   <p className="font-medium text-gray-900">
-                    {ipData?.data?.primaryIP || 'No IP detected'}
+                    {isLoading ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Checking IP...
+                      </span>
+                    ) : (
+                      ipData?.data?.primaryIP || 'No IP detected'
+                    )}
                   </p>
-                  {lastChecked && (
+                  {lastChecked && !isLoading && (
                     <p className="text-sm text-gray-500">
                       Last checked: {formatIndianTime(lastChecked)}
                     </p>
                   )}
-                  {ipData?.checkedBy && (
+                  {ipData?.checkedBy && !isLoading && (
                     <p className="text-sm text-gray-500">
                       Checked by: {ipData.checkedBy.firstName} {ipData.checkedBy.lastName}
+                    </p>
+                  )}
+                  {isLoading && (
+                    <p className="text-sm text-blue-600 flex items-center gap-1">
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      Fetching data from database...
                     </p>
                   )}
                 </div>
@@ -236,13 +259,75 @@ export default function AdminSettings() {
                 disabled={isLoading}
                 className="flex items-center gap-2"
               >
-                <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-                {isLoading ? 'Checking...' : 'Check IP'}
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Checking...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="h-4 w-4" />
+                    Check IP
+                  </>
+                )}
               </Button>
             </div>
 
+            {/* Loading Skeleton */}
+            {isLoading && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-4"
+              >
+                {/* Primary IP Loading */}
+                <div className="p-4 bg-blue-50 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-semibold text-blue-900">Primary Outbound IP</h4>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+                        <div className="h-8 w-32 bg-blue-200 rounded animate-pulse"></div>
+                      </div>
+                    </div>
+                    <div className="h-8 w-16 bg-blue-200 rounded animate-pulse"></div>
+                  </div>
+                </div>
+
+                {/* Service Results Loading */}
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <h4 className="font-semibold text-gray-900 mb-3">Service Results</h4>
+                  <div className="space-y-2">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="flex items-center justify-between text-sm">
+                        <div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="flex items-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                          <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Server Info Loading */}
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <h4 className="font-semibold text-gray-900 mb-3">Server Information</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div key={i}>
+                        <div className="h-4 w-20 bg-gray-200 rounded animate-pulse mb-1"></div>
+                        <div className="h-4 w-full bg-gray-200 rounded animate-pulse"></div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
             {/* IP Details */}
-            {ipData?.success && ipData.data && (
+            {ipData?.success && ipData.data && !isLoading && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -343,7 +428,7 @@ export default function AdminSettings() {
             )}
 
             {/* Error State */}
-            {ipData && !ipData.success && (
+            {ipData && !ipData.success && !isLoading && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

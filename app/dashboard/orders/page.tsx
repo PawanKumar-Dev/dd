@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
   Receipt, Search, Download, Eye, Calendar,
-  CheckCircle, Clock, AlertTriangle, ExternalLink, FileText, RefreshCw
+  CheckCircle, Clock, AlertTriangle, ExternalLink, FileText, RefreshCw, X
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import UserLayout from '@/components/user/UserLayout';
@@ -360,7 +360,7 @@ export default function UserOrders() {
                       onClick={() => setSelectedOrder(null)}
                       className="text-gray-400 hover:text-gray-600"
                     >
-                      <ExternalLink className="h-6 w-6" />
+                      <X className="h-6 w-6" />
                     </button>
                   </div>
 
