@@ -1045,39 +1045,39 @@ export default function DNSManagementPage() {
                             <td className="px-4 py-4 text-sm text-gray-900">
                               <div className="flex items-center space-x-2">
                                 {editingRecord === `${record.type}-${record.id || index}-${record.name}-${record.value}` ? (
-                                  <>
+                                  <div className="flex items-center space-x-3">
                                     <button
                                       onClick={handleSaveEdit}
-                                      className="text-green-600 hover:text-green-900 transition-colors"
+                                      className="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-all duration-200 group"
                                       title="Save Changes"
                                     >
-                                      <Save className="h-4 w-4" />
+                                      <Save className="h-5 w-5" />
                                     </button>
                                     <button
                                       onClick={handleCancelEdit}
-                                      className="text-gray-600 hover:text-gray-900 transition-colors"
+                                      className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-all duration-200 group"
                                       title="Cancel"
                                     >
-                                      <X className="h-4 w-4" />
+                                      <X className="h-5 w-5" />
                                     </button>
-                                  </>
+                                  </div>
                                 ) : (
-                                  <>
+                                  <div className="flex items-center space-x-3">
                                     <button
                                       onClick={() => handleEditRecord(record, index)}
-                                      className="text-blue-600 hover:text-blue-900 transition-colors"
+                                      className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-200 group"
                                       title="Edit Record"
                                     >
-                                      <Edit3 className="h-4 w-4" />
+                                      <Edit3 className="h-5 w-5" />
                                     </button>
                                     <button
                                       onClick={() => handleDeleteRecord(record.id || index.toString())}
-                                      className="text-red-600 hover:text-red-900 transition-colors"
+                                      className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all duration-200 group"
                                       title="Delete Record"
                                     >
-                                      <Trash2 className="h-4 w-4" />
+                                      <Trash2 className="h-5 w-5" />
                                     </button>
-                                  </>
+                                  </div>
                                 )}
                               </div>
                             </td>
