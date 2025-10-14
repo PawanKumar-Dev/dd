@@ -15,8 +15,21 @@ export async function GET(request: NextRequest) {
     // Connect to database
     await connectDB();
 
-    // Fetch all orders with user details (excluding soft-deleted)
-    const orders = await Order.find({ isDeleted: { $ne: true } })
+    // Get query parameters
+    const { searchParams } = new URL(request.url);
+    const archived = searchParams.get("archived");
+
+    let query = {};
+    if (archived === "true") {
+      // Fetch only archived orders
+      query = { isDeleted: true };
+    } else {
+      // Fetch only active orders (default behavior)
+      query = { isDeleted: { $ne: true } };
+    }
+
+    // Fetch orders with user details
+    const orders = await Order.find(query)
       .sort({ createdAt: -1 })
       .limit(100) // Limit to last 100 orders
       .populate("userId", "firstName lastName email", User);
