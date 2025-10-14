@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     const testingMode = request.headers.get("x-testing-mode") === "true";
 
     // Get renewal pricing
-    const pricingResult = await ResellerClubWrapper.getRenewalPricing(
+    const pricingResult = await (ResellerClubWrapper as any).getRenewalPricing(
       domainName,
       years,
       testingMode
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get domain expiry date
-    const expiryResult = await ResellerClubWrapper.getDomainExpiry(
+    const expiryResult = await (ResellerClubWrapper as any).getDomainExpiry(
       domainName,
       testingMode
     );
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
     const testingMode = request.headers.get("x-testing-mode") === "true";
 
     // Renew domain
-    const result = await ResellerClubWrapper.renewDomain(
+    const result = await (ResellerClubWrapper as any).renewDomain(
       domainName,
       years,
       testingMode

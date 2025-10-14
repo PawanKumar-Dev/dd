@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const domain = order.domains.find((d) => d.domainName === domainName);
+    const domain = order.domains.find((d: any) => d.domainName === domainName);
 
     if (!domain || !domain.resellerClubCustomerId) {
       return NextResponse.json(
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const domain = order.domains.find((d) => d.domainName === domainName);
+    const domain = order.domains.find((d: any) => d.domainName === domainName);
 
     if (!domain || !domain.resellerClubCustomerId) {
       return NextResponse.json(

@@ -261,7 +261,7 @@ export async function POST(request: NextRequest) {
           `👤 [PAYMENT-VERIFY] Creating/verifying customer account for: ${user.email}`
         );
         domainBookingStatus.push({
-          step: "customer_created" as const,
+          step: "customer_created" as any,
           message: "Setting up your account",
           timestamp: new Date(),
           progress: 40,

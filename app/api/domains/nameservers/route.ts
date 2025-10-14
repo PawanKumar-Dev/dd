@@ -4,15 +4,15 @@ import { promisify } from "util";
 import dns from "dns";
 
 export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const domainName = searchParams.get("domainName");
+  
   try {
     // Check authentication
     const user = await AuthService.getUserFromRequest(request);
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    const { searchParams } = new URL(request.url);
-    const domainName = searchParams.get("domainName");
 
     if (!domainName) {
       return NextResponse.json(
@@ -96,7 +96,7 @@ export async function GET(request: NextRequest) {
           }
         }
       } catch (bootstrapError) {
-        console.log(`⚠️ [RDAP] Bootstrap failed: ${bootstrapError.message}`);
+        console.log(`⚠️ [RDAP] Bootstrap failed: ${(bootstrapError as any).message}`);
       }
 
       // Fallback to direct RDAP servers if bootstrap fails
@@ -126,7 +126,7 @@ export async function GET(request: NextRequest) {
             }
           } catch (serverError) {
             console.log(
-              `⚠️ [RDAP] Server ${server} failed: ${serverError.message}`
+              `⚠️ [RDAP] Server ${server} failed: ${(serverError as any).message}`
             );
             continue;
           }
@@ -171,7 +171,7 @@ export async function GET(request: NextRequest) {
         throw new Error("No RDAP server responded successfully");
       }
     } catch (rdapError) {
-      console.log(`⚠️ [RDAP] Failed: ${rdapError.message}`);
+      console.log(`⚠️ [RDAP] Failed: ${(rdapError as any).message}`);
 
       // Method 2: Try DNS lookup as fallback
       try {
@@ -195,17 +195,17 @@ export async function GET(request: NextRequest) {
           status: "Unknown",
         };
       } catch (dnsError) {
-        console.error(`❌ [DNS] Also failed: ${dnsError.message}`);
+        console.error(`❌ [DNS] Also failed: ${(dnsError as any).message}`);
 
         // All lookup methods failed - throw error
         throw new Error(
-          `Unable to retrieve nameserver information for ${domainName}. Both RDAP and DNS lookups failed: RDAP (${rdapError.message}), DNS (${dnsError.message})`
+          `Unable to retrieve nameserver information for ${domainName}. Both RDAP and DNS lookups failed: RDAP (${(rdapError as any).message}), DNS (${(dnsError as any).message})`
         );
       }
     }
 
     // Clean up nameservers
-    nameservers = [...new Set(nameservers)]
+    nameservers = Array.from(new Set(nameservers))
       .map((ns) => ns.toLowerCase().trim())
       .filter((ns) => {
         return (
