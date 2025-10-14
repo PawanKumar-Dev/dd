@@ -134,7 +134,7 @@ export default function LoginForm({ className = '' }: LoginFormProps) {
                 for assistance.
               </div>
             </div>,
-            { duration: 8000 }
+            { duration: Infinity }
           );
         } else {
           toast.error(data.error || 'Login failed');
