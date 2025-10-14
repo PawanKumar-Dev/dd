@@ -220,8 +220,9 @@ export default function AdminOrdersPage() {
         const data = await response.json();
         toast.success(`Order ${data.deletedOrderId} archived successfully!`);
 
-        // Remove the order from the local state
+        // Remove the order from active orders and add to archived orders
         setOrders(orders.filter(order => order._id !== orderToDelete._id));
+        setArchivedOrders([orderToDelete, ...archivedOrders]);
 
         // Close the modal
         setIsDeleteModalOpen(false);
