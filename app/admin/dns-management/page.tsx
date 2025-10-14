@@ -819,37 +819,37 @@ export default function AdminDNSManagementPage() {
                                 </td>
                                 <td className="px-2 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium">
                                   {isEditing ? (
-                                    <div className="flex items-center space-x-2">
+                                    <div className="flex items-center space-x-3">
                                       <button
                                         onClick={handleSaveEdit}
-                                        className="text-green-600 hover:text-green-900"
+                                        className="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-all duration-200 group"
                                         title="Save changes"
                                       >
-                                        <Save className="h-3 w-3 sm:h-4 sm:w-4" />
+                                        <Save className="h-5 w-5" />
                                       </button>
                                       <button
                                         onClick={handleCancelEdit}
-                                        className="text-gray-600 hover:text-gray-900"
+                                        className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-all duration-200 group"
                                         title="Cancel editing"
                                       >
-                                        <X className="h-3 w-3 sm:h-4 sm:w-4" />
+                                        <X className="h-5 w-5" />
                                       </button>
                                     </div>
                                   ) : (
-                                    <div className="flex items-center space-x-2">
+                                    <div className="flex items-center space-x-3">
                                       <button
                                         onClick={() => handleEditRecord(record)}
-                                        className="text-blue-600 hover:text-blue-900"
+                                        className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-all duration-200 group"
                                         title="Edit record"
                                       >
-                                        <Edit3 className="h-3 w-3 sm:h-4 sm:w-4" />
+                                        <Edit3 className="h-5 w-5" />
                                       </button>
                                       <button
                                         onClick={() => handleDeleteRecord(record.id)}
-                                        className="text-red-600 hover:text-red-900"
+                                        className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-all duration-200 group"
                                         title="Delete record"
                                       >
-                                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                                        <Trash2 className="h-5 w-5" />
                                       </button>
                                     </div>
                                   )}
