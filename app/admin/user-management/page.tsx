@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Filter, MoreVertical, Trash2, Eye, RefreshCw, Key, UserCheck } from 'lucide-react';
+import { Search, Filter, MoreVertical, Trash2, Eye, RefreshCw, Key, UserCheck, XCircle, CheckCircle } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayoutNew';
 import AdminDataTable from '@/components/admin/AdminDataTable';
 import Modal from '@/components/Modal';
@@ -32,6 +32,12 @@ export default function AdminUsers() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isResettingPassword, setIsResettingPassword] = useState(false);
   const [sendEmailNotification, setSendEmailNotification] = useState(true);
+  const [isDeactivateModalOpen, setIsDeactivateModalOpen] = useState(false);
+  const [isReactivateModalOpen, setIsReactivateModalOpen] = useState(false);
+  const [userToDeactivate, setUserToDeactivate] = useState<User | null>(null);
+  const [userToReactivate, setUserToReactivate] = useState<User | null>(null);
+  const [isDeactivating, setIsDeactivating] = useState(false);
+  const [isReactivating, setIsReactivating] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -215,21 +221,18 @@ export default function AdminUsers() {
   };
 
 
-  const handleDeleteUser = async (userId: string) => {
-    if (!confirm('Are you sure you want to deactivate this user? They will not be able to log in but their data will be preserved.')) {
-      return;
-    }
+  const handleDeleteUser = (user: User) => {
+    setUserToDeactivate(user);
+    setIsDeactivateModalOpen(true);
+  };
+
+  const confirmDeactivateUser = async () => {
+    if (!userToDeactivate) return;
 
     try {
-      // Get token
-      const getCookieValue = (name: string) => {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop()?.split(';').shift();
-        return null;
-      };
-
-      const token = getCookieValue('token') || localStorage.getItem('token');
+      setIsDeactivating(true);
+      const token = localStorage.getItem('token');
+      if (!token) return;
 
       const response = await fetch('/api/admin/users', {
         method: 'DELETE',
@@ -237,38 +240,45 @@ export default function AdminUsers() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ userId }),
+        body: JSON.stringify({ userId: userToDeactivate._id }),
       });
 
       if (response.ok) {
-        // Reload users to reflect changes
-        loadUsers();
-        alert('User deactivated successfully');
+        // Remove the user from active users and add to deactivated users
+        setUsers(users.filter(user => user._id !== userToDeactivate._id));
+        setDeactivatedUsers([userToDeactivate, ...deactivatedUsers]);
+
+        // Close the modal
+        setIsDeactivateModalOpen(false);
+        setUserToDeactivate(null);
       } else {
         const error = await response.json();
-        alert(`Failed to deactivate user: ${error.message || 'Unknown error'}`);
+        console.error('Failed to deactivate user:', error);
       }
     } catch (error) {
-      console.error('Error deleting user:', error);
-      alert('Failed to deactivate user');
+      console.error('Error deactivating user:', error);
+    } finally {
+      setIsDeactivating(false);
     }
   };
 
-  const handleReactivateUser = async (userId: string) => {
-    if (!confirm('Are you sure you want to reactivate this user? They will be able to log in again.')) {
-      return;
-    }
+  const cancelDeactivateUser = () => {
+    setIsDeactivateModalOpen(false);
+    setUserToDeactivate(null);
+  };
+
+  const handleReactivateUser = (user: User) => {
+    setUserToReactivate(user);
+    setIsReactivateModalOpen(true);
+  };
+
+  const confirmReactivateUser = async () => {
+    if (!userToReactivate) return;
 
     try {
-      // Get token
-      const getCookieValue = (name: string) => {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop()?.split(';').shift();
-        return null;
-      };
-
-      const token = getCookieValue('token') || localStorage.getItem('token');
+      setIsReactivating(true);
+      const token = localStorage.getItem('token');
+      if (!token) return;
 
       const response = await fetch('/api/admin/users/reactivate', {
         method: 'POST',
@@ -276,21 +286,31 @@ export default function AdminUsers() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ userId }),
+        body: JSON.stringify({ userId: userToReactivate._id }),
       });
 
       if (response.ok) {
-        // Reload users to reflect changes
-        loadUsers();
-        alert('User reactivated successfully');
+        // Remove the user from deactivated users and add to active users
+        setDeactivatedUsers(deactivatedUsers.filter(user => user._id !== userToReactivate._id));
+        setUsers([userToReactivate, ...users]);
+
+        // Close the modal
+        setIsReactivateModalOpen(false);
+        setUserToReactivate(null);
       } else {
         const error = await response.json();
-        alert(`Failed to reactivate user: ${error.message || 'Unknown error'}`);
+        console.error('Failed to reactivate user:', error);
       }
     } catch (error) {
       console.error('Error reactivating user:', error);
-      alert('Failed to reactivate user');
+    } finally {
+      setIsReactivating(false);
     }
+  };
+
+  const cancelReactivateUser = () => {
+    setIsReactivateModalOpen(false);
+    setUserToReactivate(null);
   };
 
   const activeColumns = [
@@ -371,7 +391,7 @@ export default function AdminUsers() {
             <span className="sr-only">Reset Password</span>
           </button>
           <button
-            onClick={() => handleDeleteUser(row._id)}
+            onClick={() => handleDeleteUser(row)}
             className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 group"
             title="Deactivate user account (preserves all data)"
           >
@@ -452,7 +472,7 @@ export default function AdminUsers() {
             <span className="sr-only">View User Details</span>
           </button>
           <button
-            onClick={() => handleReactivateUser(row._id)}
+            onClick={() => handleReactivateUser(row)}
             className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all duration-200 group"
             title="Reactivate user account (restore login access)"
           >
@@ -504,8 +524,8 @@ export default function AdminUsers() {
               <button
                 onClick={() => setActiveTab('active')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'active'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
               >
                 Active Users ({users.length})
@@ -513,8 +533,8 @@ export default function AdminUsers() {
               <button
                 onClick={() => setActiveTab('deactivated')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'deactivated'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
               >
                 Deactivated Users ({deactivatedUsers.length})
@@ -699,6 +719,138 @@ export default function AdminUsers() {
           </div>
         )}
       </Modal>
+
+      {/* Deactivate User Confirmation Modal */}
+      {isDeactivateModalOpen && userToDeactivate && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center mb-4">
+                <div className="flex-shrink-0">
+                  <XCircle className="h-6 w-6 text-red-600" />
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-lg font-medium text-gray-900">
+                    Deactivate User
+                  </h3>
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <p className="text-gray-700 mb-2">
+                  Are you sure you want to deactivate this user? They will not be able to log in but their data will be preserved.
+                </p>
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <div className="text-sm">
+                    <div className="font-medium text-gray-900">
+                      {userToDeactivate.firstName} {userToDeactivate.lastName}
+                    </div>
+                    <div className="text-gray-600">
+                      {userToDeactivate.email}
+                    </div>
+                    <div className="text-gray-600">
+                      Role: {userToDeactivate.role}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={cancelDeactivateUser}
+                  disabled={isDeactivating}
+                  className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDeactivateUser}
+                  disabled={isDeactivating}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center"
+                >
+                  {isDeactivating ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Deactivating...
+                    </>
+                  ) : (
+                    <>
+                      <XCircle className="h-4 w-4 mr-2" />
+                      Deactivate User
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reactivate User Confirmation Modal */}
+      {isReactivateModalOpen && userToReactivate && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center mb-4">
+                <div className="flex-shrink-0">
+                  <CheckCircle className="h-6 w-6 text-green-600" />
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-lg font-medium text-gray-900">
+                    Reactivate User
+                  </h3>
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <p className="text-gray-700 mb-2">
+                  Are you sure you want to reactivate this user? They will be able to log in again.
+                </p>
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <div className="text-sm">
+                    <div className="font-medium text-gray-900">
+                      {userToReactivate.firstName} {userToReactivate.lastName}
+                    </div>
+                    <div className="text-gray-600">
+                      {userToReactivate.email}
+                    </div>
+                    <div className="text-gray-600">
+                      Role: {userToReactivate.role}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={cancelReactivateUser}
+                  disabled={isReactivating}
+                  className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmReactivateUser}
+                  disabled={isReactivating}
+                  className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center"
+                >
+                  {isReactivating ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Reactivating...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Reactivate User
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }
