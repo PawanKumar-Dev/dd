@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { motion } from 'framer-motion';
 import {
   Globe, ShoppingCart, TrendingUp, Clock, CheckCircle,
@@ -13,6 +14,7 @@ import { useCartStore } from '@/store/cartStore';
 import UserLayout from '@/components/user/UserLayout';
 import { PageLoading, DataLoading } from '@/components/user/LoadingComponents';
 import ClientOnly from '@/components/ClientOnly';
+import { syncAuthWithLocalStorage } from '@/lib/auth-sync';
 
 interface User {
   id: string;
@@ -33,6 +35,7 @@ interface DashboardStats {
 
 
 export default function UserDashboard() {
+  const { data: session, status } = useSession();
   const [user, setUser] = useState<User | null>(null);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -40,25 +43,43 @@ export default function UserDashboard() {
   const { items: cartItems } = useCartStore();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
+    const initializeAuth = async () => {
+      if (status === 'loading') return;
 
-    if (!token || !userData) {
-      router.push('/login');
-      return;
-    }
+      // Check for NextAuth session first
+      if (session?.user) {
+        // Sync NextAuth session with localStorage
+        const syncedUser = await syncAuthWithLocalStorage();
+        if (syncedUser) {
+          setUser(syncedUser);
+          loadDashboardData(syncedUser);
+          return;
+        }
+      }
 
-    const userObj = JSON.parse(userData);
+      // Fallback to localStorage (for existing users)
+      const token = localStorage.getItem('token');
+      const userData = localStorage.getItem('user');
 
-    // Redirect admin users to admin dashboard
-    if (userObj.role === 'admin') {
-      router.push('/admin/dashboard');
-      return;
-    }
+      if (!token || !userData) {
+        router.push('/login');
+        return;
+      }
 
-    setUser(userObj);
-    loadDashboardData(userObj);
-  }, [router]);
+      const userObj = JSON.parse(userData);
+
+      // Redirect admin users to admin dashboard
+      if (userObj.role === 'admin') {
+        router.push('/admin/dashboard');
+        return;
+      }
+
+      setUser(userObj);
+      loadDashboardData(userObj);
+    };
+
+    initializeAuth();
+  }, [session, status, router]);
 
 
   const loadDashboardData = async (userObj?: User) => {

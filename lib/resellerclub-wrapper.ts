@@ -45,13 +45,15 @@ export class ResellerClubWrapper {
     console.log(
       `🌐 [PRODUCTION] ResellerClub Wrapper: Initiating domain registration for "${domainName}"`
     );
-    return ResellerClubAPI.registerDomain(
+    return ResellerClubAPI.registerDomain({
       domainName,
       years,
       customerId,
       nameServers,
-      contacts
-    );
+      adminContactId: contacts?.admin,
+      techContactId: contacts?.tech,
+      billingContactId: contacts?.billing,
+    });
   }
 
   /**

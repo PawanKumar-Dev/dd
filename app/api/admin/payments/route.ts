@@ -64,7 +64,9 @@ export async function GET(request: NextRequest) {
     });
 
     // Get all unique email addresses from payments to look up users
-    const uniqueEmails = [...new Set(allDomainPayments.map((p) => p.email))];
+    const uniqueEmails = Array.from(
+      new Set(allDomainPayments.map((p) => p.email))
+    );
     const usersByEmail = await User.find({
       email: { $in: uniqueEmails },
     }).select("email firstName lastName");

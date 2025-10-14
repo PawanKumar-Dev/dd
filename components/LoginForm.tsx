@@ -7,6 +7,7 @@ import Button from './Button';
 import Input from './Input';
 import Card from './Card';
 import Logo from './Logo';
+import SocialLoginButtons from './SocialLoginButtons';
 import toast from 'react-hot-toast';
 import { showSuccessToast, showErrorToast, showAccountDeactivated } from '@/lib/toast';
 
@@ -238,6 +239,20 @@ export default function LoginForm({ className = '' }: LoginFormProps) {
             >
               {isLoading ? 'Signing in...' : 'Sign in'}
             </Button>
+
+            <SocialLoginButtons
+              onSuccess={() => {
+                // Redirect to dashboard after successful social login
+                setTimeout(() => {
+                  const urlParams = new URLSearchParams(window.location.search);
+                  const returnUrl = urlParams.get('returnUrl');
+                  router.push(returnUrl || '/dashboard');
+                }, 100);
+              }}
+              onError={(error) => {
+                console.error('Social login error:', error);
+              }}
+            />
           </form>
         </Card>
       </div>

@@ -1,0 +1,149 @@
+import { NextAuthOptions } from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
+import FacebookProvider from "next-auth/providers/facebook";
+import CredentialsProvider from "next-auth/providers/credentials";
+import connectDB from "@/lib/mongodb";
+import User from "@/models/User";
+import bcrypt from "bcryptjs";
+
+export const authOptions: NextAuthOptions = {
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+    FacebookProvider({
+      clientId: process.env.FACEBOOK_CLIENT_ID!,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET!,
+    }),
+    CredentialsProvider({
+      name: "credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          return null;
+        }
+
+        await connectDB();
+
+        const user = await User.findOne({ email: credentials.email });
+        if (!user) {
+          return null;
+        }
+
+        // Check if user is active and activated
+        if (!user.isActive || !user.isActivated) {
+          return null;
+        }
+
+        // Check if user is admin (prevent admin login through social auth)
+        if (user.role === "admin") {
+          return null;
+        }
+
+        const isPasswordValid = await user.comparePassword(
+          credentials.password
+        );
+        if (!isPasswordValid) {
+          return null;
+        }
+
+        return {
+          id: user._id.toString(),
+          email: user.email,
+          name: `${user.firstName} ${user.lastName}`,
+          role: user.role,
+        };
+      },
+    }),
+  ],
+  callbacks: {
+    async signIn({ user, account, profile }) {
+      // Prevent admin users from using social login
+      if (account?.provider === "google" || account?.provider === "facebook") {
+        await connectDB();
+
+        // Check if this email belongs to an admin user
+        const existingUser = await User.findOne({
+          email: user.email,
+          role: "admin",
+        });
+
+        if (existingUser) {
+          return false; // Block admin users from social login
+        }
+      }
+
+      return true;
+    },
+    async jwt({ token, user, account, profile }) {
+      if (user && account) {
+        await connectDB();
+
+        // Handle social login user creation/update
+        if (account.provider === "google" || account.provider === "facebook") {
+          let dbUser = await User.findOne({ email: user.email });
+
+          if (!dbUser) {
+            // Create new user from social login
+            const nameParts = user.name?.split(" ") || ["", ""];
+            const firstName = nameParts[0] || "";
+            const lastName = nameParts.slice(1).join(" ") || "";
+
+            dbUser = new User({
+              email: user.email,
+              firstName,
+              lastName,
+              provider: account.provider,
+              providerId: account.providerAccountId,
+              role: "user",
+              isActive: true,
+              isActivated: true, // Social login users are auto-activated
+              profileCompleted: false, // They need to complete profile for checkout
+            });
+
+            await dbUser.save();
+          } else {
+            // Update existing user with social login info if needed
+            if (!dbUser.provider) {
+              dbUser.provider = account.provider;
+              dbUser.providerId = account.providerAccountId;
+              dbUser.isActivated = true; // Auto-activate if they had an account
+              await dbUser.save();
+            }
+          }
+
+          token.role = dbUser.role;
+          token.id = dbUser._id.toString();
+          token.profileCompleted = dbUser.profileCompleted;
+        } else if (user) {
+          // Regular credential login
+          token.role = (user as any).role;
+          token.id = (user as any).id;
+        }
+      }
+
+      return token;
+    },
+    async session({ session, token }) {
+      if (token && session.user) {
+        (session.user as any).id = token.id as string;
+        (session.user as any).role = token.role as string;
+        (session.user as any).profileCompleted =
+          token.profileCompleted as boolean;
+      }
+      return session;
+    },
+  },
+  pages: {
+    signIn: "/login",
+    error: "/login",
+  },
+  session: {
+    strategy: "jwt",
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+};

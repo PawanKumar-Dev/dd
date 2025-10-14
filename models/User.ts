@@ -3,13 +3,14 @@ import bcrypt from "bcryptjs";
 
 export interface IUser extends Document {
   email: string;
-  password: string;
+  password?: string; // Made optional for social login users
   firstName: string;
   lastName: string;
-  phone: string;
-  phoneCc: string;
-  companyName: string;
-  address: {
+  phone?: string; // Made optional for social login users
+  phoneCc?: string; // Made optional for social login users
+  companyName?: string; // Made optional for social login users
+  address?: {
+    // Made optional for social login users
     line1: string;
     city: string;
     state: string;
@@ -25,6 +26,10 @@ export interface IUser extends Document {
   activationTokenExpiry?: Date;
   resetToken?: string;
   resetTokenExpiry?: Date;
+  // Social login fields
+  provider?: string; // 'google', 'facebook', 'credentials'
+  providerId?: string; // Social provider user ID
+  profileCompleted?: boolean; // Track if user has completed profile setup
   cart?: Array<{
     domainName: string;
     price: number;
@@ -45,7 +50,9 @@ const UserSchema = new Schema<IUser>(
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
+      required: function () {
+        return !this.provider || this.provider === "credentials";
+      },
       minlength: 6,
     },
     firstName: {
@@ -60,44 +67,36 @@ const UserSchema = new Schema<IUser>(
     },
     phone: {
       type: String,
-      required: [true, "Phone number is required"],
       trim: true,
     },
     phoneCc: {
       type: String,
-      required: [true, "Phone country code is required"],
       trim: true,
     },
     companyName: {
       type: String,
-      required: [true, "Company name is required"],
       trim: true,
     },
     address: {
       line1: {
         type: String,
-        required: [true, "Address line 1 is required"],
         trim: true,
       },
       city: {
         type: String,
-        required: [true, "City is required"],
         trim: true,
       },
       state: {
         type: String,
-        required: [true, "State is required"],
         trim: true,
       },
       country: {
         type: String,
-        required: [true, "Country is required"],
         trim: true,
         default: "IN",
       },
       zipcode: {
         type: String,
-        required: [true, "ZIP code is required"],
         trim: true,
       },
     },
@@ -111,6 +110,19 @@ const UserSchema = new Schema<IUser>(
       default: true,
     },
     isActivated: {
+      type: Boolean,
+      default: false,
+    },
+    // Social login fields
+    provider: {
+      type: String,
+      enum: ["google", "facebook", "credentials"],
+      default: "credentials",
+    },
+    providerId: {
+      type: String,
+    },
+    profileCompleted: {
       type: Boolean,
       default: false,
     },
@@ -159,23 +171,37 @@ const UserSchema = new Schema<IUser>(
   }
 );
 
-// Hash password before saving
+// Hash password before saving (only for credential-based users)
 UserSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+  if (!this.isModified("password") || !this.password) return next();
 
-  try {
-    const salt = await bcrypt.genSalt(12);
-    this.password = await bcrypt.hash(this.password, salt);
+  // Only hash password for credential-based users
+  if (this.provider === "credentials" || !this.provider) {
+    try {
+      const salt = await bcrypt.genSalt(12);
+      this.password = await bcrypt.hash(this.password, salt);
+      next();
+    } catch (error: any) {
+      next(error);
+    }
+  } else {
     next();
-  } catch (error: any) {
-    next(error);
   }
 });
 
-// Compare password method
+// Compare password method (only for credential-based users)
 UserSchema.methods.comparePassword = async function (
   candidatePassword: string
 ): Promise<boolean> {
+  // Social login users don't have passwords
+  if (this.provider && this.provider !== "credentials") {
+    return false;
+  }
+
+  if (!this.password) {
+    return false;
+  }
+
   return bcrypt.compare(candidatePassword, this.password);
 };
 

@@ -48,6 +48,12 @@ export default function CheckoutPage() {
       return;
     }
 
+    // Check if user has completed profile (required for checkout)
+    if (!userObj.profileCompleted) {
+      router.push(`/complete-profile?returnUrl=${encodeURIComponent('/checkout')}`);
+      return;
+    }
+
     setUser(userObj);
 
     // Sync cart with server

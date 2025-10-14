@@ -1,9 +1,16 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
 
 export async function middleware(request: NextRequest) {
-  const token = request.cookies.get("token")?.value;
   const pathname = request.nextUrl.pathname;
+
+  // Get token from both NextAuth and custom JWT
+  const nextAuthToken = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
+  const customToken = request.cookies.get("token")?.value;
 
   // Public routes that don't require authentication
   const publicRoutes = [
@@ -13,6 +20,7 @@ export async function middleware(request: NextRequest) {
     "/about",
     "/contact",
     "/reset-password",
+    "/complete-profile",
   ];
 
   // Admin routes
@@ -32,26 +40,31 @@ export async function middleware(request: NextRequest) {
 
   // Check if the current path requires authentication
   if (protectedRoutes.includes(pathname) || adminRoutes.includes(pathname)) {
-    if (!token) {
+    // Check for either NextAuth token or custom token
+    if (!nextAuthToken && !customToken) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
   }
 
   // Check if admin routes require admin role
-  if (adminRoutes.includes(pathname)) {
-    // For admin pages, just check if token exists
-    // The page itself will handle role verification
-    if (!token) {
+  if (adminRoutes.includes(pathname) || pathname.startsWith("/admin")) {
+    // For admin pages, check if user is admin
+    if (!customToken) {
       return NextResponse.redirect(new URL("/login", request.url));
+    }
+
+    // Additional check: prevent social login users from accessing admin
+    if (nextAuthToken && !customToken) {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
     }
   }
 
-  // Protect admin API routes - simplified check
+  // Protect admin API routes
   if (pathname.startsWith("/api/admin/")) {
-    if (!token) {
+    if (!customToken) {
       return NextResponse.json(
         {
-          error: "Access denied. Authentication required.",
+          error: "Access denied. Admin authentication required.",
           code: "ADMIN_ACCESS_DENIED",
         },
         { status: 401 }
