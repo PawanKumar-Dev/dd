@@ -125,6 +125,10 @@ export async function verifyUserAuth(
       return {
         valid: false,
         error: "Account is deactivated",
+        message:
+          "Your account has been deactivated. Please contact our support team at support@exceltechnologies.in for assistance.",
+        supportEmail: "support@exceltechnologies.in",
+        isDeactivated: true,
       };
     }
 
