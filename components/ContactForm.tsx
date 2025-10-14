@@ -7,6 +7,7 @@ import Input from './Input';
 import Textarea from './Textarea';
 import Card from './Card';
 import toast from 'react-hot-toast';
+import { showSuccessToast, showErrorToast } from '@/lib/toast';
 
 interface ContactFormProps {
   className?: string;
@@ -39,13 +40,13 @@ export default function ContactForm({ className = '' }: ContactFormProps) {
 
       if (response.ok) {
         setIsSubmitted(true);
-        toast.success('Message sent successfully!');
+        showSuccessToast('Message sent successfully!');
         setFormData({ name: '', email: '', subject: '', message: '' });
       } else {
-        toast.error(data.error || 'Failed to send message');
+        showErrorToast(data.error || 'Failed to send message');
       }
     } catch (error) {
-      toast.error('An error occurred. Please try again.');
+      showErrorToast('An error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

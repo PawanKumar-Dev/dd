@@ -168,8 +168,8 @@ export async function POST(request: NextRequest) {
       .toString(36)
       .substring(2, 8)}`;
 
-    // Calculate total amount
-    const totalAmount = cartItems.reduce(
+    // Calculate total amount for registration
+    const registrationTotalAmount = cartItems.reduce(
       (total, item) => total + item.price * item.registrationPeriod,
       0
     );
@@ -447,7 +447,7 @@ export async function POST(request: NextRequest) {
       razorpayOrderId: razorpay_order_id,
       razorpayPaymentId: razorpay_payment_id,
       razorpaySignature: razorpay_signature,
-      amount: totalAmount,
+      amount: registrationTotalAmount,
       currency: "INR",
       status: orderStatus,
       domains: orderDomains,
