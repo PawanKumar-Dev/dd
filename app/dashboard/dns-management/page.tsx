@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
   Globe, Plus, Edit3, Trash2, Save, X, RefreshCw, Server,
-  AlertCircle, CheckCircle, Clock, Settings, ExternalLink,
+  AlertCircle, Clock, Settings, ExternalLink,
   Database
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -542,76 +542,12 @@ export default function DNSManagementPage() {
               </div>
             </div>
 
-            {/* Stats Cards - Matching Dashboard Style */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
-              >
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="p-3 rounded-lg bg-blue-100">
-                      <Globe className="h-6 w-6 text-blue-600" />
-                    </div>
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Total Domains</p>
-                    <p className="text-2xl font-bold text-gray-900">{domains.length}</p>
-                    <p className="text-xs text-gray-500 mt-1">Available for management</p>
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
-              >
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="p-3 rounded-lg bg-green-100">
-                      <CheckCircle className="h-6 w-6 text-green-600" />
-                    </div>
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Active Domains</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {domains.filter(d => d.status === 'active').length}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">Ready for DNS management</p>
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
-              >
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="p-3 rounded-lg bg-purple-100">
-                      <Server className="h-6 w-6 text-purple-600" />
-                    </div>
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">DNS Records</p>
-                    <p className="text-2xl font-bold text-gray-900">{dnsRecords.length}</p>
-                    <p className="text-xs text-gray-500 mt-1">For selected domain</p>
-                  </div>
-                </div>
-              </motion.div>
-            </div>
 
             {/* Domain Selection - Matching Dashboard Style */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
+              transition={{ delay: 0.1 }}
               className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8"
             >
               <div className="flex items-center justify-between mb-4">
@@ -755,7 +691,7 @@ export default function DNSManagementPage() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
+                transition={{ delay: 0.2 }}
                 className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
               >
                 <div className="flex items-center justify-between mb-6">
@@ -1222,7 +1158,7 @@ export default function DNSManagementPage() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
+                transition={{ delay: 0.3 }}
                 className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center"
               >
                 <Globe className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -1235,7 +1171,7 @@ export default function DNSManagementPage() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
+                transition={{ delay: 0.3 }}
                 className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center"
               >
                 <Globe className="h-12 w-12 text-gray-400 mx-auto mb-4" />
