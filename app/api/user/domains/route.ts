@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     const domainMap = new Map();
 
     orders.forEach((order) => {
-      order.domains.forEach((domain) => {
+      order.domains.forEach((domain: any) => {
         const domainKey = domain.domainName;
 
         // Only add if not already processed or if this is a more recent status

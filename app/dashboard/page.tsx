@@ -87,6 +87,7 @@ export default function UserDashboard() {
             activeDomains: 0,
             totalOrders: 0,
             recentOrders: [],
+            recentDomains: [],
             upcomingRenewals: []
           });
         }
@@ -99,8 +100,9 @@ export default function UserDashboard() {
           totalOrders: 0,
           totalSpent: 0,
           recentOrders: [],
+          recentDomains: [],
           upcomingRenewals: []
-        });
+        } as any);
       }
     } catch (error) {
       console.error('Error loading dashboard data:', error);

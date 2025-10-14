@@ -30,14 +30,15 @@ export async function GET(request: NextRequest) {
     const activeDomains = orders.reduce(
       (sum, order) =>
         sum +
-        order.domains.filter((domain) => domain.status === "registered").length,
+        order.domains.filter((domain: any) => domain.status === "registered")
+          .length,
       0
     );
     const pendingDomains = orders.reduce(
       (sum, order) =>
         sum +
         order.domains.filter(
-          (domain) =>
+          (domain: any) =>
             domain.status === "pending" || domain.status === "processing"
         ).length,
       0
@@ -56,7 +57,7 @@ export async function GET(request: NextRequest) {
     // Get recent domains (from all orders, sorted by registration date)
     const recentDomains = orders
       .flatMap((order) =>
-        order.domains.map((domain) => ({
+        order.domains.map((domain: any) => ({
           name: domain.domainName,
           status: domain.status,
           registeredDate: new Date(order.createdAt).toLocaleDateString(),
@@ -77,9 +78,9 @@ export async function GET(request: NextRequest) {
       .flatMap((order) =>
         order.domains
           .filter(
-            (domain) => domain.status === "registered" && domain.expiresAt
+            (domain: any) => domain.status === "registered" && domain.expiresAt
           )
-          .map((domain) => {
+          .map((domain: any) => {
             const daysLeft = Math.ceil(
               (new Date(domain.expiresAt).getTime() - new Date().getTime()) /
                 (1000 * 60 * 60 * 24)

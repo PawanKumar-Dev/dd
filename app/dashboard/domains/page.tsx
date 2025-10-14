@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
-  Globe, Search, Plus, RefreshCw, Shield, Clock, Loader2
+  Globe, Search, Plus, RefreshCw, Shield, Clock, Loader2, CheckCircle, AlertTriangle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import UserLayout from '@/components/user/UserLayout';
@@ -187,7 +187,7 @@ export default function UserDomains() {
               </div>
               <div className="flex space-x-3">
                 <button
-                  onClick={loadDomains}
+                  onClick={() => loadDomains()}
                   className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   <RefreshCw className="h-4 w-4 mr-2" />

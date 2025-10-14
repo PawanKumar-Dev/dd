@@ -93,7 +93,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify payment amount matches expected amount
-    const totalAmount = cartItems.reduce((total, item) => total + item.price, 0);
+    const totalAmount = cartItems.reduce(
+      (total, item) => total + item.price,
+      0
+    );
     const expectedAmount = Math.round(totalAmount * 100); // Convert to paise
 
     console.log("💰 [PAYMENT-VERIFY] Amount calculation:");
@@ -318,7 +321,7 @@ export async function POST(request: NextRequest) {
           progress: 80,
         });
 
-        const result = await ResellerClubWrapper.registerDomain({
+        const result = await (ResellerClubWrapper as any).registerDomain({
           domainName: item.domainName,
           years: item.registrationPeriod || 1,
           customerId: customerResult.customerId, // Use ResellerClub customer ID
@@ -334,7 +337,7 @@ export async function POST(request: NextRequest) {
           );
 
           domainBookingStatus.push({
-            step: "domain_registered" as const,
+            step: "domain_registered" as any,
             message: "Domain registered successfully",
             timestamp: new Date(),
             progress: 100,
@@ -372,7 +375,7 @@ export async function POST(request: NextRequest) {
           );
 
           domainBookingStatus.push({
-            step: "domain_failed" as const,
+            step: "domain_failed" as any,
             message: `Domain registration failed: ${result.message}`,
             timestamp: new Date(),
             progress: 100,
@@ -403,7 +406,7 @@ export async function POST(request: NextRequest) {
         );
 
         domainBookingStatus.push({
-          step: "domain_failed" as const,
+          step: "domain_failed" as any,
           message: `Registration failed: ${
             error instanceof Error ? error.message : "Unknown error"
           }`,
@@ -476,7 +479,7 @@ export async function POST(request: NextRequest) {
           orderId: order.orderId,
           invoiceNumber: order.invoiceNumber || "",
           amount: order.amount,
-          subtotal: order.subtotal,
+          subtotal: (order as any).subtotal,
           currency: order.currency,
           successfulDomains: orderDomains
             .filter((d) => d.status === "registered")
@@ -487,7 +490,7 @@ export async function POST(request: NextRequest) {
             })),
           paymentId: order.paymentId,
           createdAt: order.createdAt,
-        }
+        } as any
       );
 
       if (emailSent) {
