@@ -26,6 +26,7 @@ import { useRouter } from 'next/navigation';
 import { Search, Loader2, CheckCircle, XCircle, Globe, ShoppingCart, Star, TrendingUp, Zap, AlertTriangle } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import toast from 'react-hot-toast';
+import { showSuccessToast, showErrorToast } from '@/lib/toast';
 import Button from './Button';
 import DomainRequirementsModal from './DomainRequirementsModal';
 import { getDomainRequirements, requiresAdditionalDetails, isDomainSupported } from '@/lib/domainRequirements';
@@ -277,7 +278,7 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
 
       // Check if domain is supported
       if (!isDomainSupported(result.domainName)) {
-        toast.error(`${result.domainName} requires additional verification. Please contact support.`);
+        showErrorToast(`${result.domainName} requires additional verification. Please contact support.`);
         return;
       }
 
@@ -288,14 +289,14 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
         registrationPeriod: result.registrationPeriod || 1,
       };
       addItem(cartItem);
-      toast.success(`${result.domainName} added to cart`);
+      showSuccessToast(`${result.domainName} added to cart`);
 
       // Redirect to cart page after adding to cart
       setTimeout(() => {
         router.push('/cart');
       }, 1000); // Small delay to show the success toast
     } else {
-      toast.error('Cannot add to cart - missing required data');
+      showErrorToast('Cannot add to cart - missing required data');
     }
   };
 

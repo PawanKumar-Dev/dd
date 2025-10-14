@@ -8,6 +8,7 @@ import Input from './Input';
 import Card from './Card';
 import Logo from './Logo';
 import toast from 'react-hot-toast';
+import { showSuccessToast, showErrorToast, showAccountDeactivated } from '@/lib/toast';
 
 interface LoginFormProps {
   className?: string;
@@ -95,7 +96,7 @@ export default function LoginForm({ className = '' }: LoginFormProps) {
         // Clear saved form data on successful login
         localStorage.removeItem('loginFormData');
 
-        toast.success('Login successful!');
+        showSuccessToast('Login successful!');
 
         // Small delay to ensure cookie is set
         setTimeout(() => {
@@ -113,35 +114,20 @@ export default function LoginForm({ className = '' }: LoginFormProps) {
         }, 100);
       } else {
         if (data.requiresActivation) {
-          toast.error(data.message || 'Account not activated');
+          showErrorToast(data.message || 'Account not activated');
           // Redirect to activation page with user email
           setTimeout(() => {
             router.push(`/activate?email=${encodeURIComponent(formData.email)}&message=${encodeURIComponent(data.message || 'Account not activated')}`);
           }, 1000);
         } else if (data.isDeactivated) {
           // Show a more detailed error for deactivated accounts
-          toast.error(
-            <div className="text-left">
-              <div className="font-semibold text-red-800 mb-1">Account Deactivated</div>
-              <div className="text-sm text-red-700">
-                Your account has been deactivated. Please contact our support team at{' '}
-                <a
-                  href={`mailto:${data.supportEmail}`}
-                  className="underline hover:text-red-900 font-medium"
-                >
-                  {data.supportEmail}
-                </a>{' '}
-                for assistance.
-              </div>
-            </div>,
-            { duration: Infinity }
-          );
+          showAccountDeactivated(data.supportEmail);
         } else {
-          toast.error(data.error || 'Login failed');
+          showErrorToast(data.error || 'Login failed');
         }
       }
     } catch (error) {
-      toast.error('An error occurred. Please try again.');
+      showErrorToast('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
