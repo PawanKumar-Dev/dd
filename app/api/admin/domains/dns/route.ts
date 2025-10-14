@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Domain not found" }, { status: 404 });
     }
 
-    const domain = order.domains.find((d) => d.domainName === domainName);
+    const domain = order.domains.find((d: any) => d.domainName === domainName);
 
     if (!domain || !domain.resellerClubCustomerId) {
       return NextResponse.json(
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Domain not found" }, { status: 404 });
     }
 
-    const domain = order.domains.find((d) => d.domainName === domainName);
+    const domain = order.domains.find((d: any) => d.domainName === domainName);
 
     if (!domain || !domain.resellerClubCustomerId) {
       return NextResponse.json(
@@ -135,7 +135,7 @@ export async function POST(request: NextRequest) {
       recordData
     );
 
-    if (result.success) {
+    if ((result as any).success) {
       return NextResponse.json({
         success: true,
         message: "DNS record added successfully",
@@ -143,7 +143,7 @@ export async function POST(request: NextRequest) {
       });
     } else {
       return NextResponse.json(
-        { error: result.error || "Failed to add DNS record" },
+        { error: (result as any).error || "Failed to add DNS record" },
         { status: 500 }
       );
     }
@@ -205,7 +205,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Domain not found" }, { status: 404 });
     }
 
-    const domain = order.domains.find((d) => d.domainName === domainName);
+    const domain = order.domains.find((d: any) => d.domainName === domainName);
 
     if (!domain || !domain.resellerClubCustomerId) {
       return NextResponse.json(
@@ -221,14 +221,14 @@ export async function DELETE(request: NextRequest) {
       recordData
     );
 
-    if (result.success) {
+    if ((result as any).success) {
       return NextResponse.json({
         success: true,
         message: "DNS record deleted successfully",
       });
     } else {
       return NextResponse.json(
-        { error: result.error || "Failed to delete DNS record" },
+        { error: (result as any).error || "Failed to delete DNS record" },
         { status: 500 }
       );
     }

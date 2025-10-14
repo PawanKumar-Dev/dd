@@ -26,6 +26,7 @@ import { formatIndianDate, formatIndianDateTime } from '@/lib/dateUtils';
 import AdminDataTable from '@/components/admin/AdminDataTable';
 import Invoice from '@/components/Invoice';
 import toast from 'react-hot-toast';
+import { showSuccessToast, showErrorToast } from '@/lib/toast';
 
 interface User {
   _id: string;
@@ -186,13 +187,13 @@ export default function AdminOrdersPage() {
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
-        toast.success('Invoice downloaded successfully!');
+        showSuccessToast('Invoice downloaded successfully!');
       } else {
-        toast.error('Failed to download invoice');
+        showErrorToast('Failed to download invoice');
       }
     } catch (error) {
       console.error('Error downloading invoice:', error);
-      toast.error('Failed to download invoice');
+      showErrorToast('Failed to download invoice');
     }
   };
 
@@ -218,7 +219,7 @@ export default function AdminOrdersPage() {
 
       if (response.ok) {
         const data = await response.json();
-        toast.success(`Order ${data.deletedOrderId} archived successfully!`);
+        showSuccessToast(`Order ${data.deletedOrderId} archived successfully!`);
 
         // Remove the order from active orders and add to archived orders
         setOrders(orders.filter(order => order._id !== orderToDelete._id));
@@ -229,11 +230,11 @@ export default function AdminOrdersPage() {
         setOrderToDelete(null);
       } else {
         const errorData = await response.json();
-        toast.error(errorData.error || 'Failed to archive order');
+        showErrorToast(errorData.error || 'Failed to archive order');
       }
     } catch (error) {
       console.error('Error deleting order:', error);
-      toast.error('Failed to archive order');
+      showErrorToast('Failed to archive order');
     } finally {
       setIsDeleting(false);
     }
@@ -266,7 +267,7 @@ export default function AdminOrdersPage() {
 
       if (response.ok) {
         const data = await response.json();
-        toast.success(`Order ${data.orderId} un-archived successfully!`);
+        showSuccessToast(`Order ${data.orderId} un-archived successfully!`);
 
         // Remove the order from archived orders and add to active orders
         setArchivedOrders(archivedOrders.filter(order => order._id !== orderToUnarchive._id));
@@ -277,11 +278,11 @@ export default function AdminOrdersPage() {
         setOrderToUnarchive(null);
       } else {
         const errorData = await response.json();
-        toast.error(errorData.error || 'Failed to un-archive order');
+        showErrorToast(errorData.error || 'Failed to un-archive order');
       }
     } catch (error) {
       console.error('Error un-archiving order:', error);
-      toast.error('Failed to un-archive order');
+      showErrorToast('Failed to un-archive order');
     } finally {
       setIsUnarchiving(false);
     }
