@@ -172,7 +172,7 @@ export default function AdminPayments() {
       render: (value: string, row: Payment) => (
         <div>
           <div className="text-sm font-medium text-gray-900">
-            {value && value !== 'undefined undefined' ? value : 'Unknown'}
+            {value || 'Unknown'}
           </div>
           <div className="text-sm text-gray-500">{row.customerEmail}</div>
         </div>

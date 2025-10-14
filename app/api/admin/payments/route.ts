@@ -3,6 +3,7 @@ import { AuthService } from "@/lib/auth";
 import { RazorpayPaymentsService } from "@/lib/razorpay-payments";
 import connectDB from "@/lib/mongodb";
 import Order from "@/models/Order";
+import User from "@/models/User";
 
 export async function GET(request: NextRequest) {
   try {
@@ -62,6 +63,18 @@ export async function GET(request: NextRequest) {
       orderMap.set(order.razorpayPaymentId, order);
     });
 
+    // Get all unique email addresses from payments to look up users
+    const uniqueEmails = [...new Set(allDomainPayments.map((p) => p.email))];
+    const usersByEmail = await User.find({
+      email: { $in: uniqueEmails },
+    }).select("email firstName lastName");
+
+    // Create a map of email to user data
+    const userMap = new Map();
+    usersByEmail.forEach((user) => {
+      userMap.set(user.email, user);
+    });
+
     // Combine Razorpay payment data with our order data
     const allEnrichedPayments = await Promise.all(
       allDomainPayments.map(async (razorpayPayment) => {
@@ -71,6 +84,26 @@ export async function GET(request: NextRequest) {
             razorpayPayment
           );
 
+        // Get customer name from order data, payment details, or user lookup
+        let customerName = "Unknown";
+        if (orderData?.userId) {
+          customerName =
+            `${orderData.userId.firstName || ""} ${
+              orderData.userId.lastName || ""
+            }`.trim() || "Unknown";
+        } else if (paymentDetails.customerName) {
+          customerName = paymentDetails.customerName;
+        } else {
+          // Look up user by email
+          const userByEmail = userMap.get(razorpayPayment.email);
+          if (userByEmail) {
+            customerName =
+              `${userByEmail.firstName || ""} ${
+                userByEmail.lastName || ""
+              }`.trim() || "Unknown";
+          }
+        }
+
         return {
           id: razorpayPayment.id,
           transactionId: razorpayPayment.id,
@@ -78,11 +111,7 @@ export async function GET(request: NextRequest) {
           currency: razorpayPayment.currency.toUpperCase(),
           status: razorpayPayment.status,
           paymentMethod: razorpayPayment.method || "Unknown",
-          customerName: orderData?.userId
-            ? `${orderData.userId.firstName || ""} ${
-                orderData.userId.lastName || ""
-              }`.trim() || "Unknown"
-            : paymentDetails.customerName || "Unknown",
+          customerName,
           customerEmail:
             orderData?.userId?.email ||
             paymentDetails.customerEmail ||
