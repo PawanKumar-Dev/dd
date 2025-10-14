@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
         lastName: user.lastName,
         email: user.email,
         role: user.role,
-        createdAt: user.createdAt,
+        createdAt: (user as any).createdAt,
         isActive: user.isActive !== false, // Default to true if not set
       })),
     });

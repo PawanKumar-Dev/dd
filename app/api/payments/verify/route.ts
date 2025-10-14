@@ -302,7 +302,7 @@ export async function POST(request: NextRequest) {
           `✅ [PAYMENT-VERIFY] Customer account created successfully: ${customerResult.customerId}`
         );
         domainBookingStatus.push({
-          step: "contact_created" as const,
+          step: "contact_created" as any,
           message: "Account setup completed",
           timestamp: new Date(),
           progress: 60,
@@ -312,7 +312,7 @@ export async function POST(request: NextRequest) {
           `🌐 [PAYMENT-VERIFY] Starting domain registration for: ${item.domainName}`
         );
         domainBookingStatus.push({
-          step: "domain_registering" as const,
+          step: "domain_registering" as any,
           message: "Registering domain",
           timestamp: new Date(),
           progress: 80,

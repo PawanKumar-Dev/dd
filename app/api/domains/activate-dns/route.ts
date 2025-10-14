@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Find the specific domain in the order
-    const domain = order.domains.find((d) => d.domainName === domainName);
+    const domain = order.domains.find((d: any) => d.domainName === domainName);
 
     if (!domain) {
       return NextResponse.json(
