@@ -765,6 +765,22 @@ export default function DNSManagementPage() {
                       Managing DNS for {domains.find(d => d.id === selectedDomain)?.name}
                     </p>
 
+                    {/* Help text for Name field */}
+                    <div className="mt-3 bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <div className="flex items-start">
+                        <div className="flex-shrink-0">
+                          <svg className="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <div className="ml-3">
+                          <p className="text-sm text-blue-800">
+                            <strong>💡 Name Field Help:</strong> Use <code className="bg-blue-100 px-1 rounded text-blue-900">@</code> for the root domain ({domains.find(d => d.id === selectedDomain)?.name}), or enter subdomain names like <code className="bg-blue-100 px-1 rounded text-blue-900">www</code>, <code className="bg-blue-100 px-1 rounded text-blue-900">mail</code>, etc.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
                     {/* DNS Propagation Status */}
                     {dnsPropagationStatus === 'checking' && (
                       <div className="mt-2 flex items-center text-sm text-blue-600">
@@ -915,14 +931,22 @@ export default function DNSManagementPage() {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">Name</label>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                          Name
+                          <span className="text-gray-500 ml-1" title="Use '@' for root domain, or subdomain name (e.g., 'www', 'mail')">
+                            (?)
+                          </span>
+                        </label>
                         <input
                           type="text"
                           value={newRecord.name}
                           onChange={(e) => setNewRecord({ ...newRecord, name: e.target.value })}
-                          placeholder="e.g., www"
+                          placeholder="e.g., www, mail, @"
                           className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500"
                         />
+                        <p className="text-xs text-gray-500 mt-1">
+                          💡 Use <code className="bg-gray-100 px-1 rounded">@</code> for root domain ({selectedDomain}), or enter subdomain name
+                        </p>
                       </div>
                       <div>
                         <label className="block text-xs font-medium text-gray-700 mb-1">Value</label>
@@ -993,7 +1017,12 @@ export default function DNSManagementPage() {
                       <thead className="bg-gray-50">
                         <tr>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Name
+                            <span className="text-gray-400 ml-1" title="'@' represents the root domain, subdomains show as entered">
+                              (?)
+                            </span>
+                          </th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Value</th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">TTL / Priority</th>
                           <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
