@@ -57,7 +57,7 @@ export default function HomePage() {
         <HeroSection
           background="image"
           backgroundImage="/domain-1.jpeg"
-          overlayOpacity={0.7}
+          overlayOpacity={0.85}
           className="min-h-[70vh] flex items-center"
         >
           <div className="text-center">
