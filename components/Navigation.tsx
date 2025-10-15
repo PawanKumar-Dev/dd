@@ -103,9 +103,6 @@ export default function Navigation({
               <div className="hidden md:flex items-center space-x-6">
                 {isMounted && user && (
                   <>
-                    <span className="text-sm text-gray-600">
-                      Welcome, {user.firstName} {user.lastName}
-                    </span>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${user.role === 'admin'
                       ? 'bg-red-100 text-red-800'
                       : 'bg-blue-100 text-blue-800'
