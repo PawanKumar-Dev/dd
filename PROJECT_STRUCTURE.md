@@ -17,7 +17,8 @@ dd/
 │   │   │   ├── login/            # User login
 │   │   │   ├── activate/         # Account activation
 │   │   │   ├── forgot-password/  # Password reset
-│   │   │   └── reset-password/   # Password reset completion
+│   │   │   ├── reset-password/   # Password reset completion
+│   │   │   └── [...nextauth]/    # NextAuth.js social login
 │   │   ├── admin/                # Admin-only endpoints
 │   │   │   ├── users/            # User management
 │   │   │   ├── orders/           # Order management
@@ -38,6 +39,7 @@ dd/
 │   │   │   └── verify/           # Payment verification
 │   │   ├── cart/                 # Shopping cart
 │   │   ├── user/                 # User management
+│   │   │   └── complete-profile/ # Profile completion for social login
 │   │   ├── contact/              # Contact form
 │   │   ├── check-ip/             # IP checking
 │   │   └── webhooks/             # Webhook handlers
@@ -53,6 +55,7 @@ dd/
 │   ├── activate/                 # Account activation
 │   ├── forgot-password/          # Password reset
 │   ├── reset-password/           # Password reset completion
+│   ├── complete-profile/         # Profile completion for social login
 │   ├── about/                    # About Us page
 │   ├── contact/                  # Contact Us page
 │   ├── privacy/                  # Privacy policy
@@ -71,6 +74,10 @@ dd/
 │   │   ├── AdminTable.tsx        # Admin data table
 │   │   ├── AdminTabs.tsx         # Admin tab navigation
 │   │   └── AdminPasswordReset.tsx # Admin password reset
+│   ├── auth/                     # Authentication components
+│   │   ├── SocialLoginButtons.tsx # Social login UI component
+│   │   ├── ProfileCompletionForm.tsx # Profile completion form
+│   │   └── SessionProvider.tsx   # NextAuth session provider
 │   ├── ui/                       # Base UI components
 │   │   ├── Button.tsx            # Button component with variants
 │   │   ├── Input.tsx             # Input component with validation
@@ -220,7 +227,13 @@ dd/
 - **ForgotPasswordForm**: Password reset form with email validation
 - **ContactForm**: Contact form with submission handling and validation
 
-### 4. Domain Components
+### 4. Authentication Components
+
+- **SocialLoginButtons**: Google and Facebook OAuth login buttons
+- **ProfileCompletionForm**: Profile completion form for social login users
+- **SessionProvider**: NextAuth.js session provider wrapper
+
+### 5. Domain Components
 
 - **DomainSearch**: Domain search interface with real-time pricing
 - **DomainBookingProgress**: Domain booking progress tracking
@@ -228,19 +241,19 @@ dd/
 - **DomainRequirementsModal**: Domain requirements and validation
 - **NameServerManagement**: RDAP nameserver lookup and management
 
-### 5. Payment Components
+### 6. Payment Components
 
 - **Invoice**: PDF invoice generation and display
 - **LivePricingIndicator**: Real-time pricing indicator with updates
 
-### 6. Admin Components
+### 7. Admin Components
 
 - **AdminCard**: Admin-specific card component
 - **AdminTable**: Data table for admin interfaces
 - **AdminTabs**: Tab navigation for admin sections
 - **AdminPasswordReset**: Admin password reset functionality
 
-### 7. Content Components
+### 8. Content Components
 
 - **Logo**: Reusable logo component with size and variant options
 - **FAQItem**: Accordion-style FAQ item component
@@ -251,7 +264,7 @@ dd/
 - **Section**: Generic section wrapper with background and padding options
 - **LoadingPage**: Full-page loading component
 
-### 8. Utility Components
+### 9. Utility Components
 
 - **ClientOnly**: Client-side only rendering component
 - **OutboundIPBadge**: Outbound IP address display badge

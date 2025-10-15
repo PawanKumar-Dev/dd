@@ -195,6 +195,67 @@ Reset password with reset token.
 
 ---
 
+## Social Login Endpoints
+
+### GET /api/auth/[...nextauth]
+
+NextAuth.js API route handler for social login providers.
+
+**Supported Providers:**
+- Google OAuth
+- Facebook OAuth
+
+**Endpoints:**
+- `GET /api/auth/signin` - Social login page
+- `GET /api/auth/callback/google` - Google OAuth callback
+- `GET /api/auth/callback/facebook` - Facebook OAuth callback
+- `GET /api/auth/signout` - Sign out
+- `GET /api/auth/session` - Get current session
+
+### POST /api/user/complete-profile
+
+Complete profile for social login users.
+
+**Headers:**
+- `Authorization: Bearer <token>` (NextAuth session)
+
+**Request Body:**
+```json
+{
+  "phone": "string",
+  "phoneCc": "string",
+  "companyName": "string",
+  "address": {
+    "line1": "string",
+    "city": "string",
+    "state": "string",
+    "country": "string",
+    "zipcode": "string"
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Profile completed successfully",
+  "user": {
+    "id": "string",
+    "email": "string",
+    "profileCompleted": true
+  }
+}
+```
+
+**Features:**
+- Required for social login users before checkout
+- Validates all required fields
+- Updates user profile in database
+- Marks profile as completed
+
+---
+
 ## Domain Endpoints
 
 ### GET /api/domains/search
@@ -1074,7 +1135,7 @@ For API support and questions:
 
 ---
 
-**Last Updated**: October 13, 2025  
-**Version**: 2.2.0  
+**Last Updated**: January 26, 2025  
+**Version**: 2.3.0  
 **Author**: Excel Technologies  
-**Status**: Production-ready with fully functional DNS Management API
+**Status**: Production-ready with fully functional DNS Management API and Social Login Integration
