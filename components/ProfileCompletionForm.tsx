@@ -52,6 +52,13 @@ export default function ProfileCompletionForm({ user, onComplete }: ProfileCompl
       const data = await response.json();
 
       if (response.ok) {
+        // Update localStorage with the updated user data
+        const updatedUserData = {
+          ...JSON.parse(localStorage.getItem('user') || '{}'),
+          ...data.user
+        };
+        localStorage.setItem('user', JSON.stringify(updatedUserData));
+
         toast.success('Profile completed successfully!');
         onComplete?.();
         // Redirect to checkout or dashboard

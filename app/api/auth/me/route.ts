@@ -18,6 +18,7 @@ export async function GET(request: NextRequest) {
         role: user.role,
         isActivated: user.isActivated,
         isActive: user.isActive,
+        profileCompleted: user.profileCompleted,
       },
     });
   } catch (error) {

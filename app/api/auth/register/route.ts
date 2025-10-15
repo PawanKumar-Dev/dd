@@ -87,6 +87,8 @@ export async function POST(request: NextRequest) {
       isActivated: false,
       activationToken,
       activationTokenExpiry,
+      provider: "credentials", // Multi-step form registration
+      profileCompleted: true, // Multi-step form users complete profile during registration
     });
 
     await user.save();
@@ -111,6 +113,7 @@ export async function POST(request: NextRequest) {
         lastName: user.lastName,
         role: user.role,
         isActivated: user.isActivated,
+        profileCompleted: user.profileCompleted,
       },
     });
   } catch (error) {

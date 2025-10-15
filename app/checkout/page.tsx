@@ -35,25 +35,35 @@ export default function CheckoutPage() {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
 
+    console.log('🔍 Checkout Debug - Token exists:', !!token);
+    console.log('🔍 Checkout Debug - User data exists:', !!userData);
+
     if (!token || !userData) {
+      console.log('❌ Checkout Debug - Missing token or user data, redirecting to login');
       router.push('/login');
       return;
     }
 
     const userObj = JSON.parse(userData);
+    console.log('🔍 Checkout Debug - User object:', userObj);
+    console.log('🔍 Checkout Debug - User role:', userObj.role);
+    console.log('🔍 Checkout Debug - Profile completed:', userObj.profileCompleted);
 
     // Redirect admin users to admin dashboard
     if (userObj.role === 'admin') {
+      console.log('❌ Checkout Debug - User is admin, redirecting to admin dashboard');
       router.push('/admin/dashboard');
       return;
     }
 
     // Check if user has completed profile (required for checkout)
     if (!userObj.profileCompleted) {
+      console.log('❌ Checkout Debug - Profile not completed, redirecting to complete profile');
       router.push(`/complete-profile?returnUrl=${encodeURIComponent('/checkout')}`);
       return;
     }
 
+    console.log('✅ Checkout Debug - All checks passed, setting user and syncing cart');
     setUser(userObj);
 
     // Sync cart with server
@@ -79,7 +89,16 @@ export default function CheckoutPage() {
   // Redirect to dashboard if cart is empty (after cart has been loaded)
   // But not if payment is in progress
   useEffect(() => {
+    console.log('🔍 Checkout Debug - Cart empty check:', {
+      isLoading,
+      cartItemsLength: cartItems.length,
+      user: !!user,
+      isPaymentInProgress,
+      cartItems
+    });
+
     if (!isLoading && cartItems.length === 0 && user && !isPaymentInProgress) {
+      console.log('❌ Checkout Debug - Cart is empty, redirecting to dashboard in 1 second');
       // Small delay to prevent immediate redirect during page load
       const timer = setTimeout(() => {
         router.push('/dashboard');

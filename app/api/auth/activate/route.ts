@@ -68,6 +68,7 @@ export async function POST(request: NextRequest) {
         lastName: user.lastName,
         role: user.role,
         isActivated: user.isActivated,
+        profileCompleted: user.profileCompleted,
       },
     });
   } catch (error) {
