@@ -7,6 +7,7 @@ import HeroSection from '@/components/HeroSection';
 import Section from '@/components/Section';
 import ContactForm from '@/components/ContactForm';
 import ContactInfo from '@/components/ContactInfo';
+import ContactMap from '@/components/ContactMap';
 import Footer from '@/components/Footer';
 
 interface User {
@@ -72,7 +73,10 @@ export default function ContactPage() {
         </div>
       </Section>
 
-
+      {/* Map Section */}
+      <Section background="gray">
+        <ContactMap />
+      </Section>
 
       <Footer />
     </div>
