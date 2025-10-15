@@ -357,7 +357,7 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
 
 
   return (
-    <div className={`w-full max-w-7xl mx-auto ${className}`}>
+    <div className={`w-full ${className}`}>
       {/* Google Workspace Style Search Form - Always Visible */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6 max-w-6xl mx-auto">
         <div className="text-center mb-4 sm:mb-6">

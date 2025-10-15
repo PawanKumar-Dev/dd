@@ -95,7 +95,7 @@ export default function CartPage() {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navigation user={user} />
 
-      <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
+      <div className="flex-1 max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-8 pt-24">
 
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -114,7 +114,7 @@ export default function CartPage() {
         </div>
 
         {/* Trust Indicators */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg p-4 border border-gray-200 flex items-center space-x-3">
             <div className="bg-green-100 p-2 rounded-full">
               <Shield className="h-5 w-5 text-green-600" />
@@ -176,9 +176,9 @@ export default function CartPage() {
             </div>
           </div>
         ) : (
-          <div className="grid lg:grid-cols-5 gap-8 min-h-[50vh]">
+          <div className="grid lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 gap-8 min-h-[50vh]">
             {/* Cart Items */}
-            <div className="lg:col-span-3">
+            <div className="lg:col-span-4 xl:col-span-5 2xl:col-span-7">
               <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-6">
@@ -302,7 +302,7 @@ export default function CartPage() {
             </div>
 
             {/* Order Summary */}
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2 xl:col-span-3 2xl:col-span-3">
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 sticky top-24">
                 <div className="p-6">
                   <h2 className="text-lg font-semibold text-gray-900 mb-6">Order Summary</h2>

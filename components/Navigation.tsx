@@ -147,7 +147,7 @@ export default function Navigation({
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md shadow-lg border-b border-[var(--google-border-light)]">
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
+      <div className="max-w-7xl mx-auto px-2 sm:px-3 lg:px-4">
         <div className="flex justify-between items-center py-2 sm:py-3">
           <Logo size="md" href="/" />
 
