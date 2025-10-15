@@ -28,6 +28,7 @@ export default function CheckoutPage() {
   const [user, setUser] = useState<User | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isPaymentInProgress, setIsPaymentInProgress] = useState(false);
+  const [paymentCompleted, setPaymentCompleted] = useState(false);
   const router = useRouter();
   const { items: cartItems, getTotalPrice, getSubtotalPrice, clearCart, syncWithServer, isLoading } = useCartStore();
 
@@ -126,9 +127,9 @@ export default function CheckoutPage() {
   );
 
   // Redirect to dashboard if cart is empty (after cart has been loaded)
-  // But not if payment is in progress
+  // But not if payment is in progress or just completed
   useEffect(() => {
-    if (!isLoading && cartItems.length === 0 && user && !isPaymentInProgress) {
+    if (!isLoading && cartItems.length === 0 && user && !isPaymentInProgress && !paymentCompleted) {
       // Small delay to prevent immediate redirect during page load
       const timer = setTimeout(() => {
         router.push('/dashboard');
@@ -136,7 +137,7 @@ export default function CheckoutPage() {
 
       return () => clearTimeout(timer);
     }
-  }, [cartItems.length, isLoading, user, router, isPaymentInProgress]);
+  }, [cartItems.length, isLoading, user, router, isPaymentInProgress, paymentCompleted]);
 
   const handlePayment = async () => {
     if (cartItems.length === 0) {
@@ -235,14 +236,17 @@ export default function CheckoutPage() {
 
               sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
 
+              // Mark payment as completed to prevent dashboard redirect
+              setPaymentCompleted(true);
+
               // Clear cart immediately before redirect
               clearCart();
 
+              // Reset payment in progress flag immediately
+              setIsPaymentInProgress(false);
+
               // Redirect immediately to success page
               router.push('/payment-success');
-
-              // Reset payment in progress flag after redirect
-              setTimeout(() => setIsPaymentInProgress(false), 100);
             } else {
               // Handle restricted domains error
               if (verifyData.restrictedDomains) {
@@ -261,8 +265,9 @@ export default function CheckoutPage() {
                 };
 
                 sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
+                setPaymentCompleted(true);
+                setIsPaymentInProgress(false);
                 router.push('/payment-success');
-                setTimeout(() => setIsPaymentInProgress(false), 100);
                 return;
               }
 
@@ -280,11 +285,14 @@ export default function CheckoutPage() {
               // Clear cart immediately before redirect
               clearCart();
 
+              // Mark payment as completed to prevent dashboard redirect
+              setPaymentCompleted(true);
+
+              // Reset payment in progress flag immediately
+              setIsPaymentInProgress(false);
+
               // Redirect immediately to success page
               router.push('/payment-success');
-
-              // Reset payment in progress flag after redirect
-              setTimeout(() => setIsPaymentInProgress(false), 100);
             }
           } catch (error) {
             console.error('🚨 [CHECKOUT] Payment verification error:', error);
@@ -328,11 +336,14 @@ export default function CheckoutPage() {
             // Clear cart immediately before redirect
             clearCart();
 
+            // Mark payment as completed to prevent dashboard redirect
+            setPaymentCompleted(true);
+
+            // Reset payment in progress flag immediately
+            setIsPaymentInProgress(false);
+
             // Redirect immediately to success page
             router.push('/payment-success');
-
-            // Reset payment in progress flag after redirect
-            setTimeout(() => setIsPaymentInProgress(false), 100);
           }
         },
         prefill: {
@@ -358,6 +369,9 @@ export default function CheckoutPage() {
             };
 
             sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
+
+            // Mark payment as completed to prevent dashboard redirect
+            setPaymentCompleted(true);
 
             // Redirect immediately to success page
             router.push('/payment-success');
@@ -414,11 +428,14 @@ export default function CheckoutPage() {
         // Clear cart immediately before redirect
         clearCart();
 
+        // Mark payment as completed to prevent dashboard redirect
+        setPaymentCompleted(true);
+
+        // Reset payment in progress flag immediately
+        setIsPaymentInProgress(false);
+
         // Redirect immediately to success page
         router.push('/payment-success');
-
-        // Reset payment in progress flag after redirect
-        setTimeout(() => setIsPaymentInProgress(false), 100);
       });
 
       rzp.open();
