@@ -69,12 +69,12 @@ export default function HomePage() {
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 drop-shadow-lg" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
               Professional Domain Management
             </h2>
-            <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-4 sm:mb-6 text-white px-4 drop-shadow-md" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-4 sm:mb-6 text-white px-1 drop-shadow-md" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
               Excel Technologies - Your trusted partner for domain solutions and digital excellence
             </p>
 
             {/* Domain Search Feature */}
-            <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-4 sm:p-6 border border-white border-opacity-20">
+            <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-1 sm:p-2 border border-white border-opacity-20">
               <DomainSearch className="mb-4 sm:mb-6" />
             </div>
 

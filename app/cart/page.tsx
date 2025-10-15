@@ -176,9 +176,9 @@ export default function CartPage() {
             </div>
           </div>
         ) : (
-          <div className="grid lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-8 min-h-[50vh]">
+          <div className="grid lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-8 min-h-[50vh]">
             {/* Cart Items */}
-            <div className="lg:col-span-3 xl:col-span-4 2xl:col-span-4">
+            <div className="lg:col-span-5 xl:col-span-6 2xl:col-span-6">
               <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-6">
