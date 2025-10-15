@@ -376,31 +376,31 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
                   value={searchTerm}
                   onChange={handleInputChange}
                   placeholder="Enter domain name (e.g., example or example.com)"
-                  className="pl-10 pr-4 py-2.5 text-sm border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 rounded-lg transition-all duration-200 hover:border-gray-400 bg-white text-gray-900 placeholder-gray-500"
+                  className="pl-10 pr-4 py-3 text-sm border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 rounded-lg transition-all duration-200 hover:border-gray-400 bg-white text-gray-900 placeholder-gray-500 h-12"
                   disabled={isSearching}
                   style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}
                 />
               </div>
             </div>
-            <div className="flex items-end">
+            <div className="flex items-stretch">
               <Button
                 type="submit"
                 variant="primary"
-                size="lg"
+                size="md"
                 disabled={isSearching || !searchTerm.trim()}
-                className="w-full sm:w-auto px-4 py-2.5 text-sm font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 bg-blue-600 hover:bg-blue-700 text-white border-0"
+                className="w-full sm:w-auto px-6 py-3 text-sm font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 bg-blue-600 hover:bg-blue-700 text-white border-0 h-12 flex items-center justify-center"
                 style={{
                   fontFamily: 'Google Sans, system-ui, sans-serif'
                 }}
               >
                 {isSearching ? (
                   <>
-                    <Loader2 className="h-6 w-6 mr-3 animate-spin" />
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                     Searching...
                   </>
                 ) : (
                   <>
-                    <Search className="h-6 w-6 mr-3" />
+                    <Search className="h-4 w-4 mr-2" />
                     Search Domains
                   </>
                 )}
