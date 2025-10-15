@@ -357,16 +357,16 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
 
 
   return (
-    <div className={`w-full max-w-5xl mx-auto ${className}`}>
+    <div className={`w-full max-w-7xl mx-auto ${className}`}>
       {/* Google Workspace Style Search Form - Always Visible */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6 max-w-4xl mx-auto">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6 max-w-6xl mx-auto">
         <div className="text-center mb-4 sm:mb-6">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>Find Your Perfect Domain</h2>
         </div>
 
         <form onSubmit={handleSearch} className="space-y-4">
           {/* Domain Input */}
-          <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto">
+          <div className="flex flex-col sm:flex-row gap-3 max-w-4xl mx-auto">
             <div className="flex-1">
               <div className="relative group">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
@@ -516,7 +516,7 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
 
       {/* Enhanced Loading State */}
       {isSearching && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4 sm:mb-6 max-w-4xl mx-auto">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-4 sm:mb-6 max-w-6xl mx-auto">
           <div className="flex items-center justify-center py-12">
             <div className="text-center">
               {/* Enhanced animated search icon */}
@@ -596,7 +596,7 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
 
       {/* Enhanced Results Section */}
       {hasSearched && !isSearching && (
-        <div className="space-y-4 max-w-4xl mx-auto">
+        <div className="space-y-4 max-w-6xl mx-auto">
           {/* Results Header */}
           <div className="bg-white rounded-lg shadow-sm border border-[var(--google-border-light)] p-3 sm:p-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
