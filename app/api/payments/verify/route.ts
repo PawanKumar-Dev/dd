@@ -321,15 +321,17 @@ export async function POST(request: NextRequest) {
           progress: 80,
         });
 
-        const result = await (ResellerClubWrapper as any).registerDomain({
-          domainName: item.domainName,
-          years: item.registrationPeriod || 1,
-          customerId: customerResult.customerId, // Use ResellerClub customer ID
-          adminContactId: customerResult.contactId, // Use ResellerClub contact ID for admin
-          techContactId: customerResult.contactId, // Use same contact ID for tech
-          billingContactId: customerResult.contactId, // Use same contact ID for billing
-          nameServers: nameServers, // Will use ResellerClub defaults if undefined
-        });
+        const result = await ResellerClubWrapper.registerDomain(
+          item.domainName,
+          item.registrationPeriod || 1,
+          customerResult.customerId, // Use ResellerClub customer ID
+          nameServers, // Will use ResellerClub defaults if undefined
+          {
+            admin: customerResult.contactId, // Use ResellerClub contact ID for admin
+            tech: customerResult.contactId, // Use same contact ID for tech
+            billing: customerResult.contactId, // Use same contact ID for billing
+          }
+        );
 
         if (result.status === "success") {
           console.log(

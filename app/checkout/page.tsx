@@ -557,9 +557,6 @@ export default function CheckoutPage() {
                           <p className="text-sm text-gray-600">
                             <span className="font-medium">Price per year:</span> ₹{item.price}
                           </p>
-                          <p className="text-sm text-gray-600">
-                            <span className="font-medium">Domain Type:</span> {item.domainName.includes('.io') ? 'Premium Domain' : 'Standard Domain'}
-                          </p>
                         </div>
                       </div>
                       <div className="text-right">
