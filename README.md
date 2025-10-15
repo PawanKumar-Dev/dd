@@ -25,10 +25,12 @@ A comprehensive, enterprise-grade domain registration and management platform bu
 ### User Management & Authentication
 
 - **JWT Authentication** - Secure token-based authentication with proper expiration
+- **Social Login Integration** - Google and Facebook OAuth with seamless profile completion
 - **User Registration** - Multi-step registration with email activation
 - **Password Reset** - Secure password reset with email verification
 - **Role-based Access Control** - Admin and user roles with appropriate permissions
 - **Profile Management** - Complete user profile with address and contact information
+- **Dual Authentication System** - NextAuth.js for social login, custom JWT for admin users
 
 ### Admin Panel
 
@@ -116,6 +118,26 @@ node tests/run-tests.js test-payment-success  # Payment success testing
 - **Error Handling** - Comprehensive error scenario testing
 
 For detailed testing documentation, see [tests/README.md](tests/README.md).
+
+## 🔐 Social Login Integration
+
+The system supports social login for enhanced user experience:
+
+### Supported Providers
+
+- **Google OAuth** - Sign in with Google account
+- **Facebook OAuth** - Sign in with Facebook account
+- **Admin Protection** - Admin users cannot use social login (maintains security)
+
+### Features
+
+- **Profile Completion Flow** - Social login users must complete profile before checkout
+- **Dual Authentication** - NextAuth.js for social login, custom JWT for admin users
+- **Seamless Integration** - Works alongside existing credential-based authentication
+
+### Setup
+
+For detailed social login setup instructions, see [SOCIAL_LOGIN_SETUP.md](SOCIAL_LOGIN_SETUP.md).
 
 ## 🛠️ Utility Scripts
 
@@ -471,19 +493,23 @@ For support and questions:
 
 ## 🔄 Recent Updates
 
-- ✅ Comprehensive TLD mappings (200+ TLDs) for accurate pricing
-- ✅ Simplified pricing architecture for better performance
-- ✅ Admin settings management
-- ✅ Indian timezone support
-- ✅ Enhanced error handling
-- ✅ Improved user experience
-- ✅ Comprehensive testing suite with 20+ test categories
-- ✅ Production-ready deployment configuration
-- ✅ DNS Management API fully functional with ResellerClub integration
-- ✅ Complete DNS record CRUD operations (Create, Read, Update, Delete)
-- ✅ Inline DNS record editing with real-time updates
-- ✅ Simplified pricing model without GST calculations
-- ✅ Enhanced DNS record deletion with proper ResellerClub API parameters
-- ✅ Optional Priority field support for DNS records with validation for MX/SRV records
-- ✅ Enhanced security with client-side console log removal
-- ✅ SRV record type support for service discovery
+- ✅ **Comprehensive TLD Mappings**: 200+ TLD mappings for accurate ResellerClub API integration
+- ✅ **Simplified Pricing Architecture**: Optimized pricing system for better performance and reliability
+- ✅ **Admin Settings Management**: Complete admin panel with system configuration capabilities
+- ✅ **Indian Timezone Support**: Full IST timezone integration with localized date/time formatting
+- ✅ **Enhanced Error Handling**: Comprehensive error handling with user-friendly messages
+- ✅ **Improved User Experience**: Modern UI/UX with responsive design and smooth animations
+- ✅ **Comprehensive Testing Suite**: 20+ test categories covering all system components
+- ✅ **Production-Ready Deployment**: Complete deployment configuration with security best practices
+- ✅ **DNS Management API**: Fully functional DNS record management with ResellerClub integration
+- ✅ **Complete DNS CRUD Operations**: Create, Read, Update, Delete DNS records with real-time updates
+- ✅ **Inline DNS Record Editing**: Real-time DNS record editing with immediate reflection
+- ✅ **Simplified Pricing Model**: Clean pricing without GST calculations for better transparency
+- ✅ **Enhanced DNS Record Deletion**: Proper ResellerClub API parameters for reliable deletion
+- ✅ **Priority Field Support**: Optional priority field with validation for MX/SRV records
+- ✅ **Enhanced Security**: Client-side console log removal for production security
+- ✅ **SRV Record Support**: Service discovery support with SRV record type
+- ✅ **Social Login Integration**: Google and Facebook OAuth with profile completion flow
+- ✅ **Advanced Component Library**: 30+ reusable components with TypeScript support
+- ✅ **Comprehensive API Documentation**: Complete API reference with examples and testing
+- ✅ **Utility Scripts**: Port management, database initialization, and maintenance tools
