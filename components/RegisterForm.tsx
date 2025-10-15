@@ -7,6 +7,7 @@ import Button from './Button';
 import Input from './Input';
 import Card from './Card';
 import Logo from './Logo';
+import SocialLoginButtons from './SocialLoginButtons';
 import toast from 'react-hot-toast';
 
 interface RegisterFormProps {
@@ -576,6 +577,18 @@ export default function RegisterForm({ className = '' }: RegisterFormProps) {
             >
               {isLoading ? 'Creating account...' : 'Create account'}
             </Button>
+
+            <SocialLoginButtons
+              onSuccess={() => {
+                // Redirect to dashboard after successful social login
+                setTimeout(() => {
+                  router.push('/dashboard');
+                }, 100);
+              }}
+              onError={(error) => {
+                console.error('Social login error:', error);
+              }}
+            />
           </form>
         </Card>
       </div>

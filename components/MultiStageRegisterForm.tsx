@@ -8,6 +8,7 @@ import Button from './Button';
 import Input from './Input';
 import Card from './Card';
 import Logo from './Logo';
+import SocialLoginButtons from './SocialLoginButtons';
 import toast from 'react-hot-toast';
 
 interface RegisterFormProps {
@@ -647,6 +648,23 @@ export default function MultiStageRegisterForm({ className = '' }: RegisterFormP
 
           <form onSubmit={handleSubmit}>
             {renderStepContent()}
+
+            {/* Social Login Options - Only show on first step */}
+            {currentStep === 1 && (
+              <div className="mt-6">
+                <SocialLoginButtons
+                  onSuccess={() => {
+                    // Redirect to dashboard after successful social login
+                    setTimeout(() => {
+                      router.push('/dashboard');
+                    }, 100);
+                  }}
+                  onError={(error) => {
+                    console.error('Social login error:', error);
+                  }}
+                />
+              </div>
+            )}
 
             {/* Navigation Buttons */}
             <div className="flex justify-between mt-8">
