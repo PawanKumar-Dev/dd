@@ -196,14 +196,24 @@ export default function UserDashboard() {
                     <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
                       <div>
                         <p className="font-medium text-gray-900">{domain.name}</p>
-                        <p className="text-sm text-gray-500">Registered {domain.registeredDate}</p>
+                        <p className="text-sm text-gray-500">
+                          {domain.status === 'pending' ? 'Pending' : 'Registered'} {domain.registeredDate}
+                        </p>
                       </div>
                       <div className="text-right">
-                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${domain.status === 'registered' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${domain.status === 'registered' || domain.status === 'active'
+                            ? 'bg-green-100 text-green-800'
+                            : domain.status === 'pending'
+                              ? 'bg-yellow-100 text-yellow-800'
+                              : domain.status === 'failed'
+                                ? 'bg-red-100 text-red-800'
+                                : 'bg-gray-100 text-gray-800'
                           }`}>
                           {domain.status}
                         </span>
-                        <p className="text-xs text-gray-500 mt-1">Expires {domain.expiryDate}</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {domain.status === 'pending' ? 'Awaiting registration' : `Expires ${domain.expiryDate}`}
+                        </p>
                       </div>
                     </div>
                   ))

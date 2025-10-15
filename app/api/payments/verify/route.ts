@@ -371,21 +371,21 @@ export async function POST(request: NextRequest) {
             resellerClubCustomerId: customerResult.customerId,
             resellerClubContactId: customerResult.contactId,
           });
-        } else {
-          console.error(
-            `❌ [PAYMENT-VERIFY] Domain registration failed: ${item.domainName} - ${result.message}`
+        } else if (result.status === "pending") {
+          console.log(
+            `⏳ [PAYMENT-VERIFY] Domain registration pending: ${item.domainName} - ${result.message}`
           );
 
           domainBookingStatus.push({
-            step: "domain_failed" as any,
-            message: `Domain registration failed: ${result.message}`,
+            step: "domain_pending" as any,
+            message: `Domain registration pending: ${result.message}`,
             timestamp: new Date(),
-            progress: 100,
+            progress: 50,
           });
 
           registrationResults.push({
             domainName: item.domainName,
-            status: "failed",
+            status: "pending",
             error: result.message,
           });
 
@@ -394,7 +394,63 @@ export async function POST(request: NextRequest) {
             price: item.price,
             currency: item.currency || "INR",
             registrationPeriod: item.registrationPeriod || 1,
-            status: "failed",
+            status: "pending",
+            bookingStatus: domainBookingStatus,
+            error: result.message,
+            resellerClubCustomerId: customerResult.customerId,
+            resellerClubContactId: customerResult.contactId,
+          });
+        } else {
+          console.error(
+            `❌ [PAYMENT-VERIFY] Domain registration failed: ${item.domainName} - ${result.message}`
+          );
+
+          // Log the actual ResellerClub response for debugging
+          console.log(
+            `🔍 [PAYMENT-VERIFY] ResellerClub response for "${item.domainName}":`,
+            {
+              status: result.status,
+              message: result.message,
+              data: result.data,
+            }
+          );
+
+          // More conservative approach - only mark as pending for very specific balance-related errors
+          const isInsufficientBalance =
+            result.status === "pending" || // If ResellerClub wrapper already determined it's pending
+            (result.message &&
+              (result.message.toLowerCase().includes("insufficient balance") ||
+                result.message.toLowerCase().includes("low funds") ||
+                result.message.toLowerCase().includes("insufficient funds") ||
+                result.message.toLowerCase().includes("account balance") ||
+                result.message.toLowerCase().includes("credit limit")));
+
+          const domainStatus = isInsufficientBalance ? "pending" : "failed";
+          const statusMessage = isInsufficientBalance
+            ? "Domain registration pending due to insufficient balance"
+            : `Domain registration failed: ${result.message}`;
+
+          domainBookingStatus.push({
+            step: isInsufficientBalance
+              ? ("domain_pending" as any)
+              : ("domain_failed" as any),
+            message: statusMessage,
+            timestamp: new Date(),
+            progress: isInsufficientBalance ? 50 : 100,
+          });
+
+          registrationResults.push({
+            domainName: item.domainName,
+            status: domainStatus,
+            error: result.message,
+          });
+
+          orderDomains.push({
+            domainName: item.domainName,
+            price: item.price,
+            currency: item.currency || "INR",
+            registrationPeriod: item.registrationPeriod || 1,
+            status: domainStatus,
             bookingStatus: domainBookingStatus,
             error: result.message,
             resellerClubCustomerId: customerResult.customerId,
@@ -407,19 +463,47 @@ export async function POST(request: NextRequest) {
           error
         );
 
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error";
+
+        // Log the error for debugging
+        console.log(
+          `🔍 [PAYMENT-VERIFY] Domain registration error for "${item.domainName}":`,
+          {
+            error: errorMessage,
+            errorType:
+              error instanceof Error ? error.constructor.name : typeof error,
+            stack: error instanceof Error ? error.stack : undefined,
+          }
+        );
+
+        // More conservative approach - only mark as pending for very specific balance-related errors
+        const isInsufficientBalance =
+          errorMessage &&
+          (errorMessage.toLowerCase().includes("insufficient balance") ||
+            errorMessage.toLowerCase().includes("low funds") ||
+            errorMessage.toLowerCase().includes("insufficient funds") ||
+            errorMessage.toLowerCase().includes("account balance") ||
+            errorMessage.toLowerCase().includes("credit limit"));
+
+        const domainStatus = isInsufficientBalance ? "pending" : "failed";
+        const statusMessage = isInsufficientBalance
+          ? "Domain registration pending due to insufficient balance"
+          : `Registration failed: ${errorMessage}`;
+
         domainBookingStatus.push({
-          step: "domain_failed" as any,
-          message: `Registration failed: ${
-            error instanceof Error ? error.message : "Unknown error"
-          }`,
+          step: isInsufficientBalance
+            ? ("domain_pending" as any)
+            : ("domain_failed" as any),
+          message: statusMessage,
           timestamp: new Date(),
-          progress: 100,
+          progress: isInsufficientBalance ? 50 : 100,
         });
 
         registrationResults.push({
           domainName: item.domainName,
-          status: "failed",
-          error: "Registration failed",
+          status: domainStatus,
+          error: errorMessage,
         });
 
         orderDomains.push({
@@ -427,9 +511,11 @@ export async function POST(request: NextRequest) {
           price: item.price,
           currency: item.currency || "INR",
           registrationPeriod: item.registrationPeriod || 1,
-          status: "failed",
+          status: domainStatus,
           bookingStatus: domainBookingStatus,
-          error: "Registration failed",
+          error: errorMessage,
+          resellerClubCustomerId: customerResult.customerId,
+          resellerClubContactId: customerResult.contactId,
         });
       }
     }

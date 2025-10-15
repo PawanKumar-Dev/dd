@@ -1633,9 +1633,32 @@ export class ResellerClubAPI {
           }
         );
 
+        // Log the actual ResellerClub error response for debugging
+        console.log(
+          `🔍 [PRODUCTION] ResellerClub error response for "${domainData.domainName}":`,
+          {
+            error: response.data.error,
+            fullResponse: response.data,
+            status: response.status,
+          }
+        );
+
+        const errorMessage =
+          response.data.error || "Domain registration failed";
+
+        // More conservative approach - only mark as pending for very specific balance-related errors
+        // We'll be more restrictive until we have actual ResellerClub response examples
+        const isInsufficientBalance =
+          errorMessage &&
+          (errorMessage.toLowerCase().includes("insufficient balance") ||
+            errorMessage.toLowerCase().includes("low funds") ||
+            errorMessage.toLowerCase().includes("insufficient funds") ||
+            errorMessage.toLowerCase().includes("account balance") ||
+            errorMessage.toLowerCase().includes("credit limit"));
+
         return {
-          status: "error",
-          message: response.data.error || "Domain registration failed",
+          status: isInsufficientBalance ? "pending" : "error",
+          message: errorMessage,
         };
       }
 
