@@ -74,7 +74,7 @@ export default function HomePage() {
             </p>
 
             {/* Domain Search Feature */}
-            <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-1 sm:p-2 border border-white border-opacity-20">
+            <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-1 sm:p-2 border border-white border-opacity-20 w-full">
               <DomainSearch className="mb-4 sm:mb-6" />
             </div>
 

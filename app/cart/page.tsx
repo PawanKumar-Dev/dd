@@ -178,7 +178,7 @@ export default function CartPage() {
         ) : (
           <div className="grid lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-8 min-h-[50vh]">
             {/* Cart Items */}
-            <div className="lg:col-span-5 xl:col-span-6 2xl:col-span-6">
+            <div className="lg:col-span-4 xl:col-span-5 2xl:col-span-5">
               <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-6">
@@ -302,7 +302,7 @@ export default function CartPage() {
             </div>
 
             {/* Order Summary */}
-            <div className="lg:col-span-1 xl:col-span-1 2xl:col-span-2">
+            <div className="lg:col-span-2 xl:col-span-2 2xl:col-span-3">
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 sticky top-24">
                 <div className="p-6">
                   <h2 className="text-lg font-semibold text-gray-900 mb-6">Order Summary</h2>
