@@ -115,6 +115,32 @@ function HomePage() {
 }
 ```
 
+### Hero with Background Image
+
+```tsx
+import { HeroSection } from "@/components";
+
+function HomePage() {
+  return (
+    <HeroSection
+      background="image"
+      backgroundImage="/domain-1.jpeg"
+      overlayOpacity={0.7}
+      className="min-h-[70vh] flex items-center"
+    >
+      <div className="text-center">
+        <h1 className="text-4xl font-bold mb-4 drop-shadow-lg">
+          Professional Domain Management
+        </h1>
+        <p className="text-xl text-white drop-shadow-md">
+          Your trusted partner for domain solutions
+        </p>
+      </div>
+    </HeroSection>
+  );
+}
+```
+
 ### Form Components
 
 ```tsx
@@ -137,7 +163,11 @@ function ContactPage() {
 ### Authentication Components
 
 ```tsx
-import { SocialLoginButtons, ProfileCompletionForm, SessionProvider } from "@/components";
+import {
+  SocialLoginButtons,
+  ProfileCompletionForm,
+  SessionProvider,
+} from "@/components";
 
 function LoginPage() {
   return (
@@ -208,6 +238,8 @@ function ProfileCompletionPage() {
 
 - `background`: 'gradient' | 'solid' | 'image'
 - `variant`: 'primary' | 'secondary' | 'dark'
+- `backgroundImage`: string (URL path to background image)
+- `overlayOpacity`: number (0-1, default: 0.6)
 - `className`: string
 - `children`: ReactNode
 

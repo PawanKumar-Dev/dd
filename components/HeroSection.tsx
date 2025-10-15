@@ -7,13 +7,17 @@ interface HeroSectionProps {
   className?: string;
   background?: 'gradient' | 'solid' | 'image';
   variant?: 'primary' | 'secondary' | 'dark';
+  backgroundImage?: string;
+  overlayOpacity?: number;
 }
 
 export default function HeroSection({
   children,
   className = '',
   background = 'gradient',
-  variant = 'primary'
+  variant = 'primary',
+  backgroundImage,
+  overlayOpacity = 0.6
 }: HeroSectionProps) {
   const backgroundClasses = {
     gradient: variant === 'primary'
@@ -29,10 +33,37 @@ export default function HeroSection({
     image: 'bg-cover bg-center bg-no-repeat'
   };
 
+  const backgroundStyle = backgroundImage ? {
+    backgroundImage: `url(${backgroundImage})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat'
+  } : {};
+
   return (
-    <section className={`${backgroundClasses[background]} text-white relative overflow-hidden pt-12 sm:pt-16 ${className}`}>
-      <div className="absolute inset-0 bg-black opacity-10"></div>
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-8 sm:py-12 lg:py-16 relative">
+    <section
+      className={`${backgroundClasses[background]} text-white relative overflow-hidden pt-12 sm:pt-16 ${className}`}
+      style={backgroundStyle}
+    >
+      {/* Blue overlay for better text readability */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: variant === 'primary'
+            ? `linear-gradient(135deg, rgba(59, 130, 246, ${overlayOpacity}) 0%, rgba(37, 99, 235, ${overlayOpacity}) 100%)`
+            : variant === 'secondary'
+              ? `linear-gradient(135deg, rgba(75, 85, 99, ${overlayOpacity}) 0%, rgba(31, 41, 55, ${overlayOpacity}) 100%)`
+              : `linear-gradient(135deg, rgba(31, 41, 55, ${overlayOpacity}) 0%, rgba(17, 24, 39, ${overlayOpacity}) 100%)`
+        }}
+      ></div>
+
+      {/* Subtle pattern overlay for texture */}
+      <div className="absolute inset-0 opacity-10" style={{
+        backgroundImage: `radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                         radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.05) 0%, transparent 50%)`
+      }}></div>
+
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-8 sm:py-12 lg:py-16 relative z-10">
         {children}
       </div>
     </section>
