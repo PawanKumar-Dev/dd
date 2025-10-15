@@ -43,17 +43,23 @@ export default function AboutPage() {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navigation user={user} />
 
-      <HeroSection variant="secondary">
+      <HeroSection
+        variant="secondary"
+        background="image"
+        backgroundImage="/about-us-hero.jpg"
+        overlayOpacity={0.8}
+        className="min-h-[60vh] flex items-center"
+      >
         <div className="text-center">
           <div className="flex justify-center mb-6">
-            <div className="bg-white bg-opacity-20 rounded-full p-4">
+            <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-full p-4 border border-white border-opacity-30">
               <Award className="h-12 w-12 text-white" />
             </div>
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 drop-shadow-lg">
             About Excel Technologies
           </h1>
-          <p className="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto">
+          <p className="text-xl md:text-2xl text-white max-w-3xl mx-auto drop-shadow-md">
             Leading the way in domain management solutions with innovation, security, and exceptional service.
           </p>
         </div>

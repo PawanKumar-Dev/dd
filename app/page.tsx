@@ -54,22 +54,29 @@ export default function HomePage() {
         transition={{ duration: 0.5 }}
         className="pt-12 sm:pt-16"
       >
-        <HeroSection>
+        <HeroSection
+          background="image"
+          backgroundImage="/domain-1.jpeg"
+          overlayOpacity={0.7}
+          className="min-h-[70vh] flex items-center"
+        >
           <div className="text-center">
             <div className="flex justify-center mb-3 sm:mb-4">
-              <div className="bg-white bg-opacity-20 rounded-full p-2 sm:p-3">
+              <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-full p-2 sm:p-3 border border-white border-opacity-30">
                 <Globe className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
               </div>
             </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 drop-shadow-lg" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
               Professional Domain Management
             </h2>
-            <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-4 sm:mb-6 text-primary-100 px-4" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-4 sm:mb-6 text-white px-4 drop-shadow-md" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
               Excel Technologies - Your trusted partner for domain solutions and digital excellence
             </p>
 
             {/* Domain Search Feature */}
-            <DomainSearch className="mb-4 sm:mb-6" />
+            <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-4 sm:p-6 border border-white border-opacity-20">
+              <DomainSearch className="mb-4 sm:mb-6" />
+            </div>
 
           </div>
         </HeroSection>
