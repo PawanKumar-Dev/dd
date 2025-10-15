@@ -527,11 +527,11 @@ export default function CheckoutPage() {
         </div>
       </header>
 
-      <div className="flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid lg:grid-cols-7 gap-8 min-h-[60vh]">
+      <div className="flex-1 max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid lg:grid-cols-10 gap-12 min-h-[60vh]">
           {/* Order Summary */}
-          <div className="lg:col-span-4">
-            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+          <div className="lg:col-span-6">
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
               <div className="flex items-center mb-6">
                 <div className="bg-blue-100 p-2 rounded-lg mr-3">
                   <ShoppingCart className="h-6 w-6 text-blue-600" />
@@ -618,7 +618,7 @@ export default function CheckoutPage() {
                         ₹{getTotalPrice().toFixed(2)}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">All prices include applicable taxes</p>
+                    <p className="text-xs text-gray-500 mt-1">All prices include 18% GST</p>
                   </div>
                 </div>
               </div>
@@ -626,8 +626,8 @@ export default function CheckoutPage() {
           </div>
 
           {/* Payment Section */}
-          <div className="lg:col-span-3">
-            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+          <div className="lg:col-span-4">
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
               <div className="flex items-center mb-6">
                 <div className="bg-green-100 p-2 rounded-lg mr-3">
                   <CreditCard className="h-6 w-6 text-green-600" />
@@ -640,7 +640,7 @@ export default function CheckoutPage() {
                 <div className="text-center">
                   <p className="text-sm text-gray-600 mb-1">Total Amount</p>
                   <p className="text-3xl font-bold text-gray-900">₹{getTotalPrice().toFixed(2)}</p>
-                  <p className="text-xs text-gray-500 mt-1">Including all taxes and fees</p>
+                  <p className="text-xs text-gray-500 mt-1">Including 18% GST</p>
                 </div>
               </div>
 

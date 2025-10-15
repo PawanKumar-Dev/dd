@@ -337,8 +337,8 @@ export default function CartPage() {
                       <span className="text-gray-900">₹{getSubtotalPrice().toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Taxes & Fees</span>
-                      <span className="text-gray-900">₹0.00</span>
+                      <span className="text-gray-600">GST (18%)</span>
+                      <span className="text-gray-900">Included</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Discount</span>
@@ -349,6 +349,7 @@ export default function CartPage() {
                         <span>Total</span>
                         <span className="text-primary-600">₹{getTotalPrice().toFixed(2)}</span>
                       </div>
+                      <p className="text-xs text-gray-500 mt-2 text-center">All prices include 18% GST</p>
                     </div>
                   </div>
 
