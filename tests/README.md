@@ -31,7 +31,8 @@ tests/
 │   ├── test-database.js      # Database connectivity testing
 │   ├── test-email.js         # Email service testing
 │   ├── test-integration.js   # End-to-end integration testing
-│   └── test-dns-management.js # DNS management CRUD operations testing
+│   ├── test-dns-management.js # DNS management CRUD operations testing
+│   └── test-social-login.js  # Social login integration testing
 └── scripts/                  # Utility and maintenance scripts
     └── update_pricing.js     # Pricing data update utility
 ```
@@ -174,7 +175,7 @@ node tests/run-tests.js help
 - **Payment Tests**: Payment processing, success/failure scenarios, error handling
 - **Pricing Tests**: TLD pricing accuracy, mapping validation, AI pricing
 - **Debug Tools**: Troubleshooting utilities, data analysis, debugging
-- **System Tests**: Database connectivity, email service, end-to-end integration, DNS management
+- **System Tests**: Database connectivity, email service, end-to-end integration, DNS management, social login integration
 
 #### Test All TLD Pricing
 
@@ -215,6 +216,9 @@ node tests/pricing/test-pricing-debug.js
 
 # Test DNS management
 node tests/system/test-dns-management.js
+
+# Test social login integration
+node tests/system/test-social-login.js
 ```
 
 #### Debug Issues
@@ -377,6 +381,27 @@ node tests/debug/debug-pricing.js
 - Optional priority support for other record types
 - Error handling and rollback mechanisms
 - Security testing (console log removal verification)
+
+## 🔐 Social Login Integration Tests
+
+### `test-social-login.js`
+
+**Purpose**: Test social login integration and profile completion flow
+**Usage**: `node tests/system/test-social-login.js`
+**What it tests**:
+
+- Google OAuth integration and callback handling
+- Facebook OAuth integration and callback handling
+- User creation and database storage for social login users
+- Profile completion flow validation
+- Required field validation for profile completion
+- Admin protection (admin users cannot use social login)
+- Dual authentication system (NextAuth.js + custom JWT)
+- Session management and token handling
+- Profile completion API endpoint functionality
+- Social login user checkout flow validation
+- Error handling for OAuth failures
+- Security validation for social login routes
 
 ## 💰 Pricing System Tests
 
@@ -570,7 +595,7 @@ When reporting issues, include:
 
 ---
 
-**Last Updated**: October 13, 2025  
-**Version**: 2.1.0  
+**Last Updated**: January 26, 2025  
+**Version**: 2.3.0  
 **Author**: Excel Technologies  
-**Status**: Comprehensive testing suite with 20+ test categories
+**Status**: Comprehensive testing suite with 20+ test categories and social login integration testing

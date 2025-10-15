@@ -29,6 +29,12 @@ This directory contains all reusable React components for the Excel Technologies
 - **ForgotPasswordForm**: Password reset form with email validation
 - **ContactForm**: Contact form with submission handling and validation
 
+### Authentication Components
+
+- **SocialLoginButtons**: Google and Facebook OAuth login buttons with provider selection
+- **ProfileCompletionForm**: Profile completion form for social login users with validation
+- **SessionProvider**: NextAuth.js session provider wrapper for social login integration
+
 ### Domain Components
 
 - **DomainSearch**: Domain search interface with real-time pricing
@@ -128,6 +134,29 @@ function ContactPage() {
 }
 ```
 
+### Authentication Components
+
+```tsx
+import { SocialLoginButtons, ProfileCompletionForm, SessionProvider } from "@/components";
+
+function LoginPage() {
+  return (
+    <div>
+      <LoginForm />
+      <SocialLoginButtons />
+    </div>
+  );
+}
+
+function ProfileCompletionPage() {
+  return (
+    <SessionProvider>
+      <ProfileCompletionForm />
+    </SessionProvider>
+  );
+}
+```
+
 ## Component Props
 
 ### Button Props
@@ -188,6 +217,27 @@ function ContactPage() {
 - `padding`: 'sm' | 'md' | 'lg' | 'xl'
 - `className`: string
 - `children`: ReactNode
+
+### SocialLoginButtons Props
+
+- `providers`: Array of provider configurations
+- `onSuccess`: (user: User) => void
+- `onError`: (error: string) => void
+- `className`: string
+- `showLabels`: boolean
+
+### ProfileCompletionForm Props
+
+- `onComplete`: (profile: UserProfile) => void
+- `onCancel`: () => void
+- `className`: string
+- `requiredFields`: string[]
+
+### SessionProvider Props
+
+- `children`: ReactNode
+- `session`: Session | null
+- `basePath`: string
 
 ## Styling
 
@@ -292,7 +342,7 @@ When adding new components:
 
 ---
 
-**Last Updated**: October 13, 2025  
-**Version**: 2.2.0  
+**Last Updated**: January 26, 2025  
+**Version**: 2.3.0  
 **Author**: Excel Technologies  
-**Status**: Production-ready with comprehensive component library and DNS management features
+**Status**: Production-ready with comprehensive component library, DNS management features, and social login integration
