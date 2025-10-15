@@ -46,7 +46,7 @@ export default function ContactPage() {
       <HeroSection
         variant="secondary"
         background="image"
-        backgroundImage="/domain-1.jpeg"
+        backgroundImage="/contact-us-hero.jpeg"
         overlayOpacity={0.8}
         className="min-h-[60vh] flex items-center"
       >
