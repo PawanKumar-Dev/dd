@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ShoppingCart, Trash2, ArrowLeft, CreditCard, Globe, Shield, Star, CheckCircle, Clock, Users, Award, Zap } from 'lucide-react';
+import { ShoppingCart, Trash2, ArrowLeft, CreditCard, Globe, Shield, Star, CheckCircle, Clock, Users, Award, Zap, TrendingUp } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
@@ -275,26 +275,24 @@ export default function CartPage() {
                     <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors">
                       <div className="flex items-center space-x-3">
                         <div className="bg-green-100 p-2 rounded-lg">
-                          <Shield className="h-5 w-5 text-green-600" />
+                          <Globe className="h-5 w-5 text-green-600" />
                         </div>
                         <div>
-                          <h4 className="font-medium text-gray-900">SSL Certificate</h4>
-                          <p className="text-sm text-gray-600">Free with domain</p>
+                          <h4 className="font-medium text-gray-900">Simple Dashboard</h4>
+                          <p className="text-sm text-gray-600">Easy domain management interface</p>
                         </div>
                       </div>
-                      <span className="text-green-600 font-semibold">Free</span>
                     </div>
                     <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors">
                       <div className="flex items-center space-x-3">
-                        <div className="bg-blue-100 p-2 rounded-lg">
-                          <Users className="h-5 w-5 text-blue-600" />
+                        <div className="bg-purple-100 p-2 rounded-lg">
+                          <Award className="h-5 w-5 text-purple-600" />
                         </div>
                         <div>
-                          <h4 className="font-medium text-gray-900">Privacy Protection</h4>
-                          <p className="text-sm text-gray-600">Hide your contact info</p>
+                          <h4 className="font-medium text-gray-900">Email Forwarding</h4>
+                          <p className="text-sm text-gray-600">Forward emails to your existing inbox</p>
                         </div>
                       </div>
-                      <span className="text-gray-600 font-semibold">₹299/year</span>
                     </div>
                   </div>
                 </div>
