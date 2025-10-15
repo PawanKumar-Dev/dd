@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, CreditCard, Shield } from 'lucide-react';
+import { ArrowLeft, CreditCard, Shield, ShoppingCart, Globe, Info, Check, Smartphone } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCartStore } from '@/store/cartStore';
 import ClientOnly from '@/components/ClientOnly';
@@ -527,90 +527,188 @@ export default function CheckoutPage() {
         </div>
       </header>
 
-      <div className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid lg:grid-cols-2 gap-8 min-h-[50vh]">
+      <div className="flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid lg:grid-cols-2 gap-8 min-h-[60vh]">
           {/* Order Summary */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-6">Order Summary</h2>
-            <div className="space-y-4">
-              {cartItems.map((item, index) => (
-                <div key={index} className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <h3 className="font-medium text-gray-900">{item.domainName}</h3>
-                      <p className="text-sm text-gray-600">
-                        {item.registrationPeriod || 1} year(s) registration
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-gray-900">
-                        ₹{(item.price * item.registrationPeriod).toFixed(2)}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        ₹{item.price} per year
-                      </p>
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+              <div className="flex items-center mb-6">
+                <div className="bg-blue-100 p-2 rounded-lg mr-3">
+                  <ShoppingCart className="h-6 w-6 text-blue-600" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900">Order Summary</h2>
+              </div>
+
+              <div className="space-y-4 mb-6">
+                {cartItems.map((item, index) => (
+                  <div key={index} className="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-blue-300 transition-colors">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <div className="flex items-center mb-2">
+                          <div className="bg-green-100 p-1.5 rounded-md mr-3">
+                            <Globe className="h-4 w-4 text-green-600" />
+                          </div>
+                          <h3 className="font-semibold text-gray-900 text-lg">{item.domainName}</h3>
+                        </div>
+                        <div className="ml-8 space-y-1">
+                          <p className="text-sm text-gray-600">
+                            <span className="font-medium">Registration Period:</span> {item.registrationPeriod || 1} year(s)
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            <span className="font-medium">Price per year:</span> ₹{item.price}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            <span className="font-medium">Domain Type:</span> {item.domainName.includes('.io') ? 'Premium Domain' : 'Standard Domain'}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xl font-bold text-gray-900">
+                          ₹{(item.price * item.registrationPeriod).toFixed(2)}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Total for {item.registrationPeriod || 1} year(s)
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
 
-              <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-                <div className="space-y-2">
-                  <div className="border-t border-gray-200 pt-2">
+              {/* Order Details */}
+              <div className="bg-blue-50 rounded-lg p-4 mb-6">
+                <h3 className="font-semibold text-blue-900 mb-3 flex items-center">
+                  <Info className="h-4 w-4 mr-2" />
+                  What's Included
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                  <div className="flex items-center text-blue-800">
+                    <Check className="h-4 w-4 mr-2 text-green-600" />
+                    Domain Registration
+                  </div>
+                  <div className="flex items-center text-blue-800">
+                    <Check className="h-4 w-4 mr-2 text-green-600" />
+                    DNS Management
+                  </div>
+                  <div className="flex items-center text-blue-800">
+                    <Check className="h-4 w-4 mr-2 text-green-600" />
+                    Easy User Dashboard
+                  </div>
+                  <div className="flex items-center text-blue-800">
+                    <Check className="h-4 w-4 mr-2 text-green-600" />
+                    24/7 Support
+                  </div>
+                </div>
+              </div>
+
+              {/* Price Breakdown */}
+              <div className="bg-white border border-gray-200 rounded-lg p-4">
+                <h3 className="font-semibold text-gray-900 mb-4">Price Breakdown</h3>
+                <div className="space-y-3">
+                  {cartItems.map((item, index) => (
+                    <div key={index} className="flex justify-between items-center text-sm">
+                      <span className="text-gray-600">{item.domainName} ({item.registrationPeriod || 1} year)</span>
+                      <span className="font-medium">₹{(item.price * item.registrationPeriod).toFixed(2)}</span>
+                    </div>
+                  ))}
+                  <div className="border-t border-gray-200 pt-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-lg font-semibold text-gray-900">Total:</span>
+                      <span className="text-lg font-semibold text-gray-900">Total Amount:</span>
                       <span className="text-2xl font-bold text-blue-600">
                         ₹{getTotalPrice().toFixed(2)}
                       </span>
                     </div>
+                    <p className="text-xs text-gray-500 mt-1">All prices include applicable taxes</p>
                   </div>
                 </div>
               </div>
             </div>
-
           </div>
 
           {/* Payment Section */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-6">Payment</h2>
-            <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-              <div className="text-center mb-6">
-                <CreditCard className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  Secure Payment
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+              <div className="flex items-center mb-6">
+                <div className="bg-green-100 p-2 rounded-lg mr-3">
+                  <CreditCard className="h-6 w-6 text-green-600" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900">Secure Payment</h2>
+              </div>
+
+              {/* Payment Amount */}
+              <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-lg p-4 mb-6">
+                <div className="text-center">
+                  <p className="text-sm text-gray-600 mb-1">Total Amount</p>
+                  <p className="text-3xl font-bold text-gray-900">₹{getTotalPrice().toFixed(2)}</p>
+                  <p className="text-xs text-gray-500 mt-1">Including all taxes and fees</p>
+                </div>
+              </div>
+
+              {/* Security Features */}
+              <div className="mb-6">
+                <h3 className="font-semibold text-gray-900 mb-3 flex items-center">
+                  <Shield className="h-4 w-4 mr-2 text-green-600" />
+                  Security Features
                 </h3>
-                <p className="text-gray-600">
-                  Powered by Razorpay - Your payment information is secure
-                </p>
+                <div className="space-y-3">
+                  <div className="flex items-center text-sm text-gray-600 bg-green-50 p-2 rounded-lg">
+                    <Check className="h-4 w-4 mr-2 text-green-600" />
+                    <span>SSL Encrypted Connection</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600 bg-green-50 p-2 rounded-lg">
+                    <Check className="h-4 w-4 mr-2 text-green-600" />
+                    <span>PCI DSS Compliant</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600 bg-green-50 p-2 rounded-lg">
+                    <Check className="h-4 w-4 mr-2 text-green-600" />
+                    <span>256-bit Encryption</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600 bg-green-50 p-2 rounded-lg">
+                    <Check className="h-4 w-4 mr-2 text-green-600" />
+                    <span>Razorpay Protected</span>
+                  </div>
+                </div>
               </div>
 
-              <div className="space-y-3 mb-6">
-                <div className="flex items-center text-sm text-gray-600">
-                  <Shield className="h-4 w-4 mr-2 text-green-600" />
-                  <span>SSL Encrypted</span>
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <Shield className="h-4 w-4 mr-2 text-green-600" />
-                  <span>PCI DSS Compliant</span>
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <Shield className="h-4 w-4 mr-2 text-green-600" />
-                  <span>256-bit Encryption</span>
+              {/* Payment Methods */}
+              <div className="mb-6">
+                <h3 className="font-semibold text-gray-900 mb-3">Accepted Payment Methods</h3>
+                <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                  <div className="flex items-center">
+                    <CreditCard className="h-3 w-3 mr-1" />
+                    Credit Cards
+                  </div>
+                  <div className="flex items-center">
+                    <CreditCard className="h-3 w-3 mr-1" />
+                    Debit Cards
+                  </div>
+                  <div className="flex items-center">
+                    <Smartphone className="h-3 w-3 mr-1" />
+                    UPI
+                  </div>
+                  <div className="flex items-center">
+                    <Smartphone className="h-3 w-3 mr-1" />
+                    Net Banking
+                  </div>
                 </div>
               </div>
 
+              {/* Payment Button */}
               <button
                 onClick={handlePayment}
                 disabled={isProcessing || isPaymentInProgress || cartItems.length === 0}
-                className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors flex items-center justify-center"
+                className="w-full py-4 px-6 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white font-bold rounded-lg transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
                 {isProcessing || isPaymentInProgress ? (
                   <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
                     {isPaymentInProgress ? 'Payment in Progress...' : 'Processing...'}
                   </>
                 ) : (
-                  `Pay ₹${getTotalPrice().toFixed(2)}`
+                  <>
+                    <CreditCard className="h-5 w-5 mr-2" />
+                    Pay ₹{getTotalPrice().toFixed(2)}
+                  </>
                 )}
               </button>
 
@@ -629,10 +727,28 @@ export default function CheckoutPage() {
                 </div>
               )}
 
-              <p className="text-xs text-gray-500 text-center mt-4">
-                By proceeding, you agree to our{' '}
-                <a href="/terms-and-conditions" className="text-blue-600 hover:underline">terms and conditions</a>
-              </p>
+              {/* Trust Indicators */}
+              <div className="mt-4 text-center">
+                <p className="text-xs text-gray-500 mb-2">
+                  By proceeding, you agree to our{' '}
+                  <a href="/terms-and-conditions" className="text-blue-600 hover:underline">terms and conditions</a>
+                </p>
+                <div className="flex items-center justify-center space-x-4 text-xs text-gray-400">
+                  <span>🔒 Secure</span>
+                  <span>✓ Verified</span>
+                  <span>🛡️ Protected</span>
+                </div>
+              </div>
+
+              {/* Support Info */}
+              <div className="mt-6 p-3 bg-gray-50 rounded-lg">
+                <p className="text-xs text-gray-600 text-center">
+                  Need help? Contact our support team at{' '}
+                  <a href="mailto:support@exceltechnologies.com" className="text-blue-600 hover:underline">
+                    support@exceltechnologies.com
+                  </a>
+                </p>
+              </div>
             </div>
           </div>
         </div>
