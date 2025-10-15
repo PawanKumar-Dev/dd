@@ -45,7 +45,33 @@ export default function CartPage() {
           return;
         }
 
-        setUser(userObj);
+        // Refresh user data from server to get latest profileCompleted status
+        const refreshUserData = async () => {
+          try {
+            const response = await fetch('/api/auth/me', {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+              },
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              const updatedUser = {
+                ...userObj,
+                ...data.user
+              };
+              localStorage.setItem('user', JSON.stringify(updatedUser));
+              setUser(updatedUser);
+            } else {
+              setUser(userObj);
+            }
+          } catch (error) {
+            console.error('Error refreshing user data:', error);
+            setUser(userObj);
+          }
+        };
+
+        refreshUserData();
 
         // Merge local cart with server cart for logged-in users
         mergeWithServerCart();
@@ -65,24 +91,17 @@ export default function CartPage() {
   };
 
   const handleCheckout = () => {
-    console.log('🔍 Cart Debug - Checkout button clicked');
-    console.log('🔍 Cart Debug - Cart items:', cartItems);
-    console.log('🔍 Cart Debug - User:', user);
-
     if (cartItems.length === 0) {
-      console.log('❌ Cart Debug - Cart is empty, not proceeding');
       return;
     }
 
     // Check if user is logged in
     if (!user) {
-      console.log('❌ Cart Debug - No user, redirecting to login');
       // Redirect to login with return URL
       router.push(`/login?returnUrl=${encodeURIComponent('/checkout')}`);
       return;
     }
 
-    console.log('✅ Cart Debug - All checks passed, redirecting to checkout');
     // Redirect to checkout page
     router.push('/checkout');
   };

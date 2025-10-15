@@ -6,8 +6,17 @@ export async function GET(request: NextRequest) {
     const user = await AuthService.getUserFromRequest(request);
 
     if (!user) {
+      console.log("🔍 Server Debug - /api/auth/me: User not authenticated");
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
+
+    console.log("🔍 Server Debug - /api/auth/me: User found:", {
+      id: user._id,
+      email: user.email,
+      role: user.role,
+      profileCompleted: user.profileCompleted,
+      isActivated: user.isActivated,
+    });
 
     return NextResponse.json({
       user: {

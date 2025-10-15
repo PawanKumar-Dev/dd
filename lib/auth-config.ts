@@ -106,6 +106,15 @@ export const authOptions: NextAuthOptions = {
             });
 
             await dbUser.save();
+
+            // Send profile completion email for new social login users
+            const { EmailService } = await import("@/lib/email");
+            EmailService.sendProfileCompletionEmail(
+              user.email,
+              `${firstName} ${lastName}`.trim()
+            ).catch((error) => {
+              console.error("Profile completion email failed:", error);
+            });
           } else {
             // Update existing user with social login info if needed
             if (!dbUser.provider) {

@@ -35,39 +35,78 @@ export default function CheckoutPage() {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
 
-    console.log('🔍 Checkout Debug - Token exists:', !!token);
-    console.log('🔍 Checkout Debug - User data exists:', !!userData);
-
     if (!token || !userData) {
-      console.log('❌ Checkout Debug - Missing token or user data, redirecting to login');
       router.push('/login');
       return;
     }
 
     const userObj = JSON.parse(userData);
-    console.log('🔍 Checkout Debug - User object:', userObj);
-    console.log('🔍 Checkout Debug - User role:', userObj.role);
-    console.log('🔍 Checkout Debug - Profile completed:', userObj.profileCompleted);
 
-    // Redirect admin users to admin dashboard
-    if (userObj.role === 'admin') {
-      console.log('❌ Checkout Debug - User is admin, redirecting to admin dashboard');
-      router.push('/admin/dashboard');
-      return;
-    }
+    // Refresh user data from server to get latest profileCompleted status
+    const refreshUserData = async () => {
+      try {
+        const response = await fetch('/api/auth/me', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
 
-    // Check if user has completed profile (required for checkout)
-    if (!userObj.profileCompleted) {
-      console.log('❌ Checkout Debug - Profile not completed, redirecting to complete profile');
-      router.push(`/complete-profile?returnUrl=${encodeURIComponent('/checkout')}`);
-      return;
-    }
+        if (response.ok) {
+          const data = await response.json();
+          const updatedUser = {
+            ...userObj,
+            ...data.user
+          };
+          localStorage.setItem('user', JSON.stringify(updatedUser));
 
-    console.log('✅ Checkout Debug - All checks passed, setting user and syncing cart');
-    setUser(userObj);
+          // Redirect admin users to admin dashboard
+          if (updatedUser.role === 'admin') {
+            router.push('/admin/dashboard');
+            return;
+          }
 
-    // Sync cart with server
-    syncWithServer();
+          // Check if user has completed profile (required for checkout)
+          if (!updatedUser.profileCompleted) {
+            router.push(`/complete-profile?returnUrl=${encodeURIComponent('/checkout')}`);
+            return;
+          }
+
+          setUser(updatedUser);
+          syncWithServer();
+        } else {
+          // Fallback to original logic if refresh fails
+          if (userObj.role === 'admin') {
+            router.push('/admin/dashboard');
+            return;
+          }
+
+          if (!userObj.profileCompleted) {
+            router.push(`/complete-profile?returnUrl=${encodeURIComponent('/checkout')}`);
+            return;
+          }
+
+          setUser(userObj);
+          syncWithServer();
+        }
+      } catch (error) {
+        console.error('Error refreshing user data:', error);
+        // Fallback to original logic
+        if (userObj.role === 'admin') {
+          router.push('/admin/dashboard');
+          return;
+        }
+
+        if (!userObj.profileCompleted) {
+          router.push(`/complete-profile?returnUrl=${encodeURIComponent('/checkout')}`);
+          return;
+        }
+
+        setUser(userObj);
+        syncWithServer();
+      }
+    };
+
+    refreshUserData();
 
     // Load Razorpay script
     const script = document.createElement('script');
@@ -89,16 +128,7 @@ export default function CheckoutPage() {
   // Redirect to dashboard if cart is empty (after cart has been loaded)
   // But not if payment is in progress
   useEffect(() => {
-    console.log('🔍 Checkout Debug - Cart empty check:', {
-      isLoading,
-      cartItemsLength: cartItems.length,
-      user: !!user,
-      isPaymentInProgress,
-      cartItems
-    });
-
     if (!isLoading && cartItems.length === 0 && user && !isPaymentInProgress) {
-      console.log('❌ Checkout Debug - Cart is empty, redirecting to dashboard in 1 second');
       // Small delay to prevent immediate redirect during page load
       const timer = setTimeout(() => {
         router.push('/dashboard');

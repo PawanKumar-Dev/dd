@@ -548,6 +548,121 @@ export class EmailService {
   }
 
   /**
+   * Send profile completion email for social login users
+   */
+  static async sendProfileCompletionEmail(
+    userEmail: string,
+    userName: string
+  ): Promise<boolean> {
+    const profileCompletionUrl = `${process.env.NEXTAUTH_URL}/complete-profile`;
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Complete Your Profile - Excel Technologies</title>
+      </head>
+      <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f8f9fa;">
+        <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #f59e0b, #d97706); padding: 30px; text-align: center;">
+            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: bold;">📝 Complete Your Profile</h1>
+            <p style="color: #fef3c7; margin: 10px 0 0 0; font-size: 16px;">Finish setting up your account</p>
+          </div>
+          
+          <!-- Content -->
+          <div style="padding: 30px;">
+            <div style="text-align: center; margin-bottom: 30px;">
+              <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                <span style="color: #ffffff; font-size: 32px;">📋</span>
+              </div>
+              <h2 style="color: #374151; margin: 0 0 10px 0; font-size: 20px;">Welcome ${userName}!</h2>
+              <p style="color: #6b7280; margin: 0; font-size: 16px;">Your account has been created successfully. Now let's complete your profile.</p>
+            </div>
+            
+            <div style="background-color: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 20px; margin-bottom: 25px;">
+              <h3 style="color: #92400e; margin: 0 0 15px 0; font-size: 16px;">🔐 Profile Completion Required</h3>
+              <p style="color: #92400e; margin: 0; line-height: 1.5;">
+                To access all features including domain checkout, you need to complete your profile with additional information like phone number, company details, and address.
+              </p>
+            </div>
+            
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${profileCompletionUrl}" 
+                 style="display: inline-block; background: linear-gradient(135deg, #f59e0b, #d97706); color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(245, 158, 11, 0.3);">
+                Complete My Profile
+              </a>
+            </div>
+            
+            <div style="background-color: #f9fafb; border-radius: 6px; padding: 15px; margin-bottom: 25px;">
+              <p style="color: #6b7280; margin: 0 0 10px 0; font-size: 14px; font-weight: bold;">Can't click the button?</p>
+              <p style="color: #6b7280; margin: 0; font-size: 14px; word-break: break-all;">
+                Copy and paste this link into your browser:<br>
+                <span style="color: #3b82f6;">${profileCompletionUrl}</span>
+              </p>
+            </div>
+            
+            <div style="background-color: #dbeafe; border: 1px solid #3b82f6; border-radius: 8px; padding: 15px; margin-bottom: 25px;">
+              <h4 style="color: #1e40af; margin: 0 0 10px 0; font-size: 14px;">💡 Why Complete Your Profile?</h4>
+              <ul style="color: #1e40af; margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.5;">
+                <li>Access domain checkout and purchase features</li>
+                <li>Receive important notifications about your domains</li>
+                <li>Get better customer support</li>
+                <li>Ensure accurate billing and contact information</li>
+              </ul>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+              <p style="color: #6b7280; margin: 0; font-size: 14px;">
+                After completing your profile, you'll be able to:
+              </p>
+              <div style="display: flex; justify-content: center; gap: 20px; margin-top: 15px; flex-wrap: wrap;">
+                <div style="text-align: center;">
+                  <div style="width: 40px; height: 40px; background: #dbeafe; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+                    <span style="color: #3b82f6; font-size: 18px;">🛒</span>
+                  </div>
+                  <p style="color: #374151; margin: 0; font-size: 12px; font-weight: bold;">Checkout Domains</p>
+                </div>
+                <div style="text-align: center;">
+                  <div style="width: 40px; height: 40px; background: #dbeafe; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+                    <span style="color: #3b82f6; font-size: 18px;">📊</span>
+                  </div>
+                  <p style="color: #374151; margin: 0; font-size: 12px; font-weight: bold;">View Orders</p>
+                </div>
+                <div style="text-align: center;">
+                  <div style="width: 40px; height: 40px; background: #dbeafe; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+                    <span style="color: #3b82f6; font-size: 18px;">⚙️</span>
+                  </div>
+                  <p style="color: #374151; margin: 0; font-size: 12px; font-weight: bold;">Manage DNS</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Footer -->
+          <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+            <p style="color: #6b7280; margin: 0; font-size: 14px;">
+              This email was sent to ${userEmail}. If you have any questions, please contact our support team.
+            </p>
+            <p style="color: #9ca3af; margin: 5px 0 0 0; font-size: 12px;">
+              © 2024 Excel Technologies. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    return this.sendEmail({
+      to: userEmail,
+      subject: "📝 Complete Your Profile - Excel Technologies",
+      html,
+    });
+  }
+
+  /**
    * Send account activation email
    */
   static async sendActivationEmail(
