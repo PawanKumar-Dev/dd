@@ -554,7 +554,7 @@ export class EmailService {
     userEmail: string,
     userName: string
   ): Promise<boolean> {
-    const profileCompletionUrl = `${process.env.NEXTAUTH_URL}/complete-profile`;
+    const profileCompletionUrl = `${process.env.NEXTAUTH_URL}/dashboard/settings`;
 
     const html = `
       <!DOCTYPE html>

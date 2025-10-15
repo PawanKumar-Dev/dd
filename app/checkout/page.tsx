@@ -67,7 +67,7 @@ export default function CheckoutPage() {
 
           // Check if user has completed profile (required for checkout)
           if (!updatedUser.profileCompleted) {
-            router.push(`/complete-profile?returnUrl=${encodeURIComponent('/checkout')}`);
+            router.push(`/dashboard/settings?returnUrl=${encodeURIComponent('/checkout')}`);
             return;
           }
 
@@ -81,7 +81,7 @@ export default function CheckoutPage() {
           }
 
           if (!userObj.profileCompleted) {
-            router.push(`/complete-profile?returnUrl=${encodeURIComponent('/checkout')}`);
+            router.push(`/dashboard/settings?returnUrl=${encodeURIComponent('/checkout')}`);
             return;
           }
 
@@ -97,7 +97,7 @@ export default function CheckoutPage() {
         }
 
         if (!userObj.profileCompleted) {
-          router.push(`/complete-profile?returnUrl=${encodeURIComponent('/checkout')}`);
+          router.push(`/dashboard/settings?returnUrl=${encodeURIComponent('/checkout')}`);
           return;
         }
 

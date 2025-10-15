@@ -89,6 +89,9 @@ export async function PUT(request: NextRequest) {
         if (country) user.address.country = country;
         if (zipCode) user.address.zipcode = zipCode;
       }
+
+      // Mark profile as completed when user updates their profile
+      user.profileCompleted = true;
     }
 
     // Update password if provided
