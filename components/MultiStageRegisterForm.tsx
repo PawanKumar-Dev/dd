@@ -590,7 +590,14 @@ export default function MultiStageRegisterForm({ className = '' }: RegisterFormP
   };
 
   return (
-    <div className={`min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 ${className}`}>
+    <div className={`min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 ${className}`} style={{
+      backgroundImage: `
+        linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px)
+      `,
+      backgroundSize: '40px 40px',
+      backgroundPosition: '0 0, 0 0'
+    }}>
       <div className="max-w-2xl w-full space-y-8">
         <div className="text-center">
           <div className="flex justify-center mb-6">
