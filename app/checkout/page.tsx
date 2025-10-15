@@ -528,9 +528,9 @@ export default function CheckoutPage() {
       </header>
 
       <div className="flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid lg:grid-cols-2 gap-8 min-h-[60vh]">
+        <div className="grid lg:grid-cols-7 gap-8 min-h-[60vh]">
           {/* Order Summary */}
-          <div>
+          <div className="lg:col-span-4">
             <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
               <div className="flex items-center mb-6">
                 <div className="bg-blue-100 p-2 rounded-lg mr-3">
@@ -626,7 +626,7 @@ export default function CheckoutPage() {
           </div>
 
           {/* Payment Section */}
-          <div>
+          <div className="lg:col-span-3">
             <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
               <div className="flex items-center mb-6">
                 <div className="bg-green-100 p-2 rounded-lg mr-3">
@@ -644,31 +644,6 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* Security Features */}
-              <div className="mb-6">
-                <h3 className="font-semibold text-gray-900 mb-3 flex items-center">
-                  <Shield className="h-4 w-4 mr-2 text-green-600" />
-                  Security Features
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex items-center text-sm text-gray-600 bg-green-50 p-2 rounded-lg">
-                    <Check className="h-4 w-4 mr-2 text-green-600" />
-                    <span>SSL Encrypted Connection</span>
-                  </div>
-                  <div className="flex items-center text-sm text-gray-600 bg-green-50 p-2 rounded-lg">
-                    <Check className="h-4 w-4 mr-2 text-green-600" />
-                    <span>PCI DSS Compliant</span>
-                  </div>
-                  <div className="flex items-center text-sm text-gray-600 bg-green-50 p-2 rounded-lg">
-                    <Check className="h-4 w-4 mr-2 text-green-600" />
-                    <span>256-bit Encryption</span>
-                  </div>
-                  <div className="flex items-center text-sm text-gray-600 bg-green-50 p-2 rounded-lg">
-                    <Check className="h-4 w-4 mr-2 text-green-600" />
-                    <span>Razorpay Protected</span>
-                  </div>
-                </div>
-              </div>
 
               {/* Payment Methods */}
               <div className="mb-6">
