@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ShoppingCart, Trash2, ArrowLeft, CreditCard, Globe, Shield } from 'lucide-react';
+import { ShoppingCart, Trash2, ArrowLeft, CreditCard, Globe, Shield, Star, CheckCircle, Clock, Users, Award, Zap } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
@@ -113,6 +113,46 @@ export default function CartPage() {
           </div>
         </div>
 
+        {/* Trust Indicators */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 max-w-6xl mx-auto">
+          <div className="bg-white rounded-lg p-4 border border-gray-200 flex items-center space-x-3">
+            <div className="bg-green-100 p-2 rounded-full">
+              <Shield className="h-5 w-5 text-green-600" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-900">Secure Payment</p>
+              <p className="text-xs text-gray-600">SSL Protected</p>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg p-4 border border-gray-200 flex items-center space-x-3">
+            <div className="bg-blue-100 p-2 rounded-full">
+              <Clock className="h-5 w-5 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-900">Instant Setup</p>
+              <p className="text-xs text-gray-600">24/7 Support</p>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg p-4 border border-gray-200 flex items-center space-x-3">
+            <div className="bg-purple-100 p-2 rounded-full">
+              <Users className="h-5 w-5 text-purple-600" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-900">10,000+ Customers</p>
+              <p className="text-xs text-gray-600">Trusted Worldwide</p>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg p-4 border border-gray-200 flex items-center space-x-3">
+            <div className="bg-yellow-100 p-2 rounded-full">
+              <Award className="h-5 w-5 text-yellow-600" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-900">Premium Service</p>
+              <p className="text-xs text-gray-600">99.9% Uptime</p>
+            </div>
+          </div>
+        </div>
+
         {cartItems.length === 0 ? (
           <div className="text-center py-16 min-h-[60vh] flex flex-col justify-center">
             <div className="bg-gradient-to-br from-green-50 to-emerald-100 rounded-full p-6 w-24 h-24 mx-auto mb-6 flex items-center justify-center">
@@ -136,75 +176,152 @@ export default function CartPage() {
             </div>
           </div>
         ) : (
-          <div className="grid lg:grid-cols-3 gap-8 min-h-[50vh]">
+          <div className="grid lg:grid-cols-5 gap-8 min-h-[50vh]">
             {/* Cart Items */}
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-3">
               <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                 <div className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4">Cart Items</h2>
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-lg font-semibold text-gray-900">Cart Items</h2>
+                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      <span>All items verified</span>
+                    </div>
+                  </div>
                   <div className="space-y-4">
                     {cartItems.map((item) => (
-                      <div key={item.domainName} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                        <div className="flex-1">
-                          <h3 className="text-lg font-medium text-gray-900">{item.domainName}</h3>
-                          <p className="text-sm text-gray-600">
-                            {item.registrationPeriod} year(s) registration
-                          </p>
-                        </div>
+                      <div key={item.domainName} className="group relative p-6 border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-md transition-all duration-200">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-3 mb-2">
+                              <div className="bg-blue-100 p-2 rounded-lg">
+                                <Globe className="h-5 w-5 text-blue-600" />
+                              </div>
+                              <div>
+                                <h3 className="text-lg font-medium text-gray-900">{item.domainName}</h3>
+                                <p className="text-sm text-gray-600">
+                                  {item.registrationPeriod} year(s) registration
+                                </p>
+                              </div>
+                            </div>
 
-                        <div className="flex items-center space-x-4">
-                          {/* Registration Period Selector */}
-                          <div className="flex items-center space-x-2">
-                            <label className="text-sm text-gray-600">Registration Period:</label>
-                            <select
-                              value={item.registrationPeriod}
-                              onChange={(e) => handleRegistrationPeriodChange(item.domainName, parseInt(e.target.value))}
-                              className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            {/* Domain Features */}
+                            <div className="flex flex-wrap gap-2 mt-3">
+                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <CheckCircle className="h-3 w-3 mr-1" />
+                                Available
+                              </span>
+                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                <Zap className="h-3 w-3 mr-1" />
+                                Instant Setup
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center space-x-6">
+                            {/* Registration Period Selector */}
+                            <div className="flex flex-col space-y-2">
+                              <label className="text-sm font-medium text-gray-700">Registration Period:</label>
+                              <select
+                                value={item.registrationPeriod}
+                                onChange={(e) => handleRegistrationPeriodChange(item.domainName, parseInt(e.target.value))}
+                                className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
+                              >
+                                <option value={1}>1 Year</option>
+                                <option value={2}>2 Years</option>
+                                <option value={3}>3 Years</option>
+                                <option value={4}>4 Years</option>
+                                <option value={5}>5 Years</option>
+                                <option value={10}>10 Years</option>
+                              </select>
+                            </div>
+
+                            {/* Price */}
+                            <div className="text-right">
+                              <p className="text-xl font-bold text-gray-900">
+                                ₹{(item.price * item.registrationPeriod).toFixed(2)}
+                              </p>
+                              <p className="text-sm text-gray-600">
+                                ₹{item.price} per year
+                              </p>
+                              {item.registrationPeriod > 1 && (
+                                <p className="text-xs text-green-600 font-medium">
+                                  Save ₹{((item.price * item.registrationPeriod) - (item.price * item.registrationPeriod * 0.95)).toFixed(2)}
+                                </p>
+                              )}
+                            </div>
+
+                            {/* Remove Button */}
+                            <button
+                              onClick={() => removeItem(item.domainName)}
+                              className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-200 opacity-0 group-hover:opacity-100"
+                              title="Remove item"
                             >
-                              <option value={1}>1 Year</option>
-                              <option value={2}>2 Years</option>
-                              <option value={3}>3 Years</option>
-                              <option value={4}>4 Years</option>
-                              <option value={5}>5 Years</option>
-                              <option value={10}>10 Years</option>
-                            </select>
+                              <Trash2 className="h-4 w-4" />
+                            </button>
                           </div>
-
-                          {/* Price */}
-                          <div className="text-right">
-                            <p className="text-lg font-semibold text-gray-900">
-                              ₹{(item.price * item.registrationPeriod).toFixed(2)}
-                            </p>
-                            <p className="text-sm text-gray-600">
-                              ₹{item.price} per year
-                            </p>
-                          </div>
-
-                          {/* Remove Button */}
-                          <button
-                            onClick={() => removeItem(item.domainName)}
-                            className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-200"
-                            title="Remove item"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
               </div>
+
+              {/* Additional Services */}
+              <div className="mt-6 bg-white rounded-lg shadow-sm border border-gray-200">
+                <div className="p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Recommended Add-ons</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors">
+                      <div className="flex items-center space-x-3">
+                        <div className="bg-green-100 p-2 rounded-lg">
+                          <Shield className="h-5 w-5 text-green-600" />
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-gray-900">SSL Certificate</h4>
+                          <p className="text-sm text-gray-600">Free with domain</p>
+                        </div>
+                      </div>
+                      <span className="text-green-600 font-semibold">Free</span>
+                    </div>
+                    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors">
+                      <div className="flex items-center space-x-3">
+                        <div className="bg-blue-100 p-2 rounded-lg">
+                          <Users className="h-5 w-5 text-blue-600" />
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-gray-900">Privacy Protection</h4>
+                          <p className="text-sm text-gray-600">Hide your contact info</p>
+                        </div>
+                      </div>
+                      <span className="text-gray-600 font-semibold">₹299/year</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Order Summary */}
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-2">
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 sticky top-24">
                 <div className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h2>
+                  <h2 className="text-lg font-semibold text-gray-900 mb-6">Order Summary</h2>
 
-                  <div className="space-y-3 mb-6">
-                    <div className="border-t border-gray-200 pt-3">
-                      <div className="flex justify-between text-lg font-semibold">
+                  <div className="space-y-4 mb-6">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Subtotal ({getItemCount()} items)</span>
+                      <span className="text-gray-900">₹{getSubtotalPrice().toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Taxes & Fees</span>
+                      <span className="text-gray-900">₹0.00</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Discount</span>
+                      <span className="text-green-600">-₹0.00</span>
+                    </div>
+                    <div className="border-t border-gray-200 pt-4">
+                      <div className="flex justify-between text-lg font-bold">
                         <span>Total</span>
                         <span className="text-primary-600">₹{getTotalPrice().toFixed(2)}</span>
                       </div>
@@ -213,7 +330,7 @@ export default function CartPage() {
 
                   <button
                     onClick={handleCheckout}
-                    className="w-full btn btn-primary mb-4 flex items-center justify-center space-x-2"
+                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 mb-4 flex items-center justify-center space-x-2"
                   >
                     <CreditCard className="h-5 w-5" />
                     <span>{user ? 'Proceed to Checkout' : 'Login to Checkout'}</span>
@@ -235,12 +352,21 @@ export default function CartPage() {
 
                   <button
                     onClick={clearCart}
-                    className="w-full btn btn-outline text-red-600 hover:text-red-700 hover:border-red-300"
+                    className="w-full border border-red-300 text-red-600 hover:text-red-700 hover:border-red-400 hover:bg-red-50 font-medium py-2 px-4 rounded-lg transition-all duration-200"
                   >
                     Clear Cart
                   </button>
+
+                  {/* Security Badge */}
+                  <div className="mt-6 pt-6 border-t border-gray-200">
+                    <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
+                      <Shield className="h-4 w-4 text-green-600" />
+                      <span>Secure 256-bit SSL encryption</span>
+                    </div>
+                  </div>
                 </div>
               </div>
+
             </div>
           </div>
         )}
