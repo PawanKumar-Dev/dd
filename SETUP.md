@@ -169,7 +169,44 @@ sudo systemctl enable mongodb
    RAZORPAY_WEBHOOK_SECRET=your-webhook-secret
    ```
 
-### 8. Email Configuration
+### 8. Social Login Configuration (Optional)
+
+#### Google OAuth Setup
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select existing one
+3. Enable Google+ API
+4. Create OAuth 2.0 credentials
+5. Add authorized redirect URIs:
+   - `http://localhost:3000/api/auth/callback/google` (development)
+   - `https://your-domain.com/api/auth/callback/google` (production)
+
+#### Facebook OAuth Setup
+
+1. Go to [Facebook Developers](https://developers.facebook.com/)
+2. Create a new app
+3. Add Facebook Login product
+4. Configure OAuth redirect URIs:
+   - `http://localhost:3000/api/auth/callback/facebook` (development)
+   - `https://your-domain.com/api/auth/callback/facebook` (production)
+
+#### Environment Variables for Social Login
+
+```env
+# Social Login - Google OAuth
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+
+# Social Login - Facebook OAuth
+FACEBOOK_CLIENT_ID=your-facebook-app-id
+FACEBOOK_CLIENT_SECRET=your-facebook-app-secret
+
+# NextAuth Configuration
+NEXTAUTH_SECRET=your-nextauth-secret-here
+NEXTAUTH_URL=http://localhost:3000
+```
+
+### 9. Email Configuration
 
 #### Gmail SMTP
 
@@ -189,7 +226,7 @@ sudo systemctl enable mongodb
 SENDGRID_API_KEY=your-sendgrid-api-key
 ```
 
-### 9. Run the Application
+### 10. Run the Application
 
 #### Development
 
@@ -211,7 +248,7 @@ npm run build
 npm start
 ```
 
-### 10. Verify Setup
+### 11. Verify Setup
 
 1. **Check Database Connection:**
 
@@ -243,6 +280,13 @@ npm start
    - Check order management
    - Test settings configuration
 
+6. **Test Social Login (if configured):**
+   - Navigate to login page
+   - Test Google OAuth flow
+   - Test Facebook OAuth flow
+   - Verify profile completion flow
+   - Test admin protection (admin users cannot use social login)
+
 ## 🔧 Configuration Details
 
 ### Environment Variables Reference
@@ -267,6 +311,11 @@ npm start
 | `ADMIN_PASSWORD`           | ✅       | Admin user password       | `your-secure-password`          |
 | `ADMIN_FIRST_NAME`         | ✅       | Admin first name          | `Admin`                         |
 | `ADMIN_LAST_NAME`          | ✅       | Admin last name           | `User`                          |
+| `GOOGLE_CLIENT_ID`         | ⚪       | Google OAuth client ID    | `your-google-client-id`         |
+| `GOOGLE_CLIENT_SECRET`     | ⚪       | Google OAuth secret       | `your-google-client-secret`     |
+| `FACEBOOK_CLIENT_ID`       | ⚪       | Facebook app ID           | `your-facebook-app-id`          |
+| `FACEBOOK_CLIENT_SECRET`   | ⚪       | Facebook app secret       | `your-facebook-app-secret`      |
+| `NEXTAUTH_SECRET`          | ⚪       | NextAuth secret           | `your-nextauth-secret`          |
 
 ### Feature Flags
 

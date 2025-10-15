@@ -1,6 +1,10 @@
 # Social Login Implementation Guide
 
-This document explains the social login implementation for Google and Facebook authentication in the Domain Management System.
+This document explains the social login implementation for Google and Facebook authentication in the Excel Technologies Domain Management System.
+
+**Last Updated**: January 26, 2025  
+**Version**: 2.3.0  
+**Status**: Production-ready with comprehensive social login integration
 
 ## Overview
 
@@ -25,6 +29,14 @@ The system now supports social login for regular users while maintaining separat
 - NextAuth.js for social login
 - Custom JWT for admin and existing users
 - Seamless integration between both systems
+
+### 4. Enhanced Security Features
+
+- **Admin Protection**: Admin users cannot use social login (maintains security)
+- **Profile Validation**: Required fields are validated before checkout
+- **Token Management**: Dual token system maintains security
+- **OAuth Scopes**: Minimal required scopes for user data
+- **Session Management**: Secure session handling with proper expiration
 
 ## Setup Instructions
 
@@ -186,6 +198,22 @@ interface IUser {
 1. Try to access admin routes with social login
 2. Verify redirection to user dashboard
 3. Confirm admin users cannot use social login
+
+### Test Profile Completion Flow
+
+1. Sign in with social login
+2. Try to access checkout without completing profile
+3. Verify redirection to profile completion page
+4. Complete required fields
+5. Verify profile is marked as completed
+6. Test checkout access after profile completion
+
+### Test Dual Authentication
+
+1. Test credential-based login for admin users
+2. Test social login for regular users
+3. Verify both systems work independently
+4. Test session management for both types
 
 ## Troubleshooting
 
