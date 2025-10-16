@@ -232,6 +232,9 @@ export async function POST(request: NextRequest) {
     const successfulDomains = [];
     const orderDomains = [];
 
+    // Define nameservers at higher scope for pending domain creation
+    let nameServers: string[] | undefined;
+
     for (const item of cartItems) {
       console.log(`🔄 [PAYMENT-VERIFY] Registering domain: ${item.domainName}`);
 
@@ -247,7 +250,6 @@ export async function POST(request: NextRequest) {
 
       try {
         // Get user's nameserver configuration (if any)
-        let nameServers: string[] | undefined;
         try {
           // In a real implementation, you might store this in the database
           // For now, we'll use ResellerClub defaults as configured in the API
