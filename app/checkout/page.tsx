@@ -352,29 +352,27 @@ export default function CheckoutPage() {
           ondismiss: function () {
             setIsProcessing(false);
             setIsPaymentInProgress(false);
-            // Payment was cancelled by user
-            const paymentResult = {
-              status: 'failed',
-              errorMessage: 'Payment was cancelled by user',
-              errorType: 'user_cancelled',
-              amount: getTotalPrice(),
-              currency: 'INR',
-              timestamp: Date.now(),
-              supportContact: 'support@exceltechnologies.com'
+
+            // Payment was cancelled by user - preserve cart for better UX
+            console.log('🔄 [CHECKOUT] Payment cancelled by user - preserving cart');
+
+            // Save cart to server to ensure it's preserved
+            const saveCartToServer = async () => {
+              try {
+                await syncWithServer();
+                console.log('✅ [CHECKOUT] Cart saved to server after payment cancellation');
+              } catch (error) {
+                console.error('❌ [CHECKOUT] Failed to save cart after cancellation:', error);
+              }
             };
 
-            sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
+            saveCartToServer();
 
-            // Mark payment as completed to prevent dashboard redirect
-            setPaymentCompleted(true);
+            // Show user-friendly cancellation message
+            toast.error('Payment was cancelled. Your cart has been saved and you can try again anytime.');
 
-            // Redirect immediately to success page
-            router.push('/payment-success');
-
-            // Clear cart in background after redirect (user won't see this)
-            setTimeout(() => {
-              clearCart();
-            }, 100);
+            // Don't redirect to payment success page - stay on checkout
+            // User can retry payment or continue shopping
           },
         },
       };
@@ -418,19 +416,23 @@ export default function CheckoutPage() {
           supportContact: 'support@exceltechnologies.com'
         };
 
-        sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
+        // Save cart to server to preserve it for retry
+        const saveCartToServer = async () => {
+          try {
+            await syncWithServer();
+            console.log('✅ [CHECKOUT] Cart saved to server after payment failure');
+          } catch (error) {
+            console.error('❌ [CHECKOUT] Failed to save cart after payment failure:', error);
+          }
+        };
 
-        // Clear cart immediately before redirect
-        clearCart();
+        saveCartToServer();
 
-        // Mark payment as completed to prevent dashboard redirect
-        setPaymentCompleted(true);
+        // Show user-friendly error message
+        toast.error(`${errorMessage} Your cart has been saved and you can try again.`);
 
-        // Reset payment in progress flag immediately
-        setIsPaymentInProgress(false);
-
-        // Redirect immediately to success page
-        router.push('/payment-success');
+        // Don't redirect - stay on checkout page for retry
+        // User can retry payment or continue shopping
       });
 
       rzp.open();
@@ -474,13 +476,23 @@ export default function CheckoutPage() {
         supportContact: 'support@exceltechnologies.com'
       };
 
-      sessionStorage.setItem('paymentResult', JSON.stringify(paymentResult));
+      // Save cart to server to preserve it for retry
+      const saveCartToServer = async () => {
+        try {
+          await syncWithServer();
+          console.log('✅ [CHECKOUT] Cart saved to server after payment initialization error');
+        } catch (error) {
+          console.error('❌ [CHECKOUT] Failed to save cart after initialization error:', error);
+        }
+      };
 
-      // Clear cart immediately before redirect
-      clearCart();
+      saveCartToServer();
 
-      // Redirect immediately to success page
-      router.push('/payment-success');
+      // Show user-friendly error message
+      toast.error(`${errorMessage} Your cart has been saved and you can try again.`);
+
+      // Don't redirect - stay on checkout page for retry
+      // User can retry payment or continue shopping
     }
   };
 
@@ -710,6 +722,19 @@ export default function CheckoutPage() {
                   </div>
                 </div>
               )}
+
+              {/* Cart Preservation Notice */}
+              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-start">
+                  <Info className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-xs text-blue-800 font-medium">Your cart is safe</p>
+                    <p className="text-xs text-blue-700 mt-1">
+                      If you cancel payment or encounter any issues, your selected domains will be saved and you can try again anytime.
+                    </p>
+                  </div>
+                </div>
+              </div>
 
               {/* Trust Indicators */}
               <div className="mt-4 text-center">

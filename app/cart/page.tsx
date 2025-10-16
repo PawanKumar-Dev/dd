@@ -361,6 +361,19 @@ export default function CartPage() {
                     <span>{user ? 'Proceed to Checkout' : 'Login to Checkout'}</span>
                   </button>
 
+                  {/* Cart Preservation Notice */}
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
+                    <div className="flex items-start">
+                      <CheckCircle className="h-4 w-4 text-green-600 mr-2 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="text-xs text-green-800 font-medium">Your cart is automatically saved</p>
+                        <p className="text-xs text-green-700 mt-1">
+                          If you cancel payment or encounter any issues, your selected domains will be preserved and you can try again anytime.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
                   {!user && (
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
                       <div className="flex items-start space-x-3">
