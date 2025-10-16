@@ -8,7 +8,6 @@ import { useCartStore } from '@/store/cartStore';
 import ClientOnly from '@/components/ClientOnly';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
-import { usePreventNavigation } from '@/hooks/usePreventNavigation';
 
 interface User {
   id: string;
@@ -120,11 +119,7 @@ export default function CheckoutPage() {
     };
   }, [router, syncWithServer]);
 
-  // Prevent user from leaving page during payment processing
-  usePreventNavigation(
-    isPaymentInProgress,
-    'Payment is in progress. Are you sure you want to leave? This may cancel your payment.'
-  );
+  // Navigation prevention removed - users can freely navigate during payment
 
   // Redirect to dashboard if cart is empty (after cart has been loaded)
   // But not if payment is in progress or just completed
