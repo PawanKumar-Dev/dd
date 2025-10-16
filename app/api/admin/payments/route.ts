@@ -24,8 +24,8 @@ export async function GET(request: NextRequest) {
     const to = searchParams.get("to");
 
     // For the latest transactions, we'll fetch a reasonable number to ensure we have enough domain payments
-    // Since we want only the latest 5, we'll fetch more to filter domain payments
-    const fetchLimit = Math.max(limit * 3, 15); // Fetch 3x the requested limit or minimum 15 for better filtering
+    // Since we want only the latest 5, we'll fetch more to filter domain payments and include failed payments
+    const fetchLimit = Math.max(limit * 5, 25); // Fetch 5x the requested limit or minimum 25 for better filtering
     const fetchSkip = 0; // Always start from the beginning to get the latest payments
 
     let razorpayPayments;

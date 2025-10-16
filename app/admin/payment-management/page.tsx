@@ -40,6 +40,7 @@ export default function AdminPayments() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
   const router = useRouter();
 
   const pageSize = 5; // Show 5 items per page
@@ -277,7 +278,7 @@ export default function AdminPayments() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Payment Management</h1>
-            <p className="text-gray-600">Latest domain purchase payments from Razorpay - showing 5 most recent transactions</p>
+            <p className="text-gray-600">Latest domain purchase payments from Razorpay - showing 5 most recent transactions (including failed payments)</p>
           </div>
           <button
             onClick={() => loadPayments(currentPage, searchTerm)}
@@ -289,15 +290,31 @@ export default function AdminPayments() {
         </div>
 
 
+        {/* Status Filter */}
+        <div className="flex items-center space-x-4 mb-4">
+          <label className="text-sm font-medium text-gray-700">Filter by Status:</label>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="all">All Payments</option>
+            <option value="captured">Successful</option>
+            <option value="failed">Failed</option>
+            <option value="pending">Pending</option>
+            <option value="refunded">Refunded</option>
+          </select>
+        </div>
+
         {/* Payments Table */}
         <AdminDataTable
           title="Latest Payments"
           columns={columns}
-          data={payments}
+          data={statusFilter === 'all' ? payments : payments.filter(p => p.status === statusFilter)}
           searchable={false}
           pagination={false}
           pageSize={5}
-          totalItems={payments.length}
+          totalItems={statusFilter === 'all' ? payments.length : payments.filter(p => p.status === statusFilter).length}
           currentPage={1}
           onPageChange={handlePageChange}
           onSearch={handleSearch}
@@ -349,6 +366,7 @@ export default function AdminPayments() {
                   <div>
                     <label className="text-sm font-medium text-gray-500">Amount</label>
                     <p className="text-lg font-semibold">₹{selectedPayment.amount.toFixed(2)} {selectedPayment.currency}</p>
+                    <p className="text-xs text-gray-500 mt-1">*All prices include 18% GST</p>
                   </div>
                 </div>
 

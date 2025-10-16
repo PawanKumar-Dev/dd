@@ -98,7 +98,7 @@ export class RazorpayPaymentsService {
 
   /**
    * Filter payments that are related to domain purchases
-   * This filters based on our order ID pattern and description
+   * This filters based on our order ID pattern, description, and includes failed payments
    */
   static filterDomainPayments(payments: RazorpayPayment[]): RazorpayPayment[] {
     return payments.filter((payment) => {
@@ -113,11 +113,23 @@ export class RazorpayPaymentsService {
           payment.notes.domain ||
           payment.notes.domains);
 
-      // Check if payment amount is reasonable for domain purchase (₹500 - ₹5000)
+      // Check if payment amount is reasonable for domain purchase (₹100 - ₹10000)
+      // Expanded range to include more domain pricing scenarios
       const isReasonableAmount =
-        payment.amount >= 50000 && payment.amount <= 500000; // Amount in paise
+        payment.amount >= 10000 && payment.amount <= 1000000; // Amount in paise
 
-      return hasOrderId || hasDomainNotes || isReasonableAmount;
+      // Include failed payments that might be domain-related
+      const isFailedDomainPayment =
+        payment.status === "failed" &&
+        (hasOrderId || hasDomainNotes || isReasonableAmount);
+
+      // Include all payments that match our domain criteria OR are failed payments with domain indicators
+      return (
+        hasOrderId ||
+        hasDomainNotes ||
+        isReasonableAmount ||
+        isFailedDomainPayment
+      );
     });
   }
 
