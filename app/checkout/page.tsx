@@ -666,8 +666,8 @@ export default function CheckoutPage() {
               </div>
 
 
-              {/* Payment Methods */}
-              <div className="mb-6">
+              {/* Payment Methods - Fixed height to prevent layout shift */}
+              <div className="mb-6 min-h-[120px]">
                 <h3 className="font-semibold text-gray-900 mb-3">Accepted Payment Methods</h3>
                 <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
                   <div className="flex items-center">
@@ -689,42 +689,48 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* Payment Button */}
-              <button
-                onClick={handlePayment}
-                disabled={isProcessing || isPaymentInProgress || cartItems.length === 0}
-                className="w-full py-4 px-6 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white font-bold rounded-lg transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-              >
-                {isProcessing || isPaymentInProgress ? (
-                  <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
-                    {isPaymentInProgress ? 'Payment in Progress...' : 'Processing...'}
-                  </>
-                ) : (
-                  <>
-                    <CreditCard className="h-5 w-5 mr-2" />
-                    Pay ₹{getTotalPrice().toFixed(2)}
-                  </>
-                )}
-              </button>
+              {/* Payment Button - Fixed height to prevent layout shift */}
+              <div className="h-16 flex items-center">
+                <button
+                  onClick={handlePayment}
+                  disabled={isProcessing || isPaymentInProgress || cartItems.length === 0}
+                  className="w-full py-4 px-6 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white font-bold rounded-lg transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                >
+                  {isProcessing || isPaymentInProgress ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                      {isPaymentInProgress ? 'Payment in Progress...' : 'Processing...'}
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="h-5 w-5 mr-2" />
+                      Pay ₹{getTotalPrice().toFixed(2)}
+                    </>
+                  )}
+                </button>
+              </div>
 
-              {/* Payment Progress Indicator */}
-              {isPaymentInProgress && (
-                <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <div className="flex items-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-600 mr-3"></div>
-                    <div>
-                      <p className="text-sm font-medium text-yellow-800">Payment in Progress</p>
-                      <p className="text-xs text-yellow-700">
-                        Please do not close this page or navigate away. Your payment is being processed.
-                      </p>
+              {/* Payment Progress Indicator - Always reserve space */}
+              <div className="mt-4 min-h-[80px] transition-all duration-300 ease-in-out">
+                {isPaymentInProgress ? (
+                  <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg animate-in fade-in-0 slide-in-from-top-2 duration-300">
+                    <div className="flex items-center">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-600 mr-3"></div>
+                      <div>
+                        <p className="text-sm font-medium text-yellow-800">Payment in Progress</p>
+                        <p className="text-xs text-yellow-700">
+                          Please do not close this page or navigate away. Your payment is being processed.
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                ) : (
+                  <div className="h-[80px] transition-all duration-300 ease-in-out"></div>
+                )}
+              </div>
 
-              {/* Cart Preservation Notice */}
-              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              {/* Cart Preservation Notice - Fixed height to prevent layout shift */}
+              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg min-h-[80px] transition-all duration-300 ease-in-out">
                 <div className="flex items-start">
                   <Info className="h-4 w-4 text-blue-600 mr-2 mt-0.5 flex-shrink-0" />
                   <div>
@@ -736,8 +742,8 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* Trust Indicators */}
-              <div className="mt-4 text-center">
+              {/* Trust Indicators - Fixed height to prevent layout shift */}
+              <div className="mt-4 text-center min-h-[60px] transition-all duration-300 ease-in-out">
                 <p className="text-xs text-gray-500 mb-2">
                   By proceeding, you agree to our{' '}
                   <a href="/terms-and-conditions" className="text-blue-600 hover:underline">terms and conditions</a>
@@ -749,8 +755,8 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* Support Info */}
-              <div className="mt-6 p-3 bg-gray-50 rounded-lg">
+              {/* Support Info - Fixed height to prevent layout shift */}
+              <div className="mt-6 p-3 bg-gray-50 rounded-lg min-h-[60px] transition-all duration-300 ease-in-out">
                 <p className="text-xs text-gray-600 text-center">
                   Need help? Contact our support team at{' '}
                   <a href="mailto:support@exceltechnologies.com" className="text-blue-600 hover:underline">
