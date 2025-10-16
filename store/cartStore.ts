@@ -140,8 +140,11 @@ export const useCartStore = create<CartStore>()(
           }
 
           set({ isInitialized: true });
-        } catch (error) {
-          console.error("Failed to sync cart with server:", error);
+        } catch (error: any) {
+          // Only log non-abort errors to reduce noise in development
+          if (error.code !== "ECONNRESET" && error.name !== "AbortError") {
+            console.error("Failed to sync cart with server:", error);
+          }
         } finally {
           set({ isLoading: false });
         }
@@ -163,8 +166,11 @@ export const useCartStore = create<CartStore>()(
             const data = await response.json();
             set({ items: data.cart || [] });
           }
-        } catch (error) {
-          console.error("Failed to load cart from server:", error);
+        } catch (error: any) {
+          // Only log non-abort errors to reduce noise in development
+          if (error.code !== "ECONNRESET" && error.name !== "AbortError") {
+            console.error("Failed to load cart from server:", error);
+          }
         }
       },
 
@@ -187,8 +193,11 @@ export const useCartStore = create<CartStore>()(
           if (response.ok) {
             // Cart saved successfully
           }
-        } catch (error) {
-          console.error("Failed to save cart to server:", error);
+        } catch (error: any) {
+          // Only log non-abort errors to reduce noise in development
+          if (error.code !== "ECONNRESET" && error.name !== "AbortError") {
+            console.error("Failed to save cart to server:", error);
+          }
         }
       },
 
@@ -229,8 +238,11 @@ export const useCartStore = create<CartStore>()(
             // Save merged cart to server
             await get().saveToServer();
           }
-        } catch (error) {
-          console.error("Failed to merge cart with server:", error);
+        } catch (error: any) {
+          // Only log non-abort errors to reduce noise in development
+          if (error.code !== "ECONNRESET" && error.name !== "AbortError") {
+            console.error("Failed to merge cart with server:", error);
+          }
         }
       },
     }),
