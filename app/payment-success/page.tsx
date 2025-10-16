@@ -234,7 +234,10 @@ export default function PaymentResultPage() {
                 {result.amount && (
                   <div className="flex justify-between">
                     <span className="text-green-700">Amount:</span>
-                    <span className="font-semibold text-green-800">₹{result.amount.toFixed(2)} {result.currency}</span>
+                    <div className="text-right">
+                      <span className="font-semibold text-green-800">₹{result.amount.toFixed(2)} {result.currency}</span>
+                      <p className="text-xs text-green-600 mt-1">*All prices include 18% GST</p>
+                    </div>
                   </div>
                 )}
                 <div className="flex justify-between">

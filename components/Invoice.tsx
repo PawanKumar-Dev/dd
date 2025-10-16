@@ -212,6 +212,7 @@ export default function Invoice({ order, isOpen, onClose }: InvoiceProps) {
                         <span>Total:</span>
                         <span>₹{total.toFixed(2)} {order.currency}</span>
                       </div>
+                      <p className="text-xs text-gray-500 text-right mt-1">*All prices include 18% GST</p>
                     </div>
                   </div>
                 </div>
