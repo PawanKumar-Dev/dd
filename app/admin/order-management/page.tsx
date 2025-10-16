@@ -703,6 +703,7 @@ export default function AdminOrdersPage() {
                     <div>
                       <label className="text-sm font-medium text-gray-500">Amount</label>
                       <p className="text-lg font-semibold">₹{selectedOrder.amount.toFixed(2)} {selectedOrder.currency}</p>
+                      <p className="text-xs text-gray-500 mt-1">*All prices include 18% GST</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-500">Payment ID</label>

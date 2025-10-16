@@ -228,13 +228,15 @@ export async function GET(
     });
 
     // Order total - use stored values from order if available
-    const total = order.amount || order.domains
-      .filter((d: any) => d.status === "registered")
-      .reduce(
-        (total: number, domain: any) =>
-          total + domain.price * domain.registrationPeriod,
-        0
-      );
+    const total =
+      order.amount ||
+      order.domains
+        .filter((d: any) => d.status === "registered")
+        .reduce(
+          (total: number, domain: any) =>
+            total + domain.price * domain.registrationPeriod,
+          0
+        );
 
     const summaryY = Math.max(currentY + 20, pageHeight - 80);
 
@@ -267,6 +269,17 @@ export async function GET(
       `₹${total.toFixed(2)} ${order.currency}`,
       summaryX + summaryWidth - 5,
       summaryY + 20,
+      { align: "right" }
+    );
+
+    // GST Note
+    pdf.setFontSize(8);
+    pdf.setFont("helvetica", "normal");
+    pdf.setTextColor(lightGray[0], lightGray[1], lightGray[2]);
+    pdf.text(
+      "*All prices include 18% GST",
+      summaryX + summaryWidth - 5,
+      summaryY + 30,
       { align: "right" }
     );
 
