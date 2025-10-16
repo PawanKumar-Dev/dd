@@ -378,9 +378,16 @@ export async function POST(request: NextRequest) {
             `⏳ [PAYMENT-VERIFY] Domain registration pending: ${item.domainName} - ${result.message}`
           );
 
+          // Create user-friendly message for pending status
+          const userFriendlyMessage =
+            result.message &&
+            result.message.toLowerCase().includes("order locked for processing")
+              ? "Domain registration is being processed. Our team will complete the registration shortly."
+              : `Domain registration pending: ${result.message}`;
+
           domainBookingStatus.push({
             step: "domain_pending" as any,
-            message: `Domain registration pending: ${result.message}`,
+            message: userFriendlyMessage,
             timestamp: new Date(),
             progress: 50,
           });
@@ -398,7 +405,7 @@ export async function POST(request: NextRequest) {
             registrationPeriod: item.registrationPeriod || 1,
             status: "pending",
             bookingStatus: domainBookingStatus,
-            error: result.message,
+            error: userFriendlyMessage, // Use user-friendly message instead of raw error
             resellerClubCustomerId: customerResult.customerId,
             resellerClubContactId: customerResult.contactId,
           });
@@ -540,6 +547,40 @@ export async function POST(request: NextRequest) {
 
     // Process verification results and create pending domains for failed registrations
     const pendingDomainsToCreate = [];
+
+    // First, add domains that were already marked as pending during registration
+    for (const orderDomain of orderDomains) {
+      if (orderDomain.status === "pending") {
+        console.log(
+          `📝 [PAYMENT-VERIFY] Creating pending domain record for: ${orderDomain.domainName}`
+        );
+
+        const pendingDomainData = {
+          domainName: orderDomain.domainName,
+          price: orderDomain.price,
+          currency: orderDomain.currency,
+          registrationPeriod: orderDomain.registrationPeriod,
+          userId: user._id.toString(),
+          orderId: orderId,
+          customerId: orderDomain.resellerClubCustomerId,
+          contactId: orderDomain.resellerClubContactId,
+          nameServers: nameServers,
+          adminContactId: customerResult.contactId,
+          techContactId: customerResult.contactId,
+          billingContactId: customerResult.contactId,
+          status: "pending",
+          reason:
+            orderDomain.error ||
+            "Domain registration pending - requires manual processing",
+          verificationAttempts: 0,
+          lastVerifiedAt: new Date(),
+        };
+
+        pendingDomainsToCreate.push(pendingDomainData);
+      }
+    }
+
+    // Then, process verification results for domains that appeared successful
     for (const verificationResult of verificationResults) {
       const orderDomain = orderDomains.find(
         (d) => d.domainName === verificationResult.domainName
@@ -547,6 +588,7 @@ export async function POST(request: NextRequest) {
 
       if (
         orderDomain &&
+        orderDomain.status === "registered" && // Only check domains that appeared successful
         DomainVerificationService.isPendingRegistration(verificationResult)
       ) {
         console.log(
@@ -582,6 +624,7 @@ export async function POST(request: NextRequest) {
         pendingDomainsToCreate.push(pendingDomainData);
       } else if (
         orderDomain &&
+        orderDomain.status === "registered" &&
         verificationResult.registrationStatus === "success"
       ) {
         console.log(

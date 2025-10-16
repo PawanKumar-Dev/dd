@@ -36,8 +36,25 @@ export class DomainVerificationService {
     );
 
     try {
-      // Search for the domain to check if it's still available
-      const searchResults = await ResellerClubWrapper.searchDomain(domainName);
+      // Parse domain name to get base domain and TLD
+      const domainParts = domainName.split(".");
+      const baseDomain = domainParts[0];
+      const tld = domainParts.slice(1).join(".");
+
+      console.log(
+        `🔍 [DOMAIN-VERIFICATION] Parsed domain: base="${baseDomain}", tld="${tld}"`
+      );
+
+      // Search for the domain using the base domain and TLD
+      const searchResults = await ResellerClubWrapper.searchDomainWithTlds(
+        baseDomain,
+        [tld]
+      );
+
+      console.log(
+        `🔍 [DOMAIN-VERIFICATION] Search results for ${domainName}:`,
+        searchResults
+      );
 
       // Find the exact domain in search results
       const domainResult = searchResults.find(
@@ -48,11 +65,49 @@ export class DomainVerificationService {
         console.log(
           `❌ [DOMAIN-VERIFICATION] Domain not found in search results: ${domainName}`
         );
+        console.log(
+          `🔍 [DOMAIN-VERIFICATION] Available search results:`,
+          searchResults.map((r) => `${r.domainName} (${r.status})`)
+        );
+
+        // If domain is not found in search results, it could mean:
+        // 1. Domain is registered (not available for search)
+        // 2. Domain search failed or returned unexpected results
+        // 3. Domain search API returned different format
+
+        // Check if any search results contain our domain name (partial match)
+        const partialMatch = searchResults.find(
+          (result) =>
+            result.domainName
+              .toLowerCase()
+              .includes(domainName.toLowerCase()) ||
+            domainName.toLowerCase().includes(result.domainName.toLowerCase())
+        );
+
+        if (partialMatch) {
+          console.log(
+            `🔍 [DOMAIN-VERIFICATION] Found partial match: ${partialMatch.domainName} (${partialMatch.status})`
+          );
+          // Use the partial match result
+          const isAvailable = partialMatch.status === "available";
+          return {
+            domainName,
+            isAvailable,
+            registrationStatus: isAvailable ? "pending" : "success",
+            reason: isAvailable
+              ? "Domain still available - registration likely failed due to insufficient funds"
+              : "Domain no longer available - registration successful",
+            checkedAt: new Date(),
+          };
+        }
+
+        // No match found - be conservative and mark as pending for manual verification
         return {
           domainName,
           isAvailable: false,
-          registrationStatus: "success", // If not found in search, likely registered
-          reason: "Domain not found in availability search - likely registered",
+          registrationStatus: "pending",
+          reason:
+            "Domain not found in availability search - needs manual verification",
           checkedAt: new Date(),
         };
       }

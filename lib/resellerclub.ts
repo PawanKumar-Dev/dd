@@ -1623,8 +1623,12 @@ export class ResellerClubAPI {
 
       const responseTime = Date.now() - startTime;
 
-      // Check if the response contains an error status
-      if (response.data && response.data.status === "error") {
+      // Check if the response contains an error status or error message
+      const hasError =
+        response.data &&
+        (response.data.status === "error" || response.data.error);
+
+      if (hasError) {
         console.error(
           `❌ [PRODUCTION] Domain registration failed for "${domainData.domainName}" in ${responseTime}ms:`,
           {
@@ -1646,19 +1650,26 @@ export class ResellerClubAPI {
         const errorMessage =
           response.data.error || "Domain registration failed";
 
-        // More conservative approach - only mark as pending for very specific balance-related errors
-        // We'll be more restrictive until we have actual ResellerClub response examples
-        const isInsufficientBalance =
+        // Check for various error conditions that indicate pending status
+        const isPendingStatus =
           errorMessage &&
           (errorMessage.toLowerCase().includes("insufficient balance") ||
             errorMessage.toLowerCase().includes("low funds") ||
             errorMessage.toLowerCase().includes("insufficient funds") ||
             errorMessage.toLowerCase().includes("account balance") ||
-            errorMessage.toLowerCase().includes("credit limit"));
+            errorMessage.toLowerCase().includes("credit limit") ||
+            errorMessage
+              .toLowerCase()
+              .includes("order locked for processing") ||
+            errorMessage.toLowerCase().includes("please contact support") ||
+            errorMessage.toLowerCase().includes("locked for processing") ||
+            errorMessage.toLowerCase().includes("processing") ||
+            response.data.status === "InvoicePaid"); // InvoicePaid with error message indicates pending
 
         return {
-          status: isInsufficientBalance ? "pending" : "error",
+          status: isPendingStatus ? "pending" : "error",
           message: errorMessage,
+          data: response.data, // Include full response data for debugging
         };
       }
 
