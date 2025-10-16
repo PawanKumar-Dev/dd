@@ -202,10 +202,12 @@ Reset password with reset token.
 NextAuth.js API route handler for social login providers.
 
 **Supported Providers:**
+
 - Google OAuth
 - Facebook OAuth
 
 **Endpoints:**
+
 - `GET /api/auth/signin` - Social login page
 - `GET /api/auth/callback/google` - Google OAuth callback
 - `GET /api/auth/callback/facebook` - Facebook OAuth callback
@@ -217,9 +219,11 @@ NextAuth.js API route handler for social login providers.
 Complete profile for social login users.
 
 **Headers:**
+
 - `Authorization: Bearer <token>` (NextAuth session)
 
 **Request Body:**
+
 ```json
 {
   "phone": "string",
@@ -236,6 +240,7 @@ Complete profile for social login users.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -249,6 +254,7 @@ Complete profile for social login users.
 ```
 
 **Features:**
+
 - Required for social login users before checkout
 - Validates all required fields
 - Updates user profile in database
@@ -398,6 +404,7 @@ Add a new DNS record to a domain.
 ```
 
 **Priority Field Rules:**
+
 - **Required for**: MX and SRV records
 - **Optional for**: A, AAAA, CNAME, TXT, NS records
 - **Range**: 0-65535
@@ -1135,7 +1142,7 @@ For API support and questions:
 
 ---
 
-**Last Updated**: January 26, 2025  
-**Version**: 2.3.0  
+**Last Updated**: October 16, 2025  
+**Version**: 2.4.0  
 **Author**: Excel Technologies  
-**Status**: Production-ready with fully functional DNS Management API and Social Login Integration
+**Status**: Production-ready with fully functional DNS Management API, Social Login Integration, and comprehensive testing suite
