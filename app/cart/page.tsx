@@ -362,19 +362,6 @@ export default function CartPage() {
                   </button>
 
 
-                  {!user && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                      <div className="flex items-start space-x-3">
-                        <Shield className="h-5 w-5 text-blue-600 mt-0.5" />
-                        <div>
-                          <h3 className="text-sm font-medium text-blue-800">Login Required for Checkout</h3>
-                          <p className="text-sm text-blue-700 mt-1">
-                            You need to be logged in to complete your purchase. Your cart will be saved.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
 
                   {user && user.profileCompleted === false && (
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">

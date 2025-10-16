@@ -735,18 +735,6 @@ export default function CheckoutPage() {
                 )}
               </div>
 
-              {/* Trust Indicators - Fixed height to prevent layout shift */}
-              <div className="mt-4 text-center h-[60px] flex flex-col justify-center transition-all duration-300 ease-in-out">
-                <p className="text-xs text-gray-500 mb-2">
-                  By proceeding, you agree to our{' '}
-                  <a href="/terms-and-conditions" className="text-blue-600 hover:underline">terms and conditions</a>
-                </p>
-                <div className="flex items-center justify-center space-x-4 text-xs text-gray-400">
-                  <span>🔒 Secure</span>
-                  <span>✓ Verified</span>
-                  <span>🛡️ Protected</span>
-                </div>
-              </div>
 
               {/* Support Info - Fixed height to prevent layout shift */}
               <div className="mt-6 p-3 bg-gray-50 rounded-lg h-[60px] flex items-center justify-center transition-all duration-300 ease-in-out">
