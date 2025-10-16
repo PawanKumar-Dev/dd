@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, CreditCard, Shield, ShoppingCart, Globe, Info, Check, Smartphone } from 'lucide-react';
+import { ArrowLeft, CreditCard, Shield, ShoppingCart, Globe, Info, Check, Smartphone, Zap } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCartStore } from '@/store/cartStore';
 import ClientOnly from '@/components/ClientOnly';
@@ -551,95 +551,87 @@ export default function CheckoutPage() {
         </div>
       </header>
 
-      <div className="flex-1 max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid lg:grid-cols-10 gap-12 min-h-[60vh]">
+      <div className="flex-1 max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-8">
+        <div className="grid lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-8 min-h-[50vh]">
           {/* Order Summary */}
-          <div className="lg:col-span-6">
-            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
-              <div className="flex items-center mb-6">
-                <div className="bg-blue-100 p-2 rounded-lg mr-3">
-                  <ShoppingCart className="h-6 w-6 text-blue-600" />
-                </div>
-                <h2 className="text-xl font-bold text-gray-900">Order Summary</h2>
-              </div>
-
-              <div className="space-y-4 mb-6">
-                {cartItems.map((item, index) => (
-                  <div key={index} className="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-blue-300 transition-colors">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="flex items-center mb-2">
-                          <div className="bg-green-100 p-1.5 rounded-md mr-3">
-                            <Globe className="h-4 w-4 text-green-600" />
-                          </div>
-                          <h3 className="font-semibold text-gray-900 text-lg">{item.domainName}</h3>
-                        </div>
-                        <div className="ml-8 space-y-1">
-                          <p className="text-sm text-gray-600">
-                            <span className="font-medium">Registration Period:</span> {item.registrationPeriod || 1} year(s)
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            <span className="font-medium">Price per year:</span> ₹{item.price}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-xl font-bold text-gray-900">
-                          ₹{(item.price * item.registrationPeriod).toFixed(2)}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          Total for {item.registrationPeriod || 1} year(s)
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Order Details */}
-              <div className="bg-blue-50 rounded-lg p-4 mb-6">
-                <h3 className="font-semibold text-blue-900 mb-3 flex items-center">
-                  <Info className="h-4 w-4 mr-2" />
-                  What's Included
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                  <div className="flex items-center text-blue-800">
-                    <Check className="h-4 w-4 mr-2 text-green-600" />
-                    Domain Registration
-                  </div>
-                  <div className="flex items-center text-blue-800">
-                    <Check className="h-4 w-4 mr-2 text-green-600" />
-                    DNS Management
-                  </div>
-                  <div className="flex items-center text-blue-800">
-                    <Check className="h-4 w-4 mr-2 text-green-600" />
-                    Easy User Dashboard
-                  </div>
-                  <div className="flex items-center text-blue-800">
-                    <Check className="h-4 w-4 mr-2 text-green-600" />
-                    24/7 Support
+          <div className="lg:col-span-4 xl:col-span-5 2xl:col-span-5">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-lg font-semibold text-gray-900">Order Summary</h2>
+                  <div className="flex items-center space-x-2 text-sm text-gray-600">
+                    <Check className="h-4 w-4 text-green-600" />
+                    <span>Ready for payment</span>
                   </div>
                 </div>
-              </div>
-
-              {/* Price Breakdown */}
-              <div className="bg-white border border-gray-200 rounded-lg p-4">
-                <h3 className="font-semibold text-gray-900 mb-4">Price Breakdown</h3>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {cartItems.map((item, index) => (
-                    <div key={index} className="flex justify-between items-center text-sm">
-                      <span className="text-gray-600">{item.domainName} ({item.registrationPeriod || 1} year)</span>
-                      <span className="font-medium">₹{(item.price * item.registrationPeriod).toFixed(2)}</span>
+                    <div key={index} className="group relative p-6 border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-md transition-all duration-200">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-3 mb-2">
+                            <div className="bg-blue-100 p-2 rounded-lg">
+                              <Globe className="h-5 w-5 text-blue-600" />
+                            </div>
+                            <div>
+                              <h3 className="text-lg font-medium text-gray-900">{item.domainName}</h3>
+                              <p className="text-sm text-gray-600">
+                                {item.registrationPeriod || 1} year(s) registration
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Domain Features */}
+                          <div className="flex flex-wrap gap-2 mt-3">
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                              <Check className="h-3 w-3 mr-1" />
+                              Available
+                            </span>
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                              <Zap className="h-3 w-3 mr-1" />
+                              Instant Setup
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="text-right">
+                          <p className="text-xl font-bold text-gray-900">
+                            ₹{(item.price * (item.registrationPeriod || 1)).toFixed(2)}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            ₹{item.price} per year
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   ))}
-                  <div className="border-t border-gray-200 pt-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-lg font-semibold text-gray-900">Total Amount:</span>
-                      <span className="text-2xl font-bold text-blue-600">
-                        ₹{getTotalPrice().toFixed(2)}
-                      </span>
+                </div>
+              </div>
+
+              {/* What's Included */}
+              <div className="px-6 pb-6">
+                <div className="bg-blue-50 rounded-lg p-4">
+                  <h3 className="font-semibold text-blue-900 mb-3 flex items-center">
+                    <Info className="h-4 w-4 mr-2" />
+                    What's Included
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                    <div className="flex items-center text-blue-800">
+                      <Check className="h-4 w-4 mr-2 text-green-600" />
+                      Domain Registration
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">All prices include 18% GST</p>
+                    <div className="flex items-center text-blue-800">
+                      <Check className="h-4 w-4 mr-2 text-green-600" />
+                      DNS Management
+                    </div>
+                    <div className="flex items-center text-blue-800">
+                      <Check className="h-4 w-4 mr-2 text-green-600" />
+                      Easy User Dashboard
+                    </div>
+                    <div className="flex items-center text-blue-800">
+                      <Check className="h-4 w-4 mr-2 text-green-600" />
+                      24/7 Support
+                    </div>
                   </div>
                 </div>
               </div>
@@ -647,103 +639,86 @@ export default function CheckoutPage() {
           </div>
 
           {/* Payment Section */}
-          <div className="lg:col-span-4">
-            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
-              <div className="flex items-center mb-6">
-                <div className="bg-green-100 p-2 rounded-lg mr-3">
-                  <CreditCard className="h-6 w-6 text-green-600" />
-                </div>
-                <h2 className="text-xl font-bold text-gray-900">Secure Payment</h2>
-              </div>
+          <div className="lg:col-span-2 xl:col-span-2 2xl:col-span-3">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 sticky top-24">
+              <div className="p-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-6">Secure Payment</h2>
 
-              {/* Payment Amount */}
-              <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-lg p-4 mb-6">
-                <div className="text-center">
-                  <p className="text-sm text-gray-600 mb-1">Total Amount</p>
-                  <p className="text-3xl font-bold text-gray-900">₹{getTotalPrice().toFixed(2)}</p>
-                  <p className="text-xs text-gray-500 mt-1">Including 18% GST</p>
-                </div>
-              </div>
-
-
-              {/* Payment Methods - Fixed height to prevent layout shift */}
-              <div className="mb-6 min-h-[120px]">
-                <h3 className="font-semibold text-gray-900 mb-3">Accepted Payment Methods</h3>
-                <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
-                  <div className="flex items-center">
-                    <CreditCard className="h-3 w-3 mr-1" />
-                    Credit Cards
-                  </div>
-                  <div className="flex items-center">
-                    <CreditCard className="h-3 w-3 mr-1" />
-                    Debit Cards
-                  </div>
-                  <div className="flex items-center">
-                    <Smartphone className="h-3 w-3 mr-1" />
-                    UPI
-                  </div>
-                  <div className="flex items-center">
-                    <Smartphone className="h-3 w-3 mr-1" />
-                    Net Banking
+                {/* Payment Amount */}
+                <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-lg p-4 mb-6">
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600 mb-1">Total Amount</p>
+                    <p className="text-3xl font-bold text-gray-900">₹{getTotalPrice().toFixed(2)}</p>
+                    <p className="text-xs text-gray-500 mt-1">Including 18% GST</p>
                   </div>
                 </div>
-              </div>
 
-              {/* Payment Button - Fixed height and width to prevent layout shift */}
-              <div className="h-16 flex items-center">
+                {/* Payment Methods */}
+                <div className="mb-6">
+                  <h3 className="font-semibold text-gray-900 mb-3">Accepted Payment Methods</h3>
+                  <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                    <div className="flex items-center">
+                      <CreditCard className="h-3 w-3 mr-1" />
+                      Credit Cards
+                    </div>
+                    <div className="flex items-center">
+                      <CreditCard className="h-3 w-3 mr-1" />
+                      Debit Cards
+                    </div>
+                    <div className="flex items-center">
+                      <Smartphone className="h-3 w-3 mr-1" />
+                      UPI
+                    </div>
+                    <div className="flex items-center">
+                      <Smartphone className="h-3 w-3 mr-1" />
+                      Net Banking
+                    </div>
+                  </div>
+                </div>
+
+                {/* Payment Button */}
                 <button
                   onClick={handlePayment}
                   disabled={isProcessing || isPaymentInProgress || cartItems.length === 0}
-                  className="w-full h-12 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white font-bold rounded-lg transition-all duration-200 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 mb-4 flex items-center justify-center space-x-2"
                 >
-                  <div className="flex items-center justify-center min-w-0">
-                    {isProcessing || isPaymentInProgress ? (
-                      <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3 flex-shrink-0"></div>
-                        <span className="truncate">
-                          {isPaymentInProgress ? 'Payment in Progress...' : 'Processing...'}
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <CreditCard className="h-5 w-5 mr-2 flex-shrink-0" />
-                        <span className="truncate">
-                          Pay ₹{getTotalPrice().toFixed(2)}
-                        </span>
-                      </>
-                    )}
-                  </div>
+                  {isProcessing || isPaymentInProgress ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      <span>{isPaymentInProgress ? 'Payment in Progress...' : 'Processing...'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="h-5 w-5" />
+                      <span>Pay ₹{getTotalPrice().toFixed(2)}</span>
+                    </>
+                  )}
                 </button>
-              </div>
 
-              {/* Payment Progress Indicator - Always reserve space */}
-              <div className="mt-4 h-[80px] flex items-center transition-all duration-300 ease-in-out">
-                {isPaymentInProgress ? (
-                  <div className="w-full p-4 bg-yellow-50 border border-yellow-200 rounded-lg animate-in fade-in-0 slide-in-from-top-2 duration-300">
+                {/* Payment Progress Indicator */}
+                {isPaymentInProgress && (
+                  <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                     <div className="flex items-center">
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-600 mr-3 flex-shrink-0"></div>
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-yellow-800">Payment in Progress</p>
                         <p className="text-xs text-yellow-700">
-                          Please do not close this page or navigate away. Your payment is being processed.
+                          Please do not close this page or navigate away.
                         </p>
                       </div>
                     </div>
                   </div>
-                ) : (
-                  <div className="w-full h-full"></div>
                 )}
-              </div>
 
-
-              {/* Support Info - Fixed height to prevent layout shift */}
-              <div className="mt-6 p-3 bg-gray-50 rounded-lg h-[60px] flex items-center justify-center transition-all duration-300 ease-in-out">
-                <p className="text-xs text-gray-600 text-center">
-                  Need help? Contact our support team at{' '}
-                  <a href="mailto:support@exceltechnologies.com" className="text-blue-600 hover:underline">
-                    support@exceltechnologies.com
-                  </a>
-                </p>
+                {/* Support Info */}
+                <div className="pt-6 border-t border-gray-200">
+                  <p className="text-xs text-gray-600 text-center">
+                    Need help? Contact our support team at{' '}
+                    <a href="mailto:support@exceltechnologies.com" className="text-blue-600 hover:underline">
+                      support@exceltechnologies.com
+                    </a>
+                  </p>
+                </div>
               </div>
             </div>
           </div>

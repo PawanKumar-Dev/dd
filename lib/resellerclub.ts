@@ -1664,6 +1664,11 @@ export class ResellerClubAPI {
             errorMessage.toLowerCase().includes("please contact support") ||
             errorMessage.toLowerCase().includes("locked for processing") ||
             errorMessage.toLowerCase().includes("processing") ||
+            errorMessage
+              .toLowerCase()
+              .includes("already exists in our database") ||
+            errorMessage.toLowerCase().includes("pending order") ||
+            errorMessage.toLowerCase().includes("pending order for") ||
             response.data.status === "InvoicePaid"); // InvoicePaid with error message indicates pending
 
         return {

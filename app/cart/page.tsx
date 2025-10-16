@@ -340,10 +340,6 @@ export default function CartPage() {
                       <span className="text-gray-600">GST (18%)</span>
                       <span className="text-gray-900">Included</span>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Discount</span>
-                      <span className="text-green-600">-₹0.00</span>
-                    </div>
                     <div className="border-t border-gray-200 pt-4">
                       <div className="flex justify-between text-lg font-bold">
                         <span>Total</span>

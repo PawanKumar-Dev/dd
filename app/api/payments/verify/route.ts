@@ -235,6 +235,45 @@ export async function POST(request: NextRequest) {
     // Define nameservers at higher scope for pending domain creation
     let nameServers: string[] | undefined;
 
+    // Get or create ResellerClub customer and contact IDs (outside loop to avoid duplication)
+    console.log(
+      `👤 [PAYMENT-VERIFY] Creating/verifying customer account for: ${user.email}`
+    );
+
+    const customerResult = await ResellerClubAPI.getOrCreateCustomerAndContact({
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      phone: user.phone,
+      phoneCc: user.phoneCc,
+      companyName: user.companyName,
+      address: user.address
+        ? {
+            line1: user.address.line1,
+            city: user.address.city,
+            state: user.address.state,
+            country: user.address.country,
+            zipcode: user.address.zipcode,
+          }
+        : undefined,
+    });
+
+    if (
+      customerResult.status !== "success" ||
+      !customerResult.customerId ||
+      !customerResult.contactId
+    ) {
+      console.error(
+        `❌ [PAYMENT-VERIFY] Failed to get ResellerClub customer/contact IDs for user ${user.email}:`,
+        customerResult.error
+      );
+      throw new Error("Failed to get ResellerClub customer/contact IDs");
+    }
+
+    console.log(
+      `✅ [PAYMENT-VERIFY] Customer account created successfully: ${customerResult.customerId}`
+    );
+
     for (const item of cartItems) {
       console.log(`🔄 [PAYMENT-VERIFY] Registering domain: ${item.domainName}`);
 
@@ -245,6 +284,18 @@ export async function POST(request: NextRequest) {
           message: "Payment verified successfully",
           timestamp: new Date(),
           progress: 20,
+        },
+        {
+          step: "customer_created" as any,
+          message: "Setting up your account",
+          timestamp: new Date(),
+          progress: 40,
+        },
+        {
+          step: "contact_created" as any,
+          message: "Account setup completed",
+          timestamp: new Date(),
+          progress: 60,
         },
       ];
 
@@ -262,58 +313,6 @@ export async function POST(request: NextRequest) {
             error
           );
         }
-
-        // Get or create ResellerClub customer and contact IDs
-        console.log(
-          `👤 [PAYMENT-VERIFY] Creating/verifying customer account for: ${user.email}`
-        );
-        domainBookingStatus.push({
-          step: "customer_created" as any,
-          message: "Setting up your account",
-          timestamp: new Date(),
-          progress: 40,
-        });
-
-        const customerResult =
-          await ResellerClubAPI.getOrCreateCustomerAndContact({
-            email: user.email,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            phone: user.phone,
-            phoneCc: user.phoneCc,
-            companyName: user.companyName,
-            address: user.address
-              ? {
-                  line1: user.address.line1,
-                  city: user.address.city,
-                  state: user.address.state,
-                  country: user.address.country,
-                  zipcode: user.address.zipcode,
-                }
-              : undefined,
-          });
-
-        if (
-          customerResult.status !== "success" ||
-          !customerResult.customerId ||
-          !customerResult.contactId
-        ) {
-          console.error(
-            `❌ [PAYMENT-VERIFY] Failed to get ResellerClub customer/contact IDs for user ${user.email}:`,
-            customerResult.error
-          );
-          throw new Error("Failed to get ResellerClub customer/contact IDs");
-        }
-
-        console.log(
-          `✅ [PAYMENT-VERIFY] Customer account created successfully: ${customerResult.customerId}`
-        );
-        domainBookingStatus.push({
-          step: "contact_created" as any,
-          message: "Account setup completed",
-          timestamp: new Date(),
-          progress: 60,
-        });
 
         console.log(
           `🌐 [PAYMENT-VERIFY] Starting domain registration for: ${item.domainName}`
@@ -434,11 +433,20 @@ export async function POST(request: NextRequest) {
                 result.message.toLowerCase().includes("low funds") ||
                 result.message.toLowerCase().includes("insufficient funds") ||
                 result.message.toLowerCase().includes("account balance") ||
-                result.message.toLowerCase().includes("credit limit")));
+                result.message.toLowerCase().includes("credit limit") ||
+                result.message
+                  .toLowerCase()
+                  .includes("already exists in our database") ||
+                result.message.toLowerCase().includes("pending order") ||
+                result.message.toLowerCase().includes("pending order for")));
 
           const domainStatus = isInsufficientBalance ? "pending" : "failed";
           const statusMessage = isInsufficientBalance
-            ? "Domain registration pending due to insufficient balance"
+            ? result.message
+                .toLowerCase()
+                .includes("already exists in our database")
+              ? "Domain registration is being processed. Our team will complete the registration shortly."
+              : "Domain registration pending due to insufficient balance"
             : `Domain registration failed: ${result.message}`;
 
           domainBookingStatus.push({
