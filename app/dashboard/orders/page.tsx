@@ -400,6 +400,7 @@ export default function UserOrders() {
                           <span className="text-lg font-semibold text-gray-900">Total</span>
                           <span className="text-lg font-bold text-gray-900">₹{(selectedOrder.amount || 0).toLocaleString()}</span>
                         </div>
+                        <p className="text-xs text-gray-500 text-right">*All prices include 18% GST</p>
                       </div>
                     </div>
                   </div>
