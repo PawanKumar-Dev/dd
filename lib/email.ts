@@ -334,6 +334,12 @@ export class EmailService {
         price: number;
         registrationPeriod: number;
       }>;
+      allDomains: Array<{
+        domainName: string;
+        price: number;
+        registrationPeriod: number;
+        status: string;
+      }>;
       paymentId: string;
       createdAt: Date;
     }
@@ -362,13 +368,19 @@ export class EmailService {
       headerTitle = "Order Failed";
     }
 
-    const successfulDomainsList = orderData.successfulDomains
-      .map(
-        (domain) => `
+    const allDomainsList = orderData.allDomains
+      .map((domain) => {
+        const statusColor =
+          domain.status === "registered" ? "#10b981" : "#ef4444";
+        const statusText =
+          domain.status === "registered" ? "✅ Registered" : "❌ Failed";
+        return `
         <tr>
-          <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">${
-            domain.domainName
-          }</td>
+          <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">
+            ${domain.domainName}
+            <br>
+            <span style="font-size: 12px; color: ${statusColor}; font-weight: 600;">${statusText}</span>
+          </td>
           <td style="padding: 8px; border-bottom: 1px solid #e5e7eb; text-align: center;">${
             domain.registrationPeriod
           } year${domain.registrationPeriod !== 1 ? "s" : ""}</td>
@@ -380,8 +392,8 @@ export class EmailService {
             domain.price * domain.registrationPeriod
           ).toFixed(2)}</td>
         </tr>
-      `
-      )
+      `;
+      })
       .join("");
 
     // Use total amount from order
@@ -449,7 +461,7 @@ export class EmailService {
                 </tr>
               </thead>
               <tbody>
-                ${successfulDomainsList}
+                ${allDomainsList}
               </tbody>
             </table>
           </div>

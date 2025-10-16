@@ -15,6 +15,7 @@ A comprehensive, enterprise-grade domain registration and management platform bu
 - **Domain Renewal** - Easy domain renewal with automated notifications
 - **Cart System** - Add multiple domains to cart for bulk registration
 - **Pending Domains Detection** - Automatic detection of failed registrations due to insufficient funds or processing issues
+- **TLD-Specific Validation** - Automatic validation of minimum registration periods for different TLDs (e.g., .ai domains require 2+ years)
 
 ### Payment & Order System
 
@@ -39,6 +40,7 @@ A comprehensive, enterprise-grade domain registration and management platform bu
 - **Order Tracking** - Real-time order monitoring and management
 - **Payment Monitoring** - Payment status tracking and management
 - **Pending Domains Management** - Handle domains that failed registration due to insufficient funds or processing issues
+- **TLD Requirements Management** - Configure and enforce TLD-specific registration requirements
 - **Pricing Configuration** - TLD pricing management and updates
 - **System Settings** - Application-wide settings management
 - **Analytics Dashboard** - System statistics and performance metrics
@@ -526,10 +528,14 @@ For support and questions:
 - ✅ **Comprehensive API Documentation**: Complete API reference with examples and testing
 - ✅ **Utility Scripts**: Port management, database initialization, and maintenance tools
 - ✅ **Latest Updates**: Enhanced documentation, improved testing coverage, and production optimizations
+- ✅ **TLD-Specific Validation**: Automatic validation of minimum registration periods for different TLDs
+- ✅ **Enhanced Error Handling**: Improved error detection for "already exists" and pending domain scenarios
+- ✅ **Layout Stability**: Fixed checkout page layout shifting issues with stable grid system
+- ✅ **User Experience Improvements**: Removed unnecessary messages and streamlined cart/checkout flow
 
 ---
 
 **Last Updated**: October 16, 2025  
-**Version**: 2.4.0  
+**Version**: 2.5.0  
 **Author**: Excel Technologies  
-**Status**: Production-ready with fully functional DNS Management API, Social Login Integration, and comprehensive testing suite
+**Status**: Production-ready with TLD validation, enhanced error handling, and improved user experience

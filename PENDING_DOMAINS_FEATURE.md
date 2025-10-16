@@ -27,6 +27,9 @@ This feature addresses the issue where ResellerClub API doesn't provide reliable
   - "Locked for Processing"
   - "Processing"
   - "InvoicePaid" status with error message
+  - "Already exists in our database"
+  - "Pending order"
+  - "Pending order for"
   - Insufficient balance indicators
 
 **Logic:**
@@ -50,6 +53,7 @@ A service that verifies domain registration success by checking domain availabil
 - **Correct Search Method**: Uses `searchDomainWithTlds()` for accurate results
 - **Partial Match Detection**: Handles cases where API returns unexpected formats
 - **Conservative Approach**: Marks uncertain cases as pending for manual verification
+- **Enhanced Error Recognition**: Now recognizes "already exists in database" as pending status
 
 **Verification Logic:**
 
@@ -145,6 +149,41 @@ Comprehensive admin dashboard for managing pending domains:
 ### 7. Navigation Integration
 
 Added "Pending Domains" to admin navigation menu with AlertTriangle icon for visibility.
+
+### 8. TLD-Specific Validation System
+
+#### Cart Page Validation (`app/cart/page.tsx`)
+
+- **Dynamic Registration Period Dropdown**: Only shows valid registration periods based on TLD requirements
+- **Visual Indicators**: Shows "(Minimum)" for required periods and TLD-specific warnings
+- **Auto-correction**: Prevents users from selecting invalid periods
+- **TLD Support**: Comprehensive support for .ai (2+ years), .co (2+ years), and standard TLDs (1+ year)
+
+#### Checkout Page Validation (`app/checkout/page.tsx`)
+
+- **Pre-payment Validation**: Validates all domains before processing payment
+- **Error Prevention**: Shows clear error messages for invalid registration periods
+- **Visual Indicators**: Shows minimum requirements in order summary
+- **User-Friendly Messages**: Clear guidance on TLD requirements
+
+#### Implementation Details
+
+```typescript
+// Helper function to get minimum registration period for TLD
+const getMinRegistrationPeriod = (domainName: string): number => {
+  const tld = domainName.split(".").pop()?.toLowerCase();
+
+  const minPeriods: { [key: string]: number } = {
+    ai: 2, // .ai domains require minimum 2 years
+    co: 2, // .co domains require minimum 2 years
+    io: 1, // .io domains allow 1 year
+    com: 1, // .com domains allow 1 year
+    // ... more TLDs
+  };
+
+  return minPeriods[tld || ""] || 1;
+};
+```
 
 ## Workflow
 

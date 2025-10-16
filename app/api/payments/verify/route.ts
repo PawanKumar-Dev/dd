@@ -712,6 +712,12 @@ export async function POST(request: NextRequest) {
               price: d.price,
               registrationPeriod: d.registrationPeriod,
             })),
+          allDomains: orderDomains.map((d) => ({
+            domainName: d.domainName,
+            price: d.price,
+            registrationPeriod: d.registrationPeriod,
+            status: d.status,
+          })),
           paymentId: order.paymentId,
           createdAt: order.createdAt,
         } as any

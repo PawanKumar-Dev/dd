@@ -15,6 +15,24 @@ interface User {
   role: string;
 }
 
+// Helper function to get minimum registration period for TLD
+const getMinRegistrationPeriod = (domainName: string): number => {
+  const tld = domainName.split('.').pop()?.toLowerCase();
+
+  // TLD-specific minimum registration periods
+  const minPeriods: { [key: string]: number } = {
+    'ai': 2,    // .ai domains require minimum 2 years
+    'co': 2,    // .co domains require minimum 2 years
+    'io': 1,    // .io domains allow 1 year
+    'com': 1,   // .com domains allow 1 year
+    'net': 1,   // .net domains allow 1 year
+    'org': 1,   // .org domains allow 1 year
+    // Add more TLDs as needed
+  };
+
+  return minPeriods[tld || ''] || 1; // Default to 1 year if TLD not specified
+};
+
 export default function CartPage() {
   const { items: cartItems, removeItem, updateItem, getTotalPrice, getSubtotalPrice, getItemCount, clearCart, syncWithServer, mergeWithServerCart, isLoading } = useCartStore();
   const [isClient, setIsClient] = useState(false);
@@ -86,7 +104,10 @@ export default function CartPage() {
     if (newPeriod <= 0) {
       removeItem(domainName);
     } else {
-      updateItem(domainName, { registrationPeriod: newPeriod });
+      const minPeriod = getMinRegistrationPeriod(domainName);
+      // Ensure the new period meets the minimum requirement
+      const validPeriod = Math.max(newPeriod, minPeriod);
+      updateItem(domainName, { registrationPeriod: validPeriod });
     }
   };
 
@@ -253,13 +274,27 @@ export default function CartPage() {
                                 onChange={(e) => handleRegistrationPeriodChange(item.domainName, parseInt(e.target.value))}
                                 className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
                               >
-                                <option value={1}>1 Year</option>
-                                <option value={2}>2 Years</option>
-                                <option value={3}>3 Years</option>
-                                <option value={4}>4 Years</option>
-                                <option value={5}>5 Years</option>
-                                <option value={10}>10 Years</option>
+                                {(() => {
+                                  const minPeriod = getMinRegistrationPeriod(item.domainName);
+                                  const options = [];
+
+                                  for (let i = minPeriod; i <= 10; i++) {
+                                    options.push(
+                                      <option key={i} value={i}>
+                                        {i} Year{i !== 1 ? 's' : ''}
+                                        {i === minPeriod && minPeriod > 1 ? ' (Minimum)' : ''}
+                                      </option>
+                                    );
+                                  }
+
+                                  return options;
+                                })()}
                               </select>
+                              {getMinRegistrationPeriod(item.domainName) > 1 && (
+                                <p className="text-xs text-amber-600">
+                                  {item.domainName.split('.').pop()?.toUpperCase()} domains require minimum {getMinRegistrationPeriod(item.domainName)} year registration
+                                </p>
+                              )}
                             </div>
 
                             {/* Price */}

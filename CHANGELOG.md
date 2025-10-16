@@ -18,6 +18,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Automatic Pending Domain Creation**: Domains with failed registrations are automatically added to pending list
 - **User-Friendly Messages**: Shows "Domain registration is being processed" instead of technical errors
 
+#### TLD-Specific Validation System
+
+- **Minimum Registration Period Validation**: Automatic validation of TLD-specific minimum registration requirements
+- **Dynamic Cart Interface**: Registration period dropdown adapts based on TLD requirements
+- **Pre-payment Validation**: Prevents payment processing for invalid registration periods
+- **Visual Indicators**: Clear warnings and minimum period indicators in cart and checkout
+- **TLD Support**: Comprehensive support for .ai (2+ years), .co (2+ years), and standard TLDs (1+ year)
+
 #### API Endpoints
 
 - `GET /api/admin/pending-domains` - List pending domains with filtering and pagination
@@ -44,6 +52,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Improved Status Handling**: "Order Locked for Processing" responses are marked as pending instead of successful
 - **User Experience**: Customer-facing messages are now user-friendly instead of technical
 - **Automatic Pending Creation**: Domains with pending status are immediately added to pending domains list
+- **"Already Exists" Error Handling**: Enhanced detection of "already exists in database" errors as pending status
+
+#### User Interface Improvements
+
+- **Checkout Page Redesign**: Complete redesign using cart page layout pattern for stability
+- **Layout Stability**: Fixed layout shifting issues with consistent grid system
+- **Cart Experience**: Removed unnecessary messages and streamlined user flow
+- **Payment Flow**: Improved payment button states and progress indicators
 
 #### Domain Verification Logic
 
@@ -64,11 +80,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **"Order Locked for Processing" Detection**: Fixed issue where domains with this response were marked as successful
 - **Error Message Parsing**: Enhanced logic to detect various error conditions that indicate pending status
 - **Domain Availability Verification**: Fixed domain search logic to properly handle domain name parsing
+- **"Already Exists" Error Recognition**: Fixed issue where "already exists in database" errors were marked as failed instead of pending
 
 #### Customer Experience
 
 - **Technical Error Messages**: Replaced technical error messages with user-friendly ones
 - **Status Transparency**: Customers now see appropriate "processing" messages instead of confusing errors
+- **Layout Shifting**: Fixed checkout page layout shifting when payment button states change
+- **Cart Preservation**: Improved cart preservation during payment cancellation/failure
+- **Unnecessary Messages**: Removed redundant messages from cart and checkout pages
+
+#### Payment Processing
+
+- **ReferenceError Fix**: Fixed `customerResult is not defined` error in payment verification
+- **Scope Issues**: Moved customer creation outside loop to prevent scope conflicts
+- **Error Handling**: Improved error handling for TLD-specific registration failures
 
 ### Technical Improvements
 

@@ -9,6 +9,24 @@ import ClientOnly from '@/components/ClientOnly';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 
+// Helper function to get minimum registration period for TLD
+const getMinRegistrationPeriod = (domainName: string): number => {
+  const tld = domainName.split('.').pop()?.toLowerCase();
+
+  // TLD-specific minimum registration periods
+  const minPeriods: { [key: string]: number } = {
+    'ai': 2,    // .ai domains require minimum 2 years
+    'co': 2,    // .co domains require minimum 2 years
+    'io': 1,    // .io domains allow 1 year
+    'com': 1,   // .com domains allow 1 year
+    'net': 1,   // .net domains allow 1 year
+    'org': 1,   // .org domains allow 1 year
+    // Add more TLDs as needed
+  };
+
+  return minPeriods[tld || ''] || 1; // Default to 1 year if TLD not specified
+};
+
 interface User {
   id: string;
   email: string;
@@ -137,6 +155,18 @@ export default function CheckoutPage() {
   const handlePayment = async () => {
     if (cartItems.length === 0) {
       toast.error('Cart is empty');
+      return;
+    }
+
+    // Validate registration periods for all domains
+    const invalidDomains = cartItems.filter(item => {
+      const minPeriod = getMinRegistrationPeriod(item.domainName);
+      return item.registrationPeriod < minPeriod;
+    });
+
+    if (invalidDomains.length > 0) {
+      const domainNames = invalidDomains.map(d => d.domainName).join(', ');
+      toast.error(`Invalid registration period for ${domainNames}. Please check the minimum requirements.`);
       return;
     }
 
@@ -577,6 +607,11 @@ export default function CheckoutPage() {
                               <h3 className="text-lg font-medium text-gray-900">{item.domainName}</h3>
                               <p className="text-sm text-gray-600">
                                 {item.registrationPeriod || 1} year(s) registration
+                                {getMinRegistrationPeriod(item.domainName) > 1 && (
+                                  <span className="ml-2 text-xs text-amber-600">
+                                    (Min: {getMinRegistrationPeriod(item.domainName)} year{getMinRegistrationPeriod(item.domainName) > 1 ? 's' : ''})
+                                  </span>
+                                )}
                               </p>
                             </div>
                           </div>
