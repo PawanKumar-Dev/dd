@@ -2,6 +2,35 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { CartItem } from "@/lib/types";
 
+// Helper function to get minimum registration period for TLD
+const getMinRegistrationPeriod = (domainName: string): number => {
+  const tld = domainName.split(".").pop()?.toLowerCase();
+
+  // TLD-specific minimum registration periods
+  const minPeriods: { [key: string]: number } = {
+    ai: 2, // .ai domains require minimum 2 years
+    co: 2, // .co domains require minimum 2 years
+    io: 1, // .io domains allow 1 year
+    com: 1, // .com domains allow 1 year
+    net: 1, // .net domains allow 1 year
+    org: 1, // .org domains allow 1 year
+    // Add more TLDs as needed
+  };
+
+  return minPeriods[tld || ""] || 1; // Default to 1 year if TLD not specified
+};
+
+// Helper function to validate and correct cart items
+const validateAndCorrectCartItems = (items: CartItem[]): CartItem[] => {
+  return items.map((item) => {
+    const minPeriod = getMinRegistrationPeriod(item.domainName);
+    if (item.registrationPeriod < minPeriod) {
+      return { ...item, registrationPeriod: minPeriod };
+    }
+    return item;
+  });
+};
+
 interface CartStore {
   items: CartItem[];
   isLoading: boolean;
@@ -28,20 +57,29 @@ export const useCartStore = create<CartStore>()(
 
       addItem: (item) => {
         set((state) => {
+          // Validate and correct the new item
+          const minPeriod = getMinRegistrationPeriod(item.domainName);
+          const validatedItem = {
+            ...item,
+            registrationPeriod: Math.max(item.registrationPeriod, minPeriod),
+          };
+
           const existingItem = state.items.find(
-            (i) => i.domainName === item.domainName
+            (i) => i.domainName === validatedItem.domainName
           );
 
           if (existingItem) {
             return {
               items: state.items.map((i) =>
-                i.domainName === item.domainName ? { ...i, ...item } : i
+                i.domainName === validatedItem.domainName
+                  ? { ...i, ...validatedItem }
+                  : i
               ),
             };
           }
 
           return {
-            items: [...state.items, item],
+            items: [...state.items, validatedItem],
           };
         });
 
@@ -139,7 +177,10 @@ export const useCartStore = create<CartStore>()(
             }
           }
 
-          set({ isInitialized: true });
+          // Validate all items one final time before marking as initialized
+          const finalItems = get().items;
+          const validatedFinalItems = validateAndCorrectCartItems(finalItems);
+          set({ items: validatedFinalItems, isInitialized: true });
         } catch (error: any) {
           // Only log non-abort errors to reduce noise in development
           if (error.code !== "ECONNRESET" && error.name !== "AbortError") {
@@ -164,7 +205,8 @@ export const useCartStore = create<CartStore>()(
 
           if (response.ok) {
             const data = await response.json();
-            set({ items: data.cart || [] });
+            const validatedItems = validateAndCorrectCartItems(data.cart || []);
+            set({ items: validatedItems });
           }
         } catch (error: any) {
           // Only log non-abort errors to reduce noise in development
@@ -232,8 +274,9 @@ export const useCartStore = create<CartStore>()(
               }
             });
 
-            // Update local cart with merged items
-            set({ items: mergedItems });
+            // Validate and correct all merged items
+            const validatedItems = validateAndCorrectCartItems(mergedItems);
+            set({ items: validatedItems });
 
             // Save merged cart to server
             await get().saveToServer();
@@ -248,6 +291,22 @@ export const useCartStore = create<CartStore>()(
     }),
     {
       name: "cart-storage",
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          // Validate and correct all items when store is rehydrated from localStorage
+          const validatedItems = validateAndCorrectCartItems(state.items);
+          if (JSON.stringify(validatedItems) !== JSON.stringify(state.items)) {
+            state.items = validatedItems;
+            // Save corrected items back to localStorage
+            setTimeout(() => {
+              const token = localStorage.getItem("token");
+              if (token) {
+                get().saveToServer();
+              }
+            }, 100);
+          }
+        }
+      },
     }
   )
 );
