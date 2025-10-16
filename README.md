@@ -14,6 +14,7 @@ A comprehensive, enterprise-grade domain registration and management platform bu
 - **DNS Management** - Complete DNS record management with RDAP nameserver lookup, full CRUD operations, and priority field support for MX/SRV records
 - **Domain Renewal** - Easy domain renewal with automated notifications
 - **Cart System** - Add multiple domains to cart for bulk registration
+- **Pending Domains Detection** - Automatic detection of failed registrations due to insufficient funds or processing issues
 
 ### Payment & Order System
 
@@ -37,6 +38,7 @@ A comprehensive, enterprise-grade domain registration and management platform bu
 - **User Management** - Complete user administration with role controls
 - **Order Tracking** - Real-time order monitoring and management
 - **Payment Monitoring** - Payment status tracking and management
+- **Pending Domains Management** - Handle domains that failed registration due to insufficient funds or processing issues
 - **Pricing Configuration** - TLD pricing management and updates
 - **System Settings** - Application-wide settings management
 - **Analytics Dashboard** - System statistics and performance metrics
@@ -414,6 +416,16 @@ SMTP_PORT=587
 - **Live Pricing**: Real-time pricing from ResellerClub customer and reseller APIs
 - **Performance Optimized**: Intelligent caching with 5-minute TTL
 - **Error Handling**: Robust fallback mechanisms for missing TLD data
+
+### Pending Domains Management
+
+- **Dual Detection Methods**: Enhanced API response parsing + domain availability verification
+- **Immediate Detection**: "Order Locked for Processing" responses are caught immediately
+- **User-Friendly Messages**: Shows "Domain registration is being processed" instead of technical errors
+- **Admin Dashboard**: Complete interface for managing pending domains with bulk operations
+- **Manual Recovery**: Admins can refill funds and manually register domains
+- **Automatic Creation**: Pending domain records are created automatically for failed registrations
+- **Status Tracking**: Complete audit trail of registration attempts and status changes
 
 ## 🔒 Security Features
 

@@ -764,6 +764,294 @@ Get payment data (Admin only).
   }
 ```
 
+### GET /api/admin/pending-domains
+
+Get all pending domains (Admin only).
+
+**Headers:**
+
+- `Authorization: Bearer <admin-token>`
+
+**Query Parameters:**
+
+- `status` (optional): Filter by status (pending, processing, completed, failed)
+- `page` (optional): Page number for pagination (default: 1)
+- `limit` (optional): Number of items per page (default: 20)
+- `search` (optional): Search by domain name or order ID
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "pendingDomains": [
+    {
+      "_id": "string",
+      "domainName": "string",
+      "price": number,
+      "currency": "string",
+      "registrationPeriod": number,
+      "userId": {
+        "_id": "string",
+        "firstName": "string",
+        "lastName": "string",
+        "email": "string",
+        "phone": "string",
+        "companyName": "string"
+      },
+      "orderId": "string",
+      "customerId": number,
+      "contactId": number,
+      "status": "pending|processing|completed|failed",
+      "reason": "string",
+      "verificationAttempts": number,
+      "lastVerifiedAt": "string",
+      "registeredAt": "string",
+      "expiresAt": "string",
+      "resellerClubOrderId": "string",
+      "adminNotes": "string",
+      "createdAt": "string",
+      "updatedAt": "string"
+    }
+  ],
+  "pagination": {
+    "page": number,
+    "limit": number,
+    "total": number,
+    "pages": number
+  },
+  "statusSummary": {
+    "total": number,
+    "pending": number,
+    "processing": number,
+    "completed": number,
+    "failed": number
+  }
+}
+```
+
+### POST /api/admin/pending-domains
+
+Create a new pending domain record (Admin only).
+
+**Headers:**
+
+- `Authorization: Bearer <admin-token>`
+- `Content-Type: application/json`
+
+**Request Body:**
+
+```json
+{
+  "domainName": "string",
+  "price": number,
+  "currency": "string",
+  "registrationPeriod": number,
+  "userId": "string",
+  "orderId": "string",
+  "customerId": number,
+  "contactId": number,
+  "nameServers": ["string"],
+  "adminContactId": number,
+  "techContactId": number,
+  "billingContactId": number,
+  "reason": "string"
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Pending domain created successfully",
+  "pendingDomain": {
+    "_id": "string",
+    "domainName": "string",
+    "status": "pending",
+    "createdAt": "string"
+  }
+}
+```
+
+### GET /api/admin/pending-domains/[id]
+
+Get specific pending domain details (Admin only).
+
+**Headers:**
+
+- `Authorization: Bearer <admin-token>`
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "pendingDomain": {
+    "_id": "string",
+    "domainName": "string",
+    "price": number,
+    "currency": "string",
+    "registrationPeriod": number,
+    "userId": {
+      "_id": "string",
+      "firstName": "string",
+      "lastName": "string",
+      "email": "string",
+      "phone": "string",
+      "companyName": "string"
+    },
+    "orderId": "string",
+    "customerId": number,
+    "contactId": number,
+    "status": "pending|processing|completed|failed",
+    "reason": "string",
+    "verificationAttempts": number,
+    "lastVerifiedAt": "string",
+    "registeredAt": "string",
+    "expiresAt": "string",
+    "resellerClubOrderId": "string",
+    "adminNotes": "string",
+    "createdAt": "string",
+    "updatedAt": "string"
+  }
+}
+```
+
+### PUT /api/admin/pending-domains/[id]
+
+Update pending domain status and notes (Admin only).
+
+**Headers:**
+
+- `Authorization: Bearer <admin-token>`
+- `Content-Type: application/json`
+
+**Request Body:**
+
+```json
+{
+  "status": "pending|processing|completed|failed",
+  "adminNotes": "string",
+  "reason": "string"
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Pending domain updated successfully",
+  "pendingDomain": {
+    "_id": "string",
+    "domainName": "string",
+    "status": "string",
+    "adminNotes": "string",
+    "updatedAt": "string"
+  }
+}
+```
+
+### DELETE /api/admin/pending-domains/[id]
+
+Delete pending domain record (Admin only).
+
+**Headers:**
+
+- `Authorization: Bearer <admin-token>`
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Pending domain deleted successfully"
+}
+```
+
+### POST /api/admin/pending-domains/[id]/register
+
+Manually register a pending domain (Admin only).
+
+**Headers:**
+
+- `Authorization: Bearer <admin-token>`
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Domain registered successfully",
+  "result": {
+    "status": "success",
+    "data": {
+      "orderid": "string"
+    }
+  },
+  "pendingDomain": {
+    "_id": "string",
+    "domainName": "string",
+    "status": "completed",
+    "registeredAt": "string",
+    "expiresAt": "string",
+    "resellerClubOrderId": "string"
+  }
+}
+```
+
+### POST /api/admin/pending-domains/verify
+
+Batch verify multiple pending domains (Admin only).
+
+**Headers:**
+
+- `Authorization: Bearer <admin-token>`
+- `Content-Type: application/json`
+
+**Request Body:**
+
+```json
+{
+  "domainIds": ["string"]
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Domain verification completed",
+  "verificationResults": [
+    {
+      "domainName": "string",
+      "isAvailable": boolean,
+      "registrationStatus": "success|pending|failed",
+      "reason": "string",
+      "checkedAt": "string"
+    }
+  ],
+  "updatedDomains": [
+    {
+      "_id": "string",
+      "domainName": "string",
+      "status": "string",
+      "verificationAttempts": number,
+      "lastVerifiedAt": "string"
+    }
+  ],
+  "summary": {
+    "total": number,
+    "successful": number,
+    "pending": number,
+    "failed": number,
+    "pendingDomains": ["string"]
+  }
+}
+```
+
 ### GET /api/admin/tld-pricing
 
 Get TLD pricing data (Admin only).
@@ -1143,6 +1431,6 @@ For API support and questions:
 ---
 
 **Last Updated**: October 16, 2025  
-**Version**: 2.4.0  
+**Version**: 2.5.0  
 **Author**: Excel Technologies  
-**Status**: Production-ready with fully functional DNS Management API, Social Login Integration, and comprehensive testing suite
+**Status**: Production-ready with fully functional DNS Management API, Social Login Integration, Pending Domains Management, and comprehensive testing suite

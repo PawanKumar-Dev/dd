@@ -2,19 +2,40 @@
 
 ## Overview
 
-This feature addresses the issue where ResellerClub API doesn't provide reliable wallet balance information or proper error responses for insufficient funds. Instead of relying on API error messages, we implement a workaround that detects failed domain registrations by checking domain availability after registration attempts.
+This feature addresses the issue where ResellerClub API doesn't provide reliable wallet balance information or proper error responses for insufficient funds. We implement a comprehensive solution that detects failed domain registrations through multiple methods: enhanced API response parsing and domain availability verification.
 
 ## Problem Statement
 
 - ResellerClub API doesn't throw proper responses for insufficient funds
 - ResellerClub support confirmed they have no way to confirm wallet details
 - Domain registrations can fail silently due to low wallet balance
+- "Order Locked for Processing, Please contact Support" responses indicate pending registrations
 - Users don't get notified about failed registrations
 - Admins have no visibility into pending/failed registrations
 
 ## Solution
 
-### 1. Domain Verification Service (`lib/domain-verification.ts`)
+### 1. Enhanced ResellerClub API Response Handling (`lib/resellerclub.ts`)
+
+**NEW**: Enhanced logic to detect pending registrations from ResellerClub API responses:
+
+- **Error Message Detection**: Identifies error messages even in successful HTTP responses
+- **Pending Status Recognition**: Recognizes "Order Locked for Processing" as pending status
+- **Comprehensive Error Patterns**: Handles various error conditions:
+  - "Order Locked for Processing"
+  - "Please contact Support"
+  - "Locked for Processing"
+  - "Processing"
+  - "InvoicePaid" status with error message
+  - Insufficient balance indicators
+
+**Logic:**
+
+- If response contains error message → Check if it indicates pending status
+- If pending indicators found → Mark as "pending" instead of "error"
+- If no error message → Proceed with domain verification
+
+### 2. Domain Verification Service (`lib/domain-verification.ts`)
 
 A service that verifies domain registration success by checking domain availability:
 
@@ -23,13 +44,20 @@ A service that verifies domain registration success by checking domain availabil
 - **`isPendingRegistration(result)`**: Determines if a domain registration is pending
 - **`getVerificationSummary(results)`**: Provides summary statistics
 
-**Logic:**
+**Enhanced Logic:**
+
+- **Better Domain Parsing**: Properly splits domain into base domain and TLD
+- **Correct Search Method**: Uses `searchDomainWithTlds()` for accurate results
+- **Partial Match Detection**: Handles cases where API returns unexpected formats
+- **Conservative Approach**: Marks uncertain cases as pending for manual verification
+
+**Verification Logic:**
 
 - If domain is still available → Registration likely failed (pending)
 - If domain is no longer available → Registration successful
 - If verification fails → Mark as failed
 
-### 2. Pending Domains Database Model (`models/PendingDomain.ts`)
+### 3. Pending Domains Database Model (`models/PendingDomain.ts`)
 
 MongoDB schema for tracking pending domain registrations:
 
@@ -60,7 +88,7 @@ interface IPendingDomain {
 }
 ```
 
-### 3. API Endpoints
+### 4. API Endpoints
 
 #### Admin Pending Domains Management
 
@@ -78,16 +106,19 @@ interface IPendingDomain {
 
 - **`POST /api/admin/pending-domains/verify`**: Batch verify multiple domains
 
-### 4. Payment Verification Integration
+### 5. Payment Verification Integration
 
 Updated `app/api/payments/verify/route.ts` to:
 
-1. **After domain registration attempts**: Verify all domains using `DomainVerificationService`
-2. **Detect failed registrations**: If domain is still available, mark as pending
-3. **Create pending records**: Automatically create `PendingDomain` records for failed registrations
-4. **Update order status**: Mark domains as "pending" in the original order
+1. **Enhanced API Response Handling**: Detect "Order Locked for Processing" responses and mark as pending
+2. **User-Friendly Messages**: Show "Domain registration is being processed. Our team will complete the registration shortly." instead of technical errors
+3. **Automatic Pending Domain Creation**: Domains with pending status are immediately added to pending domains list
+4. **After domain registration attempts**: Verify all domains using `DomainVerificationService`
+5. **Detect failed registrations**: If domain is still available, mark as pending
+6. **Create pending records**: Automatically create `PendingDomain` records for failed registrations
+7. **Update order status**: Mark domains as "pending" in the original order
 
-### 5. Admin Interface (`app/admin/pending-domains/page.tsx`)
+### 6. Admin Interface (`app/admin/pending-domains/page.tsx`)
 
 Comprehensive admin dashboard for managing pending domains:
 
@@ -111,7 +142,7 @@ Comprehensive admin dashboard for managing pending domains:
 - **Completed**: Domain successfully registered
 - **Failed**: Domain registration failed permanently
 
-### 6. Navigation Integration
+### 7. Navigation Integration
 
 Added "Pending Domains" to admin navigation menu with AlertTriangle icon for visibility.
 
@@ -121,8 +152,9 @@ Added "Pending Domains" to admin navigation menu with AlertTriangle icon for vis
 
 ```
 User completes payment → Domain registration attempted →
-Domain verification performed → Failed registrations detected →
-Pending domain records created → Admin notified
+Enhanced API response handling → Detect "Order Locked for Processing" →
+Mark as pending immediately → Domain verification performed →
+Failed registrations detected → Pending domain records created → Admin notified
 ```
 
 ### 2. Admin Management
@@ -137,17 +169,21 @@ Updates status to completed → Customer notified
 
 - **Frontend users**: No visibility into pending status (as requested)
 - **Successful registrations**: Work normally
+- **Pending registrations**: Show user-friendly message "Domain registration is being processed. Our team will complete the registration shortly."
 - **Failed registrations**: Appear as "pending" in user dashboard
 - **Admin intervention**: Transparent to users
 
 ## Benefits
 
-1. **Reliable Detection**: No longer dependent on unreliable API error messages
-2. **Admin Visibility**: Clear dashboard for managing failed registrations
-3. **Manual Recovery**: Admins can refill funds and retry registrations
-4. **Audit Trail**: Complete history of registration attempts and status changes
-5. **Batch Operations**: Efficient management of multiple pending domains
-6. **User Experience**: Seamless experience for successful registrations
+1. **Dual Detection Methods**: Enhanced API response parsing + domain availability verification
+2. **Immediate Detection**: "Order Locked for Processing" responses are caught immediately
+3. **Reliable Detection**: No longer dependent on unreliable API error messages
+4. **Admin Visibility**: Clear dashboard for managing failed registrations
+5. **Manual Recovery**: Admins can refill funds and retry registrations
+6. **Audit Trail**: Complete history of registration attempts and status changes
+7. **Batch Operations**: Efficient management of multiple pending domains
+8. **User Experience**: Seamless experience with user-friendly messages
+9. **Proactive Management**: Domains are added to pending list before verification
 
 ## Technical Implementation
 
