@@ -595,7 +595,7 @@ When reporting issues, include:
 
 ---
 
-**Last Updated**: January 26, 2025  
-**Version**: 2.3.0  
+**Last Updated**: October 16, 2025  
+**Version**: 2.4.0  
 **Author**: Excel Technologies  
-**Status**: Comprehensive testing suite with 20+ test categories and social login integration testing
+**Status**: Comprehensive testing suite with 20+ test categories, social login integration testing, and enhanced debugging tools
