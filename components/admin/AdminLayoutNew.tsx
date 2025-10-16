@@ -15,7 +15,8 @@ import {
   X,
   Shield,
   Receipt,
-  Globe
+  Globe,
+  AlertTriangle
 } from 'lucide-react';
 import RupeeIcon from '@/components/icons/RupeeIcon';
 
@@ -38,6 +39,7 @@ export default function AdminLayoutNew({ children, user, onLogout }: AdminLayout
     { name: 'Users', href: '/admin/user-management', icon: Users },
     { name: 'Orders', href: '/admin/order-management', icon: Receipt },
     { name: 'Payments', href: '/admin/payment-management', icon: CreditCard },
+    { name: 'Pending Domains', href: '/admin/pending-domains', icon: AlertTriangle },
     { name: 'DNS Management', href: '/admin/dns-management', icon: Globe },
     { name: 'TLD Pricing', href: '/admin/pricing-management', icon: RupeeIcon },
     { name: 'Settings', href: '/admin/settings', icon: Settings },

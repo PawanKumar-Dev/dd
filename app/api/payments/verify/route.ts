@@ -4,8 +4,10 @@ import { RazorpayService } from "@/lib/razorpay";
 import { ResellerClubWrapper } from "@/lib/resellerclub-wrapper";
 import { ResellerClubAPI } from "@/lib/resellerclub";
 import { EmailService } from "@/lib/email";
+import { DomainVerificationService } from "@/lib/domain-verification";
 import connectDB from "@/lib/mongodb";
 import Order from "@/models/Order";
+import PendingDomain from "@/models/PendingDomain";
 import {
   isDomainSupported,
   requiresAdditionalDetails,
@@ -526,6 +528,87 @@ export async function POST(request: NextRequest) {
       successful: successfulDomains.length,
       successfulDomains: successfulDomains,
     });
+
+    // Verify domain registrations to detect failed registrations due to insufficient funds
+    console.log(
+      "🔍 [PAYMENT-VERIFY] Starting domain verification for all registered domains..."
+    );
+
+    const domainsToVerify = orderDomains.map((domain) => domain.domainName);
+    const verificationResults =
+      await DomainVerificationService.verifyMultipleDomains(domainsToVerify);
+
+    // Process verification results and create pending domains for failed registrations
+    const pendingDomainsToCreate = [];
+    for (const verificationResult of verificationResults) {
+      const orderDomain = orderDomains.find(
+        (d) => d.domainName === verificationResult.domainName
+      );
+
+      if (
+        orderDomain &&
+        DomainVerificationService.isPendingRegistration(verificationResult)
+      ) {
+        console.log(
+          `⚠️ [PAYMENT-VERIFY] Domain still available after registration: ${verificationResult.domainName}`
+        );
+
+        // Update order domain status to pending
+        orderDomain.status = "pending";
+        orderDomain.verificationResult = verificationResult;
+
+        // Create pending domain record for admin management
+        const pendingDomainData = {
+          domainName: verificationResult.domainName,
+          price: orderDomain.price,
+          currency: orderDomain.currency,
+          registrationPeriod: orderDomain.registrationPeriod,
+          userId: user._id.toString(),
+          orderId: orderId,
+          customerId: orderDomain.resellerClubCustomerId,
+          contactId: orderDomain.resellerClubContactId,
+          nameServers: nameServers,
+          adminContactId: customerResult.contactId,
+          techContactId: customerResult.contactId,
+          billingContactId: customerResult.contactId,
+          status: "pending",
+          reason:
+            verificationResult.reason ||
+            "Domain still available - registration likely failed due to insufficient funds",
+          verificationAttempts: 1,
+          lastVerifiedAt: new Date(),
+        };
+
+        pendingDomainsToCreate.push(pendingDomainData);
+      } else if (
+        orderDomain &&
+        verificationResult.registrationStatus === "success"
+      ) {
+        console.log(
+          `✅ [PAYMENT-VERIFY] Domain verification successful: ${verificationResult.domainName}`
+        );
+        // Domain is properly registered, no action needed
+      }
+    }
+
+    // Create pending domain records in database
+    if (pendingDomainsToCreate.length > 0) {
+      console.log(
+        `📝 [PAYMENT-VERIFY] Creating ${pendingDomainsToCreate.length} pending domain records for admin management`
+      );
+      try {
+        await PendingDomain.insertMany(pendingDomainsToCreate);
+        console.log(
+          `✅ [PAYMENT-VERIFY] Successfully created ${pendingDomainsToCreate.length} pending domain records`
+        );
+      } catch (error) {
+        console.error(
+          "❌ [PAYMENT-VERIFY] Failed to create pending domain records:",
+          error
+        );
+        // Don't fail the entire process if pending domain creation fails
+      }
+    }
 
     // Determine order status - always "completed" if payment succeeded
     const orderStatus = "completed";
