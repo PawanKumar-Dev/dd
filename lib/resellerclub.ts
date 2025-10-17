@@ -271,8 +271,6 @@ export class ResellerClubAPI {
           bw: "dotbw",
           by: "dotby",
           bz: "dotbz",
-          ca: "dotca",
-          cc: "dotcc",
           cd: "dotcd",
           cf: "dotcf",
           cg: "dotcg",
@@ -282,7 +280,6 @@ export class ResellerClubAPI {
           cl: "dotcl",
           cm: "dotcm",
           cn: "dotcn",
-          co: "dotco",
           cr: "dotcr",
           cu: "dotcu",
           cv: "dotcv",
@@ -306,7 +303,6 @@ export class ResellerClubAPI {
           fk: "dotfk",
           fm: "dotfm",
           fo: "dotfo",
-          fr: "dotfr",
           ga: "dotga",
           gb: "dotgb",
           gd: "dotgd",
@@ -336,8 +332,6 @@ export class ResellerClubAPI {
           ie: "dotie",
           il: "dotil",
           im: "dotim",
-          in: "thirdleveldotin",
-          io: "dotio",
           iq: "dotiq",
           ir: "dotir",
           is: "dotis",
@@ -371,7 +365,6 @@ export class ResellerClubAPI {
           ma: "dotma",
           mc: "dotmc",
           md: "dotmd",
-          me: "dotme",
           mf: "dotmf",
           mg: "dotmg",
           mh: "dotmh",
@@ -397,7 +390,6 @@ export class ResellerClubAPI {
           nf: "dotnf",
           ng: "dotng",
           ni: "dotni",
-          nl: "dotnl",
           no: "dotno",
           np: "dotnp",
           nr: "dotnr",
@@ -458,24 +450,19 @@ export class ResellerClubAPI {
           to: "dottto",
           tr: "dottr",
           tt: "dotttht",
-          tv: "dottv",
           tw: "dottw",
           tz: "dottz",
           ua: "dotua",
           ug: "dotug",
-          uk: "dotuk",
-          us: "domus",
           uy: "dotuy",
           uz: "dotuz",
           va: "dotva",
-          vc: "dotvc",
           ve: "dotve",
           vg: "dotvg",
           vi: "dotvi",
           vn: "dotvn",
           vu: "dotvu",
           wf: "dotwf",
-          ws: "dotws",
           ye: "dotye",
           yt: "dotyt",
           za: "dotza",
@@ -619,9 +606,9 @@ export class ResellerClubAPI {
               isAvailable ? "unavailable" : "taken";
 
             if (isAvailable) {
+              const domainParts = domain.split(".");
+              const tld = domainParts.slice(1).join(".").toLowerCase(); // Get full TLD for multi-level TLDs
               try {
-                const domainParts = domain.split(".");
-                const tld = domainParts.slice(1).join(".").toLowerCase(); // Get full TLD for multi-level TLDs
                 if (tld) {
                   console.log(
                     `💰 [PRODUCTION] Fetching live customer pricing for ${domain} (TLD: ${tld})`
@@ -2139,52 +2126,6 @@ export class ResellerClubAPI {
       return {
         status: "error",
         message: "Failed to get customer details",
-      };
-    }
-  }
-
-  /**
-   * Update DNS record
-   */
-  static async updateDNSRecord(
-    domainName: string,
-    recordId: string,
-    recordData: {
-      type: string;
-      name: string;
-      value: string;
-      ttl: number;
-      priority?: number;
-    }
-  ): Promise<ResellerClubResponse> {
-    try {
-      const response = await api.post(
-        "/api/dns/manage/modify-record.json",
-        null,
-        {
-          params: {
-            "domain-name": domainName,
-            "auth-userid": RESELLERCLUB_ID,
-            "api-key": RESELLERCLUB_SECRET,
-            "record-id": recordId,
-            type: recordData.type,
-            host: recordData.name,
-            value: recordData.value,
-            ttl: recordData.ttl,
-            priority: recordData.priority,
-          },
-        }
-      );
-
-      return {
-        status: "success",
-        data: response.data,
-      };
-    } catch (error) {
-      console.error("ResellerClub update DNS record error:", error);
-      return {
-        status: "error",
-        message: "Failed to update DNS record",
       };
     }
   }

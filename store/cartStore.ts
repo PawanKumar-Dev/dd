@@ -301,7 +301,7 @@ export const useCartStore = create<CartStore>()(
             setTimeout(() => {
               const token = localStorage.getItem("token");
               if (token) {
-                get().saveToServer();
+                useCartStore.getState().saveToServer();
               }
             }, 100);
           }
