@@ -46,8 +46,8 @@ interface SearchResult {
 }
 
 
-// Top popular TLDs for quick suggestions
-const TOP_TLDS = ['.com', '.net', '.org', '.co', '.io', '.ai', '.app', '.dev', '.tech', '.store', '.shop', '.online'];
+// Top popular TLDs for quick suggestions (max 7)
+const TOP_TLDS = ['.com', '.net', '.org', '.co', '.io', '.ai', '.app'];
 
 /**
  * Domain Search Component
@@ -137,8 +137,8 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
     // Filter out restricted TLDs from top TLDs
     const filteredSuggestions = TOP_TLDS.filter(tld => !isRestrictedTLD(tld));
 
-    // Return top 8 suggestions
-    return filteredSuggestions.slice(0, 8);
+    // Return max 7 suggestions
+    return filteredSuggestions.slice(0, 7);
   };
 
   const handleSearch = async (e: React.FormEvent) => {
