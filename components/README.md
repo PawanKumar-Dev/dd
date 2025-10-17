@@ -9,17 +9,20 @@ This directory contains all reusable React components for the Excel Technologies
 - **Header**: Site header with navigation and user menu
 - **Navigation**: Complete navigation bar with mobile menu support
 - **Footer**: Site footer with links and company information
-- **PageTransition**: Smooth page transition animations
+- **PageTransition**: Enhanced page transition animations with custom easing, scale effects, and improved timing
 
 ### UI Components
 
-- **Button**: Comprehensive button with multiple variants (primary, secondary, outline, ghost, danger)
-- **Input**: Form input with label, error handling, and icon support
+- **Button**: Enhanced button with Framer Motion animations, hover effects, scale transitions, and ripple effects
+- **Input**: Enhanced form input with focus animations, icon transitions, and smooth error/helper text animations
 - **Textarea**: Textarea input with validation and character counting
-- **Card**: Card container with hover effects and variants
-- **Modal**: Modal dialog with backdrop and close functionality
+- **Card**: Enhanced card container with smooth hover animations, scale effects, and staggered content animations
+- **Modal**: Enhanced modal dialog with AnimatePresence, backdrop animations, and size variants
 - **LoadingSpinner**: Loading spinner with customizable size and color
+- **LoadingPage**: Enhanced loading page with gradient backgrounds, pulsing ring effects, and animated progress bars
 - **EmptyState**: Empty state component for no-data scenarios
+- **EnhancedToast**: Advanced toast notifications with slide-in animations, progress bars, and auto-dismiss functionality
+- **Skeleton**: Enhanced skeleton loading components with wave animations and pre-built variants
 
 ### Form Components
 
@@ -63,11 +66,21 @@ This directory contains all reusable React components for the Excel Technologies
 - **Logo**: Reusable logo component with size and variant options
 - **FAQItem**: Accordion-style FAQ item component
 - **ContactInfo**: Contact information display component
-- **FeatureCard**: Feature display card with icons and descriptions
-- **StatsCard**: Statistics display card with trend indicators
+- **FeatureCard**: Enhanced feature display card with animated icons, hover effects, and staggered content animations
+- **StatsCard**: Enhanced statistics display card with animated trend indicators and interactive hover effects
 - **HeroSection**: Hero section component with customizable backgrounds
 - **Section**: Generic section wrapper with background and padding options
 - **LoadingPage**: Full-page loading component
+
+### Enhanced Components
+
+- **EnhancedToast**: Advanced toast notification system with slide-in animations, progress bars, and auto-dismiss functionality
+- **ToastContainer**: Container component for managing multiple toast notifications
+- **Skeleton**: Enhanced skeleton loading component with wave animations and customizable variants
+- **SkeletonText**: Pre-built skeleton component for text content with multiple lines
+- **SkeletonCard**: Pre-built skeleton component for card layouts
+- **SkeletonTable**: Pre-built skeleton component for table layouts
+- **SkeletonList**: Pre-built skeleton component for list layouts
 
 ### Utility Components
 
@@ -87,6 +100,39 @@ function MyComponent() {
       <Input label="Name" placeholder="Enter your name" />
       <Button variant="primary">Submit</Button>
     </Card>
+  );
+}
+```
+
+### Enhanced Components Usage
+
+```tsx
+import {
+  EnhancedToast,
+  ToastContainer,
+  Skeleton,
+  SkeletonCard,
+} from "@/components";
+
+function MyComponent() {
+  const [toasts, setToasts] = useState([]);
+
+  return (
+    <div>
+      {/* Enhanced Toast */}
+      <EnhancedToast
+        id="1"
+        type="success"
+        title="Success!"
+        message="Operation completed successfully"
+        duration={5000}
+        onClose={(id) => setToasts((prev) => prev.filter((t) => t.id !== id))}
+      />
+
+      {/* Skeleton Loading */}
+      <SkeletonCard />
+      <Skeleton variant="text" width="80%" />
+    </div>
   );
 }
 ```
