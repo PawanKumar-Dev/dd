@@ -62,7 +62,6 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
   const [hasSearched, setHasSearched] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [baseDomain, setBaseDomain] = useState('');
-  const [selectedTlds, setSelectedTlds] = useState<string[]>([]);
   const [showTldSuggestions, setShowTldSuggestions] = useState(false);
   const [searchMode, setSearchMode] = useState<'single' | 'multiple'>('single');
   const [showRequirementsModal, setShowRequirementsModal] = useState(false);
@@ -79,7 +78,6 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
         if (state.searchTerm) {
           setSearchTerm(state.searchTerm);
           setBaseDomain(state.baseDomain || '');
-          setSelectedTlds(state.selectedTlds || []);
           setSearchMode(state.searchMode || 'single');
         }
       } catch (error) {
@@ -97,12 +95,11 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
       const searchState = {
         searchTerm,
         baseDomain,
-        selectedTlds,
         searchMode
       };
       localStorage.setItem('domainSearchState', JSON.stringify(searchState));
     }
-  }, [searchTerm, baseDomain, selectedTlds, searchMode, hasSearched]);
+  }, [searchTerm, baseDomain, searchMode, hasSearched]);
 
   const validateDomainInput = (input: string) => {
     const trimmed = input.trim();
@@ -137,7 +134,7 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
     // Filter out restricted TLDs from top TLDs
     const filteredSuggestions = TOP_TLDS.filter(tld => !isRestrictedTLD(tld));
 
-    // Return max 7 suggestions
+    // Return all available suggestions (max 7)
     return filteredSuggestions.slice(0, 7);
   };
 
@@ -199,8 +196,8 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
           }
         }
       } else {
-        // Multiple TLD search
-        searchTlds = selectedTlds.length > 0 ? selectedTlds : getSuggestedTlds(validation.baseDomain || '');
+        // Multiple TLD search - use all suggested TLDs automatically
+        searchTlds = getSuggestedTlds(validation.baseDomain || '');
 
         const response = await fetch('/api/domains/search', {
           method: 'POST',
@@ -280,18 +277,6 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
     }
   };
 
-  const toggleTldSelection = (tld: string) => {
-    setSelectedTlds(prev =>
-      prev.includes(tld)
-        ? prev.filter(t => t !== tld)
-        : [...prev, tld]
-    );
-  };
-
-
-  const clearTldSelection = () => {
-    setSelectedTlds([]);
-  };
 
   const formatPrice = (price: number, currency: string = 'INR') => {
     return new Intl.NumberFormat('en-IN', {
@@ -308,12 +293,28 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
 
     // Auto-detect search mode based on input
     const validation = validateDomainInput(value);
+
     if (validation.isValid && !validation.suggestedTld) {
+      // Domain name without TLD - show multiple TLD suggestions
       setSearchMode('multiple');
       setShowTldSuggestions(true);
+      setBaseDomain(validation.baseDomain || '');
+      // Clear any previous search results when switching to multiple mode
+      if (hasSearched) {
+        setResults([]);
+        setHasSearched(false);
+        setError(null);
+      }
     } else if (validation.suggestedTld) {
+      // Domain name with TLD - single search
       setSearchMode('single');
       setShowTldSuggestions(false);
+      setBaseDomain(validation.baseDomain || '');
+    } else {
+      // Invalid input
+      setSearchMode('single');
+      setShowTldSuggestions(false);
+      setBaseDomain('');
     }
   };
 
@@ -323,7 +324,6 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
     setHasSearched(false);
     setError(null);
     setBaseDomain('');
-    setSelectedTlds([]);
     setShowTldSuggestions(false);
     setSearchMode('single');
     localStorage.removeItem('domainSearchState');
@@ -383,21 +383,13 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
           </div>
 
 
-          {searchMode === 'multiple' && showTldSuggestions && baseDomain && (
+          {searchMode === 'multiple' && baseDomain && (
             <div className="space-y-4 sm:space-y-6 bg-gray-50 rounded-xl p-4 sm:p-6 border-2 border-gray-200">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-3 text-sm text-gray-800 bg-blue-100 px-4 py-3 rounded-lg font-medium" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
                   <TrendingUp className="h-5 w-5 flex-shrink-0 text-blue-600" />
-                  <span className="text-sm">Select domain extensions below to search multiple TLDs</span>
+                  <span className="text-sm">We'll search all popular domain extensions for you</span>
                 </div>
-                <button
-                  type="button"
-                  onClick={clearTldSelection}
-                  className="text-sm text-blue-600 hover:text-blue-700 font-medium px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors self-start sm:self-auto"
-                  style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}
-                >
-                  Clear all
-                </button>
               </div>
 
               {/* Top TLD Suggestions */}
@@ -412,72 +404,26 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
                         Popular Extensions
                       </h3>
                       <p className="text-sm text-gray-600" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
-                        Choose from the most popular domain extensions
+                        We'll search these 7 popular domain extensions
                       </p>
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const availableTlds = TOP_TLDS.filter(tld => !isRestrictedTLD(tld));
-                      setSelectedTlds(availableTlds);
-                    }}
-                    className="text-sm text-blue-600 hover:text-blue-700 font-medium px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors self-start sm:self-auto"
-                    style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}
-                  >
-                    Select all
-                  </button>
                 </div>
                 <div className="flex flex-wrap gap-1.5 sm:gap-2">
                   {TOP_TLDS.filter(tld => !isRestrictedTLD(tld)).map((tld) => (
-                    <button
+                    <div
                       key={tld}
-                      type="button"
-                      onClick={() => toggleTldSelection(tld)}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${selectedTlds.includes(tld)
-                        ? 'bg-blue-600 text-white shadow-md hover:bg-blue-700'
-                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:shadow-sm'
-                        }`}
+                      className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white shadow-md"
                       style={{
                         fontFamily: 'Google Sans, system-ui, sans-serif'
                       }}
                     >
                       {tld}
-                    </button>
+                    </div>
                   ))}
                 </div>
               </div>
 
-              {/* Selected TLDs Summary */}
-              {selectedTlds.length > 0 && (
-                <div className="bg-blue-600 p-6 sm:p-8 rounded-xl text-white shadow-lg">
-                  <div className="flex items-center gap-4 mb-4 sm:mb-6">
-                    <div className="p-3 bg-white bg-opacity-20 rounded-xl flex-shrink-0">
-                      <Globe className="h-6 w-6" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <h4 className="font-semibold text-lg sm:text-xl" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>Selected Extensions</h4>
-                      <p className="text-blue-100 text-sm sm:text-base" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>{selectedTlds.length} TLD{selectedTlds.length !== 1 ? 's' : ''} selected</p>
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap gap-2 sm:gap-3">
-                    {selectedTlds.slice(0, 5).map((tld) => (
-                      <span
-                        key={tld}
-                        className="px-4 py-2 bg-white bg-opacity-25 text-white text-sm rounded-lg font-medium"
-                        style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}
-                      >
-                        {tld}
-                      </span>
-                    ))}
-                    {selectedTlds.length > 5 && (
-                      <span className="px-4 py-2 bg-white bg-opacity-15 text-white text-sm rounded-lg font-medium" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
-                        +{selectedTlds.length - 5} more
-                      </span>
-                    )}
-                  </div>
-                </div>
-              )}
             </div>
           )}
         </form>
