@@ -57,7 +57,7 @@ export async function PUT(
     }
 
     // Prevent admin from deactivating themselves
-    if (user._id.toString() === authResult.user?.id && isActive === false) {
+    if (user._id?.toString() === authResult.user?.id && isActive === false) {
       return NextResponse.json(
         { error: "Cannot deactivate your own account" },
         { status: 400 }
@@ -113,7 +113,7 @@ export async function DELETE(
     }
 
     // Prevent admin from deleting themselves
-    if (user._id.toString() === authResult.user?.id) {
+    if (user._id?.toString() === authResult.user?.id) {
       return NextResponse.json(
         { error: "Cannot delete your own account" },
         { status: 400 }

@@ -128,3 +128,7 @@ function getTldPrice(tld: string): string {
 export function requiresSpecialVerification(tld: string): boolean {
   return Object.keys(DOMAIN_REQUIREMENTS).includes(tld);
 }
+
+// Alias for backward compatibility
+export const requiresAdditionalDetails = requiresSpecialVerification;
+export const isDomainSupported = (tld: string): boolean => !requiresSpecialVerification(tld);
