@@ -110,7 +110,7 @@ export const authOptions: NextAuthOptions = {
             // Send profile completion email for new social login users
             const { EmailService } = await import("@/lib/email");
             EmailService.sendProfileCompletionEmail(
-              user.email,
+              user.email || '',
               `${firstName} ${lastName}`.trim()
             ).catch((error) => {
               console.error("Profile completion email failed:", error);
@@ -126,7 +126,7 @@ export const authOptions: NextAuthOptions = {
           }
 
           token.role = dbUser.role;
-          token.id = dbUser._id.toString();
+          token.id = dbUser._id?.toString() || '';
           token.profileCompleted = dbUser.profileCompleted;
         } else if (user) {
           // Regular credential login

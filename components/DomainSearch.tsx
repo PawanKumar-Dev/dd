@@ -807,10 +807,11 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
             setShowRequirementsModal(false);
             setSelectedDomainForRequirements('');
           }}
-          domainName={selectedDomainForRequirements}
-          requirements={getDomainRequirements(selectedDomainForRequirements).requirements}
-          restrictions={getDomainRequirements(selectedDomainForRequirements).restrictions}
-          onContactSupport={() => {
+          domain={selectedDomainForRequirements.split('.')[0]}
+          tld={`.${selectedDomainForRequirements.split('.').slice(1).join('.')}`}
+          requirements={getDomainRequirements(`.${selectedDomainForRequirements.split('.').slice(1).join('.')}`).requirements}
+          restrictions={getDomainRequirements(`.${selectedDomainForRequirements.split('.').slice(1).join('.')}`).restrictions}
+          onSelectAlternative={() => {
             // Handle contact support action
             window.open('mailto:support@exceltechnologies.com?subject=Domain Registration Support');
           }}

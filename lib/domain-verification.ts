@@ -67,7 +67,7 @@ export class DomainVerificationService {
         );
         console.log(
           `🔍 [DOMAIN-VERIFICATION] Available search results:`,
-          searchResults.map((r) => `${r.domainName} (${r.status})`)
+          searchResults.map((r) => `${r.domainName} (${r.available ? 'available' : 'taken'})`)
         );
 
         // If domain is not found in search results, it could mean:
@@ -86,10 +86,10 @@ export class DomainVerificationService {
 
         if (partialMatch) {
           console.log(
-            `🔍 [DOMAIN-VERIFICATION] Found partial match: ${partialMatch.domainName} (${partialMatch.status})`
+            `🔍 [DOMAIN-VERIFICATION] Found partial match: ${partialMatch.domainName} (${partialMatch.available ? 'available' : 'taken'})`
           );
           // Use the partial match result
-          const isAvailable = partialMatch.status === "available";
+          const isAvailable = partialMatch.available;
           return {
             domainName,
             isAvailable,
@@ -112,7 +112,7 @@ export class DomainVerificationService {
         };
       }
 
-      const isAvailable = domainResult.status === "available";
+      const isAvailable = domainResult.available;
 
       if (isAvailable) {
         console.log(

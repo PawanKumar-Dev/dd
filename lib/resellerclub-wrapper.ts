@@ -82,7 +82,11 @@ export class ResellerClubWrapper {
     domainName: string,
     years: number
   ): Promise<ResellerClubResponse> {
-    return ResellerClubAPI.renewDomain(domainName, years);
+    // TODO: Implement domain renewal functionality
+    return {
+      status: "error",
+      message: "Domain renewal not yet implemented",
+    };
   }
 
   /**
