@@ -808,7 +808,8 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
             setSelectedDomainForRequirements('');
           }}
           domainName={selectedDomainForRequirements}
-          requirements={getDomainRequirements(selectedDomainForRequirements)!}
+          requirements={getDomainRequirements(selectedDomainForRequirements).requirements}
+          restrictions={getDomainRequirements(selectedDomainForRequirements).restrictions}
           onContactSupport={() => {
             // Handle contact support action
             window.open('mailto:support@exceltechnologies.com?subject=Domain Registration Support');
