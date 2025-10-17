@@ -55,6 +55,7 @@ export {
   SkeletonTable,
   SkeletonList,
 } from "./EnhancedSkeleton";
+export { default as DomainRequirementsModal } from "./DomainRequirementsModal";
 
 // Testing Components
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
+import { useModalScroll } from '@/hooks/useModalScroll';
 
 interface ModalProps {
   isOpen: boolean;
@@ -19,6 +20,9 @@ export default function Modal({
   size = 'md',
   closeOnOverlayClick = true
 }: ModalProps) {
+  // Handle modal scroll behavior
+  useModalScroll(isOpen);
+
   const sizeClasses = {
     sm: 'max-w-sm',
     md: 'max-w-lg',
@@ -30,7 +34,7 @@ export default function Modal({
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex min-h-screen items-center justify-center p-4">
+          <div className="flex min-h-screen items-start justify-center p-4 pt-8 pb-8">
             {/* Background overlay */}
             <motion.div
               className="fixed inset-0 bg-gray-500 bg-opacity-75"
@@ -43,7 +47,7 @@ export default function Modal({
 
             {/* Modal panel */}
             <motion.div
-              className={`relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl w-full ${sizeClasses[size]}`}
+              className={`relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl w-full max-h-[calc(100vh-4rem)] flex flex-col ${sizeClasses[size]}`}
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -52,8 +56,8 @@ export default function Modal({
                 ease: [0.25, 0.46, 0.45, 0.94]
               }}
             >
-              {/* Header */}
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 border-b border-gray-200">
+              {/* Header - Fixed */}
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 border-b border-gray-200 flex-shrink-0">
                 <div className="flex items-center justify-between">
                   <motion.h3
                     className="text-lg font-medium text-gray-900"
@@ -78,9 +82,9 @@ export default function Modal({
                 </div>
               </div>
 
-              {/* Content */}
+              {/* Content - Scrollable */}
               <motion.div
-                className="bg-white px-4 pb-4 sm:p-6"
+                className="bg-white px-4 pb-4 sm:p-6 overflow-y-auto flex-1 modal-scrollbar"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.3 }}

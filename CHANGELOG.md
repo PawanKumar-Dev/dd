@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Animated Modal System**: Upgraded Modal component with AnimatePresence, backdrop animations, and size variants
 - **Enhanced Toast Notifications**: New EnhancedToast component with slide-in animations, progress bars, and auto-dismiss functionality
 - **Skeleton Loading Components**: New EnhancedSkeleton system with wave animations, pre-built components (SkeletonText, SkeletonCard, SkeletonTable, SkeletonList)
+- **Domain Requirements Modal**: Specialized modal component for domain registration requirements with proper scroll handling and alternative domain suggestions
+- **Modal Scroll Management**: Enhanced modal system with proper scroll handling, body scroll prevention, and custom scrollbar styling
 - **Micro-interactions**: Added subtle animations throughout the application for better user feedback and engagement
 
 #### Component Enhancements
@@ -33,6 +35,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **User Experience**: Significantly improved overall user experience with smooth animations and better visual feedback
 - **Component Library**: Enhanced component library with consistent animation patterns and improved developer experience
 - **Visual Polish**: Added visual polish throughout the application with professional-grade animations and transitions
+- **Modal System**: Fixed modal overflow issues with proper scroll handling, preventing content from being cut off
+- **Scroll Management**: Improved scroll behavior with body scroll prevention and custom scrollbar styling
+
+### Fixed
+
+- **Modal Content Overflow**: Fixed issue where modal content was being cut off at the bottom of the viewport
+- **Scroll Behavior**: Improved modal scroll behavior to prevent background page scrolling when modal is open
+- **Content Visibility**: Ensured all modal content is accessible through proper scroll handling and responsive design
 
 ## [2.5.0] - 2025-10-16
 
