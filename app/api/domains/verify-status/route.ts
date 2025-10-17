@@ -43,10 +43,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check domain status in ResellerClub
-    const result = await ResellerClubAPI.getDomainDetails(
-      domainName,
-      domain.resellerClubCustomerId
-    );
+    const result = await ResellerClubAPI.getDomainDetails(domainName);
 
     if (result.status === "error") {
       // If domain not found in ResellerClub, it might be pending or failed

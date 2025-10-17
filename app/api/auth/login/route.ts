@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
     // Generate token with remember me option
     const token = AuthService.generateToken(
       {
-        userId: user._id.toString(),
+        userId: user._id?.toString() || '',
         email: user.email,
         role: user.role,
       },

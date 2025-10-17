@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Prevent admin from resetting their own password through this endpoint
-    if (user._id.toString() === userId) {
+    if (user._id?.toString() || '' === userId) {
       return NextResponse.json(
         { error: "Use the admin settings to reset your own password" },
         { status: 400 }

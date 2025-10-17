@@ -52,7 +52,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         return {
-          id: user._id.toString(),
+          id: user._id?.toString() || '',
           email: user.email,
           name: `${user.firstName} ${user.lastName}`,
           role: user.role,

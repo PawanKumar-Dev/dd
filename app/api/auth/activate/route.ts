@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
 
     // Generate JWT token for immediate login
     const jwtToken = AuthService.generateToken({
-      userId: user._id.toString(),
+      userId: user._id?.toString() || '',
       email: user.email,
       role: user.role,
     });

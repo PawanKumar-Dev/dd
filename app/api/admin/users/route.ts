@@ -147,7 +147,7 @@ export async function DELETE(request: NextRequest) {
     await connectDB();
 
     // Prevent admin from deleting themselves
-    if (user._id.toString() === userId) {
+    if (user._id?.toString() || '' === userId) {
       return NextResponse.json(
         { error: "Cannot delete your own account" },
         { status: 400 }
