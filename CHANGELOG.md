@@ -5,6 +5,35 @@ All notable changes to the Excel Technologies Domain Management System will be d
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.6.0] - 2025-01-26
+
+### Added
+
+#### Enhanced User Experience & Animations
+
+- **Advanced Button Animations**: Enhanced Button component with Framer Motion animations, hover effects, scale transitions, and ripple effects
+- **Interactive Card Components**: Improved Card, FeatureCard, and StatsCard with smooth hover animations, scale effects, and staggered content animations
+- **Enhanced Page Transitions**: Upgraded PageTransition component with custom easing, scale effects, and improved timing
+- **Advanced Loading States**: Enhanced LoadingPage with gradient backgrounds, pulsing ring effects, animated progress bars, and customizable loading messages
+- **Interactive Form Elements**: Enhanced Input component with focus animations, icon transitions, and smooth error/helper text animations
+- **Animated Modal System**: Upgraded Modal component with AnimatePresence, backdrop animations, and size variants
+- **Enhanced Toast Notifications**: New EnhancedToast component with slide-in animations, progress bars, and auto-dismiss functionality
+- **Skeleton Loading Components**: New EnhancedSkeleton system with wave animations, pre-built components (SkeletonText, SkeletonCard, SkeletonTable, SkeletonList)
+- **Micro-interactions**: Added subtle animations throughout the application for better user feedback and engagement
+
+#### Component Enhancements
+
+- **Animation Props**: Added animation control props to components (animate, delay) for fine-tuned animation control
+- **Improved Accessibility**: Enhanced animations maintain accessibility standards with reduced motion support
+- **Performance Optimizations**: Optimized animations for better performance with proper easing and duration controls
+- **Responsive Animations**: All animations are optimized for mobile devices with touch-friendly interactions
+
+### Enhanced
+
+- **User Experience**: Significantly improved overall user experience with smooth animations and better visual feedback
+- **Component Library**: Enhanced component library with consistent animation patterns and improved developer experience
+- **Visual Polish**: Added visual polish throughout the application with professional-grade animations and transitions
+
 ## [2.5.0] - 2025-10-16
 
 ### Added
