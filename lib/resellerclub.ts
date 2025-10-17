@@ -1580,23 +1580,27 @@ export class ResellerClubAPI {
       const tld = domainParts.slice(1).join(".").toLowerCase(); // Get full TLD for multi-level TLDs
 
       if (tld === "au") {
-        // Australian domain policy requirements
-        params.append("id", "AUS");
+        // Australian domain policy requirements - using correct ResellerClub parameter names
+        params.append("id", "AUS123456789"); // ABN/ACN number
         params.append("id-type", "Business Registration Number");
         params.append("policy-reason", "1"); // 1 = Business/Commercial use
+        // Additional AU-specific parameters
+        params.append("au-eligibility-type", "1"); // 1 = Australian Business
+        params.append("au-eligibility-name", "Excel Tech");
+        params.append("au-eligibility-id", "AUS123456789"); // ABN/ACN
       } else if (tld === "uk" || tld === "co.uk") {
         // UK domain policy requirements
-        params.append("id", "GB");
+        params.append("id", "GB12345678"); // UK Company Number
         params.append("id-type", "Company Registration Number");
         params.append("policy-reason", "1");
       } else if (tld === "ca") {
         // Canadian domain policy requirements
-        params.append("id", "CA");
+        params.append("id", "CA123456789"); // Canadian Business Number
         params.append("id-type", "Business Registration Number");
         params.append("policy-reason", "1");
       } else if (tld === "de") {
         // German domain policy requirements
-        params.append("id", "DE");
+        params.append("id", "DE123456789"); // German Business Registration
         params.append("id-type", "Business Registration Number");
         params.append("policy-reason", "1");
       }

@@ -143,12 +143,8 @@ export default function CheckoutPage() {
   // But not if payment is in progress or just completed
   useEffect(() => {
     if (!isLoading && cartItems.length === 0 && user && !isPaymentInProgress && !paymentCompleted) {
-      // Small delay to prevent immediate redirect during page load
-      const timer = setTimeout(() => {
-        router.push('/dashboard');
-      }, 1000);
-
-      return () => clearTimeout(timer);
+      // Immediate redirect without showing intermediate state
+      router.replace('/dashboard');
     }
   }, [cartItems.length, isLoading, user, router, isPaymentInProgress, paymentCompleted]);
 
@@ -537,21 +533,13 @@ export default function CheckoutPage() {
     );
   }
 
+  // If cart is empty, show loading while redirect happens
   if (cartItems.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="bg-white rounded-lg p-8 shadow-sm border border-gray-200 max-w-md">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Redirecting...</h2>
-            <p className="text-gray-600 mb-6">Your cart is empty. Redirecting you to the dashboard.</p>
-            <button
-              onClick={() => router.push('/dashboard')}
-              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
-            >
-              Go to Dashboard
-            </button>
-          </div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );

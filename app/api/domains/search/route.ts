@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ResellerClubWrapper } from "@/lib/resellerclub-wrapper";
 import { InputValidator } from "@/lib/validation";
+import { isRestrictedTLD } from "@/lib/domainRequirements";
 
 export async function POST(request: NextRequest) {
   const requestId = Math.random().toString(36).substring(7);
@@ -47,6 +48,22 @@ export async function POST(request: NextRequest) {
         fullDomain: userEnteredDomain,
       });
 
+      // Check if the TLD is restricted
+      if (isRestrictedTLD(userTLD)) {
+        console.log(
+          `🚫 [API-${requestId}] Restricted TLD detected: ${userTLD}`
+        );
+        return NextResponse.json({
+          success: false,
+          error: "restricted_tld",
+          message: `Domain registration for .${userTLD} requires special permissions and additional documentation. Please contact our support team for assistance.`,
+          domain: userEnteredDomain,
+          tld: userTLD,
+          supportContact: "support@exceltechnologies.com",
+          requestId,
+        });
+      }
+
       // Search only for the specific TLD the user entered
       searchTlds = [userTLD];
     } else {
@@ -60,10 +77,45 @@ export async function POST(request: NextRequest) {
         searchTlds = ["com"]; // Default to .com only
       }
 
+      // Filter out restricted TLDs and warn user
+      const restrictedTlds = searchTlds.filter((tld) => isRestrictedTLD(tld));
+      const allowedTlds = searchTlds.filter((tld) => !isRestrictedTLD(tld));
+
+      if (restrictedTlds.length > 0) {
+        console.log(
+          `🚫 [API-${requestId}] Restricted TLDs detected: ${restrictedTlds.join(
+            ", "
+          )}`
+        );
+        // If all TLDs are restricted, return error
+        if (allowedTlds.length === 0) {
+          return NextResponse.json({
+            success: false,
+            error: "all_tlds_restricted",
+            message: `Domain registration for ${restrictedTlds
+              .map((tld) => `.${tld}`)
+              .join(
+                ", "
+              )} requires special permissions and additional documentation. Please contact our support team for assistance.`,
+            restrictedTlds: restrictedTlds,
+            supportContact: "support@exceltechnologies.com",
+            requestId,
+          });
+        }
+        // If some TLDs are restricted, continue with allowed ones but note the restriction
+        searchTlds = allowedTlds;
+        console.log(
+          `⚠️ [API-${requestId}] Filtered out restricted TLDs, continuing with: ${allowedTlds.join(
+            ", "
+          )}`
+        );
+      }
+
       console.log(`🌐 [API-${requestId}] Base domain search:`, {
         baseDomain: baseDomain,
         searchTlds: searchTlds,
         providedTlds: tlds,
+        restrictedTlds: restrictedTlds,
       });
     }
 

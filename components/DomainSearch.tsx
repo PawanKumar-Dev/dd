@@ -29,7 +29,7 @@ import toast from 'react-hot-toast';
 import { showSuccessToast, showErrorToast } from '@/lib/toast';
 import Button from './Button';
 import DomainRequirementsModal from './DomainRequirementsModal';
-import { getDomainRequirements, requiresAdditionalDetails, isDomainSupported } from '@/lib/domainRequirements';
+import { getDomainRequirements, requiresAdditionalDetails, isDomainSupported, isRestrictedTLD } from '@/lib/domainRequirements';
 import Input from './Input';
 
 interface DomainSearchProps {
@@ -185,8 +185,11 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
       suggestions.push(...TLD_CATEGORIES[4].tlds);
     }
 
+    // Filter out restricted TLDs
+    const filteredSuggestions = suggestions.filter(tld => !isRestrictedTLD(tld));
+
     // Remove duplicates and limit to 12 suggestions
-    return Array.from(new Set(suggestions)).slice(0, 12);
+    return Array.from(new Set(filteredSuggestions)).slice(0, 12);
   };
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -229,8 +232,22 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
           setError(null);
         } else {
           setResults([]);
-          setError(data.error || 'Failed to search domain. Please try again.');
-          toast.error(data.error || 'Failed to search domain. Please try again.');
+
+          // Handle restricted TLD errors
+          if (data.error === 'restricted_tld' || data.error === 'all_tlds_restricted') {
+            setError(data.message);
+            toast.error(data.message, {
+              duration: 8000,
+              style: {
+                background: '#fef2f2',
+                color: '#dc2626',
+                border: '1px solid #fecaca',
+              },
+            });
+          } else {
+            setError(data.error || 'Failed to search domain. Please try again.');
+            toast.error(data.error || 'Failed to search domain. Please try again.');
+          }
         }
       } else {
         // Multiple TLD search
@@ -254,8 +271,22 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
           setError(null);
         } else {
           setResults([]);
-          setError(data.error || 'Failed to search domain. Please try again.');
-          toast.error(data.error || 'Failed to search domain. Please try again.');
+
+          // Handle restricted TLD errors
+          if (data.error === 'restricted_tld' || data.error === 'all_tlds_restricted') {
+            setError(data.message);
+            toast.error(data.message, {
+              duration: 8000,
+              style: {
+                background: '#fef2f2',
+                color: '#dc2626',
+                border: '1px solid #fecaca',
+              },
+            });
+          } else {
+            setError(data.error || 'Failed to search domain. Please try again.');
+            toast.error(data.error || 'Failed to search domain. Please try again.');
+          }
         }
       }
     } catch (error) {
@@ -430,7 +461,7 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
               <div className="space-y-4">
                 {TLD_CATEGORIES.map((category) => {
                   const categoryTlds = category.tlds.filter(tld =>
-                    !searchTerm.includes('.') || !searchTerm.endsWith(tld)
+                    (!searchTerm.includes('.') || !searchTerm.endsWith(tld)) && !isRestrictedTLD(tld)
                   );
 
                   if (categoryTlds.length === 0) return null;

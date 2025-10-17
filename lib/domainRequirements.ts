@@ -15,6 +15,32 @@ export interface AlternativeDomain {
   price?: string;
 }
 
+// TLDs that require special permissions and should be blocked from cart
+export const RESTRICTED_TLDS = [
+  ".au", // Australian domains - require ABN/ACN
+  ".uk", // UK domains - require UK presence
+  ".co.uk", // UK domains - require UK presence
+  ".ca", // Canadian domains - require Canadian presence
+  ".de", // German domains - require German presence
+  ".fr", // French domains - require French presence
+  ".nl", // Dutch domains - require Dutch presence
+  ".es", // Spanish domains - require Spanish presence
+  ".it", // Italian domains - require Italian presence
+  ".jp", // Japanese domains - require Japanese presence
+  ".cn", // Chinese domains - require Chinese presence
+  ".in", // Indian domains - require Indian presence
+  ".br", // Brazilian domains - require Brazilian presence
+  ".mx", // Mexican domains - require Mexican presence
+  ".ru", // Russian domains - require Russian presence
+  ".za", // South African domains - require South African presence
+];
+
+// Function to check if a TLD is restricted
+export function isRestrictedTLD(tld: string): boolean {
+  const normalizedTld = tld.startsWith(".") ? tld : `.${tld}`;
+  return RESTRICTED_TLDS.includes(normalizedTld.toLowerCase());
+}
+
 // Pre-defined requirements for common TLDs
 export const DOMAIN_REQUIREMENTS: Record<
   string,
@@ -131,4 +157,5 @@ export function requiresSpecialVerification(tld: string): boolean {
 
 // Alias for backward compatibility
 export const requiresAdditionalDetails = requiresSpecialVerification;
-export const isDomainSupported = (tld: string): boolean => !requiresSpecialVerification(tld);
+export const isDomainSupported = (tld: string): boolean =>
+  !requiresSpecialVerification(tld);
