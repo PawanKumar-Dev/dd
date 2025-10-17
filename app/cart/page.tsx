@@ -13,6 +13,7 @@ interface User {
   firstName: string;
   lastName: string;
   role: string;
+  profileCompleted?: boolean;
 }
 
 // Helper function to get minimum registration period for TLD

@@ -13,17 +13,18 @@ import { PageLoading } from '@/components/user/LoadingComponents';
 import ClientOnly from '@/components/ClientOnly';
 
 interface User {
-  id: string;
+  id?: string;
   email: string;
   firstName: string;
   lastName: string;
-  role: string;
+  role?: string;
   phone?: string;
   address?: string;
   city?: string;
   state?: string;
   country?: string;
   zipCode?: string;
+  profileCompleted?: boolean;
 }
 
 interface UserSettings {
@@ -158,7 +159,14 @@ export default function UserSettings() {
       });
 
       if (response.ok) {
-        const updatedUserData = { ...user, ...updatedUser, profileCompleted: true };
+        const updatedUserData = { 
+          ...user, 
+          ...updatedUser, 
+          profileCompleted: true,
+          email: updatedUser.email || user?.email || '',
+          firstName: updatedUser.firstName || user?.firstName || '',
+          lastName: updatedUser.lastName || user?.lastName || ''
+        };
         setUser(updatedUserData);
 
         // Update localStorage with the updated user data

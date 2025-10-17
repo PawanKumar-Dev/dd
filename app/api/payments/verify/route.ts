@@ -217,9 +217,7 @@ export async function POST(request: NextRequest) {
             "Some domains in your order require additional verification and cannot be processed automatically.",
           restrictedDomains: restrictedDomains.map((d) => ({
             domainName: d.domainName,
-            reason:
-              d.requirements?.warningMessage ||
-              "Additional verification required",
+            reason: "Additional verification required",
           })),
           supportContact:
             "Please contact support@exceltechnologies.com for assistance with these domains.",
@@ -429,25 +427,25 @@ export async function POST(request: NextRequest) {
           const isInsufficientBalance =
             result.status === "pending" || // If ResellerClub wrapper already determined it's pending
             (result.message &&
-              (result.message.toLowerCase().includes("insufficient balance") ||
-                result.message.toLowerCase().includes("low funds") ||
-                result.message.toLowerCase().includes("insufficient funds") ||
-                result.message.toLowerCase().includes("account balance") ||
-                result.message.toLowerCase().includes("credit limit") ||
+              (result.message?.toLowerCase().includes("insufficient balance") ||
+                result.message?.toLowerCase().includes("low funds") ||
+                result.message?.toLowerCase().includes("insufficient funds") ||
+                result.message?.toLowerCase().includes("account balance") ||
+                result.message?.toLowerCase().includes("credit limit") ||
                 result.message
-                  .toLowerCase()
+                  ?.toLowerCase()
                   .includes("already exists in our database") ||
-                result.message.toLowerCase().includes("pending order") ||
-                result.message.toLowerCase().includes("pending order for")));
+                result.message?.toLowerCase().includes("pending order") ||
+                result.message?.toLowerCase().includes("pending order for")));
 
           const domainStatus = isInsufficientBalance ? "pending" : "failed";
           const statusMessage = isInsufficientBalance
             ? result.message
-                .toLowerCase()
+                ?.toLowerCase()
                 .includes("already exists in our database")
               ? "Domain registration is being processed. Our team will complete the registration shortly."
               : "Domain registration pending due to insufficient balance"
-            : `Domain registration failed: ${result.message}`;
+            : `Domain registration failed: ${result.message || 'Unknown error'}`;
 
           domainBookingStatus.push({
             step: isInsufficientBalance
@@ -607,7 +605,6 @@ export async function POST(request: NextRequest) {
 
         // Update order domain status to pending
         orderDomain.status = "pending";
-        orderDomain.verificationResult = verificationResult;
 
         // Create pending domain record for admin management
         const pendingDomainData = {
