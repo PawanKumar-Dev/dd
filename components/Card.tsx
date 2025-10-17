@@ -1,6 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
+import { motion } from 'framer-motion';
 
 interface CardProps {
   children: ReactNode;
@@ -8,6 +9,8 @@ interface CardProps {
   hover?: boolean;
   padding?: 'sm' | 'md' | 'lg';
   variant?: 'default' | 'elevated' | 'outlined';
+  animate?: boolean;
+  delay?: number;
 }
 
 export default function Card({
@@ -15,7 +18,9 @@ export default function Card({
   className = '',
   hover = false,
   padding = 'md',
-  variant = 'default'
+  variant = 'default',
+  animate = true,
+  delay = 0
 }: CardProps) {
   const paddingClasses = {
     sm: 'p-4',
@@ -29,11 +34,33 @@ export default function Card({
     outlined: 'bg-white border-2 border-gray-200'
   };
 
-  const hoverClass = hover ? 'hover:shadow-lg transition-shadow duration-300' : '';
+  const hoverClass = hover ? 'hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 hover:-translate-y-1' : '';
 
-  return (
-    <div className={`rounded-lg ${variantClasses[variant]} ${paddingClasses[padding]} ${hoverClass} ${className}`}>
+  const cardContent = (
+    <div className={`rounded-lg ${variantClasses[variant]} ${paddingClasses[padding]} ${hoverClass} ${className} group`}>
       {children}
     </div>
   );
+
+  if (animate) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          duration: 0.5,
+          delay: delay,
+          ease: "easeOut"
+        }}
+        whileHover={hover ? {
+          scale: 1.02,
+          transition: { duration: 0.2 }
+        } : {}}
+      >
+        {cardContent}
+      </motion.div>
+    );
+  }
+
+  return cardContent;
 }
