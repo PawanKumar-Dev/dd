@@ -1,0 +1,36 @@
+/* Custom scrollbar styles for modal content */
+.modal-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.modal-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+}
+
+.modal-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Firefox scrollbar styles */
+.modal-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+/* Smooth scrolling */
+.modal-scrollbar {
+  scroll-behavior: smooth;
+}
+
+/* Focus styles for accessibility */
+.modal-scrollbar:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
