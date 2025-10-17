@@ -1,145 +1,130 @@
+// Domain requirements data for different TLDs
 export interface DomainRequirement {
-  tld: string;
-  name: string;
-  requiresAdditionalDetails: boolean;
-  requirements: string[];
-  restrictions: string[];
-  supported: boolean;
-  warningMessage?: string;
+  text: string;
+  required: boolean;
 }
 
-export const DOMAIN_REQUIREMENTS: Record<string, DomainRequirement> = {
-  au: {
-    tld: "au",
-    name: "Australian (.au)",
-    requiresAdditionalDetails: true,
-    supported: false,
+export interface DomainRestriction {
+  text: string;
+  type: "warning" | "error" | "info";
+}
+
+export interface AlternativeDomain {
+  domain: string;
+  available: boolean;
+  price?: string;
+}
+
+// Pre-defined requirements for common TLDs
+export const DOMAIN_REQUIREMENTS: Record<
+  string,
+  {
+    requirements: DomainRequirement[];
+    restrictions: DomainRestriction[];
+  }
+> = {
+  ".au": {
     requirements: [
-      "Australian Business Number (ABN) or Australian Company Number (ACN)",
-      "Australian presence or connection",
-      "Business registration details",
-      "Specific contact information requirements",
+      {
+        text: "Australian Business Number (ABN) or Australian Company Number (ACN)",
+        required: true,
+      },
+      { text: "Australian presence or connection", required: true },
+      { text: "Business registration details", required: true },
+      { text: "Specific contact information requirements", required: true },
     ],
     restrictions: [
-      "Must have Australian business registration",
-      "Cannot be registered by individuals without business connection",
-      "Requires additional verification process",
+      { text: "Must have Australian business registration", type: "warning" },
+      {
+        text: "Cannot be registered by individuals without business connection",
+        type: "error",
+      },
+      { text: "Requires additional verification process", type: "info" },
     ],
-    warningMessage:
-      "Australian domains require business registration and additional verification. Please contact support for assistance.",
   },
-  "co.uk": {
-    tld: "co.uk",
-    name: "UK Commercial (.co.uk)",
-    requiresAdditionalDetails: true,
-    supported: false,
+  ".co.uk": {
     requirements: [
-      "UK business registration",
-      "UK presence or connection",
-      "Company registration number",
+      { text: "UK presence or connection", required: true },
+      { text: "Valid UK address", required: true },
+      { text: "Contact information in UK", required: true },
     ],
     restrictions: [
-      "Must have UK business registration",
-      "Requires UK company details",
+      { text: "Must have UK connection", type: "warning" },
+      { text: "Cannot be registered without UK presence", type: "error" },
     ],
-    warningMessage:
-      "UK commercial domains require business registration. Please contact support for assistance.",
   },
-  uk: {
-    tld: "uk",
-    name: "UK (.uk)",
-    requiresAdditionalDetails: true,
-    supported: false,
+  ".ca": {
     requirements: [
-      "UK business registration",
-      "UK presence or connection",
-      "Company registration number",
+      { text: "Canadian presence or connection", required: true },
+      { text: "Valid Canadian address", required: true },
+      { text: "Canadian citizen or permanent resident", required: true },
     ],
     restrictions: [
-      "Must have UK business registration",
-      "Requires UK company details",
+      { text: "Must have Canadian connection", type: "warning" },
+      { text: "Cannot be registered without Canadian presence", type: "error" },
     ],
-    warningMessage:
-      "UK domains require business registration. Please contact support for assistance.",
   },
-  ca: {
-    tld: "ca",
-    name: "Canadian (.ca)",
-    requiresAdditionalDetails: true,
-    supported: false,
+  ".de": {
     requirements: [
-      "Canadian business registration",
-      "Canadian presence or connection",
-      "Business registration number",
+      { text: "German presence or connection", required: true },
+      { text: "Valid German address", required: true },
+      { text: "German citizen or resident", required: true },
     ],
     restrictions: [
-      "Must have Canadian business registration",
-      "Requires Canadian company details",
+      { text: "Must have German connection", type: "warning" },
+      { text: "Cannot be registered without German presence", type: "error" },
     ],
-    warningMessage:
-      "Canadian domains require business registration. Please contact support for assistance.",
-  },
-  de: {
-    tld: "de",
-    name: "German (.de)",
-    requiresAdditionalDetails: true,
-    supported: false,
-    requirements: [
-      "German business registration",
-      "German presence or connection",
-      "Business registration number",
-    ],
-    restrictions: [
-      "Must have German business registration",
-      "Requires German company details",
-    ],
-    warningMessage:
-      "German domains require business registration. Please contact support for assistance.",
-  },
-  eu: {
-    tld: "eu",
-    name: "European Union (.eu)",
-    requiresAdditionalDetails: true,
-    supported: false,
-    requirements: [
-      "EU citizenship OR residence in EU/EEA countries",
-      "Company/organization established in EU/EEA",
-      "Valid EU business registration",
-      "Compliance with EURid registry policies",
-    ],
-    restrictions: [
-      "Only EU citizens can register as individuals",
-      "Non-EU citizens must reside in EU/EEA countries",
-      "Companies must be legally established in EU/EEA",
-      "Indian residents without EU citizenship/company cannot register",
-    ],
-    warningMessage:
-      "EU domains require EU citizenship, residence, or business establishment. Indian residents without EU connections cannot register .eu domains. Please contact support for assistance.",
   },
 };
 
-export function getDomainRequirements(
-  domainName: string
-): DomainRequirement | null {
-  const domainParts = domainName.split(".");
-  const tld = domainParts.slice(1).join(".").toLowerCase(); // Get full TLD for multi-level TLDs
-  if (!tld) return null;
-
-  return DOMAIN_REQUIREMENTS[tld] || null;
+// Function to get requirements for a specific TLD
+export function getDomainRequirements(tld: string): {
+  requirements: DomainRequirement[];
+  restrictions: DomainRestriction[];
+} {
+  return (
+    DOMAIN_REQUIREMENTS[tld] || {
+      requirements: [],
+      restrictions: [],
+    }
+  );
 }
 
-export function isDomainSupported(domainName: string): boolean {
-  const requirements = getDomainRequirements(domainName);
-  return !requirements || requirements.supported;
+// Function to generate alternative domains
+export function generateAlternativeDomains(
+  domainName: string,
+  tld: string
+): AlternativeDomain[] {
+  const alternatives: AlternativeDomain[] = [];
+  const commonTlds = [".com", ".net", ".org", ".io", ".co"];
+
+  commonTlds.forEach((altTld) => {
+    if (altTld !== tld) {
+      alternatives.push({
+        domain: `${domainName}${altTld}`,
+        available: true, // This would be checked against actual availability
+        price: getTldPrice(altTld),
+      });
+    }
+  });
+
+  return alternatives;
 }
 
-export function requiresAdditionalDetails(domainName: string): boolean {
-  const requirements = getDomainRequirements(domainName);
-  return requirements?.requiresAdditionalDetails || false;
+// Function to get pricing for TLDs
+function getTldPrice(tld: string): string {
+  const prices: Record<string, string> = {
+    ".com": "$12.99/year",
+    ".net": "$14.99/year",
+    ".org": "$13.99/year",
+    ".io": "$49.99/year",
+    ".co": "$29.99/year",
+  };
+
+  return prices[tld] || "$12.99/year";
 }
 
-export function getRestrictedDomains(): string[] {
-  return Object.values(DOMAIN_REQUIREMENTS)
-    .filter((req) => !req.supported)
-    .map((req) => req.tld);
+// Function to check if a TLD requires special verification
+export function requiresSpecialVerification(tld: string): boolean {
+  return Object.keys(DOMAIN_REQUIREMENTS).includes(tld);
 }
