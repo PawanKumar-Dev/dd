@@ -23,7 +23,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Loader2, CheckCircle, XCircle, Globe, ShoppingCart, Star, TrendingUp, Zap, AlertTriangle } from 'lucide-react';
+import { Search, Loader2, CheckCircle, XCircle, Globe, Star, AlertTriangle, TrendingUp, ShoppingCart } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import toast from 'react-hot-toast';
 import { showSuccessToast, showErrorToast } from '@/lib/toast';
@@ -45,45 +45,9 @@ interface SearchResult {
   pricingSource?: "live" | "fallback" | "unavailable" | "taken";
 }
 
-interface TLDCategory {
-  name: string;
-  icon: React.ComponentType<any>;
-  tlds: string[];
-  description: string;
-}
 
-const TLD_CATEGORIES: TLDCategory[] = [
-  {
-    name: 'Popular',
-    icon: Star,
-    tlds: ['.com', '.net', '.org', '.info', '.biz'],
-    description: 'Most popular domain extensions'
-  },
-  {
-    name: 'Business',
-    icon: TrendingUp,
-    tlds: ['.co', '.io', '.ai', '.app', '.dev', '.tech'],
-    description: 'Perfect for businesses and startups'
-  },
-  {
-    name: 'E-commerce',
-    icon: ShoppingCart,
-    tlds: ['.store', '.shop', '.buy', '.market', '.sale'],
-    description: 'Great for online stores and marketplaces'
-  },
-  {
-    name: 'Technology',
-    icon: Zap,
-    tlds: ['.tech', '.app', '.dev', '.ai', '.cloud', '.data'],
-    description: 'Ideal for tech companies and developers'
-  },
-  {
-    name: 'Online',
-    icon: Globe,
-    tlds: ['.online', '.web', '.site', '.website', '.digital'],
-    description: 'Perfect for online presence'
-  }
-];
+// Top popular TLDs for quick suggestions
+const TOP_TLDS = ['.com', '.net', '.org', '.co', '.io', '.ai', '.app', '.dev', '.tech', '.store', '.shop', '.online'];
 
 /**
  * Domain Search Component
@@ -170,26 +134,11 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
   };
 
   const getSuggestedTlds = (domain: string) => {
-    const domainLower = domain.toLowerCase();
-    const suggestions: string[] = [];
+    // Filter out restricted TLDs from top TLDs
+    const filteredSuggestions = TOP_TLDS.filter(tld => !isRestrictedTLD(tld));
 
-    if (domainLower.includes('shop') || domainLower.includes('store') || domainLower.includes('buy')) {
-      suggestions.push(...TLD_CATEGORIES[2].tlds);
-    }
-
-    if (domainLower.includes('tech') || domainLower.includes('app') || domainLower.includes('dev') || domainLower.includes('ai')) {
-      suggestions.push(...TLD_CATEGORIES[3].tlds);
-    }
-
-    if (domainLower.includes('online') || domainLower.includes('web') || domainLower.includes('site')) {
-      suggestions.push(...TLD_CATEGORIES[4].tlds);
-    }
-
-    // Filter out restricted TLDs
-    const filteredSuggestions = suggestions.filter(tld => !isRestrictedTLD(tld));
-
-    // Remove duplicates and limit to 12 suggestions
-    return Array.from(new Set(filteredSuggestions)).slice(0, 12);
+    // Return top 8 suggestions
+    return filteredSuggestions.slice(0, 8);
   };
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -339,12 +288,6 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
     );
   };
 
-  const selectAllTlds = (categoryTlds: string[]) => {
-    setSelectedTlds(prev => {
-      const newTlds = Array.from(new Set([...prev, ...categoryTlds]));
-      return newTlds;
-    });
-  };
 
   const clearTldSelection = () => {
     setSelectedTlds([]);
@@ -457,57 +400,52 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
                 </button>
               </div>
 
-              {/* TLD Categories */}
-              <div className="space-y-4">
-                {TLD_CATEGORIES.map((category) => {
-                  const categoryTlds = category.tlds.filter(tld =>
-                    (!searchTerm.includes('.') || !searchTerm.endsWith(tld)) && !isRestrictedTLD(tld)
-                  );
-
-                  if (categoryTlds.length === 0) return null;
-
-                  return (
-                    <div key={category.name} className="bg-white rounded-xl p-4 sm:p-5 shadow-md border-2 border-gray-200">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
-                        <div className="flex items-center gap-3">
-                          <div className="p-3 bg-blue-100 rounded-xl flex-shrink-0">
-                            <category.icon className="h-5 w-5 text-blue-600" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <h3 className="font-semibold text-gray-900 text-lg sm:text-xl" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>{category.name}</h3>
-                            <p className="text-sm text-gray-600" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>{category.description}</p>
-                          </div>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => selectAllTlds(categoryTlds)}
-                          className="text-sm text-blue-600 hover:text-blue-700 font-medium px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors self-start sm:self-auto"
-                          style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}
-                        >
-                          Select all
-                        </button>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                        {categoryTlds.map((tld) => (
-                          <button
-                            key={tld}
-                            type="button"
-                            onClick={() => toggleTldSelection(tld)}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${selectedTlds.includes(tld)
-                              ? 'bg-blue-600 text-white shadow-md hover:bg-blue-700'
-                              : 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:shadow-sm'
-                              }`}
-                            style={{
-                              fontFamily: 'Google Sans, system-ui, sans-serif'
-                            }}
-                          >
-                            {tld}
-                          </button>
-                        ))}
-                      </div>
+              {/* Top TLD Suggestions */}
+              <div className="bg-white rounded-xl p-4 sm:p-5 shadow-md border-2 border-gray-200">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-blue-100 rounded-xl flex-shrink-0">
+                      <Star className="h-5 w-5 text-blue-600" />
                     </div>
-                  );
-                })}
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-semibold text-gray-900 text-lg sm:text-xl" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
+                        Popular Extensions
+                      </h3>
+                      <p className="text-sm text-gray-600" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
+                        Choose from the most popular domain extensions
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const availableTlds = TOP_TLDS.filter(tld => !isRestrictedTLD(tld));
+                      setSelectedTlds(availableTlds);
+                    }}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors self-start sm:self-auto"
+                    style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}
+                  >
+                    Select all
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                  {TOP_TLDS.filter(tld => !isRestrictedTLD(tld)).map((tld) => (
+                    <button
+                      key={tld}
+                      type="button"
+                      onClick={() => toggleTldSelection(tld)}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${selectedTlds.includes(tld)
+                        ? 'bg-blue-600 text-white shadow-md hover:bg-blue-700'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:shadow-sm'
+                        }`}
+                      style={{
+                        fontFamily: 'Google Sans, system-ui, sans-serif'
+                      }}
+                    >
+                      {tld}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Selected TLDs Summary */}
