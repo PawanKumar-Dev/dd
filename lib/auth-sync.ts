@@ -21,17 +21,22 @@ export async function syncAuthWithLocalStorage() {
       // Store in localStorage for compatibility
       localStorage.setItem("user", JSON.stringify(userData));
 
-      // Create a simple token for API compatibility
-      // In a real app, you might want to create a proper JWT token
-      const token = btoa(
-        JSON.stringify({
-          userId: (session.user as any).id,
-          email: session.user.email || "",
-          role: (session.user as any).role || "user",
-          iat: Math.floor(Date.now() / 1000),
-          exp: Math.floor(Date.now() / 1000) + 24 * 60 * 60, // 24 hours
-        })
-      );
+      // Create a proper JWT token for API compatibility
+      const jwt = require('jsonwebtoken');
+      const JWT_SECRET = process.env.NEXTAUTH_SECRET || "your-secret-key";
+      
+      const token = jwt.sign({
+        userId: (session.user as any).id,
+        email: session.user.email || "",
+        role: (session.user as any).role || "user",
+        jti: `${(session.user as any).id}_${Date.now()}`,
+        iat: Math.floor(Date.now() / 1000),
+      }, JWT_SECRET, {
+        expiresIn: '24h',
+        issuer: 'excel-technologies',
+        audience: 'domain-management-system',
+        algorithm: 'HS256'
+      });
 
       localStorage.setItem("token", token);
 
