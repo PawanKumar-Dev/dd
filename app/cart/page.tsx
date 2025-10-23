@@ -7,6 +7,7 @@ import { useCartStore } from '@/store/cartStore';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import ClientOnly from '@/components/ClientOnly';
+import ProfileCompletionWarning from '@/components/ProfileCompletionWarning';
 import Link from 'next/link';
 
 interface User {
@@ -144,6 +145,7 @@ export default function CartPage() {
       <Navigation user={user} />
 
       <div className="flex-1 max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-8 pt-24">
+        <ProfileCompletionWarning />
 
         {/* Header */}
         <div className="flex items-center justify-between mb-8">

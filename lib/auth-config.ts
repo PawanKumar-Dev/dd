@@ -128,6 +128,7 @@ export const authOptions: NextAuthOptions = {
           token.role = dbUser.role;
           token.id = dbUser._id?.toString() || '';
           token.profileCompleted = dbUser.profileCompleted;
+          token.provider = account.provider;
         } else if (user) {
           // Regular credential login
           token.role = (user as any).role;
@@ -143,6 +144,7 @@ export const authOptions: NextAuthOptions = {
         (session.user as any).role = token.role as string;
         (session.user as any).profileCompleted =
           token.profileCompleted as boolean;
+        (session.user as any).provider = token.provider as string;
       }
       return session;
     },

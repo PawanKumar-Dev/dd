@@ -56,7 +56,7 @@ export default function SocialLoginButtons({
         onSuccess?.();
       }
     } catch (error) {
-      console.error('Social login error:', error);
+      // Social login error
       const errorMessage = 'An unexpected error occurred. Please try again.';
       toast.error(errorMessage);
       onError?.(errorMessage);
