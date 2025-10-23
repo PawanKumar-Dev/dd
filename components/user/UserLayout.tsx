@@ -20,6 +20,7 @@ import {
   Server
 } from 'lucide-react';
 import RupeeIcon from '@/components/icons/RupeeIcon';
+import ProfileCompletionWarning from '@/components/ProfileCompletionWarning';
 
 interface UserLayoutProps {
   children: React.ReactNode;
@@ -170,6 +171,7 @@ export default function UserLayout({ children, user, onLogout }: UserLayoutProps
             transition={{ duration: 0.3 }}
             className="h-full"
           >
+            <ProfileCompletionWarning />
             {children}
           </motion.div>
         </main>

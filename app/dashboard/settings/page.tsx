@@ -71,7 +71,7 @@ export default function UserSettings() {
       try {
         const token = localStorage.getItem('token');
         if (!token) {
-          console.error('No authentication token available');
+
           setSettings({} as any);
           return;
         }
@@ -95,7 +95,7 @@ export default function UserSettings() {
           setSettings({} as any);
         }
       } catch (error) {
-        console.error('Failed to fetch settings:', error);
+
         // Use default settings
         setSettings({
           notifications: {
@@ -107,7 +107,7 @@ export default function UserSettings() {
         } as any);
       }
     } catch (error) {
-      console.error('Error loading settings:', error);
+
       toast.error('Failed to load settings');
     } finally {
       setIsLoading(false);
@@ -130,7 +130,7 @@ export default function UserSettings() {
 
       toast.success('Settings saved successfully');
     } catch (error) {
-      console.error('Error saving settings:', error);
+
       toast.error('Failed to save settings');
     } finally {
       setIsSaving(false);
@@ -178,7 +178,7 @@ export default function UserSettings() {
         toast.error(errorData.error || 'Failed to update profile');
       }
     } catch (error) {
-      console.error('Error updating profile:', error);
+
       toast.error('Failed to update profile');
     } finally {
       setIsSaving(false);
