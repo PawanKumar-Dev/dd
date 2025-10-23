@@ -44,11 +44,13 @@ export async function middleware(request: NextRequest) {
     if (!nextAuthToken && !customToken) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
-    
+
     // For social login users, ensure they have a proper token
     if (nextAuthToken && !customToken) {
       // Social login user without custom token - redirect to sync
-      return NextResponse.redirect(new URL("/api/auth/sync-token", request.url));
+      return NextResponse.redirect(
+        new URL("/api/auth/sync-token", request.url)
+      );
     }
   }
 
