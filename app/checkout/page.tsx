@@ -8,6 +8,7 @@ import { useCartStore } from '@/store/cartStore';
 import ClientOnly from '@/components/ClientOnly';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import ProfileCompletionWarning from '@/components/ProfileCompletionWarning';
 
 // Helper function to get minimum registration period for TLD
 const getMinRegistrationPeriod = (domainName: string): number => {
@@ -548,6 +549,9 @@ export default function CheckoutPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navigation user={user} />
+
+      {/* Profile Completion Warning */}
+      <ProfileCompletionWarning />
 
       {/* Header */}
       <header className="bg-white shadow-sm">
