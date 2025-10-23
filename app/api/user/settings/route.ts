@@ -3,6 +3,31 @@ import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
 import { AuthService } from "@/lib/auth";
 
+function checkProfileCompletion(user: any): boolean {
+  // Check if all required fields are filled
+  const hasPhone = user.phone && user.phone.trim() !== "";
+  const hasPhoneCc = user.phoneCc && user.phoneCc.trim() !== "";
+  const hasCompanyName = user.companyName && user.companyName.trim() !== "";
+  const hasAddress = user.address?.line1 && user.address.line1.trim() !== "";
+  const hasCity = user.address?.city && user.address.city.trim() !== "";
+  const hasState = user.address?.state && user.address.state.trim() !== "";
+  const hasCountry =
+    user.address?.country && user.address.country.trim() !== "";
+  const hasZipcode =
+    user.address?.zipcode && user.address.zipcode.trim() !== "";
+
+  return (
+    hasPhone &&
+    hasPhoneCc &&
+    hasCompanyName &&
+    hasAddress &&
+    hasCity &&
+    hasState &&
+    hasCountry &&
+    hasZipcode
+  );
+}
+
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
@@ -58,22 +83,20 @@ export async function PUT(request: NextRequest) {
         lastName,
         email,
         phone,
-        company,
+        phoneCc,
+        companyName,
         address,
-        city,
-        state,
-        country,
-        zipCode,
       } = body.profile;
 
       if (firstName) user.firstName = firstName;
       if (lastName) user.lastName = lastName;
       if (email) user.email = email;
       if (phone) user.phone = phone;
-      if (company) user.companyName = company;
+      if (phoneCc) user.phoneCc = phoneCc;
+      if (companyName) user.companyName = companyName;
 
       // Update nested address object
-      if (address || city || state || country || zipCode) {
+      if (address) {
         if (!user.address) {
           user.address = {
             line1: "",
@@ -83,15 +106,16 @@ export async function PUT(request: NextRequest) {
             zipcode: "",
           };
         }
-        if (address) user.address.line1 = address;
-        if (city) user.address.city = city;
-        if (state) user.address.state = state;
-        if (country) user.address.country = country;
-        if (zipCode) user.address.zipcode = zipCode;
+        if (address.line1) user.address.line1 = address.line1;
+        if (address.city) user.address.city = address.city;
+        if (address.state) user.address.state = address.state;
+        if (address.country) user.address.country = address.country;
+        if (address.zipcode) user.address.zipcode = address.zipcode;
       }
 
-      // Mark profile as completed when user updates their profile
-      user.profileCompleted = true;
+      // Check if profile is completed based on required fields
+      const isProfileComplete = checkProfileCompletion(user);
+      user.profileCompleted = isProfileComplete;
     }
 
     // Update password if provided

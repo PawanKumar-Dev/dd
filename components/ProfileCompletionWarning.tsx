@@ -20,14 +20,14 @@ export default function ProfileCompletionWarning({ className = "" }: ProfileComp
     if (session?.user) {
       const profileCompleted = (session.user as any).profileCompleted;
       const provider = (session.user as any).provider;
-      
+
       // Show warning if:
       // 1. User is from social login (has provider) OR profile is explicitly not completed
       // 2. Profile is not completed
       // 3. Warning hasn't been dismissed
       const isSocialLogin = provider && (provider === 'google' || provider === 'facebook');
       const needsProfileCompletion = profileCompleted === false;
-      
+
       if ((isSocialLogin || needsProfileCompletion) && !isDismissed) {
         setShowWarning(true);
       } else {
@@ -37,7 +37,7 @@ export default function ProfileCompletionWarning({ className = "" }: ProfileComp
   }, [session, isDismissed]);
 
   const handleCompleteProfile = () => {
-    router.push("/complete-profile");
+    router.push("/dashboard/settings");
   };
 
   const handleDismiss = () => {
@@ -62,7 +62,7 @@ export default function ProfileCompletionWarning({ className = "" }: ProfileComp
                 Profile Completion Required
               </h3>
               <div className="mt-1 text-sm text-red-700">
-                You must complete your profile before you can proceed to checkout. 
+                You must complete your profile before you can proceed to checkout.
                 Please fill in all the required fields below and save your changes.
               </div>
             </div>

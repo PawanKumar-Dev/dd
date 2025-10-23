@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
   User, Mail, Phone, MapPin, Shield, Key, Save,
-  Eye, EyeOff, Calendar, Globe, CreditCard, AlertCircle
+  Eye, EyeOff, Calendar, Globe, CreditCard, AlertCircle, Building
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import UserLayout from '@/components/user/UserLayout';
@@ -19,11 +19,15 @@ interface User {
   lastName: string;
   role?: string;
   phone?: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  country?: string;
-  zipCode?: string;
+  phoneCc?: string;
+  companyName?: string;
+  address?: {
+    line1: string;
+    city: string;
+    state: string;
+    country: string;
+    zipcode: string;
+  };
   profileCompleted?: boolean;
 }
 
@@ -137,6 +141,20 @@ export default function UserSettings() {
     }
   };
 
+  const checkProfileCompletion = (userData: Partial<User>): boolean => {
+    // Check if all required fields are filled
+    const hasPhone = userData.phone && userData.phone.trim() !== '';
+    const hasPhoneCc = userData.phoneCc && userData.phoneCc.trim() !== '';
+    const hasCompanyName = userData.companyName && userData.companyName.trim() !== '';
+    const hasAddress = userData.address?.line1 && userData.address.line1.trim() !== '';
+    const hasCity = userData.address?.city && userData.address.city.trim() !== '';
+    const hasState = userData.address?.state && userData.address.state.trim() !== '';
+    const hasCountry = userData.address?.country && userData.address.country.trim() !== '';
+    const hasZipcode = userData.address?.zipcode && userData.address.zipcode.trim() !== '';
+
+    return hasPhone && hasPhoneCc && hasCompanyName && hasAddress && hasCity && hasState && hasCountry && hasZipcode;
+  };
+
   const handleUpdateProfile = async (updatedUser: Partial<User>) => {
     try {
       setIsSaving(true);
@@ -159,10 +177,13 @@ export default function UserSettings() {
       });
 
       if (response.ok) {
+        // Check if all required fields are filled for profile completion
+        const isProfileComplete = checkProfileCompletion(updatedUser);
+
         const updatedUserData = {
           ...user,
           ...updatedUser,
-          profileCompleted: true,
+          profileCompleted: isProfileComplete,
           email: updatedUser.email || user?.email || '',
           firstName: updatedUser.firstName || user?.firstName || '',
           lastName: updatedUser.lastName || user?.lastName || ''
@@ -172,7 +193,11 @@ export default function UserSettings() {
         // Update localStorage with the updated user data
         localStorage.setItem('user', JSON.stringify(updatedUserData));
 
-        toast.success('Profile updated successfully');
+        if (isProfileComplete) {
+          toast.success('Profile completed successfully!');
+        } else {
+          toast.success('Profile updated successfully');
+        }
       } else {
         const errorData = await response.json();
         toast.error(errorData.error || 'Failed to update profile');
@@ -293,31 +318,71 @@ export default function UserSettings() {
                         <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
                       </div>
 
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Phone Number
-                        </label>
-                        <div className="relative">
-                          <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                          <input
-                            type="tel"
-                            value={user.phone || ''}
-                            onChange={(e) => setUser(prev => prev ? { ...prev, phone: e.target.value } : null)}
-                            className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="Enter your phone number"
-                          />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Company Name
+                          </label>
+                          <div className="relative">
+                            <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <input
+                              type="text"
+                              value={user.companyName || ''}
+                              onChange={(e) => setUser(prev => prev ? { ...prev, companyName: e.target.value } : null)}
+                              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              placeholder="Enter your company name"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Phone Number
+                          </label>
+                          <div className="flex">
+                            <select
+                              value={user.phoneCc || '+91'}
+                              onChange={(e) => setUser(prev => prev ? { ...prev, phoneCc: e.target.value } : null)}
+                              className="px-3 py-2 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
+                            >
+                              <option value="+91">+91 (India)</option>
+                              <option value="+1">+1 (USA)</option>
+                              <option value="+44">+44 (UK)</option>
+                              <option value="+61">+61 (Australia)</option>
+                              <option value="+49">+49 (Germany)</option>
+                              <option value="+33">+33 (France)</option>
+                              <option value="+81">+81 (Japan)</option>
+                              <option value="+86">+86 (China)</option>
+                            </select>
+                            <div className="relative flex-1">
+                              <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                              <input
+                                type="tel"
+                                value={user.phone || ''}
+                                onChange={(e) => setUser(prev => prev ? { ...prev, phone: e.target.value } : null)}
+                                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                placeholder="Enter your phone number"
+                              />
+                            </div>
+                          </div>
                         </div>
                       </div>
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Address
+                          Address Line 1
                         </label>
                         <div className="relative">
                           <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                           <textarea
-                            value={user.address || ''}
-                            onChange={(e) => setUser(prev => prev ? { ...prev, address: e.target.value } : null)}
+                            value={user.address?.line1 || ''}
+                            onChange={(e) => setUser(prev => prev ? {
+                              ...prev,
+                              address: {
+                                ...prev.address,
+                                line1: e.target.value
+                              }
+                            } : null)}
                             rows={3}
                             className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="Enter your address"
@@ -325,16 +390,23 @@ export default function UserSettings() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
                             City
                           </label>
                           <input
                             type="text"
-                            value={user.city || ''}
-                            onChange={(e) => setUser(prev => prev ? { ...prev, city: e.target.value } : null)}
+                            value={user.address?.city || ''}
+                            onChange={(e) => setUser(prev => prev ? {
+                              ...prev,
+                              address: {
+                                ...prev.address,
+                                city: e.target.value
+                              }
+                            } : null)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="Enter your city"
                           />
                         </div>
 
@@ -344,10 +416,46 @@ export default function UserSettings() {
                           </label>
                           <input
                             type="text"
-                            value={user.state || ''}
-                            onChange={(e) => setUser(prev => prev ? { ...prev, state: e.target.value } : null)}
+                            value={user.address?.state || ''}
+                            onChange={(e) => setUser(prev => prev ? {
+                              ...prev,
+                              address: {
+                                ...prev.address,
+                                state: e.target.value
+                              }
+                            } : null)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="Enter your state"
                           />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Country
+                          </label>
+                          <select
+                            value={user.address?.country || 'IN'}
+                            onChange={(e) => setUser(prev => prev ? {
+                              ...prev,
+                              address: {
+                                ...prev.address,
+                                country: e.target.value
+                              }
+                            } : null)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          >
+                            <option value="IN">India</option>
+                            <option value="US">United States</option>
+                            <option value="GB">United Kingdom</option>
+                            <option value="AU">Australia</option>
+                            <option value="DE">Germany</option>
+                            <option value="FR">France</option>
+                            <option value="JP">Japan</option>
+                            <option value="CN">China</option>
+                            <option value="CA">Canada</option>
+                          </select>
                         </div>
 
                         <div>
@@ -356,9 +464,16 @@ export default function UserSettings() {
                           </label>
                           <input
                             type="text"
-                            value={user.zipCode || ''}
-                            onChange={(e) => setUser(prev => prev ? { ...prev, zipCode: e.target.value } : null)}
+                            value={user.address?.zipcode || ''}
+                            onChange={(e) => setUser(prev => prev ? {
+                              ...prev,
+                              address: {
+                                ...prev.address,
+                                zipcode: e.target.value
+                              }
+                            } : null)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="Enter your ZIP code"
                           />
                         </div>
                       </div>
