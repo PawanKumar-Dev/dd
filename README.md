@@ -2,8 +2,6 @@
 
 A comprehensive, enterprise-grade domain registration and management platform built with Next.js 14, featuring ResellerClub API integration, Razorpay payment processing, and advanced admin management capabilities.
 
-## 🚀 Core Features
-
 ### Domain Management
 
 - **Domain Search & Registration** - Search and register domains across 400+ TLDs with real-time availability checking
