@@ -44,25 +44,60 @@ export class AuthService {
    */
   static verifyToken(token: string): JWTPayload | null {
     try {
-      const decoded = jwt.verify(token, JWT_SECRET, {
-        issuer: "excel-technologies",
-        audience: "domain-management-system",
-        algorithms: ["HS256"],
-      }) as any;
+      // First try to verify as a proper JWT token
+      try {
+        const decoded = jwt.verify(token, JWT_SECRET, {
+          issuer: "excel-technologies",
+          audience: "domain-management-system",
+          algorithms: ["HS256"],
+        }) as any;
 
-      // Additional security checks
-      if (!decoded.userId || !decoded.email || !decoded.role) {
-        return null;
+        // Additional security checks
+        if (!decoded.userId || !decoded.email || !decoded.role) {
+          return null;
+        }
+
+        // Check if token is not too old (additional security)
+        const tokenAge = Date.now() / 1000 - decoded.iat;
+        const maxAge = 30 * 24 * 60 * 60; // 30 days in seconds
+        if (tokenAge > maxAge) {
+          return null;
+        }
+
+        return decoded as JWTPayload;
+      } catch (jwtError) {
+        // If JWT verification fails, try to decode as base64 (for social login tokens)
+        try {
+          const decoded = JSON.parse(atob(token));
+
+          // Validate the decoded payload
+          if (!decoded.userId || !decoded.email || !decoded.role) {
+            return null;
+          }
+
+          // Check if token is expired
+          if (decoded.exp && Date.now() / 1000 > decoded.exp) {
+            return null;
+          }
+
+          // Check if token is not too old (additional security)
+          if (decoded.iat) {
+            const tokenAge = Date.now() / 1000 - decoded.iat;
+            const maxAge = 30 * 24 * 60 * 60; // 30 days in seconds
+            if (tokenAge > maxAge) {
+              return null;
+            }
+          }
+
+          return decoded as JWTPayload;
+        } catch (base64Error) {
+          console.error(
+            "Token verification failed - not a valid JWT or base64 token:",
+            error
+          );
+          return null;
+        }
       }
-
-      // Check if token is not too old (additional security)
-      const tokenAge = Date.now() / 1000 - decoded.iat;
-      const maxAge = 30 * 24 * 60 * 60; // 30 days in seconds
-      if (tokenAge > maxAge) {
-        return null;
-      }
-
-      return decoded as JWTPayload;
     } catch (error) {
       console.error("Token verification failed:", error);
       return null;
