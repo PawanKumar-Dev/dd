@@ -397,20 +397,6 @@ export default function CartPage() {
 
 
 
-                  {user && user.profileCompleted === false && (
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                      <div className="flex items-start space-x-3">
-                        <Shield className="h-5 w-5 text-red-600 mt-0.5" />
-                        <div>
-                          <h3 className="text-sm font-medium text-red-800">Profile Completion Required</h3>
-                          <p className="text-sm text-red-700 mt-1">
-                            <strong>You must complete your profile before you can proceed to checkout.</strong>
-                            This is required to process your domain registration and ensure we have all necessary information for your order.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
 
                   <button
                     onClick={clearCart}
