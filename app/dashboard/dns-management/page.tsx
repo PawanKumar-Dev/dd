@@ -87,7 +87,7 @@ export default function DNSManagementPage() {
       setUser(parsedUser);
       loadDomains();
     } catch (error) {
-      console.error('Error parsing user data:', error);
+
       router.push('/login');
     }
   }, [router]);
@@ -116,11 +116,11 @@ export default function DNSManagementPage() {
         const data = await response.json();
         setDomains(data.domains || []);
       } else {
-        console.error('Failed to load domains');
+
         setDomains([]);
       }
     } catch (error) {
-      console.error('Error loading domains:', error);
+
       toast.error('Failed to load domains');
     } finally {
       setIsLoading(false);
@@ -139,7 +139,7 @@ export default function DNSManagementPage() {
       const token = localStorage.getItem('token');
       const domain = domains.find(d => d.id === domainId);
       if (!domain) {
-        console.error('Domain not found for ID:', domainId);
+
         setDnsRecords([]);
         return;
       }
@@ -159,7 +159,6 @@ export default function DNSManagementPage() {
         setPropagationRetryCount(0);
       } else {
         const errorData = await response.json().catch(() => ({}));
-        console.error('Failed to load DNS records:', errorData);
 
         // Check if it's a 404 error (domain not found in ResellerClub)
         if (response.status === 404) {
@@ -187,7 +186,7 @@ export default function DNSManagementPage() {
         }
       }
     } catch (error) {
-      console.error('Error loading DNS records:', error);
+
       setDnsPropagationStatus('error');
       toast.error('Failed to load DNS records');
     } finally {
@@ -202,7 +201,7 @@ export default function DNSManagementPage() {
       const token = localStorage.getItem('token');
       const domain = domains.find(d => d.id === domainId);
       if (!domain) {
-        console.error('Domain not found for ID:', domainId);
+
         setNameservers([]);
         return;
       }
@@ -223,12 +222,12 @@ export default function DNSManagementPage() {
           // Handle API success but lookup failure
           setNameservers([]);
           setNameserverMethod('');
-          console.error('Nameserver lookup failed:', data.message);
+
           toast.error(data.message || 'Failed to retrieve nameserver information');
         }
       } else {
         const errorData = await response.json().catch(() => ({}));
-        console.error('Failed to load nameservers:', errorData);
+
         setNameservers([]);
         setNameserverMethod('');
 
@@ -242,7 +241,7 @@ export default function DNSManagementPage() {
         }
       }
     } catch (error) {
-      console.error('Error loading nameservers:', error);
+
       setNameservers([]);
       toast.error('Failed to load nameserver information');
     } finally {
@@ -297,7 +296,7 @@ export default function DNSManagementPage() {
         toast.error(error.error || 'Failed to add DNS record');
       }
     } catch (error) {
-      console.error('Error adding DNS record:', error);
+
       toast.error('Failed to add DNS record');
     }
   };
@@ -336,7 +335,7 @@ export default function DNSManagementPage() {
         toast.error(error.error || 'Failed to delete DNS record');
       }
     } catch (error) {
-      console.error('Error deleting DNS record:', error);
+
       toast.error('Failed to delete DNS record');
     }
   };
@@ -433,7 +432,7 @@ export default function DNSManagementPage() {
         });
       }
     } catch (error) {
-      console.error('Error updating DNS record:', error);
+
       toast.error('Failed to update DNS record');
     }
   };
@@ -489,7 +488,7 @@ export default function DNSManagementPage() {
         toast.error(errorData.error || 'Failed to activate DNS management');
       }
     } catch (error) {
-      console.error('Error activating DNS:', error);
+
       toast.error('Failed to activate DNS management');
     } finally {
       setIsActivating(false);

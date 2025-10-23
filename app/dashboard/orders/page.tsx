@@ -68,7 +68,7 @@ export default function UserOrders() {
       setUser(userObj);
       loadOrders();
     } catch (error) {
-      console.error('Error parsing user data:', error);
+
       router.push('/login');
     }
   }, [router]);
@@ -93,15 +93,15 @@ export default function UserOrders() {
           const data = await response.json();
           setOrders(data.orders || []);
         } else {
-          console.error('Failed to fetch orders:', response.status, response.statusText);
+
           setOrders([]);
         }
       } catch (error) {
-        console.error('Failed to fetch orders:', error);
+
         setOrders([]);
       }
     } catch (error) {
-      console.error('Error loading orders:', error);
+
       toast.error('Failed to load orders');
     } finally {
       setIsLoading(false);

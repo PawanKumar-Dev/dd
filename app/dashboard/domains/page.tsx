@@ -76,7 +76,7 @@ export default function UserDomains() {
       try {
         const token = localStorage.getItem('token');
         if (!token) {
-          console.error('No authentication token available');
+
           setDomains([]);
           return;
         }
@@ -94,11 +94,11 @@ export default function UserDomains() {
           setDomains([]);
         }
       } catch (error) {
-        console.error('Failed to fetch domains:', error);
+
         setDomains([]);
       }
     } catch (error) {
-      console.error('Error loading domains:', error);
+
       toast.error('Failed to load domains');
     } finally {
       setIsLoading(false);
