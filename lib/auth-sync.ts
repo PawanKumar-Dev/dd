@@ -46,7 +46,7 @@ export async function syncAuthWithLocalStorage() {
 
     return null;
   } catch (error) {
-    console.error("Error syncing auth with localStorage:", error);
+    // Error syncing auth - handled silently on client side
     return null;
   }
 }
