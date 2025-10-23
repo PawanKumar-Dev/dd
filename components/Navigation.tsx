@@ -50,7 +50,7 @@ export default function Navigation({
         const userObj = JSON.parse(userData);
         setCurrentUser(userObj);
       } catch (error) {
-        console.error('Error parsing user data:', error);
+        // Error parsing user data
         setIsLoggedIn(false);
         setCurrentUser(null);
       }

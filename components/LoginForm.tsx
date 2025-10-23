@@ -41,7 +41,7 @@ export default function LoginForm({ className = '' }: LoginFormProps) {
           password: '',
         }));
       } catch (error) {
-        console.error('Error parsing saved form data:', error);
+        // Error parsing saved form data
       }
     }
 
@@ -257,7 +257,7 @@ export default function LoginForm({ className = '' }: LoginFormProps) {
                 }, 100);
               }}
               onError={(error) => {
-                console.error('Social login error:', error);
+                // Social login error
               }}
             />
           </form>

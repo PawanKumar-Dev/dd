@@ -15,13 +15,10 @@ export default function AuthSync() {
       // Sync NextAuth session with localStorage and create JWT token
       syncAuthWithLocalStorage()
         .then((userData) => {
-          if (userData) {
-            console.log("Auth synced successfully:", userData);
-          }
+          // Auth sync completed successfully
         })
         .catch((error) => {
-          console.error("Auth sync failed:", error);
-          // Don't block the user if sync fails
+          // Auth sync failed - handled silently
         })
         .finally(() => {
           setIsSyncing(false);
