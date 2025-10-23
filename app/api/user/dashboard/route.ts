@@ -3,13 +3,27 @@ import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
 import Order from "@/models/Order";
 import { AuthService } from "@/lib/auth";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth-config";
 
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
-    // Get user from JWT token
-    const user = await AuthService.getUserFromRequest(request);
+    // Try to get user from JWT token first
+    let user = await AuthService.getUserFromRequest(request);
+    
+    // If no user from JWT, try NextAuth session
+    if (!user) {
+      const session = await getServerSession(authOptions);
+      if (session?.user) {
+        user = await User.findById((session.user as any).id).select("-password");
+        if (!user || !user.isActive) {
+          return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+      }
+    }
+    
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
