@@ -41,8 +41,6 @@
 - **Domain Requirements Error**: Fixed "requirements.map is not a function" error by adding proper array validation and default values
 - **Type Safety**: Enhanced DomainRequirementsModal with proper TypeScript types and error handling
 
-## [2.5.0] - 2025-10-16
-
 ### Added
 
 #### Pending Domains Management System
