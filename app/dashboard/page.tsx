@@ -117,7 +117,6 @@ export default function UserDashboard() {
           });
         }
       } catch (error) {
-        console.error('Failed to fetch dashboard data:', error);
         // Fallback to basic stats
         setStats({
           totalDomains: 0,
@@ -130,7 +129,6 @@ export default function UserDashboard() {
         } as any);
       }
     } catch (error) {
-      console.error('Error loading dashboard data:', error);
       toast.error('Failed to load dashboard data');
     } finally {
       setIsLoading(false);
