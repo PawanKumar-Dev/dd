@@ -14,7 +14,6 @@ import { useCartStore } from '@/store/cartStore';
 import UserLayout from '@/components/user/UserLayout';
 import { PageLoading, DataLoading } from '@/components/user/LoadingComponents';
 import ClientOnly from '@/components/ClientOnly';
-import { syncAuthWithLocalStorage } from '@/lib/auth-sync';
 
 interface User {
   id: string;
@@ -48,13 +47,18 @@ export default function UserDashboard() {
 
       // Check for NextAuth session first
       if (session?.user) {
-        // Sync NextAuth session with localStorage
-        const syncedUser = await syncAuthWithLocalStorage();
-        if (syncedUser) {
-          setUser(syncedUser);
-          loadDashboardData(syncedUser);
-          return;
-        }
+        // Create user object from NextAuth session
+        const userObj = {
+          id: (session.user as any).id,
+          email: session.user.email || "",
+          firstName: session.user.name?.split(" ")[0] || "",
+          lastName: session.user.name?.split(" ").slice(1).join(" ") || "",
+          role: (session.user as any).role || "user",
+        };
+
+        setUser(userObj);
+        loadDashboardData(userObj);
+        return;
       }
 
       // Fallback to localStorage (for existing users)
@@ -202,12 +206,12 @@ export default function UserDashboard() {
                       </div>
                       <div className="text-right">
                         <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${domain.status === 'registered' || domain.status === 'active'
-                            ? 'bg-green-100 text-green-800'
-                            : domain.status === 'pending'
-                              ? 'bg-yellow-100 text-yellow-800'
-                              : domain.status === 'failed'
-                                ? 'bg-red-100 text-red-800'
-                                : 'bg-gray-100 text-gray-800'
+                          ? 'bg-green-100 text-green-800'
+                          : domain.status === 'pending'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : domain.status === 'failed'
+                              ? 'bg-red-100 text-red-800'
+                              : 'bg-gray-100 text-gray-800'
                           }`}>
                           {domain.status}
                         </span>
