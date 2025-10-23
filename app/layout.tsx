@@ -4,6 +4,7 @@ import './globals.css';
 import { Toaster } from 'react-hot-toast';
 import ClientOnly from '@/components/ClientOnly';
 import SessionProvider from '@/components/SessionProvider';
+import AuthSync from '@/components/AuthSync';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -29,6 +30,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <SessionProvider>
+          <AuthSync />
           {children}
         </SessionProvider>
         <Toaster position="top-right" />
