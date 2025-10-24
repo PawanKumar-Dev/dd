@@ -12,10 +12,10 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
-    FacebookProvider({
-      clientId: process.env.FACEBOOK_CLIENT_ID!,
-      clientSecret: process.env.FACEBOOK_CLIENT_SECRET!,
-    }),
+    // FacebookProvider({
+    //   clientId: process.env.FACEBOOK_CLIENT_ID!,
+    //   clientSecret: process.env.FACEBOOK_CLIENT_SECRET!,
+    // }),
     CredentialsProvider({
       name: "credentials",
       credentials: {
@@ -153,18 +153,25 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login",
     error: "/login",
   },
-  debug: process.env.NODE_ENV === "development",
+  debug: false, // Disable debug to reduce console noise
   logger: {
     error(code, metadata) {
-      console.error("NextAuth Error:", code, metadata);
+      // Only log actual errors, not warnings
+      if (code !== 'CLIENT_FETCH_ERROR' && code !== 'DEBUG_ENABLED') {
+        console.error("NextAuth Error:", code, metadata);
+      }
     },
     warn(code) {
-      console.warn("NextAuth Warning:", code);
+      // Suppress debug warnings in development
+      if (code !== 'DEBUG_ENABLED') {
+        console.warn("NextAuth Warning:", code);
+      }
     },
     debug(code, metadata) {
-      if (process.env.NODE_ENV === "development") {
-        console.log("NextAuth Debug:", code, metadata);
-      }
+      // Disable debug logging completely
+      // if (process.env.NODE_ENV === "development") {
+      //   console.log("NextAuth Debug:", code, metadata);
+      // }
     },
   },
   session: {

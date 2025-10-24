@@ -42,11 +42,14 @@ export async function middleware(request: NextRequest) {
   if (protectedRoutes.includes(pathname) || adminRoutes.includes(pathname)) {
     // Check for either NextAuth token or custom token
     if (!nextAuthToken && !customToken) {
+      console.log('🚫 No tokens found - redirecting to login');
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
     // For social login users, ensure they have a proper token
-    if (nextAuthToken && !customToken) {
+    // BUT skip this check if user is going to login (logout scenario)
+    if (nextAuthToken && !customToken && pathname !== '/login') {
+      console.log('🔄 Social login user without custom token - redirecting to sync');
       // Social login user without custom token - redirect to sync
       return NextResponse.redirect(
         new URL("/api/auth/sync-token", request.url)
