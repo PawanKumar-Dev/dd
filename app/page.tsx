@@ -128,7 +128,7 @@ export default function HomePage() {
               Our Impact
             </h2>
             <p className="text-xl text-gray-600">
-              Trusted by thousands of customers worldwide
+              Trusted by thousands of customers across India
             </p>
           </div>
 
