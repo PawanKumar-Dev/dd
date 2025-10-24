@@ -93,7 +93,7 @@ export class AuthService {
         } catch (base64Error) {
           console.error(
             "Token verification failed - not a valid JWT or base64 token:",
-            error
+            base64Error
           );
           return null;
         }

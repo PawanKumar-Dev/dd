@@ -1,4 +1,5 @@
 import toast from "react-hot-toast";
+import { signOut } from "next-auth/react";
 
 /**
  * Simple logout utility - same process for all users
@@ -33,18 +34,28 @@ export const useLogout = () => {
 
       // Step 2: Clear all cookies manually
       console.log('🍪 Clearing cookies...');
-      document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-      document.cookie = 'next-auth.session-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-      document.cookie = 'next-auth.callback-url=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-      document.cookie = 'next-auth.csrf-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+      const cookiesToClear = [
+        'token',
+        'next-auth.session-token',
+        'next-auth.callback-url',
+        'next-auth.csrf-token',
+        '__Secure-next-auth.session-token',
+        '__Host-next-auth.csrf-token'
+      ];
+
+      cookiesToClear.forEach(cookieName => {
+        document.cookie = `${cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+        document.cookie = `${cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=${window.location.hostname}`;
+      });
 
       // Step 3: Show success message
       toast.success('Logged out successfully');
+      console.log('✅ Logout successful!');
 
-      // Step 4: Use NextAuth signout to clear all sessions (works for both social and credential)
-      console.log('🔄 Using NextAuth signout to clear all sessions...');
+      // Step 4: Direct redirect to login (all cleanup done above)
+      console.log('🔄 Redirecting to login page...');
       setTimeout(() => {
-        window.location.href = '/api/auth/signout?callbackUrl=' + encodeURIComponent('/login');
+        window.location.href = '/login';
       }, 500); // Small delay to ensure toast is visible
 
     } catch (error) {
@@ -56,8 +67,9 @@ export const useLogout = () => {
         document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
       });
       toast.success('Logged out successfully');
+      console.log('✅ Logout successful!');
       setTimeout(() => {
-        window.location.href = '/api/auth/signout?callbackUrl=' + encodeURIComponent('/login');
+        window.location.href = '/login';
       }, 500);
     }
   };
@@ -111,12 +123,12 @@ export const logoutUser = async () => {
     });
 
     // Show success message
-    console.log('✅ Showing success message...');
     toast.success('Logged out successfully');
+    console.log('✅ Logout successful!');
 
-    // Always use NextAuth signout to clear all sessions (works for both social and credential)
-    console.log('🔄 Using NextAuth signout to clear all sessions...');
-    window.location.href = '/api/auth/signout?callbackUrl=' + encodeURIComponent('/login');
+    // Direct redirect to login (all cleanup done above)
+    console.log('🔄 Redirecting to login page...');
+    window.location.href = '/login';
 
   } catch (error) {
     console.error('❌ Direct logout error:', error);
@@ -126,8 +138,9 @@ export const logoutUser = async () => {
       document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
     });
     toast.success('Logged out successfully');
+    console.log('✅ Logout successful!');
     setTimeout(() => {
-      window.location.href = '/api/auth/signout?callbackUrl=' + encodeURIComponent('/login');
+      window.location.href = '/login';
     }, 100);
   }
 };

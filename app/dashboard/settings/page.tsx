@@ -23,11 +23,11 @@ interface User {
   phoneCc?: string;
   companyName?: string;
   address?: {
-    line1: string;
-    city: string;
-    state: string;
-    country: string;
-    zipcode: string;
+    line1?: string;
+    city?: string;
+    state?: string;
+    country?: string;
+    zipcode?: string;
   };
   profileCompleted?: boolean;
 }
@@ -139,14 +139,14 @@ export default function UserSettings() {
 
   const checkProfileCompletion = (userData: Partial<User>): boolean => {
     // Check if all required fields are filled
-    const hasPhone = userData.phone && userData.phone.trim() !== '';
-    const hasPhoneCc = userData.phoneCc && userData.phoneCc.trim() !== '';
-    const hasCompanyName = userData.companyName && userData.companyName.trim() !== '';
-    const hasAddress = userData.address?.line1 && userData.address.line1.trim() !== '';
-    const hasCity = userData.address?.city && userData.address.city.trim() !== '';
-    const hasState = userData.address?.state && userData.address.state.trim() !== '';
-    const hasCountry = userData.address?.country && userData.address.country.trim() !== '';
-    const hasZipcode = userData.address?.zipcode && userData.address.zipcode.trim() !== '';
+    const hasPhone = !!(userData.phone && userData.phone.trim() !== '');
+    const hasPhoneCc = !!(userData.phoneCc && userData.phoneCc.trim() !== '');
+    const hasCompanyName = !!(userData.companyName && userData.companyName.trim() !== '');
+    const hasAddress = !!(userData.address?.line1 && userData.address.line1.trim() !== '');
+    const hasCity = !!(userData.address?.city && userData.address.city.trim() !== '');
+    const hasState = !!(userData.address?.state && userData.address.state.trim() !== '');
+    const hasCountry = !!(userData.address?.country && userData.address.country.trim() !== '');
+    const hasZipcode = !!(userData.address?.zipcode && userData.address.zipcode.trim() !== '');
 
     return hasPhone && hasPhoneCc && hasCompanyName && hasAddress && hasCity && hasState && hasCountry && hasZipcode;
   };
