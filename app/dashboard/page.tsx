@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { useLogout } from '@/lib/logout';
 import { motion } from 'framer-motion';
 import {
   Globe, ShoppingCart, TrendingUp, Clock, CheckCircle,
@@ -135,12 +136,7 @@ export default function UserDashboard() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    router.push('/login');
-    toast.success('Logged out successfully');
-  };
+  const handleLogout = useLogout();
 
 
   if (!user) {

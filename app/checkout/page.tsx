@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useLogout } from '@/lib/logout';
 import { ArrowLeft, CreditCard, Shield, ShoppingCart, Globe, Info, Check, Smartphone, Zap } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCartStore } from '@/store/cartStore';
@@ -45,6 +46,7 @@ declare global {
 export default function CheckoutPage() {
   const [user, setUser] = useState<User | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const handleLogout = useLogout();
   const [isPaymentInProgress, setIsPaymentInProgress] = useState(false);
   const [paymentCompleted, setPaymentCompleted] = useState(false);
   const router = useRouter();
@@ -548,7 +550,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Navigation user={user} />
+      <Navigation user={user} onLogout={user ? handleLogout : undefined} />
 
       {/* Profile Completion Warning */}
       <ProfileCompletionWarning />
