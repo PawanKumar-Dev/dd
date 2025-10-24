@@ -189,7 +189,7 @@ export default function CartPage() {
             </div>
             <div>
               <p className="text-sm font-medium text-gray-900">10,000+ Customers</p>
-              <p className="text-xs text-gray-600">Trusted Worldwide</p>
+              <p className="text-xs text-gray-600">Trusted in India</p>
             </div>
           </div>
           <div className="bg-white rounded-lg p-4 border border-gray-200 flex items-center space-x-3">
