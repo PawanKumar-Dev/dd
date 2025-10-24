@@ -161,19 +161,10 @@ export default function ProfileCompletionForm({ user, onComplete }: ProfileCompl
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Country Code
                 </label>
-                <select
-                  name="phoneCc"
-                  value={formData.phoneCc}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-                  required
-                >
-                  <option value="+91">+91 (India)</option>
-                  <option value="+1">+1 (USA)</option>
-                  <option value="+44">+44 (UK)</option>
-                  <option value="+61">+61 (Australia)</option>
-                  <option value="+86">+86 (China)</option>
-                </select>
+                <div className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-700 font-medium">
+                  🇮🇳 +91 (India)
+                </div>
+                <input type="hidden" name="phoneCc" value="+91" />
               </div>
               <div className="md:col-span-2">
                 <Input
@@ -245,19 +236,10 @@ export default function ProfileCompletionForm({ user, onComplete }: ProfileCompl
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Country
                   </label>
-                  <select
-                    name="address.country"
-                    value={formData.address.country}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-                    required
-                  >
-                    <option value="IN">India</option>
-                    <option value="US">United States</option>
-                    <option value="GB">United Kingdom</option>
-                    <option value="AU">Australia</option>
-                    <option value="CA">Canada</option>
-                  </select>
+                  <div className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-700 font-medium">
+                    🇮🇳 India
+                  </div>
+                  <input type="hidden" name="address.country" value="IN" />
                 </div>
                 <Input
                   label="ZIP Code"
