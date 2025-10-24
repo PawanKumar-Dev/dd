@@ -16,6 +16,7 @@ export interface AlternativeDomain {
 }
 
 // TLDs that require special permissions and should be blocked from cart
+// Since we only serve India, we restrict all country-specific TLDs except Indian ones
 export const RESTRICTED_TLDS = [
   ".au", // Australian domains - require ABN/ACN
   ".uk", // UK domains - require UK presence
@@ -28,11 +29,11 @@ export const RESTRICTED_TLDS = [
   ".it", // Italian domains - require Italian presence
   ".jp", // Japanese domains - require Japanese presence
   ".cn", // Chinese domains - require Chinese presence
-  ".in", // Indian domains - require Indian presence
   ".br", // Brazilian domains - require Brazilian presence
   ".mx", // Mexican domains - require Mexican presence
   ".ru", // Russian domains - require Russian presence
   ".za", // South African domains - require South African presence
+  // Note: .in and .co.in are allowed as we serve India
 ];
 
 // Function to check if a TLD is restricted
