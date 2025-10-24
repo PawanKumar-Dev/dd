@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useLogout } from '@/lib/logout';
 import { ShoppingCart, Trash2, ArrowLeft, CreditCard, Globe, Shield, Star, CheckCircle, Clock, Users, Award, Zap, TrendingUp } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import Navigation from '@/components/Navigation';
@@ -40,6 +41,7 @@ export default function CartPage() {
   const [isClient, setIsClient] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
+  const handleLogout = useLogout();
 
   useEffect(() => {
     setIsClient(true);
@@ -142,7 +144,7 @@ export default function CartPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Navigation user={user} />
+      <Navigation user={user} onLogout={user ? handleLogout : undefined} />
 
       <div className="flex-1 max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-8 pt-24">
         <ProfileCompletionWarning />

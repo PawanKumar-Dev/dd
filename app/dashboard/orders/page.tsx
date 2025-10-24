@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { useLogout } from '@/lib/logout';
 import {
   Receipt, Search, Download, Eye, Calendar,
   CheckCircle, Clock, AlertTriangle, ExternalLink, FileText, RefreshCw, X
@@ -108,12 +109,7 @@ export default function UserOrders() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    router.push('/login');
-    toast.success('Logged out successfully');
-  };
+  const handleLogout = useLogout();
 
   const getStatusColor = (status: string) => {
     switch (status) {

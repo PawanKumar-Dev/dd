@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { useLogout } from '@/lib/logout';
 import {
   Globe, Plus, Edit3, Trash2, Save, X, RefreshCw, Server,
   AlertCircle, Clock, Settings, ExternalLink,
@@ -495,12 +496,7 @@ export default function DNSManagementPage() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    router.push('/login');
-    toast.success('Logged out successfully');
-  };
+  const handleLogout = useLogout();
 
   if (!user) {
     return <PageLoading page="dns-management" />;

@@ -12,10 +12,6 @@ export default function ContactInfo({ className = '' }: ContactInfoProps) {
     <div className={`space-y-6 ${className}`}>
       <div>
         <h3 className="text-2xl font-bold text-gray-900 mb-6">Get in touch</h3>
-        <p className="text-gray-600 mb-8">
-          Have questions about our domain management services? We'd love to hear from you.
-          Send us a message and we'll respond as soon as possible.
-        </p>
       </div>
 
       <div className="space-y-4">

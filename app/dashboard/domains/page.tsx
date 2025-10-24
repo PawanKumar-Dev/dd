@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { useLogout } from '@/lib/logout';
 import {
   Globe, Search, Plus, RefreshCw, Shield, Clock, Loader2, CheckCircle, AlertTriangle
 } from 'lucide-react';
@@ -105,12 +106,7 @@ export default function UserDomains() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    router.push('/login');
-    toast.success('Logged out successfully');
-  };
+  const handleLogout = useLogout();
 
   const getStatusColor = (status: string) => {
     switch (status) {

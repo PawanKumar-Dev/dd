@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { useLogout } from '@/lib/logout';
 import {
   User, Mail, Phone, MapPin, Shield, Key, Save,
   Eye, EyeOff, Calendar, Globe, CreditCard, AlertCircle, Building
@@ -118,12 +119,7 @@ export default function UserSettings() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    router.push('/login');
-    toast.success('Logged out successfully');
-  };
+  const handleLogout = useLogout();
 
   const handleSaveSettings = async () => {
     try {
