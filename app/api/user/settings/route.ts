@@ -95,27 +95,38 @@ export async function PUT(request: NextRequest) {
       if (phoneCc) user.phoneCc = phoneCc;
       if (companyName) user.companyName = companyName;
 
+      // Initialize address object if it doesn't exist
+      if (!user.address) {
+        user.address = {
+          line1: "",
+          city: "",
+          state: "",
+          country: "IN", // Default to India
+          zipcode: "",
+        };
+      }
+
       // Update nested address object
       if (address) {
-        if (!user.address) {
-          user.address = {
-            line1: "",
-            city: "",
-            state: "",
-            country: "",
-            zipcode: "",
-          };
-        }
-        if (address.line1) user.address.line1 = address.line1;
-        if (address.city) user.address.city = address.city;
-        if (address.state) user.address.state = address.state;
-        if (address.country) user.address.country = address.country;
-        if (address.zipcode) user.address.zipcode = address.zipcode;
+        if (address.line1 !== undefined) user.address.line1 = address.line1;
+        if (address.city !== undefined) user.address.city = address.city;
+        if (address.state !== undefined) user.address.state = address.state;
+        if (address.country !== undefined) user.address.country = address.country;
+        if (address.zipcode !== undefined) user.address.zipcode = address.zipcode;
       }
 
       // Check if profile is completed based on required fields
       const isProfileComplete = checkProfileCompletion(user);
       user.profileCompleted = isProfileComplete;
+
+      console.log('Profile update:', {
+        userId: user._id,
+        isProfileComplete,
+        phone: user.phone,
+        phoneCc: user.phoneCc,
+        companyName: user.companyName,
+        address: user.address
+      });
     }
 
     // Update password if provided
