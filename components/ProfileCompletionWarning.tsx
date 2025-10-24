@@ -65,13 +65,21 @@ export default function ProfileCompletionWarning({ className = "" }: ProfileComp
       }
 
       if (userData) {
-        // Check if profile is actually completed by validating all required fields
-        const isProfileActuallyComplete = checkProfileCompletion(userData);
+        // Only show warning for social login users
+        const isSocialLogin = userData.provider && (userData.provider === 'google' || userData.provider === 'facebook');
 
-        // Show warning if profile is not actually complete and warning hasn't been dismissed
-        if (!isProfileActuallyComplete && !isDismissed) {
-          setShowWarning(true);
+        if (isSocialLogin) {
+          // Check if profile is actually completed by validating all required fields
+          const isProfileActuallyComplete = checkProfileCompletion(userData);
+
+          // Show warning if profile is not actually complete and warning hasn't been dismissed
+          if (!isProfileActuallyComplete && !isDismissed) {
+            setShowWarning(true);
+          } else {
+            setShowWarning(false);
+          }
         } else {
+          // For credential-based users, never show the warning
           setShowWarning(false);
         }
       } else {
