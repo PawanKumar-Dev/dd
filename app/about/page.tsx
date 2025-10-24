@@ -77,7 +77,7 @@ export default function AboutPage() {
             services while providing an intuitive user experience.
           </p>
           <p className="text-lg text-gray-600">
-            Today, we're proud to serve thousands of customers worldwide, helping them
+            Today, we're proud to serve thousands of customers across India, helping them
             manage their digital presence with confidence and ease.
           </p>
         </div>
@@ -138,8 +138,8 @@ export default function AboutPage() {
           />
           <FeatureCard
             icon={<Globe className="h-8 w-8" />}
-            title="Global Integration"
-            description="Seamless integration with global domain services for worldwide domain operations"
+            title="Domain Integration"
+            description="Seamless integration with domain services for comprehensive domain operations in India"
           />
           <FeatureCard
             icon={<Users className="h-8 w-8" />}
