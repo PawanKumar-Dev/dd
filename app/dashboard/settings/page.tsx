@@ -165,6 +165,16 @@ export default function UserSettings() {
         return;
       }
 
+      // Ensure phoneCc and country are set for India-only service
+      const profileData = {
+        ...updatedUser,
+        phoneCc: '+91', // Always set to India
+        address: {
+          ...updatedUser.address,
+          country: 'IN' // Always set to India
+        }
+      };
+
       const response = await fetch('/api/user/settings', {
         method: 'PUT',
         headers: {
@@ -172,26 +182,31 @@ export default function UserSettings() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          profile: updatedUser
+          profile: profileData
         })
       });
 
       if (response.ok) {
         // Check if all required fields are filled for profile completion
-        const isProfileComplete = checkProfileCompletion(updatedUser);
+        const isProfileComplete = checkProfileCompletion(profileData);
 
         const updatedUserData = {
           ...user,
-          ...updatedUser,
+          ...profileData,
           profileCompleted: isProfileComplete,
-          email: updatedUser.email || user?.email || '',
-          firstName: updatedUser.firstName || user?.firstName || '',
-          lastName: updatedUser.lastName || user?.lastName || ''
+          email: profileData.email || user?.email || '',
+          firstName: profileData.firstName || user?.firstName || '',
+          lastName: profileData.lastName || user?.lastName || ''
         };
         setUser(updatedUserData);
 
         // Update localStorage with the updated user data
         localStorage.setItem('user', JSON.stringify(updatedUserData));
+
+        // Trigger a custom event to notify other components of profile update
+        window.dispatchEvent(new CustomEvent('profileUpdated', {
+          detail: { user: updatedUserData, isComplete: isProfileComplete }
+        }));
 
         if (isProfileComplete) {
           toast.success('Profile completed successfully!');
