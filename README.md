@@ -451,12 +451,13 @@ SMTP_PORT=587
 - Touch-friendly interface
 - Optimized for all screen sizes
 
-## 🌍 Internationalization
+## 🇮🇳 India-Focused Service
 
-- Indian timezone support (IST)
-- Indian currency formatting (₹)
-- Indian date formats (DD/MM/YYYY)
-- Localized number formatting
+- **Indian timezone support (IST)** - All dates and times in Indian Standard Time
+- **Indian currency formatting (₹)** - Prices displayed in Indian Rupees
+- **Indian date formats (DD/MM/YYYY)** - Localized date formatting
+- **India-only registration** - Service exclusively available for Indian customers
+- **+91 phone numbers** - Indian phone number format and validation
 
 ## 🚀 Deployment
 
