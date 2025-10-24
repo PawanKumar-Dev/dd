@@ -9,31 +9,102 @@ interface ProfileCompletionWarningProps {
   className?: string;
 }
 
+interface User {
+  phone?: string;
+  phoneCc?: string;
+  companyName?: string;
+  address?: {
+    line1?: string;
+    city?: string;
+    state?: string;
+    country?: string;
+    zipcode?: string;
+  };
+  profileCompleted?: boolean;
+  provider?: string;
+}
+
 export default function ProfileCompletionWarning({ className = "" }: ProfileCompletionWarningProps) {
   const { data: session } = useSession();
   const router = useRouter();
   const [showWarning, setShowWarning] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
 
+  const checkProfileCompletion = (userData: User): boolean => {
+    // Check if all required fields are filled
+    const hasPhone = userData.phone && userData.phone.trim() !== '';
+    const hasPhoneCc = userData.phoneCc && userData.phoneCc.trim() !== '';
+    const hasCompanyName = userData.companyName && userData.companyName.trim() !== '';
+    const hasAddress = userData.address?.line1 && userData.address.line1.trim() !== '';
+    const hasCity = userData.address?.city && userData.address.city.trim() !== '';
+    const hasState = userData.address?.state && userData.address.state.trim() !== '';
+    const hasCountry = userData.address?.country && userData.address.country.trim() !== '';
+    const hasZipcode = userData.address?.zipcode && userData.address.zipcode.trim() !== '';
+
+    return hasPhone && hasPhoneCc && hasCompanyName && hasAddress && hasCity && hasState && hasCountry && hasZipcode;
+  };
+
   useEffect(() => {
-    // Check if user is from social login and profile is not completed
-    if (session?.user) {
-      const profileCompleted = (session.user as any).profileCompleted;
-      const provider = (session.user as any).provider;
+    const checkUserProfile = () => {
+      let userData: User | null = null;
 
-      // Show warning if:
-      // 1. User is from social login (has provider) OR profile is explicitly not completed
-      // 2. Profile is not completed
-      // 3. Warning hasn't been dismissed
-      const isSocialLogin = provider && (provider === 'google' || provider === 'facebook');
-      const needsProfileCompletion = profileCompleted === false;
+      // Check both NextAuth session and localStorage for user data
+      if (session?.user) {
+        // User from NextAuth (social login)
+        userData = session.user as any;
+      } else {
+        // Check localStorage for custom JWT user
+        const localUserData = localStorage.getItem('user');
+        if (localUserData) {
+          try {
+            userData = JSON.parse(localUserData);
+          } catch (error) {
+            console.error('Error parsing user data from localStorage:', error);
+          }
+        }
+      }
 
-      if ((isSocialLogin || needsProfileCompletion) && !isDismissed) {
-        setShowWarning(true);
+      if (userData) {
+        // Check if profile is actually completed by validating all required fields
+        const isProfileActuallyComplete = checkProfileCompletion(userData);
+
+        // Show warning if profile is not actually complete and warning hasn't been dismissed
+        if (!isProfileActuallyComplete && !isDismissed) {
+          setShowWarning(true);
+        } else {
+          setShowWarning(false);
+        }
       } else {
         setShowWarning(false);
       }
-    }
+    };
+
+    // Initial check
+    checkUserProfile();
+
+    // Listen for localStorage changes (when profile is updated)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'user') {
+        checkUserProfile();
+      }
+    };
+
+    // Listen for custom profile update events
+    const handleProfileUpdate = (e: CustomEvent) => {
+      checkUserProfile();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('profileUpdated', handleProfileUpdate as EventListener);
+
+    // Also check periodically in case localStorage was updated in the same tab
+    const interval = setInterval(checkUserProfile, 1000);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('profileUpdated', handleProfileUpdate as EventListener);
+      clearInterval(interval);
+    };
   }, [session, isDismissed]);
 
   const handleCompleteProfile = () => {

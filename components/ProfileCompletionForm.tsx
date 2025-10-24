@@ -40,13 +40,24 @@ export default function ProfileCompletionForm({ user, onComplete }: ProfileCompl
 
     try {
       const token = localStorage.getItem('token');
+
+      // Ensure phoneCc and country are set for India-only service
+      const profileData = {
+        ...formData,
+        phoneCc: '+91', // Always set to India
+        address: {
+          ...formData.address,
+          country: 'IN' // Always set to India
+        }
+      };
+
       const response = await fetch('/api/user/complete-profile', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(profileData),
       });
 
       const data = await response.json();
@@ -58,6 +69,11 @@ export default function ProfileCompletionForm({ user, onComplete }: ProfileCompl
           ...data.user
         };
         localStorage.setItem('user', JSON.stringify(updatedUserData));
+
+        // Trigger a custom event to notify other components of profile update
+        window.dispatchEvent(new CustomEvent('profileUpdated', {
+          detail: { user: updatedUserData, isComplete: true }
+        }));
 
         toast.success('Profile completed successfully!');
         onComplete?.();
