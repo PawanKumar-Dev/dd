@@ -283,14 +283,14 @@ export default function RegisterForm({ className = '' }: RegisterFormProps) {
         };
       }
 
-      // Update form with detected location
+      // Update form with detected location (India only)
       setFormData(prev => ({
         ...prev,
         address: {
           line1: data.localityInfo?.administrative?.[0]?.name || data.principalSubdivision || '',
           city: data.city || data.locality || '',
           state: data.principalSubdivision || data.administrativeAreaLevel1 || '',
-          country: data.countryCode || 'IN',
+          country: 'IN', // Always set to India
           zipcode: data.postcode || '',
         }
       }));
@@ -395,24 +395,10 @@ export default function RegisterForm({ className = '' }: RegisterFormProps) {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Country Code
                 </label>
-                <select
-                  name="phoneCc"
-                  value={formData.phoneCc}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-                >
-                  <option value="+91">🇮🇳 +91 (India)</option>
-                  <option value="+1">🇺🇸 +1 (USA)</option>
-                  <option value="+44">🇬🇧 +44 (UK)</option>
-                  <option value="+61">🇦🇺 +61 (Australia)</option>
-                  <option value="+49">🇩🇪 +49 (Germany)</option>
-                  <option value="+33">🇫🇷 +33 (France)</option>
-                  <option value="+65">🇸🇬 +65 (Singapore)</option>
-                  <option value="+971">🇦🇪 +971 (UAE)</option>
-                  <option value="+81">🇯🇵 +81 (Japan)</option>
-                  <option value="+86">🇨🇳 +86 (China)</option>
-                </select>
+                <div className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-700 font-medium">
+                  🇮🇳 +91 (India)
+                </div>
+                <input type="hidden" name="phoneCc" value="+91" />
               </div>
               <div className="col-span-2">
                 <Input
@@ -490,24 +476,10 @@ export default function RegisterForm({ className = '' }: RegisterFormProps) {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Country
                   </label>
-                  <select
-                    name="address.country"
-                    value={formData.address.country}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-                  >
-                    <option value="IN">India</option>
-                    <option value="US">United States</option>
-                    <option value="UK">United Kingdom</option>
-                    <option value="CA">Canada</option>
-                    <option value="AU">Australia</option>
-                    <option value="DE">Germany</option>
-                    <option value="FR">France</option>
-                    <option value="SG">Singapore</option>
-                    <option value="AE">United Arab Emirates</option>
-                    <option value="JP">Japan</option>
-                  </select>
+                  <div className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-700 font-medium">
+                    🇮🇳 India
+                  </div>
+                  <input type="hidden" name="address.country" value="IN" />
                 </div>
                 <Input
                   label="ZIP/Postal Code"
