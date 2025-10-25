@@ -45,7 +45,7 @@ export default function AdminPasswordReset() {
         toast.error(data.error || 'Failed to update password');
       }
     } catch (error) {
-      console.error('Password reset error:', error);
+      // Password reset error
       toast.error('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);

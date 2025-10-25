@@ -68,7 +68,7 @@ export default function DomainBookingProgress({
         }
       }
     } catch (error) {
-      console.error('Error fetching booking status:', error);
+      // Error fetching booking status
     } finally {
       setIsLoading(false);
     }

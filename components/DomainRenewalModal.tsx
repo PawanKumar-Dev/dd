@@ -63,7 +63,7 @@ export default function DomainRenewalModal({
         toast.error(error.error || 'Failed to load renewal information');
       }
     } catch (error) {
-      console.error('Error loading renewal info:', error);
+      // Error loading renewal info
       toast.error('Failed to load renewal information');
     } finally {
       setIsLoading(false);
@@ -101,7 +101,7 @@ export default function DomainRenewalModal({
         toast.error(error.error || 'Failed to renew domain');
       }
     } catch (error) {
-      console.error('Error renewing domain:', error);
+      // Error renewing domain
       toast.error('Failed to renew domain');
     } finally {
       setIsProcessing(false);
