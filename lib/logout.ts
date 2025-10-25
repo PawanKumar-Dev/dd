@@ -25,15 +25,21 @@ export const useLogout = () => {
         }
       }
 
-      // Step 1: Clear all localStorage data
+      // Step 1: Sign out from NextAuth (handles social login sessions)
+      console.log('🔐 Signing out from NextAuth...');
+      await signOut({ redirect: false });
+
+      // Step 2: Clear all localStorage data
       console.log('🧹 Clearing localStorage...');
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       localStorage.removeItem('rememberMe');
       localStorage.removeItem('savedEmail');
 
-      // Step 2: Clear all cookies manually
+      // Step 3: Clear all cookies manually (more aggressive approach)
       console.log('🍪 Clearing cookies...');
+
+      // Clear all cookies by setting them to expire
       const cookiesToClear = [
         'token',
         'next-auth.session-token',
@@ -48,19 +54,24 @@ export const useLogout = () => {
         document.cookie = `${cookieName}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; domain=${window.location.hostname}`;
       });
 
-      // Step 3: Show success message
+      // Step 4: Show success message
       toast.success('Logged out successfully');
       console.log('✅ Logout successful!');
 
-      // Step 4: Direct redirect to login (all cleanup done above)
+      // Step 5: Direct redirect to login (same for all users)
       console.log('🔄 Redirecting to login page...');
       setTimeout(() => {
         window.location.href = '/login';
-      }, 500); // Small delay to ensure toast is visible
+      }, 500);
 
     } catch (error) {
       console.error('❌ Logout error:', error);
       // Fallback: clear everything and redirect
+      try {
+        await signOut({ redirect: false });
+      } catch (e) {
+        console.error('NextAuth signOut failed:', e);
+      }
       localStorage.clear();
       // Clear all cookies
       document.cookie.split(";").forEach(function (c) {
@@ -99,6 +110,10 @@ export const logoutUser = async () => {
       }
     }
 
+    // Sign out from NextAuth (handles social login sessions)
+    console.log('🔐 Signing out from NextAuth...');
+    await signOut({ redirect: false });
+
     // Clear all localStorage data
     console.log('🧹 Clearing localStorage...');
     localStorage.removeItem('token');
@@ -126,13 +141,18 @@ export const logoutUser = async () => {
     toast.success('Logged out successfully');
     console.log('✅ Logout successful!');
 
-    // Direct redirect to login (all cleanup done above)
+    // Direct redirect to login (same for all users)
     console.log('🔄 Redirecting to login page...');
     window.location.href = '/login';
 
   } catch (error) {
     console.error('❌ Direct logout error:', error);
     // Fallback: clear everything and redirect
+    try {
+      await signOut({ redirect: false });
+    } catch (e) {
+      console.error('NextAuth signOut failed:', e);
+    }
     localStorage.clear();
     document.cookie.split(";").forEach(function (c) {
       document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
@@ -141,6 +161,6 @@ export const logoutUser = async () => {
     console.log('✅ Logout successful!');
     setTimeout(() => {
       window.location.href = '/login';
-    }, 100);
+    }, 500);
   }
 };
