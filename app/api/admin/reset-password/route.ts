@@ -4,6 +4,9 @@ import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import { verifyAdminAuth } from "@/lib/admin-auth";
 
+// Force dynamic rendering - required for API routes
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     // Verify admin authentication

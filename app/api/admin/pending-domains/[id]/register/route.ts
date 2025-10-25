@@ -6,6 +6,9 @@ import Order from "@/models/Order";
 import { ResellerClubWrapper } from "@/lib/resellerclub-wrapper";
 import { DomainVerificationService } from "@/lib/domain-verification";
 
+// Force dynamic rendering - required for API routes
+export const dynamic = 'force-dynamic';
+
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }

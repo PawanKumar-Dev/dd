@@ -4,6 +4,9 @@ import connectDB from "@/lib/mongodb";
 import PendingDomain from "@/models/PendingDomain";
 import { DomainVerificationService } from "@/lib/domain-verification";
 
+// Force dynamic rendering - required for API routes
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     // Check authentication
