@@ -107,7 +107,7 @@ export default function RegisterForm({ className = '' }: RegisterFormProps) {
           confirmPassword: '',
         }));
       } catch (error) {
-        console.error('Error parsing saved form data:', error);
+        // Silent error handling
       }
     }
   }, []);
@@ -254,7 +254,7 @@ export default function RegisterForm({ className = '' }: RegisterFormProps) {
 
         data = await response.json();
       } catch (primaryError) {
-        console.warn('Primary geocoding failed, trying fallback:', primaryError);
+        // Try fallback service
 
         // Fallback service: OpenStreetMap Nominatim (free, no API key required)
         const fallbackResponse = await fetch(
@@ -297,7 +297,7 @@ export default function RegisterForm({ className = '' }: RegisterFormProps) {
 
       toast.success('Location detected and address filled automatically!');
     } catch (error: any) {
-      console.error('Location detection error:', error);
+      // Location detection failed
 
       if (error.code === 1) {
         if (error.message.includes('secure origins')) {
@@ -565,7 +565,7 @@ export default function RegisterForm({ className = '' }: RegisterFormProps) {
                 }, 100);
               }}
               onError={(error) => {
-                console.error('Social login error:', error);
+                // Social login error handled
               }}
             />
           </form>
