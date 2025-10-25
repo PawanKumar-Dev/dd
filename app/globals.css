@@ -248,3 +248,44 @@
 .animate-bounce-enhanced {
   animation: bounce-enhanced 1s infinite;
 }
+
+/* Toast progress bar animation */
+@keyframes shrink {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+/* Toast enter/leave animations */
+@keyframes animate-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes animate-leave {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.95);
+  }
+}
+
+.animate-enter {
+  animation: animate-enter 0.2s ease-out;
+}
+
+.animate-leave {
+  animation: animate-leave 0.15s ease-in forwards;
+}
