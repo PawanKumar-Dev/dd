@@ -2,13 +2,20 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { usePathname } from "next/navigation";
 import { syncAuthWithLocalStorage } from "@/lib/auth-sync";
 
 export default function AuthSync() {
   const { data: session, status } = useSession();
   const [isSyncing, setIsSyncing] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
+    // Don't sync on login page to avoid conflicts during logout
+    if (pathname === "/login") {
+      return;
+    }
+
     if (status === "authenticated" && session && !isSyncing) {
       setIsSyncing(true);
 
@@ -24,7 +31,7 @@ export default function AuthSync() {
           setIsSyncing(false);
         });
     }
-  }, [session, status, isSyncing]);
+  }, [session, status, isSyncing, pathname]);
 
   return null; // This component doesn't render anything
 }
