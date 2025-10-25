@@ -36,25 +36,41 @@ export async function syncAuthWithLocalStorage() {
       // Store in localStorage for compatibility
       localStorage.setItem("user", JSON.stringify(userData));
 
-      // Create a simple token for API compatibility (server will validate via NextAuth)
-      // We'll use a base64 encoded payload that the server can decode
-      const tokenPayload = {
-        userId: (session.user as any).id,
-        email: session.user.email || "",
-        role: (session.user as any).role || "user",
-        jti: `${(session.user as any).id}_${Date.now()}`,
-        iat: Math.floor(Date.now() / 1000),
-        exp: Math.floor(Date.now() / 1000) + 24 * 60 * 60, // 24 hours
-        iss: "excel-technologies",
-        aud: "domain-management-system",
-      };
+      // Fetch a proper JWT token from the server
+      try {
+        const syncResponse = await fetch('/api/auth/sync-token', {
+          credentials: 'include',
+          headers: {
+            'Accept': 'application/json',
+          },
+        });
+        
+        if (syncResponse.ok) {
+          const data = await syncResponse.json();
+          if (data.token) {
+            // Store token in localStorage
+            localStorage.setItem("token", data.token);
+            // Cookie is already set by the server
+          }
+        }
+      } catch (error) {
+        console.error('Failed to sync token with server:', error);
+        // Fallback: create base64 token for client-side
+        const tokenPayload = {
+          userId: (session.user as any).id,
+          email: session.user.email || "",
+          role: (session.user as any).role || "user",
+          jti: `${(session.user as any).id}_${Date.now()}`,
+          iat: Math.floor(Date.now() / 1000),
+          exp: Math.floor(Date.now() / 1000) + 24 * 60 * 60,
+          iss: "excel-technologies",
+          aud: "domain-management-system",
+        };
 
-      const token = btoa(JSON.stringify(tokenPayload));
-
-      localStorage.setItem("token", token);
-
-      // Set cookie for server-side access
-      document.cookie = `token=${token}; path=/; max-age=${24 * 60 * 60}`;
+        const token = btoa(JSON.stringify(tokenPayload));
+        localStorage.setItem("token", token);
+        document.cookie = `token=${token}; path=/; max-age=${24 * 60 * 60}`;
+      }
 
       return userData;
     }

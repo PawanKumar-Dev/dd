@@ -46,14 +46,12 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    // For social login users, ensure they have a proper token
-    // Skip this check during logout or when going to login page
-    if (nextAuthToken && !customToken && pathname !== '/login') {
-      console.log('🔄 Social login user without custom token - redirecting to sync');
-      // Social login user without custom token - redirect to sync
-      return NextResponse.redirect(
-        new URL("/api/auth/sync-token", request.url)
-      );
+    // For social login users with NextAuth token but no custom token,
+    // allow access - AuthSync component will handle token creation client-side
+    // This prevents redirect loops
+    if (nextAuthToken && !customToken) {
+      console.log('✅ Social login user - allowing access, AuthSync will handle token');
+      return NextResponse.next();
     }
   }
 

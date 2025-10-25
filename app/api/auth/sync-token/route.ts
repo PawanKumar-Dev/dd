@@ -11,6 +11,11 @@ export async function GET(request: NextRequest) {
     const session = await getServerSession(authOptions);
     
     if (!session?.user) {
+      // Check if this is an API call or redirect
+      const isApiCall = request.headers.get('accept')?.includes('application/json');
+      if (isApiCall) {
+        return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+      }
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
@@ -30,12 +35,28 @@ export async function GET(request: NextRequest) {
       algorithm: 'HS256'
     });
 
-    // Set the token cookie
+    // Check if this is an API call or redirect
+    const isApiCall = request.headers.get('accept')?.includes('application/json');
+    
+    if (isApiCall) {
+      // Return JSON response with token
+      const response = NextResponse.json({ token, success: true });
+      response.cookies.set('token', token, {
+        path: '/',
+        maxAge: 24 * 60 * 60, // 24 hours
+        httpOnly: false, // Allow JavaScript access for localStorage
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax'
+      });
+      return response;
+    }
+
+    // Redirect with token cookie
     const response = NextResponse.redirect(new URL("/dashboard", request.url));
     response.cookies.set('token', token, {
       path: '/',
       maxAge: 24 * 60 * 60, // 24 hours
-      httpOnly: true,
+      httpOnly: false, // Allow JavaScript access for localStorage  
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax'
     });
@@ -43,6 +64,10 @@ export async function GET(request: NextRequest) {
     return response;
   } catch (error) {
     console.error("Token sync error:", error);
+    const isApiCall = request.headers.get('accept')?.includes('application/json');
+    if (isApiCall) {
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    }
     return NextResponse.redirect(new URL("/login", request.url));
   }
 }

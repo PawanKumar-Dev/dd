@@ -86,17 +86,29 @@ export default function UserDashboard() {
     initializeAuth();
   }, [session, status, router]);
 
-
   const loadDashboardData = async (userObj?: User) => {
     try {
       setIsLoading(true);
 
-      // Simulate API calls for dashboard data
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // For social login users, wait for token to be created by AuthSync
+      let token = localStorage.getItem('token');
+      if (!token && session) {
+        // Wait up to 3 seconds for AuthSync to create token
+        for (let i = 0; i < 30; i++) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          token = localStorage.getItem('token');
+          if (token) break;
+        }
+      }
+
+      if (!token) {
+        console.warn('No token available for API call');
+        setIsLoading(false);
+        return;
+      }
 
       // Fetch actual dashboard data
       try {
-        const token = localStorage.getItem('token');
         const response = await fetch('/api/user/dashboard', {
           headers: {
             'Authorization': `Bearer ${token}`,
