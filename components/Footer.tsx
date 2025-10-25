@@ -122,8 +122,11 @@ export default function Footer({ className = '' }: FooterProps) {
               <Link href="/terms-and-conditions" className="text-gray-400 hover:text-white text-sm transition-colors">
                 Terms and Conditions
               </Link>
+              <Link href="/data-deletion" className="text-gray-400 hover:text-white text-sm transition-colors">
+                Data Deletion
+              </Link>
               <Link href="/cancellation-refund" className="text-gray-400 hover:text-white text-sm transition-colors">
-                Cancellation & Refund Policy
+                Cancellation & Refund
               </Link>
             </div>
           </div>
