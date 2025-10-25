@@ -85,7 +85,7 @@ export default function ProfileCompletionForm({ user, onComplete }: ProfileCompl
         toast.error(data.error || 'Failed to complete profile');
       }
     } catch (error) {
-      console.error('Profile completion error:', error);
+      // Profile completion error
       toast.error('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);

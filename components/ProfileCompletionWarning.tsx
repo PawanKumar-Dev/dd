@@ -59,7 +59,7 @@ export default function ProfileCompletionWarning({ className = "" }: ProfileComp
           try {
             userData = JSON.parse(localUserData);
           } catch (error) {
-            console.error('Error parsing user data from localStorage:', error);
+            // Error parsing user data
           }
         }
       }
