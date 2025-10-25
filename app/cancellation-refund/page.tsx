@@ -34,7 +34,7 @@ export default function CancellationRefundPage() {
           return;
         }
       } catch (error) {
-        console.error('Error parsing user data:', error);
+        // Error parsing user data
       }
     }
   }, [router]);

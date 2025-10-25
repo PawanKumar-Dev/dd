@@ -110,7 +110,7 @@ export default function CheckoutPage() {
           syncWithServer();
         }
       } catch (error) {
-        console.error('Error refreshing user data:', error);
+        // Error refreshing user data
         // Fallback to original logic
         if (userObj.role === 'admin') {
           router.push('/admin/dashboard');
@@ -189,7 +189,7 @@ export default function CheckoutPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        console.error('❌ [CHECKOUT] Create order failed:', data);
+        // Create order failed
 
         // Handle specific error cases
         if (data.error?.includes('Invalid payment amount')) {
@@ -319,7 +319,7 @@ export default function CheckoutPage() {
               router.push('/payment-success');
             }
           } catch (error) {
-            console.error('🚨 [CHECKOUT] Payment verification error:', error);
+            // Payment verification error
 
             // Determine error message based on error type
             let errorMessage = 'Payment verification failed due to a technical error';
@@ -383,15 +383,13 @@ export default function CheckoutPage() {
             setIsPaymentInProgress(false);
 
             // Payment was cancelled by user - preserve cart for better UX
-            console.log('🔄 [CHECKOUT] Payment cancelled by user - preserving cart');
 
             // Save cart to server to ensure it's preserved
             const saveCartToServer = async () => {
               try {
                 await syncWithServer();
-                console.log('✅ [CHECKOUT] Cart saved to server after payment cancellation');
               } catch (error) {
-                console.error('❌ [CHECKOUT] Failed to save cart after cancellation:', error);
+                // Failed to save cart
               }
             };
 
@@ -449,9 +447,8 @@ export default function CheckoutPage() {
         const saveCartToServer = async () => {
           try {
             await syncWithServer();
-            console.log('✅ [CHECKOUT] Cart saved to server after payment failure');
           } catch (error) {
-            console.error('❌ [CHECKOUT] Failed to save cart after payment failure:', error);
+            // Failed to save cart
           }
         };
 
@@ -466,7 +463,7 @@ export default function CheckoutPage() {
 
       rzp.open();
     } catch (error: any) {
-      console.error('🚨 [CHECKOUT] Payment initialization error:', error);
+      // Payment initialization error
       setIsProcessing(false);
       setIsPaymentInProgress(false);
 
@@ -509,9 +506,8 @@ export default function CheckoutPage() {
       const saveCartToServer = async () => {
         try {
           await syncWithServer();
-          console.log('✅ [CHECKOUT] Cart saved to server after payment initialization error');
         } catch (error) {
-          console.error('❌ [CHECKOUT] Failed to save cart after initialization error:', error);
+          // Failed to save cart
         }
       };
 

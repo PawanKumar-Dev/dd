@@ -88,7 +88,6 @@ export default function CartPage() {
               setUser(userObj);
             }
           } catch (error) {
-            console.error('Error refreshing user data:', error);
             setUser(userObj);
           }
         };
@@ -98,7 +97,7 @@ export default function CartPage() {
         // Merge local cart with server cart for logged-in users
         mergeWithServerCart();
       } catch (error) {
-        console.error('Error parsing user data:', error);
+        // Error parsing user data
       }
     }
     // Note: No redirect to login - allow guest access to cart
