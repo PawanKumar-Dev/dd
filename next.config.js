@@ -18,6 +18,17 @@ const nextConfig = {
     FROM_EMAIL: process.env.FROM_EMAIL,
     FROM_NAME: process.env.FROM_NAME,
   },
+
+  // Production optimizations for security
+  compiler: {
+    // Remove console.log in production (keep error and warn for debugging)
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn'],
+    } : false,
+  },
+
+  // Disable source maps in production (prevent code inspection)
+  productionBrowserSourceMaps: false,
 }
 
 module.exports = nextConfig

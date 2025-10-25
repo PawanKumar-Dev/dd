@@ -22,8 +22,7 @@ export default function Error({ error, reset }: ErrorProps) {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    // Log the error to an error reporting service
-    console.error('Application error:', error);
+    // Error tracking would go here (e.g., Sentry)
 
     // Check if user is logged in
     const getCookieValue = (name: string) => {
@@ -40,7 +39,7 @@ export default function Error({ error, reset }: ErrorProps) {
       try {
         setUser(JSON.parse(userData));
       } catch (error) {
-        console.error('Error parsing user data:', error);
+        // Error parsing user data
       }
     }
   }, [error]);
