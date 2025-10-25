@@ -8,14 +8,29 @@ export async function syncAuthWithLocalStorage() {
     const session = await getSession();
 
     if (session?.user) {
+      // Check if user already has data in localStorage (to preserve profileCompleted)
+      const existingUserData = localStorage.getItem("user");
+      let existingProfileCompleted = false;
+      
+      if (existingUserData) {
+        try {
+          const existing = JSON.parse(existingUserData);
+          existingProfileCompleted = existing.profileCompleted === true;
+        } catch (e) {
+          // Ignore parse errors
+        }
+      }
+      
       // Create a compatible user object for localStorage
+      // IMPORTANT: Preserve existing profileCompleted status if user already had one
       const userData = {
         id: (session.user as any).id,
         email: session.user.email || "",
         firstName: session.user.name?.split(" ")[0] || "",
         lastName: session.user.name?.split(" ").slice(1).join(" ") || "",
         role: (session.user as any).role || "user",
-        profileCompleted: (session.user as any).profileCompleted || false,
+        // Preserve existing profileCompleted or use session value, never default to false if they had true
+        profileCompleted: existingProfileCompleted || (session.user as any).profileCompleted || false,
       };
 
       // Store in localStorage for compatibility

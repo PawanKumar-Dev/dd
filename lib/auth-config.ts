@@ -116,11 +116,28 @@ export const authOptions: NextAuthOptions = {
               console.error("Profile completion email failed:", error);
             });
           } else {
-            // Update existing user with social login info if needed
-            if (!dbUser.provider) {
+            // Existing user found - link social login to existing account
+            // Check if user already has a complete profile from manual registration
+            const hasCompleteProfile = dbUser.profileCompleted === true;
+            const hasAddress = dbUser.address && dbUser.address.line1 && dbUser.address.city;
+            const hasPhone = dbUser.phone && dbUser.phoneCc;
+            
+            // If user has all required fields, they have a complete profile
+            const isProfileActuallyComplete = hasCompleteProfile || (hasAddress && hasPhone);
+            
+            // Only update provider if they don't have one, or it's credentials
+            if (!dbUser.provider || dbUser.provider === "credentials") {
+              // Link social account to existing credential account
               dbUser.provider = account.provider;
               dbUser.providerId = account.providerAccountId;
               dbUser.isActivated = true; // Auto-activate if they had an account
+              
+              // CRITICAL: Preserve profileCompleted status for manually registered users
+              // Don't reset it to false if they already completed their profile
+              if (isProfileActuallyComplete) {
+                dbUser.profileCompleted = true;
+              }
+              
               await dbUser.save();
             }
           }
