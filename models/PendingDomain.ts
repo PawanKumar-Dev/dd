@@ -124,8 +124,8 @@ const PendingDomainSchema = new Schema<IPendingDomain>(
 );
 
 // Indexes for efficient queries
+// Note: domainName index is automatically created by unique: true
 PendingDomainSchema.index({ userId: 1, status: 1 });
-PendingDomainSchema.index({ domainName: 1 });
 PendingDomainSchema.index({ orderId: 1 });
 PendingDomainSchema.index({ status: 1, createdAt: -1 });
 PendingDomainSchema.index({ lastVerifiedAt: 1 });

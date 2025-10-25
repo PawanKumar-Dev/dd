@@ -3,6 +3,9 @@ import crypto from "crypto";
 import connectDB from "@/lib/mongodb";
 import Order from "@/models/Order";
 
+// Force dynamic rendering - required for API routes
+export const dynamic = 'force-dynamic';
+
 const RAZORPAY_WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET;
 
 export async function POST(request: NextRequest) {
