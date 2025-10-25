@@ -151,11 +151,32 @@ export default function UserLayout({ children, user, onLogout }: UserLayoutProps
               </h1>
             </div>
 
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4" style={{ zIndex: 9999, position: 'relative' }}>
               <button
-                onClick={onLogout}
-                disabled={!onLogout}
-                className="flex items-center px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                onMouseDown={(e) => {
+                  console.log('MouseDown event');
+                  e.preventDefault();
+                }}
+                onClick={(e) => {
+                  console.log('Click event triggered');
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (onLogout) {
+                    console.log('Executing logout');
+                    onLogout();
+                  } else {
+                    console.error('onLogout is undefined');
+                    alert('Logout function not available');
+                  }
+                }}
+                type="button"
+                className="flex items-center px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-all duration-200 cursor-pointer border-2 border-red-600"
+                style={{ 
+                  pointerEvents: 'auto',
+                  position: 'relative',
+                  zIndex: 9999,
+                  touchAction: 'manipulation'
+                }}
               >
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout

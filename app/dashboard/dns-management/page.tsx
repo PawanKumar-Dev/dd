@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { useLogout } from '@/lib/logout';
+import { performLogout } from '@/lib/logout';
 import {
   Globe, Plus, Edit3, Trash2, Save, X, RefreshCw, Server,
   AlertCircle, Clock, Settings, ExternalLink,
@@ -496,14 +496,7 @@ export default function DNSManagementPage() {
     }
   };
 
-  const handleLogout = useLogout();
-
-  // Ensure logout handler is ready
-  const safeHandleLogout = () => {
-    if (typeof handleLogout === 'function') {
-      handleLogout();
-    }
-  };
+  // Use performLogout directly - always available
 
   if (!user) {
     return <PageLoading page="dns-management" />;
@@ -512,7 +505,7 @@ export default function DNSManagementPage() {
   if (isLoading) {
     return (
       <ClientOnly>
-        <UserLayout user={user} onLogout={safeHandleLogout}>
+        <UserLayout user={user} onLogout={performLogout}>
           <div className="min-h-screen bg-gray-50 flex items-center justify-center">
             <DataLoading />
           </div>

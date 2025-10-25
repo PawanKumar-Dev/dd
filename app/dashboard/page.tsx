@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { useLogout } from '@/lib/logout';
+import { performLogout } from '@/lib/logout';
 import { motion } from 'framer-motion';
 import {
   Globe, ShoppingCart, TrendingUp, Clock, CheckCircle,
@@ -39,8 +39,14 @@ export default function UserDashboard() {
   const [user, setUser] = useState<User | null>(null);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isHydrated, setIsHydrated] = useState(false);
   const router = useRouter();
   const { items: cartItems } = useCartStore();
+
+  // Ensure client-side hydration is complete
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -155,22 +161,13 @@ export default function UserDashboard() {
     }
   };
 
-  const handleLogout = useLogout();
-
-  // Ensure logout handler is ready
-  const safeHandleLogout = () => {
-    if (typeof handleLogout === 'function') {
-      handleLogout();
-    }
-  };
-
   if (!user) {
     return <PageLoading page="dashboard" />;
   }
 
   if (isLoading) {
     return (
-      <UserLayout user={user} onLogout={safeHandleLogout}>
+      <UserLayout user={user} onLogout={() => performLogout()}>
         <div className="p-6">
           <DataLoading type="card" count={3} />
         </div>
@@ -181,7 +178,7 @@ export default function UserDashboard() {
 
   return (
     <ClientOnly>
-      <UserLayout user={user} onLogout={safeHandleLogout}>
+      <UserLayout user={user} onLogout={() => performLogout()}>
         <div className="p-6">
           {/* Welcome Section */}
           <div className="mb-8">

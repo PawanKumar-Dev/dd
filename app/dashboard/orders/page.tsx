@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { useLogout } from '@/lib/logout';
+import { performLogout } from '@/lib/logout';
 import {
   Receipt, Search, Download, Eye, Calendar,
   CheckCircle, Clock, AlertTriangle, ExternalLink, FileText, RefreshCw, X
@@ -109,14 +109,7 @@ export default function UserOrders() {
     }
   };
 
-  const handleLogout = useLogout();
-
-  // Ensure logout handler is ready
-  const safeHandleLogout = () => {
-    if (typeof handleLogout === 'function') {
-      handleLogout();
-    }
-  };
+  // Use performLogout directly - always available
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -174,7 +167,7 @@ export default function UserOrders() {
 
   if (isLoading) {
     return (
-      <UserLayout user={user} onLogout={safeHandleLogout}>
+      <UserLayout user={user} onLogout={performLogout}>
         <div className="p-6">
           <DataLoading type="table" count={5} />
         </div>
@@ -184,7 +177,7 @@ export default function UserOrders() {
 
   return (
     <ClientOnly>
-      <UserLayout user={user} onLogout={safeHandleLogout}>
+      <UserLayout user={user} onLogout={performLogout}>
         <div className="p-6">
           {/* Header */}
           <div className="mb-8">

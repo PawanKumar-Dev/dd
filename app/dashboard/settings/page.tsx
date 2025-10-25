@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { useLogout } from '@/lib/logout';
+import { performLogout } from '@/lib/logout';
 import {
   User, Mail, Phone, MapPin, Shield, Key, Save,
   Eye, EyeOff, Calendar, Globe, CreditCard, AlertCircle, Building
@@ -136,14 +136,7 @@ export default function UserSettings() {
     }
   };
 
-  const handleLogout = useLogout();
-
-  // Ensure logout handler is ready
-  const safeHandleLogout = () => {
-    if (typeof handleLogout === 'function') {
-      handleLogout();
-    }
-  };
+  // Use performLogout directly - always available
 
   const handleChangePassword = async () => {
     try {
@@ -305,7 +298,7 @@ export default function UserSettings() {
 
   if (isLoading) {
     return (
-      <UserLayout user={user} onLogout={safeHandleLogout}>
+      <UserLayout user={user} onLogout={performLogout}>
         <div className="p-6">
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-gray-200 rounded w-1/4"></div>
@@ -323,7 +316,7 @@ export default function UserSettings() {
 
   return (
     <ClientOnly>
-      <UserLayout user={user} onLogout={safeHandleLogout}>
+      <UserLayout user={user} onLogout={performLogout}>
         <div className="p-6">
           {/* Header */}
           <div className="mb-8">

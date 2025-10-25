@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { useLogout } from '@/lib/logout';
+import { performLogout } from '@/lib/logout';
 import {
   Globe, Search, Plus, RefreshCw, Shield, Clock, Loader2, CheckCircle, AlertTriangle
 } from 'lucide-react';
@@ -106,14 +106,7 @@ export default function UserDomains() {
     }
   };
 
-  const handleLogout = useLogout();
-
-  // Ensure logout handler is ready
-  const safeHandleLogout = () => {
-    if (typeof handleLogout === 'function') {
-      handleLogout();
-    }
-  };
+  // Use performLogout directly - always available
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -167,7 +160,7 @@ export default function UserDomains() {
 
   if (isLoading) {
     return (
-      <UserLayout user={user} onLogout={safeHandleLogout}>
+      <UserLayout user={user} onLogout={performLogout}>
         <div className="p-6">
           <DataLoading type="table" count={5} />
         </div>
@@ -177,7 +170,7 @@ export default function UserDomains() {
 
   return (
     <ClientOnly>
-      <UserLayout user={user} onLogout={safeHandleLogout}>
+      <UserLayout user={user} onLogout={performLogout}>
         <div className="p-6">
           {/* Header */}
           <div className="mb-8">
