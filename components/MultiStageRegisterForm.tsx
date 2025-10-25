@@ -110,7 +110,7 @@ export default function MultiStageRegisterForm({ className = '' }: RegisterFormP
           confirmPassword: '',
         }));
       } catch (error) {
-        console.error('Failed to load saved form data:', error);
+        // Silent error handling
       }
     }
   }, []);
@@ -184,7 +184,7 @@ export default function MultiStageRegisterForm({ className = '' }: RegisterFormP
         toast.error(data.error || 'An error occurred. Please try again.');
       }
     } catch (error) {
-      console.error('Registration error:', error);
+      // Registration error
       toast.error('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);
@@ -252,7 +252,7 @@ export default function MultiStageRegisterForm({ className = '' }: RegisterFormP
 
         data = await response.json();
       } catch (primaryError) {
-        console.warn('Primary geocoding failed, trying fallback:', primaryError);
+        // Try fallback service
 
         // Fallback service: OpenStreetMap Nominatim (free, no API key required)
         const fallbackResponse = await fetch(
@@ -295,7 +295,7 @@ export default function MultiStageRegisterForm({ className = '' }: RegisterFormP
 
       toast.success('Location detected and address filled automatically!');
     } catch (error: any) {
-      console.error('Location detection error:', error);
+      // Location detection failed
 
       if (error.code === 1) {
         if (error.message.includes('secure origins')) {
@@ -639,7 +639,7 @@ export default function MultiStageRegisterForm({ className = '' }: RegisterFormP
                     }, 100);
                   }}
                   onError={(error) => {
-                    console.error('Social login error:', error);
+                    // Social login error handled
                   }}
                 />
               </div>

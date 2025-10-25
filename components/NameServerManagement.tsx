@@ -44,7 +44,7 @@ export default function NameServerManagement() {
         const parsed = JSON.parse(savedConfigs);
         setConfigs([RESELLERCLUB_DEFAULT, ...parsed]);
       } catch (error) {
-        console.error('Failed to load nameserver configs:', error);
+        // Failed to load nameserver configs
         setConfigs([RESELLERCLUB_DEFAULT]);
       }
     } else {

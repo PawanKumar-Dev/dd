@@ -40,7 +40,7 @@ export default function LivePricingIndicator({ domainName, tld, onPriceUpdate }:
         setError("Live pricing not available");
       }
     } catch (err) {
-      console.error('Failed to fetch live pricing:', err);
+      // Failed to fetch live pricing
       setError("Failed to fetch live pricing");
     } finally {
       setIsLoading(false);
