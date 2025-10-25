@@ -189,19 +189,18 @@ UserSchema.pre("save", async function (next) {
   }
 });
 
-// Compare password method (only for credential-based users)
+// Compare password method
 UserSchema.methods.comparePassword = async function (
   candidatePassword: string
 ): Promise<boolean> {
-  // Social login users don't have passwords
-  if (this.provider && this.provider !== "credentials") {
-    return false;
-  }
-
+  // If no password is stored, return false
   if (!this.password) {
     return false;
   }
 
+  // Compare the password (works for users with password regardless of provider)
+  // This allows users who registered with credentials to still login with password
+  // even if they later linked a social account
   return bcrypt.compare(candidatePassword, this.password);
 };
 

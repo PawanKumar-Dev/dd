@@ -43,6 +43,12 @@ export default function UserSettings() {
   const [isSaving, setIsSaving] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [hasExistingPassword, setHasExistingPassword] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -99,6 +105,17 @@ export default function UserSettings() {
           // Use default settings
           setSettings({} as any);
         }
+
+        // Check if user has existing password (credential user vs social login)
+        const meResponse = await fetch('/api/auth/me', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          }
+        });
+        if (meResponse.ok) {
+          const meData = await meResponse.json();
+          setHasExistingPassword(!!meData.user?.password || meData.user?.provider === 'credentials');
+        }
       } catch (error) {
 
         // Use default settings
@@ -121,17 +138,71 @@ export default function UserSettings() {
 
   const handleLogout = useLogout();
 
-  const handleSaveSettings = async () => {
+  const handleChangePassword = async () => {
     try {
+      // Validate passwords
+      if (!hasExistingPassword && !passwordData.newPassword) {
+        toast.error('Please enter a new password');
+        return;
+      }
+
+      if (hasExistingPassword && !passwordData.currentPassword) {
+        toast.error('Please enter your current password');
+        return;
+      }
+
+      if (!passwordData.newPassword) {
+        toast.error('Please enter a new password');
+        return;
+      }
+
+      if (passwordData.newPassword.length < 6) {
+        toast.error('Password must be at least 6 characters');
+        return;
+      }
+
+      if (passwordData.newPassword !== passwordData.confirmPassword) {
+        toast.error('Passwords do not match');
+        return;
+      }
+
       setIsSaving(true);
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error('No authentication token available');
+        return;
+      }
 
-      toast.success('Settings saved successfully');
+      const response = await fetch('/api/user/settings', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          password: {
+            currentPassword: hasExistingPassword ? passwordData.currentPassword : undefined,
+            newPassword: passwordData.newPassword
+          }
+        })
+      });
+
+      if (response.ok) {
+        toast.success(hasExistingPassword ? 'Password changed successfully' : 'Password set successfully! You can now login with email and password.');
+        setPasswordData({
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: ''
+        });
+        setHasExistingPassword(true);
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.error || 'Failed to update password');
+      }
     } catch (error) {
-
-      toast.error('Failed to save settings');
+      console.error('Password change error:', error);
+      toast.error('Failed to update password');
     } finally {
       setIsSaving(false);
     }
@@ -492,28 +563,47 @@ export default function UserSettings() {
 
                     <div className="space-y-6">
                       <div className="border-t pt-6">
-                        <h4 className="text-sm font-medium text-gray-900 mb-4">Change Password</h4>
-                        <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Current Password
-                            </label>
-                            <div className="relative">
-                              <Key className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                              <input
-                                type={showPassword ? 'text' : 'password'}
-                                className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                placeholder="Enter current password"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                              >
-                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                              </button>
+                        <h4 className="text-sm font-medium text-gray-900 mb-2">
+                          {hasExistingPassword ? 'Change Password' : 'Set Password'}
+                        </h4>
+                        {!hasExistingPassword && (
+                          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
+                            <div className="flex">
+                              <AlertCircle className="h-5 w-5 text-blue-400 mr-2 flex-shrink-0" />
+                              <div>
+                                <p className="text-sm text-blue-700">
+                                  You signed in with social login. Set a password to enable email/password login.
+                                </p>
+                              </div>
                             </div>
                           </div>
+                        )}
+                        <form onSubmit={(e) => { e.preventDefault(); handleChangePassword(); }} className="space-y-4">
+                          {hasExistingPassword && (
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Current Password
+                              </label>
+                              <div className="relative">
+                                <Key className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                <input
+                                  type={showPassword ? 'text' : 'password'}
+                                  value={passwordData.currentPassword}
+                                  onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
+                                  className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                  placeholder="Enter current password"
+                                  required
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => setShowPassword(!showPassword)}
+                                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                >
+                                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                </button>
+                              </div>
+                            </div>
+                          )}
 
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -521,8 +611,12 @@ export default function UserSettings() {
                             </label>
                             <input
                               type="password"
+                              value={passwordData.newPassword}
+                              onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              placeholder="Enter new password"
+                              placeholder="Enter new password (min 6 characters)"
+                              required
+                              minLength={6}
                             />
                           </div>
 
@@ -532,8 +626,11 @@ export default function UserSettings() {
                             </label>
                             <input
                               type="password"
+                              value={passwordData.confirmPassword}
+                              onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                               placeholder="Confirm new password"
+                              required
                             />
                           </div>
                         </form>
@@ -542,19 +639,19 @@ export default function UserSettings() {
 
                     <div className="mt-8 flex justify-end">
                       <button
-                        onClick={handleSaveSettings}
+                        onClick={handleChangePassword}
                         disabled={isSaving}
                         className="flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
                       >
                         {isSaving ? (
                           <>
                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                            Saving...
+                            {hasExistingPassword ? 'Changing...' : 'Setting...'}
                           </>
                         ) : (
                           <>
                             <Save className="h-4 w-4 mr-2" />
-                            Save Settings
+                            {hasExistingPassword ? 'Change Password' : 'Set Password'}
                           </>
                         )}
                       </button>

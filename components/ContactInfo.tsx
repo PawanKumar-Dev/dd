@@ -22,7 +22,7 @@ export default function ContactInfo({ className = '' }: ContactInfoProps) {
           <div>
             <h4 className="text-lg font-semibold text-gray-900 mb-1">Call Us</h4>
             <p className="text-gray-600 mb-1">+91-777-888-9674</p>
-            <p className="text-sm text-gray-500">Mon-Fri 9AM-6PM IST</p>
+            <p className="text-sm text-gray-500">10AM to 6PM</p>
           </div>
         </Card>
 

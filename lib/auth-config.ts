@@ -282,11 +282,16 @@ export const authOptions: NextAuthOptions = {
             // If user has all required fields, they have a complete profile
             const isProfileActuallyComplete = hasCompleteProfile || (hasAddress && hasPhone);
             
-            // Only update provider if they don't have one, or it's credentials
-            if (!dbUser.provider || dbUser.provider === "credentials") {
-              // Link social account to existing credential account
+            // Only update provider if they don't have one
+            // Do NOT overwrite "credentials" provider to preserve password login
+            if (!dbUser.provider) {
               dbUser.provider = account.provider;
               dbUser.providerId = account.providerAccountId;
+              needsUpdate = true;
+            }
+            
+            // Always ensure social login users are activated
+            if (!dbUser.isActivated) {
               dbUser.isActivated = true;
               needsUpdate = true;
             }

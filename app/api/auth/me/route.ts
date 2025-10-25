@@ -31,6 +31,8 @@ export async function GET(request: NextRequest) {
         isActivated: user.isActivated,
         isActive: user.isActive,
         profileCompleted: user.profileCompleted,
+        provider: user.provider,
+        password: !!user.password, // Boolean indicating if password exists
       },
     });
   } catch (error) {

@@ -66,11 +66,11 @@ export default function HomePage() {
                 <Globe className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
               </div>
             </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 drop-shadow-lg" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
-              Professional Domain Management
-            </h2>
-            <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-4 sm:mb-6 text-white px-1 drop-shadow-md" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
-              Excel Technologies - Your trusted partner for domain solutions and digital excellence
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 drop-shadow-lg" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
+              Buy & Manage Your Domain Names
+            </h1>
+            <p className="text-xs sm:text-sm md:text-base lg:text-lg mb-4 sm:mb-6 text-white drop-shadow-md max-w-3xl mx-auto" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
+              Search, purchase, and manage domain names with complete DNS control, secure payments, and 24/7 support
             </p>
 
             {/* Domain Search Feature */}
@@ -81,6 +81,61 @@ export default function HomePage() {
           </div>
         </HeroSection>
 
+        {/* Clear Service Description Section */}
+        <Section background="white" className="border-b-2 border-primary-100">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
+                Domain Registration & Management Services
+              </h2>
+              <p className="text-lg sm:text-xl text-gray-700 leading-relaxed px-4" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
+                Excel Technologies is a professional <strong>domain name registration and management platform</strong> that helps individuals and businesses secure their online identity.
+              </p>
+            </div>
+            
+            <div className="grid sm:grid-cols-2 gap-6 px-4">
+              <div className="bg-primary-50 rounded-lg p-6 border-l-4 border-primary-600">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-primary-600" />
+                  Domain Buying
+                </h3>
+                <p className="text-gray-700">
+                  Purchase new domain names from our extensive catalog of available domains across 100+ extensions including .com, .in, .org, .net, and more with instant registration.
+                </p>
+              </div>
+              
+              <div className="bg-primary-50 rounded-lg p-6 border-l-4 border-primary-600">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-primary-600" />
+                  Domain Management
+                </h3>
+                <p className="text-gray-700">
+                  Manage all your domains from a single dashboard - configure DNS settings, update nameservers, enable WHOIS privacy, transfer domains, and set up auto-renewal.
+                </p>
+              </div>
+              
+              <div className="bg-primary-50 rounded-lg p-6 border-l-4 border-primary-600">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-primary-600" />
+                  DNS Configuration
+                </h3>
+                <p className="text-gray-700">
+                  Full DNS management tools to connect your domain to web hosting, email services, and other platforms with A records, CNAME, MX records, and TXT records.
+                </p>
+              </div>
+              
+              <div className="bg-primary-50 rounded-lg p-6 border-l-4 border-primary-600">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-primary-600" />
+                  Domain Renewals
+                </h3>
+                <p className="text-gray-700">
+                  Keep your domains active with easy renewal options, automatic renewal settings, and timely expiration reminders to prevent domain loss.
+                </p>
+              </div>
+            </div>
+          </div>
+        </Section>
 
         <Section background="white">
           <div className="text-center mb-12 sm:mb-16">
@@ -90,29 +145,43 @@ export default function HomePage() {
               </div>
             </div>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3 sm:mb-4" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
-              Why Choose Excel Technologies?
+              Complete Domain Services Platform
             </h2>
             <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-3xl mx-auto px-4" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
-              We provide comprehensive domain management solutions with cutting-edge technology
-              and exceptional customer support.
+              From domain registration to full DNS management - we provide everything you need to establish and maintain your online presence with professional-grade tools and support.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             <FeatureCard
               icon={<Search className="h-8 w-8" />}
-              title="Domain Search"
-              description="Search for available domains across multiple TLDs with real-time pricing"
+              title="Domain Registration"
+              description="Search and register available domains instantly across .com, .in, .org, and 100+ TLDs with transparent pricing and real-time availability"
+            />
+            <FeatureCard
+              icon={<Shield className="h-8 w-8" />}
+              title="Domain Management"
+              description="Complete control panel to manage your domains - update DNS records, configure nameservers, enable privacy protection, and renew domains"
             />
             <FeatureCard
               icon={<CreditCard className="h-8 w-8" />}
-              title="Secure Payments"
-              description="Safe and secure payment processing with Razorpay integration"
+              title="Secure Purchase"
+              description="Buy domains securely with Razorpay payment gateway - supports credit/debit cards, UPI, net banking, and digital wallets"
             />
             <FeatureCard
               icon={<Globe className="h-8 w-8" />}
-              title="DNS Management"
-              description="Complete DNS management with easy-to-use interface"
+              title="DNS & Hosting Setup"
+              description="Advanced DNS management tools with intuitive interface - configure A records, CNAME, MX records, and connect your domain to any hosting"
+            />
+            <FeatureCard
+              icon={<Headphones className="h-8 w-8" />}
+              title="24/7 Expert Support"
+              description="Get help anytime with our dedicated support team via email, phone, or chat for domain setup, transfers, and technical assistance"
+            />
+            <FeatureCard
+              icon={<Clock className="h-8 w-8" />}
+              title="Auto-Renewal Options"
+              description="Never lose your domain - enable auto-renewal, get expiry reminders, and manage multiple domains from one dashboard"
             />
           </div>
         </Section>
@@ -132,7 +201,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8">
             <StatsCard
               icon={<Globe className="h-6 w-6" />}
               value="10,000+"
@@ -172,41 +241,44 @@ export default function HomePage() {
               </div>
             </div>
             <h3 className="text-3xl font-bold text-gray-900 mb-4">
-              Built with Modern Technology
+              How Our Domain Services Work
             </h3>
             <p className="text-xl text-gray-600">
-              Leveraging the latest technologies for optimal performance
+              Simple, secure, and professional domain purchasing and management process
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="bg-gray-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
-                <Server className="h-10 w-10 text-primary-600" />
+              <div className="bg-primary-50 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                <Search className="h-10 w-10 text-primary-600" />
               </div>
-              <h4 className="text-xl font-semibold mb-2">Live Domain Services</h4>
+              <div className="bg-primary-600 text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto -mt-2 mb-3 text-sm font-bold">1</div>
+              <h4 className="text-xl font-semibold mb-2">Search & Select Domain</h4>
               <p className="text-gray-600">
-                Real-time domain registration and management services
+                Use our domain search tool to find available domain names. Browse through multiple extensions (.com, .in, .org, etc.) with real-time availability and pricing
               </p>
             </div>
 
             <div className="text-center">
-              <div className="bg-gray-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
-                <Shield className="h-10 w-10 text-primary-600" />
+              <div className="bg-primary-50 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                <CreditCard className="h-10 w-10 text-primary-600" />
               </div>
-              <h4 className="text-xl font-semibold mb-2">Secure Payments</h4>
+              <div className="bg-primary-600 text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto -mt-2 mb-3 text-sm font-bold">2</div>
+              <h4 className="text-xl font-semibold mb-2">Purchase Securely</h4>
               <p className="text-gray-600">
-                Razorpay integration ensures secure and reliable payment processing
+                Complete your domain purchase through our secure Razorpay payment system. Accept all major payment methods including cards, UPI, and net banking
               </p>
             </div>
 
             <div className="text-center">
-              <div className="bg-gray-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
-                <TrendingDown className="h-10 w-10 text-primary-600" />
+              <div className="bg-primary-50 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                <Globe className="h-10 w-10 text-primary-600" />
               </div>
-              <h4 className="text-xl font-semibold mb-2">Best Prices</h4>
+              <div className="bg-primary-600 text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto -mt-2 mb-3 text-sm font-bold">3</div>
+              <h4 className="text-xl font-semibold mb-2">Manage & Configure</h4>
               <p className="text-gray-600">
-                Competitive pricing with transparent costs and no hidden fees
+                Access your domain dashboard to manage DNS settings, configure nameservers, enable privacy protection, set up email, and renew your domains
               </p>
             </div>
           </div>

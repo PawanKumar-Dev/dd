@@ -136,11 +136,38 @@ export async function PUT(request: NextRequest) {
     if (body.password) {
       const { currentPassword, newPassword } = body.password;
 
-      // In production, verify current password with bcrypt
-      // For now, we'll just update the password
-      if (newPassword) {
-        user.password = newPassword; // In production, hash this password
+      if (!newPassword || newPassword.length < 6) {
+        return NextResponse.json(
+          { error: "New password must be at least 6 characters" },
+          { status: 400 }
+        );
       }
+
+      // Check if user has an existing password (credentials user)
+      if (user.password) {
+        // Verify current password
+        if (!currentPassword) {
+          return NextResponse.json(
+            { error: "Current password is required" },
+            { status: 400 }
+          );
+        }
+
+        const isPasswordValid = await user.comparePassword(currentPassword);
+        if (!isPasswordValid) {
+          return NextResponse.json(
+            { error: "Current password is incorrect" },
+            { status: 401 }
+          );
+        }
+      } else {
+        // Social login user setting password for the first time
+        // No need to verify current password
+        // Keep provider as-is (tracks original registration method)
+      }
+
+      // Set new password (will be hashed by pre-save hook)
+      user.password = newPassword;
     }
 
     await user.save();
