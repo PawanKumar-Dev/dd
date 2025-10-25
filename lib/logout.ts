@@ -10,6 +10,9 @@ export const useLogout = () => {
     try {
       console.log('🚪 Starting logout process...');
 
+      // Set logout flag to prevent AuthSync from re-syncing
+      sessionStorage.setItem('isLoggingOut', 'true');
+
       // Get user data for debugging
       const userData = localStorage.getItem('user');
       if (userData) {
@@ -29,12 +32,13 @@ export const useLogout = () => {
       console.log('🔐 Signing out from NextAuth...');
       await signOut({ redirect: false });
 
-      // Step 2: Clear all localStorage data
-      console.log('🧹 Clearing localStorage...');
+      // Step 2: Clear all localStorage and sessionStorage data
+      console.log('🧹 Clearing localStorage and sessionStorage...');
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       localStorage.removeItem('rememberMe');
       localStorage.removeItem('savedEmail');
+      sessionStorage.clear(); // Clear all session storage including logout flag
 
       // Step 3: Clear all cookies manually (more aggressive approach)
       console.log('🍪 Clearing cookies...');
@@ -59,9 +63,10 @@ export const useLogout = () => {
       console.log('✅ Logout successful!');
 
       // Step 5: Direct redirect to login (same for all users)
+      // Use replace() to prevent back button from returning to authenticated page
       console.log('🔄 Redirecting to login page...');
       setTimeout(() => {
-        window.location.href = '/login';
+        window.location.replace('/login');
       }, 500);
 
     } catch (error) {
@@ -80,7 +85,7 @@ export const useLogout = () => {
       toast.success('Logged out successfully');
       console.log('✅ Logout successful!');
       setTimeout(() => {
-        window.location.href = '/login';
+        window.location.replace('/login');
       }, 500);
     }
   };
@@ -94,6 +99,9 @@ export const useLogout = () => {
 export const logoutUser = async () => {
   try {
     console.log('🚪 Direct logout function called...');
+
+    // Set logout flag to prevent AuthSync from re-syncing
+    sessionStorage.setItem('isLoggingOut', 'true');
 
     // Get user data for debugging
     const userData = localStorage.getItem('user');
@@ -114,12 +122,13 @@ export const logoutUser = async () => {
     console.log('🔐 Signing out from NextAuth...');
     await signOut({ redirect: false });
 
-    // Clear all localStorage data
-    console.log('🧹 Clearing localStorage...');
+    // Clear all localStorage and sessionStorage data
+    console.log('🧹 Clearing localStorage and sessionStorage...');
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('rememberMe');
     localStorage.removeItem('savedEmail');
+    sessionStorage.clear(); // Clear all session storage including logout flag
 
     // Clear all cookies
     console.log('🍪 Clearing cookies...');
@@ -142,8 +151,9 @@ export const logoutUser = async () => {
     console.log('✅ Logout successful!');
 
     // Direct redirect to login (same for all users)
+    // Use replace() to prevent back button from returning to authenticated page
     console.log('🔄 Redirecting to login page...');
-    window.location.href = '/login';
+    window.location.replace('/login');
 
   } catch (error) {
     console.error('❌ Direct logout error:', error);
@@ -160,7 +170,7 @@ export const logoutUser = async () => {
     toast.success('Logged out successfully');
     console.log('✅ Logout successful!');
     setTimeout(() => {
-      window.location.href = '/login';
+      window.location.replace('/login');
     }, 500);
   }
 };

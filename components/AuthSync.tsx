@@ -16,6 +16,14 @@ export default function AuthSync() {
       return;
     }
 
+    // Check if user is in the process of logging out
+    if (typeof window !== "undefined") {
+      const isLoggingOut = sessionStorage.getItem("isLoggingOut");
+      if (isLoggingOut === "true") {
+        return; // Don't sync during logout
+      }
+    }
+
     if (status === "authenticated" && session && !isSyncing) {
       setIsSyncing(true);
 
@@ -30,6 +38,11 @@ export default function AuthSync() {
         .finally(() => {
           setIsSyncing(false);
         });
+    }
+
+    // Clear any old logout flags when session is unauthenticated
+    if (status === "unauthenticated" && typeof window !== "undefined") {
+      sessionStorage.removeItem("isLoggingOut");
     }
   }, [session, status, isSyncing, pathname]);
 

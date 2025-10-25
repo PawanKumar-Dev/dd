@@ -47,7 +47,7 @@ export async function middleware(request: NextRequest) {
     }
 
     // For social login users, ensure they have a proper token
-    // BUT skip this check if user is going to login (logout scenario)
+    // Skip this check during logout or when going to login page
     if (nextAuthToken && !customToken && pathname !== '/login') {
       console.log('🔄 Social login user without custom token - redirecting to sync');
       // Social login user without custom token - redirect to sync
