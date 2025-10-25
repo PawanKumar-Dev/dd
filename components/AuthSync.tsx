@@ -20,20 +20,22 @@ export default function AuthSync() {
     if (typeof window !== "undefined") {
       const isLoggingOut = sessionStorage.getItem("isLoggingOut");
       if (isLoggingOut === "true") {
+        console.log("🚫 [AuthSync] Logout in progress, skipping sync");
         return; // Don't sync during logout
       }
     }
 
     if (status === "authenticated" && session && !isSyncing) {
+      console.log("✅ [AuthSync] Session authenticated, starting sync...");
       setIsSyncing(true);
 
       // Sync NextAuth session with localStorage and create JWT token
       syncAuthWithLocalStorage()
         .then((userData) => {
-          // Auth sync completed successfully
+          console.log("✅ [AuthSync] Sync completed successfully");
         })
         .catch((error) => {
-          // Auth sync failed - handled silently
+          console.warn("⚠️ [AuthSync] Sync failed:", error);
         })
         .finally(() => {
           setIsSyncing(false);
@@ -42,7 +44,11 @@ export default function AuthSync() {
 
     // Clear any old logout flags when session is unauthenticated
     if (status === "unauthenticated" && typeof window !== "undefined") {
-      sessionStorage.removeItem("isLoggingOut");
+      const wasLoggingOut = sessionStorage.getItem("isLoggingOut");
+      if (wasLoggingOut === "true") {
+        console.log("🧹 [AuthSync] Clearing logout flag after session ended");
+        sessionStorage.removeItem("isLoggingOut");
+      }
     }
   }, [session, status, isSyncing, pathname]);
 

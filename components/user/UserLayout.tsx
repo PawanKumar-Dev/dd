@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import RupeeIcon from '@/components/icons/RupeeIcon';
 import ProfileCompletionWarning from '@/components/ProfileCompletionWarning';
+import { DataLoading } from '@/components/user/LoadingComponents';
 
 interface UserLayoutProps {
   children: React.ReactNode;
@@ -29,12 +30,128 @@ interface UserLayoutProps {
     lastName: string;
     email: string;
   } | null;
-  onLogout?: () => void;
+  onLogout?: () => void | Promise<void>;
+  isLoading?: boolean;
 }
 
-export default function UserLayout({ children, user, onLogout }: UserLayoutProps) {
+export default function UserLayout({ children, user, onLogout, isLoading = false }: UserLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const pathname = usePathname();
+  const logoutButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Debug: Track component lifecycle
+  useEffect(() => {
+    console.log('🟢 [UserLayout] Component mounted');
+    console.log('🔍 [UserLayout] Initial state:', {
+      hasOnLogout: !!onLogout,
+      onLogoutType: typeof onLogout,
+      hasUser: !!user,
+      userName: user?.firstName
+    });
+    setIsMounted(true);
+
+    return () => {
+      console.log('🔴 [UserLayout] Component unmounting');
+    };
+  }, []);
+
+  // Debug: Track onLogout prop changes
+  useEffect(() => {
+    console.log('🔄 [UserLayout] onLogout prop changed:', {
+      hasOnLogout: !!onLogout,
+      onLogoutType: typeof onLogout,
+      timestamp: new Date().toISOString()
+    });
+  }, [onLogout]);
+
+  // Debug: Track user prop changes
+  useEffect(() => {
+    console.log('👤 [UserLayout] user prop changed:', {
+      hasUser: !!user,
+      userName: user?.firstName,
+      userEmail: user?.email
+    });
+  }, [user]);
+
+  // Debug: Track logout button availability
+  useEffect(() => {
+    if (isMounted) {
+      console.log('🔘 [UserLayout] Logout button status:', {
+        hasOnLogout: !!onLogout,
+        onLogoutType: typeof onLogout,
+        hasUser: !!user,
+        isLoading: isLoading,
+        buttonShouldBeActive: !!onLogout && !!user,
+        timestamp: new Date().toISOString()
+      });
+    }
+  }, [isMounted, onLogout, user, isLoading]);
+
+  // Debug: Track when logout button becomes clickable
+  useEffect(() => {
+    if (isMounted && onLogout && user) {
+      console.log('✅ [UserLayout] Logout button is now ACTIVE and clickable!', {
+        userEmail: user.email,
+        timestamp: new Date().toISOString()
+      });
+
+      // Add a test click listener to verify the button is working
+      if (logoutButtonRef.current) {
+        const testClickHandler = (e: Event) => {
+          console.log('🧪 [UserLayout] TEST: Button received click event!', {
+            event: e,
+            timestamp: new Date().toISOString()
+          });
+        };
+
+        logoutButtonRef.current.addEventListener('click', testClickHandler);
+
+        return () => {
+          if (logoutButtonRef.current) {
+            logoutButtonRef.current.removeEventListener('click', testClickHandler);
+          }
+        };
+      }
+    }
+  }, [isMounted, onLogout, user]);
+
+  // Handler for logout button that properly awaits async logout
+  const handleLogoutClick = useCallback(async () => {
+    console.log('🚪 [UserLayout] Logout button CLICKED');
+    console.log('🔍 [UserLayout] User state:', { hasUser: !!user, userEmail: user?.email });
+    console.log('🔍 [UserLayout] onLogout function:', {
+      exists: !!onLogout,
+      type: typeof onLogout,
+      isFunction: typeof onLogout === 'function'
+    });
+
+    if (!onLogout) {
+      console.error('❌ [UserLayout] No onLogout function provided!');
+      return;
+    }
+
+    if (!user) {
+      console.warn('⚠️ [UserLayout] User not loaded yet, ignoring logout click');
+      return;
+    }
+
+    try {
+      console.log('🔍 [UserLayout] Calling onLogout function...');
+      console.log('🔍 [UserLayout] onLogout function details:', onLogout.toString().substring(0, 100) + '...');
+
+      // Test if the function is callable
+      if (typeof onLogout === 'function') {
+        console.log('✅ [UserLayout] onLogout is a function, calling it...');
+        await onLogout();
+        console.log('✅ [UserLayout] onLogout completed successfully');
+      } else {
+        console.error('❌ [UserLayout] onLogout is not a function!', typeof onLogout);
+      }
+    } catch (error) {
+      console.error('❌ [UserLayout] Error calling onLogout:', error);
+    }
+  }, [onLogout, user]);
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -96,10 +213,19 @@ export default function UserLayout({ children, user, onLogout }: UserLayoutProps
               </div>
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-900">
-                {user?.firstName} {user?.lastName}
-              </p>
-              <p className="text-xs text-gray-500">{user?.email}</p>
+              {user ? (
+                <>
+                  <p className="text-sm font-medium text-gray-900">
+                    {user.firstName} {user.lastName}
+                  </p>
+                  <p className="text-xs text-gray-500">{user.email}</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm font-medium text-gray-500">Loading...</p>
+                  <p className="text-xs text-gray-400">Please wait</p>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -137,7 +263,7 @@ export default function UserLayout({ children, user, onLogout }: UserLayoutProps
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top Bar */}
-        <div className="bg-white shadow-sm border-b border-gray-200">
+        <div className="bg-white shadow-sm border-b border-gray-200 relative z-50">
           <div className="flex items-center justify-between h-16 px-6">
             <div className="flex items-center">
               <button
@@ -151,36 +277,33 @@ export default function UserLayout({ children, user, onLogout }: UserLayoutProps
               </h1>
             </div>
 
-            <div className="flex items-center space-x-4" style={{ zIndex: 9999, position: 'relative' }}>
-              <button
-                onMouseDown={(e) => {
-                  console.log('MouseDown event');
-                  e.preventDefault();
-                }}
-                onClick={(e) => {
-                  console.log('Click event triggered');
-                  e.preventDefault();
-                  e.stopPropagation();
-                  if (onLogout) {
-                    console.log('Executing logout');
-                    onLogout();
-                  } else {
-                    console.error('onLogout is undefined');
-                    alert('Logout function not available');
-                  }
-                }}
-                type="button"
-                className="flex items-center px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-all duration-200 cursor-pointer border-2 border-red-600"
-                style={{ 
-                  pointerEvents: 'auto',
-                  position: 'relative',
-                  zIndex: 9999,
-                  touchAction: 'manipulation'
-                }}
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Logout
-              </button>
+            <div className="flex items-center space-x-4">
+              {onLogout ? (
+                <button
+                  ref={logoutButtonRef}
+                  onClick={handleLogoutClick}
+                  type="button"
+                  disabled={!user}
+                  className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${user
+                    ? 'text-red-600 hover:bg-red-50 hover:text-red-700 cursor-pointer border border-red-200'
+                    : 'text-gray-400 cursor-not-allowed border border-gray-200'
+                    }`}
+                  data-testid={user ? "logout-button-active" : "logout-button-disabled"}
+                  title={user ? 'Click to logout' : 'Please wait for user data to load'}
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  {user ? 'Logout' : 'Loading...'}
+                  {user && <span className="ml-1 text-xs">✓</span>}
+                </button>
+              ) : (
+                <div
+                  className="flex items-center px-3 py-2 text-sm font-medium text-gray-400"
+                  data-testid="logout-button-inactive"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  <span className="text-xs">No logout handler</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -194,7 +317,13 @@ export default function UserLayout({ children, user, onLogout }: UserLayoutProps
             className="h-full"
           >
             <ProfileCompletionWarning />
-            {children}
+            {isLoading ? (
+              <div className="p-6">
+                <DataLoading type="card" count={3} />
+              </div>
+            ) : (
+              children
+            )}
           </motion.div>
         </main>
 
