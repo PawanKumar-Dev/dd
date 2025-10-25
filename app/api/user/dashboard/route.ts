@@ -6,6 +6,9 @@ import { AuthService } from "@/lib/auth";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth-config";
 
+// Force dynamic rendering - required for API routes
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     await connectDB();

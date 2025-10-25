@@ -3,6 +3,9 @@ import { ResellerClubWrapper } from "@/lib/resellerclub-wrapper";
 import { InputValidator } from "@/lib/validation";
 import { isRestrictedTLD } from "@/lib/domainRequirements";
 
+// Force dynamic rendering - required for API routes
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   const requestId = Math.random().toString(36).substring(7);
   const startTime = Date.now();
