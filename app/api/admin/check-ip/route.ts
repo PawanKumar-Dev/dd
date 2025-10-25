@@ -3,6 +3,9 @@ import { AuthService } from "@/lib/auth";
 import connectDB from "@/lib/mongodb";
 import IPCheck from "@/models/IPCheck";
 
+// Force dynamic rendering - required for authenticated routes
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     // Check admin authentication
