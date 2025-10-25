@@ -12,7 +12,12 @@ export const useLogout = () => {
       sessionStorage.setItem('isLoggingOut', 'true');
 
       // Sign out from NextAuth (handles social login sessions)
-      await signOut({ redirect: false });
+      // Wrap in try-catch in case NextAuth isn't ready yet
+      try {
+        await signOut({ redirect: false });
+      } catch (signOutError) {
+        console.warn('NextAuth signOut failed, continuing with logout:', signOutError);
+      }
 
       // Clear all localStorage and sessionStorage data
       localStorage.removeItem('token');

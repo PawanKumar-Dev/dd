@@ -108,6 +108,13 @@ export default function UserDomains() {
 
   const handleLogout = useLogout();
 
+  // Ensure logout handler is ready
+  const safeHandleLogout = () => {
+    if (typeof handleLogout === 'function') {
+      handleLogout();
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active':
@@ -160,7 +167,7 @@ export default function UserDomains() {
 
   if (isLoading) {
     return (
-      <UserLayout user={user} onLogout={handleLogout}>
+      <UserLayout user={user} onLogout={safeHandleLogout}>
         <div className="p-6">
           <DataLoading type="table" count={5} />
         </div>
@@ -170,7 +177,7 @@ export default function UserDomains() {
 
   return (
     <ClientOnly>
-      <UserLayout user={user} onLogout={handleLogout}>
+      <UserLayout user={user} onLogout={safeHandleLogout}>
         <div className="p-6">
           {/* Header */}
           <div className="mb-8">

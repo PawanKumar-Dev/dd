@@ -111,6 +111,13 @@ export default function UserOrders() {
 
   const handleLogout = useLogout();
 
+  // Ensure logout handler is ready
+  const safeHandleLogout = () => {
+    if (typeof handleLogout === 'function') {
+      handleLogout();
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
@@ -167,7 +174,7 @@ export default function UserOrders() {
 
   if (isLoading) {
     return (
-      <UserLayout user={user} onLogout={handleLogout}>
+      <UserLayout user={user} onLogout={safeHandleLogout}>
         <div className="p-6">
           <DataLoading type="table" count={5} />
         </div>
@@ -177,7 +184,7 @@ export default function UserOrders() {
 
   return (
     <ClientOnly>
-      <UserLayout user={user} onLogout={handleLogout}>
+      <UserLayout user={user} onLogout={safeHandleLogout}>
         <div className="p-6">
           {/* Header */}
           <div className="mb-8">

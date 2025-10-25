@@ -44,7 +44,10 @@ export default function UserDashboard() {
 
   useEffect(() => {
     const initializeAuth = async () => {
-      if (status === 'loading') return;
+      // Wait for session to be fully loaded
+      if (status === 'loading') {
+        return;
+      }
 
       // Check for NextAuth session first
       if (session?.user) {
@@ -58,6 +61,10 @@ export default function UserDashboard() {
         };
 
         setUser(userObj);
+        
+        // Small delay to ensure session handlers are ready
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         loadDashboardData(userObj);
         return;
       }
@@ -150,6 +157,12 @@ export default function UserDashboard() {
 
   const handleLogout = useLogout();
 
+  // Ensure logout handler is ready
+  const safeHandleLogout = () => {
+    if (typeof handleLogout === 'function') {
+      handleLogout();
+    }
+  };
 
   if (!user) {
     return <PageLoading page="dashboard" />;
@@ -157,7 +170,7 @@ export default function UserDashboard() {
 
   if (isLoading) {
     return (
-      <UserLayout user={user} onLogout={handleLogout}>
+      <UserLayout user={user} onLogout={safeHandleLogout}>
         <div className="p-6">
           <DataLoading type="card" count={3} />
         </div>
@@ -168,7 +181,7 @@ export default function UserDashboard() {
 
   return (
     <ClientOnly>
-      <UserLayout user={user} onLogout={handleLogout}>
+      <UserLayout user={user} onLogout={safeHandleLogout}>
         <div className="p-6">
           {/* Welcome Section */}
           <div className="mb-8">

@@ -138,6 +138,13 @@ export default function UserSettings() {
 
   const handleLogout = useLogout();
 
+  // Ensure logout handler is ready
+  const safeHandleLogout = () => {
+    if (typeof handleLogout === 'function') {
+      handleLogout();
+    }
+  };
+
   const handleChangePassword = async () => {
     try {
       // Validate passwords
@@ -298,7 +305,7 @@ export default function UserSettings() {
 
   if (isLoading) {
     return (
-      <UserLayout user={user} onLogout={handleLogout}>
+      <UserLayout user={user} onLogout={safeHandleLogout}>
         <div className="p-6">
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-gray-200 rounded w-1/4"></div>
@@ -316,7 +323,7 @@ export default function UserSettings() {
 
   return (
     <ClientOnly>
-      <UserLayout user={user} onLogout={handleLogout}>
+      <UserLayout user={user} onLogout={safeHandleLogout}>
         <div className="p-6">
           {/* Header */}
           <div className="mb-8">
