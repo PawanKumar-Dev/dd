@@ -3,6 +3,9 @@ import { AuthService } from "@/lib/auth";
 import { RazorpayService } from "@/lib/razorpay";
 import { v4 as uuidv4 } from "uuid";
 
+// Force dynamic rendering - required for API routes
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     // Check authentication

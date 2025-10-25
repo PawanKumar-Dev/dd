@@ -14,6 +14,9 @@ import {
   getDomainRequirements,
 } from "@/lib/domainRequirements";
 
+// Force dynamic rendering - required for API routes
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     // Check authentication

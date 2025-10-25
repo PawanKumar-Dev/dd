@@ -3,6 +3,9 @@ import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
 import { AuthService } from "@/lib/auth";
 
+// Force dynamic rendering - required for API routes
+export const dynamic = 'force-dynamic';
+
 function checkProfileCompletion(user: any): boolean {
   // Check if all required fields are filled
   const hasPhone = user.phone && user.phone.trim() !== "";

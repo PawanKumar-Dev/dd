@@ -14,7 +14,6 @@ const SettingsSchema = new Schema<ISettings>({
     type: String,
     required: true,
     unique: true,
-    index: true,
   },
   value: {
     type: Schema.Types.Mixed,
@@ -39,8 +38,7 @@ const SettingsSchema = new Schema<ISettings>({
   },
 });
 
-// Ensure only one document per key
-SettingsSchema.index({ key: 1 }, { unique: true });
+// Index automatically created by unique: true on key field
 
 export default mongoose.models.Settings ||
   mongoose.model<ISettings>("Settings", SettingsSchema);

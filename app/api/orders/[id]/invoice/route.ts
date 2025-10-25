@@ -6,6 +6,9 @@ import User from "@/models/User";
 import jsPDF from "jspdf";
 import { formatIndianDate } from "@/lib/dateUtils";
 
+// Force dynamic rendering - required for API routes
+export const dynamic = 'force-dynamic';
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
