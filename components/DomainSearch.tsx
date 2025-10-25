@@ -81,7 +81,7 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
           setSearchMode(state.searchMode || 'single');
         }
       } catch (error) {
-        console.error('Failed to load saved search state:', error);
+        // Failed to load saved search state
       }
     }
 

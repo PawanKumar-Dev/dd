@@ -80,7 +80,7 @@ export default function Invoice({ order, isOpen, onClose }: InvoiceProps) {
       const fileName = `Invoice-${order.invoiceNumber || order.orderId}.pdf`;
       pdf.save(fileName);
     } catch (error) {
-      console.error('Error generating PDF:', error);
+      // Error generating PDF
     } finally {
       setIsGeneratingPDF(false);
     }
