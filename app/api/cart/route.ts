@@ -3,6 +3,9 @@ import { AuthService } from "@/lib/auth";
 import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
 
+// Force dynamic rendering - required for API routes
+export const dynamic = 'force-dynamic';
+
 // Helper function to get minimum registration period for TLD
 const getMinRegistrationPeriod = (domainName: string): number => {
   const tld = domainName.split(".").pop()?.toLowerCase();

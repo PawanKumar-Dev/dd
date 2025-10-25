@@ -3,6 +3,9 @@ import { AuthService } from "@/lib/auth";
 import Settings from "@/models/Settings";
 import { connectToDatabase } from "@/lib/mongoose";
 
+// Force dynamic rendering - required for API routes
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     // Check authentication

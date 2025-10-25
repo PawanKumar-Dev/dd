@@ -6,6 +6,9 @@ import { EmailService } from "@/lib/email";
 import { InputValidator } from "@/lib/validation";
 import crypto from "crypto";
 
+// Force dynamic rendering - required for API routes
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     const {

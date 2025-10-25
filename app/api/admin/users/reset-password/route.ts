@@ -5,6 +5,9 @@ import { AuthService } from "@/lib/auth";
 import bcrypt from "bcryptjs";
 import { EmailService } from "@/lib/email";
 
+// Force dynamic rendering - required for API routes
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     // Verify admin authentication

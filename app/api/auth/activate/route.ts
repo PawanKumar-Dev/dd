@@ -3,6 +3,9 @@ import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
 import { AuthService } from "@/lib/auth";
 
+// Force dynamic rendering - required for API routes
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     const { token } = await request.json();

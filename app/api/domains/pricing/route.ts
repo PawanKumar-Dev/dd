@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ResellerClubAPI } from "@/lib/resellerclub";
 
+// Force dynamic rendering - required for API routes
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   const startTime = Date.now();
   const requestId = Math.random().toString(36).substring(7);

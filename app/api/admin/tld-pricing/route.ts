@@ -3,6 +3,9 @@ import { AuthService } from "@/lib/auth";
 import { PricingService } from "@/lib/pricing-service";
 import { formatIndianCurrency, formatIndianNumber } from "@/lib/dateUtils";
 
+// Force dynamic rendering - required for API routes
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     // Check admin authentication

@@ -3,6 +3,9 @@ import { AuthService } from "@/lib/auth";
 import connectDB from "@/lib/mongodb";
 import Order from "@/models/Order";
 
+// Force dynamic rendering - required for API routes
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     // Check authentication

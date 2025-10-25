@@ -3,6 +3,9 @@ import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
 import { verifyAdminAuth } from "@/lib/admin-auth";
 
+// Force dynamic rendering - required for API routes
+export const dynamic = 'force-dynamic';
+
 // GET - Get specific user (admin only)
 export async function GET(
   request: NextRequest,

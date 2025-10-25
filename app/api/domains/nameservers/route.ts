@@ -3,6 +3,9 @@ import { AuthService } from "@/lib/auth";
 import { promisify } from "util";
 import dns from "dns";
 
+// Force dynamic rendering - required for API routes
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const domainName = searchParams.get("domainName");

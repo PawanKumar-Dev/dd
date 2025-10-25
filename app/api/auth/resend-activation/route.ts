@@ -4,6 +4,9 @@ import User from "@/models/User";
 import { EmailService } from "@/lib/email";
 import crypto from "crypto";
 
+// Force dynamic rendering - required for API routes
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     const { email } = await request.json();

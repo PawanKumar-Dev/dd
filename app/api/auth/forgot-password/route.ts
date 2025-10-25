@@ -5,6 +5,9 @@ import { EmailService } from "@/lib/email";
 import crypto from "crypto";
 import { rateLimiters } from "@/lib/rate-limit";
 
+// Force dynamic rendering - required for API routes
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting for password reset
