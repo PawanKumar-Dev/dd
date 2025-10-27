@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { AuthService } from "@/lib/auth";
 import connectDB from "@/lib/mongodb";
 import PendingDomain from "@/models/PendingDomain";
+import Order from "@/models/Order";
 import User from "@/models/User";
 
 // Force dynamic rendering - required for API routes
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   try {
@@ -30,39 +31,107 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "20");
     const search = searchParams.get("search");
 
-    // Build query
-    const query: any = {};
+    // STEP 1: Get domains from PendingDomain collection
+    const pendingDomainQuery: any = {};
     if (status && status !== "all") {
-      query.status = status;
+      pendingDomainQuery.status = status;
     }
     if (search) {
-      query.$or = [
+      pendingDomainQuery.$or = [
         { domainName: { $regex: search, $options: "i" } },
         { orderId: { $regex: search, $options: "i" } },
       ];
     }
 
-    // Get pending domains with pagination
-    const skip = (page - 1) * limit;
-    const pendingDomains = await PendingDomain.find(query)
+    const pendingDomainsFromCollection = await PendingDomain.find(
+      pendingDomainQuery
+    )
       .populate("userId", "firstName lastName email phone companyName")
       .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
+      .lean();
 
-    // Get total count for pagination
-    const total = await PendingDomain.countDocuments(query);
+    // STEP 2: Get domains from Orders with pending/processing status
+    const orderQuery: any = {
+      isDeleted: { $ne: true },
+      "domains.status": { $in: ["pending", "processing"] },
+    };
 
-    // Get status counts
-    const statusCounts = await PendingDomain.aggregate([
-      {
-        $group: {
-          _id: "$status",
-          count: { $sum: 1 },
-        },
-      },
-    ]);
+    const ordersWithPendingDomains = await Order.find(orderQuery)
+      .populate("userId", "firstName lastName email phone companyName")
+      .sort({ createdAt: -1 })
+      .lean();
 
+    // Extract pending/processing domains from orders
+    const pendingDomainsFromOrders: any[] = [];
+    for (const order of ordersWithPendingDomains) {
+      for (const domain of order.domains) {
+        if (domain.status === "pending" || domain.status === "processing") {
+          // Check if this domain is already in PendingDomain collection
+          const existsInCollection = pendingDomainsFromCollection.some(
+            (pd: any) =>
+              pd.domainName.toLowerCase() === domain.domainName.toLowerCase()
+          );
+
+          // Only add if not already in PendingDomain collection
+          if (!existsInCollection) {
+            // Apply status filter if specified
+            if (status && status !== "all" && domain.status !== status) {
+              continue;
+            }
+
+            // Apply search filter if specified
+            if (search) {
+              const searchLower = search.toLowerCase();
+              if (
+                !domain.domainName.toLowerCase().includes(searchLower) &&
+                !order.orderId.toLowerCase().includes(searchLower)
+              ) {
+                continue;
+              }
+            }
+
+            // Transform Order domain to match PendingDomain structure
+            pendingDomainsFromOrders.push({
+              _id: `order_${order._id}_${domain.domainName}`, // Synthetic ID
+              domainName: domain.domainName,
+              price: domain.price,
+              currency: domain.currency,
+              registrationPeriod: domain.registrationPeriod,
+              userId: order.userId,
+              orderId: order.orderId,
+              customerId: domain.resellerClubCustomerId || 0,
+              contactId: domain.resellerClubContactId || 0,
+              status: domain.status,
+              reason: domain.error || "Domain registration in progress",
+              verificationAttempts: 0,
+              resellerClubOrderId: domain.resellerClubOrderId,
+              createdAt: order.createdAt,
+              updatedAt: order.updatedAt,
+              source: "order", // Mark as coming from Order collection
+            });
+          }
+        }
+      }
+    }
+
+    // STEP 3: Merge both sources
+    const allPendingDomains = [
+      ...pendingDomainsFromCollection.map((pd: any) => ({
+        ...pd,
+        source: "pending_domain",
+      })),
+      ...pendingDomainsFromOrders,
+    ].sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    // STEP 4: Apply pagination
+    const skip = (page - 1) * limit;
+    const paginatedDomains = allPendingDomains.slice(skip, skip + limit);
+    const total = allPendingDomains.length;
+
+    // STEP 5: Calculate status counts from all sources
     const statusSummary = {
       total: 0,
       pending: 0,
@@ -71,14 +140,17 @@ export async function GET(request: NextRequest) {
       failed: 0,
     };
 
-    statusCounts.forEach((item) => {
-      statusSummary[item._id as keyof typeof statusSummary] = item.count;
-      statusSummary.total += item.count;
+    allPendingDomains.forEach((domain: any) => {
+      const domainStatus = domain.status;
+      if (domainStatus in statusSummary) {
+        statusSummary[domainStatus as keyof typeof statusSummary]++;
+        statusSummary.total++;
+      }
     });
 
     return NextResponse.json({
       success: true,
-      pendingDomains,
+      pendingDomains: paginatedDomains,
       pagination: {
         page,
         limit,

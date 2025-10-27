@@ -395,7 +395,7 @@ export async function POST(request: NextRequest) {
             registrationPeriod: item.registrationPeriod || 1,
             status: "pending",
             bookingStatus: domainBookingStatus,
-            error: userFriendlyMessage, // Use user-friendly message instead of raw error
+            error: result.message,
             resellerClubCustomerId: customerResult.customerId,
             resellerClubContactId: customerResult.contactId,
           });
