@@ -13,6 +13,11 @@ interface PaymentResult {
   orderId?: string;
   invoiceNumber?: string;
   successfulDomains?: string[];
+  pendingDomains?: string[];
+  failedDomains?: Array<{
+    domainName: string;
+    error?: string;
+  }>;
   registrationResults?: Array<{
     domainName: string;
     status: string;
@@ -29,6 +34,9 @@ interface PaymentResult {
   supportContact?: string;
   amount?: number;
   currency?: string;
+  paymentStatus?: string;
+  domainRegistrationStatus?: string;
+  requiresSupport?: boolean;
 }
 
 export default function PaymentResultPage() {
@@ -209,7 +217,7 @@ export default function PaymentResultPage() {
 
           <p className="text-lg text-gray-600 mb-8">
             {result.status === 'success'
-              ? 'Your payment has been processed successfully.'
+              ? result.message || 'Your payment has been processed successfully.'
               : 'We encountered an issue processing your payment.'
             }
           </p>
@@ -257,6 +265,69 @@ export default function PaymentResultPage() {
                   <div key={index} className="flex items-center text-green-700">
                     <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
                     <span className="font-mono">{domain}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Pending Domains */}
+          {result.pendingDomains && Array.isArray(result.pendingDomains) && result.pendingDomains.length > 0 && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6 text-left">
+              <div className="flex items-center mb-4">
+                <Clock className="h-6 w-6 text-blue-600 mr-3" />
+                <h3 className="text-lg font-semibold text-blue-800">Domains Being Processed</h3>
+              </div>
+              <p className="text-blue-700 mb-4 text-sm">
+                {result.requiresSupport
+                  ? 'Your domains are being registered by our team. This typically completes within 24 hours. You will receive an email confirmation once complete.'
+                  : 'The following domains are currently being registered. This process may take a few minutes to complete. You can check the status in your dashboard.'
+                }
+              </p>
+              <div className="space-y-2">
+                {result.pendingDomains.map((domain, index) => (
+                  <div key={index} className="flex items-center justify-between bg-white border border-blue-200 rounded-lg p-3">
+                    <div className="flex items-center text-blue-700">
+                      <Loader2 className="h-4 w-4 mr-2 text-blue-600 animate-spin" />
+                      <span className="font-mono">{domain}</span>
+                    </div>
+                    <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">Processing</span>
+                  </div>
+                ))}
+              </div>
+              {!result.requiresSupport && result.orderId && (
+                <div className="mt-4 pt-4 border-t border-blue-200">
+                  <p className="text-sm text-blue-700">
+                    <strong>Note:</strong> You can track the registration progress in your dashboard under Orders.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Failed Domains */}
+          {result.failedDomains && Array.isArray(result.failedDomains) && result.failedDomains.length > 0 && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-6 text-left">
+              <div className="flex items-center mb-4">
+                <XCircle className="h-6 w-6 text-red-600 mr-3" />
+                <h3 className="text-lg font-semibold text-red-800">Registration Issues</h3>
+              </div>
+              <p className="text-red-700 mb-4 text-sm">
+                The following domains could not be registered automatically. Our support team has been notified and will contact you shortly.
+              </p>
+              <div className="space-y-2">
+                {result.failedDomains.map((domain, index) => (
+                  <div key={index} className="bg-white border border-red-200 rounded-lg p-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center text-red-700">
+                        <AlertCircle className="h-4 w-4 mr-2 text-red-600" />
+                        <span className="font-mono font-medium">{domain.domainName}</span>
+                      </div>
+                      <span className="text-xs text-red-600 bg-red-100 px-2 py-1 rounded">Requires Attention</span>
+                    </div>
+                    {domain.error && (
+                      <p className="text-xs text-red-600 ml-6">{domain.error}</p>
+                    )}
                   </div>
                 ))}
               </div>
