@@ -755,7 +755,7 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
                     <TrendingUp className="h-5 w-5" />
                     <span>Show More Suggestions</span>
                   </button>
-                  <p className="text-xs text-[var(--google-text-secondary)] mt-2" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
+                  <p className="text-xs text-white/80 mt-2" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
                     See more TLD options for "{baseDomain}"
                   </p>
                 </div>
@@ -765,8 +765,8 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
               {isLoadingMore && (
                 <div className="mt-6 text-center">
                   <div className="flex items-center justify-center gap-2">
-                    <Loader2 className="h-5 w-5 animate-spin text-[var(--google-blue)]" />
-                    <span className="text-sm text-[var(--google-text-secondary)]" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
+                    <Loader2 className="h-5 w-5 animate-spin text-white" />
+                    <span className="text-sm text-white/90" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
                       Loading more suggestions...
                     </span>
                   </div>

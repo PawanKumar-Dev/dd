@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { performLogout } from '@/lib/logout';
 import {
   User, Mail, Phone, MapPin, Shield, Key, Save,
-  Eye, EyeOff, Calendar, Globe, CreditCard, AlertCircle, Building
+  Eye, EyeOff, Calendar, Globe, CreditCard, AlertCircle, Building, Navigation
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import UserLayout from '@/components/user/UserLayout';
@@ -49,6 +49,7 @@ export default function UserSettings() {
     confirmPassword: ''
   });
   const [hasExistingPassword, setHasExistingPassword] = useState(true);
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -292,6 +293,95 @@ export default function UserSettings() {
     }
   };
 
+  const handleDetectLocation = async () => {
+    if (!navigator.geolocation) {
+      toast.error('Geolocation is not supported by your browser');
+      return;
+    }
+
+    setIsDetectingLocation(true);
+    const loadingToast = toast.loading('Detecting your location...');
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+
+          // Use Nominatim reverse geocoding API (free and no API key required)
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`,
+            {
+              headers: {
+                'Accept': 'application/json',
+                'User-Agent': 'Excel Technologies Domain Management' // Required by Nominatim
+              }
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error('Failed to fetch address details');
+          }
+
+          const data = await response.json();
+          const address = data.address;
+
+          // Extract address components
+          const line1 = [
+            address.house_number,
+            address.road || address.street,
+            address.neighbourhood || address.suburb
+          ].filter(Boolean).join(', ');
+
+          const city = address.city || address.town || address.village || address.municipality || '';
+          const state = address.state || '';
+          const zipcode = address.postcode || '';
+
+          // Update user state with detected location
+          setUser(prev => prev ? {
+            ...prev,
+            address: {
+              ...prev.address,
+              line1: line1 || prev.address?.line1 || '',
+              city: city || prev.address?.city || '',
+              state: state || prev.address?.state || '',
+              zipcode: zipcode || prev.address?.zipcode || '',
+              country: 'IN' // Keep India as default
+            }
+          } : null);
+
+          toast.success('Location detected and address filled!', { id: loadingToast });
+        } catch (error) {
+          toast.error('Failed to get address details from location', { id: loadingToast });
+        } finally {
+          setIsDetectingLocation(false);
+        }
+      },
+      (error) => {
+        let errorMessage = 'Failed to detect location';
+
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = 'Location permission denied. Please enable location access in your browser settings.';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = 'Location information is unavailable';
+            break;
+          case error.TIMEOUT:
+            errorMessage = 'Location request timed out';
+            break;
+        }
+
+        toast.error(errorMessage, { id: loadingToast });
+        setIsDetectingLocation(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    );
+  };
+
   if (!user) {
     return <PageLoading page="settings" />;
   }
@@ -440,9 +530,20 @@ export default function UserSettings() {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Address Line 1
-                        </label>
+                        <div className="flex items-center justify-between mb-2">
+                          <label className="block text-sm font-medium text-gray-700">
+                            Address Line 1
+                          </label>
+                          <button
+                            type="button"
+                            onClick={handleDetectLocation}
+                            disabled={isDetectingLocation}
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-blue-200 hover:border-blue-300"
+                          >
+                            <Navigation className={`h-3.5 w-3.5 ${isDetectingLocation ? 'animate-spin' : ''}`} />
+                            {isDetectingLocation ? 'Detecting...' : 'Detect Location'}
+                          </button>
+                        </div>
                         <div className="relative">
                           <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                           <textarea
@@ -456,9 +557,12 @@ export default function UserSettings() {
                             } : null)}
                             rows={3}
                             className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="Enter your address"
+                            placeholder="Enter your address or use location detection"
                           />
                         </div>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Click "Detect Location" to automatically fill your address details
+                        </p>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

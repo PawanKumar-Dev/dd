@@ -42,24 +42,13 @@ function UserLayout({ children, user, onLogout, isLoading = false }: UserLayoutP
 
   // Track component lifecycle and props
   useEffect(() => {
-    console.log('🟢 [UserLayout] Component mounted with:', {
-      hasOnLogout: !!onLogout,
-      hasUser: !!user,
-      userEmail: user?.email,
-      isLoading: isLoading
-    });
     setIsMounted(true);
-
-    return () => {
-      console.log('🔴 [UserLayout] Component unmounting');
-    };
   }, []);
 
   // Track when onLogout prop changes
   const onLogoutRef = useRef(onLogout);
   useEffect(() => {
     if (onLogoutRef.current !== onLogout) {
-      console.log('⚠️ [UserLayout] onLogout prop CHANGED! Old:', !!onLogoutRef.current, 'New:', !!onLogout);
       onLogoutRef.current = onLogout;
     }
   }, [onLogout]);
@@ -68,36 +57,21 @@ function UserLayout({ children, user, onLogout, isLoading = false }: UserLayoutP
   const handleLogoutClick = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    console.log('🚪 [UserLayout] Logout button CLICKED at', new Date().toISOString());
-    console.log('🔍 [UserLayout] Current state:', {
-      hasOnLogout: !!onLogout,
-      onLogoutType: typeof onLogout,
-      hasUser: !!user,
-      userEmail: user?.email,
-      isMounted: isMounted
-    });
 
     if (!onLogout) {
-      console.error('❌ [UserLayout] No onLogout function provided!');
-      console.trace('Stack trace:');
       return;
     }
 
     if (!user) {
-      console.warn('⚠️ [UserLayout] User not loaded yet, ignoring logout click');
       return;
     }
 
     try {
-      console.log('✅ [UserLayout] Calling onLogout function...');
-      const result = await onLogout();
-      console.log('✅ [UserLayout] onLogout completed, result:', result);
+      await onLogout();
     } catch (error) {
-      console.error('❌ [UserLayout] Error in logout:', error);
-      console.trace('Error stack trace:');
+      // Error handling if needed
     }
-  }, [onLogout, user, isMounted]);
+  }, [onLogout, user]);
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -227,20 +201,15 @@ function UserLayout({ children, user, onLogout, isLoading = false }: UserLayoutP
               {onLogout ? (
                 <button
                   ref={logoutButtonRef}
-                  onClick={(e) => {
-                    console.log('👆 [UserLayout] Button onClick fired!');
-                    handleLogoutClick(e);
-                  }}
+                  onClick={handleLogoutClick}
                   type="button"
                   disabled={!user}
-                  className={`relative z-50 pointer-events-auto flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                      user
+                  className={`relative z-50 pointer-events-auto flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${user
                       ? 'text-red-600 hover:bg-red-50 hover:text-red-700 cursor-pointer border border-red-200'
                       : 'text-gray-400 cursor-not-allowed border border-gray-200'
                     }`}
                   data-testid={user ? "logout-button-active" : "logout-button-disabled"}
                   title={!user ? 'Please wait for user data to load' : 'Click to logout'}
-                  onMouseEnter={() => console.log('👆 [UserLayout] Logout button hover - clickable:', !!user)}
                 >
                   <LogOut className="h-4 w-4 mr-2" />
                   {!user ? 'Loading...' : 'Logout'}
@@ -249,7 +218,6 @@ function UserLayout({ children, user, onLogout, isLoading = false }: UserLayoutP
                 <div
                   className="flex items-center px-3 py-2 text-sm font-medium text-gray-400"
                   data-testid="logout-button-inactive"
-                  onClick={() => console.error('❌ [UserLayout] No onLogout provided to UserLayout!')}
                 >
                   <LogOut className="h-4 w-4 mr-2" />
                   <span className="text-xs">No logout handler</span>
