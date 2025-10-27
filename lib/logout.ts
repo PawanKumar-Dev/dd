@@ -48,6 +48,9 @@ export const performLogout = async () => {
     }, 500);
 
   } catch (error) {
+    // Clear the flag even on error
+    sessionStorage.removeItem('isLoggingOut');
+    
     // Fallback: clear everything and redirect
     try {
       await signOut({ redirect: false });
@@ -115,6 +118,9 @@ export const logoutUser = async () => {
     window.location.replace('/login');
 
   } catch (error) {
+    // Clear the flag even on error
+    sessionStorage.removeItem('isLoggingOut');
+    
     // Fallback: clear everything and redirect
     try {
       await signOut({ redirect: false });
