@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { AuthService } from "@/lib/auth";
 
 // Force dynamic rendering - required for API routes
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   try {
@@ -33,6 +33,11 @@ export async function GET(request: NextRequest) {
         profileCompleted: user.profileCompleted,
         provider: user.provider,
         password: !!user.password, // Boolean indicating if password exists
+        // Include complete profile data to prevent data loss
+        phone: user.phone,
+        phoneCc: user.phoneCc,
+        companyName: user.companyName,
+        address: user.address,
       },
     });
   } catch (error) {

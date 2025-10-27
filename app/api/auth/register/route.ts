@@ -7,7 +7,7 @@ import { InputValidator } from "@/lib/validation";
 import crypto from "crypto";
 
 // Force dynamic rendering - required for API routes
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
@@ -117,6 +117,11 @@ export async function POST(request: NextRequest) {
         role: user.role,
         isActivated: user.isActivated,
         profileCompleted: user.profileCompleted,
+        // Include complete profile data to prevent data loss
+        phone: user.phone,
+        phoneCc: user.phoneCc,
+        companyName: user.companyName,
+        address: user.address,
       },
     });
   } catch (error) {

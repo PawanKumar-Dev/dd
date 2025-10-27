@@ -4,7 +4,7 @@ import User from "@/models/User";
 import { AuthService } from "@/lib/auth";
 
 // Force dynamic rendering - required for API routes
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
 
     // Generate JWT token for immediate login
     const jwtToken = AuthService.generateToken({
-      userId: user._id?.toString() || '',
+      userId: user._id?.toString() || "",
       email: user.email,
       role: user.role,
     });
@@ -72,6 +72,11 @@ export async function POST(request: NextRequest) {
         role: user.role,
         isActivated: user.isActivated,
         profileCompleted: user.profileCompleted,
+        // Include complete profile data to prevent data loss
+        phone: user.phone,
+        phoneCc: user.phoneCc,
+        companyName: user.companyName,
+        address: user.address,
       },
     });
   } catch (error) {

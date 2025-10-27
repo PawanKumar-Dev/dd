@@ -5,7 +5,7 @@ import { AuthService } from "@/lib/auth";
 import { rateLimiters } from "@/lib/rate-limit";
 
 // Force dynamic rendering - required for API routes
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     // Generate token with remember me option
     const token = AuthService.generateToken(
       {
-        userId: user._id?.toString() || '',
+        userId: user._id?.toString() || "",
         email: user.email,
         role: user.role,
       },
@@ -98,6 +98,12 @@ export async function POST(request: NextRequest) {
         role: user.role,
         isActivated: user.isActivated,
         isActive: user.isActive,
+        profileCompleted: user.profileCompleted,
+        // Include complete profile data to prevent data loss
+        phone: user.phone,
+        phoneCc: user.phoneCc,
+        companyName: user.companyName,
+        address: user.address,
       },
     });
   } catch (error) {
