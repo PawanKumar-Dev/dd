@@ -157,8 +157,13 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
     try {
       let searchTlds: string[] = [];
 
-      if (searchMode === 'single' || validation.suggestedTld) {
-        // Single domain search
+      // Determine if this should be a single or multiple TLD search
+      // If user provided a TLD (e.g., "example.com"), search only that domain
+      // If user provided just a name (e.g., "example"), search multiple TLDs
+      const shouldSearchMultipleTlds = !validation.suggestedTld;
+
+      if (!shouldSearchMultipleTlds) {
+        // Single domain search - user specified a TLD
         const domainToSearch = searchTerm;
 
         const response = await fetch('/api/domains/search', {

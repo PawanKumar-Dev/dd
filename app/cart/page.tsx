@@ -397,10 +397,23 @@ export default function CartPage() {
 
                   <button
                     onClick={handleCheckout}
-                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 mb-4 flex items-center justify-center space-x-2"
+                    disabled={user && !user.profileCompleted}
+                    className={`w-full font-semibold py-3 px-4 rounded-lg transition-all duration-200 mb-4 flex items-center justify-center space-x-2 ${
+                      user && !user.profileCompleted
+                        ? 'bg-gray-400 cursor-not-allowed opacity-60'
+                        : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-xl transform hover:scale-105'
+                    }`}
+                    title={user && !user.profileCompleted ? 'Complete your profile first' : ''}
                   >
                     <CreditCard className="h-5 w-5" />
-                    <span>{user ? 'Proceed to Checkout' : 'Login to Checkout'}</span>
+                    <span>
+                      {!user 
+                        ? 'Login to Checkout' 
+                        : user.profileCompleted 
+                          ? 'Proceed to Checkout' 
+                          : 'Complete Profile First'
+                      }
+                    </span>
                   </button>
 
 
