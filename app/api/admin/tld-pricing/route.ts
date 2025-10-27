@@ -67,9 +67,14 @@ export async function GET(request: NextRequest) {
       margin?: number;
     }> = [];
 
-    if (pricingData && pricingData.customerPricing) {
+    if (
+      pricingData &&
+      pricingData.customerPricing &&
+      pricingData.resellerPricing
+    ) {
       // Process customer pricing data
       const customerPricing = pricingData.customerPricing;
+      const resellerPricing = pricingData.resellerPricing;
 
       // Common TLDs to display
       const commonTlds = [
@@ -142,13 +147,20 @@ export async function GET(request: NextRequest) {
         "gl",
       ];
 
+      // Process pricing data that was already fetched
       for (const tld of commonTlds) {
         try {
-          const tldData = await PricingService.getTLDPricing([tld]);
+          // Use the already-fetched pricing data instead of making individual API calls
+          const customerTldData = customerPricing[tld];
+          const resellerTldData = resellerPricing[tld];
 
-          if (tldData && tldData[tld]) {
-            const customerPrice = parseFloat(tldData[tld].price) || 0;
-            const resellerPrice = parseFloat(tldData[tld].resellerPrice) || 0;
+          if (customerTldData || resellerTldData) {
+            const customerPrice = customerTldData
+              ? parseFloat(customerTldData["1"] || customerTldData.price || "0")
+              : 0;
+            const resellerPrice = resellerTldData
+              ? parseFloat(resellerTldData["1"] || resellerTldData.price || "0")
+              : 0;
 
             const margin =
               customerPrice > 0 && resellerPrice > 0
@@ -159,17 +171,15 @@ export async function GET(request: NextRequest) {
               tld: `.${tld}`,
               customerPrice: customerPrice,
               resellerPrice: resellerPrice,
-              currency: tldData[tld].currency || "INR",
+              currency: "INR",
               category: getTldCategory(tld),
               description: getTldDescription(tld),
               margin: margin,
             });
-
-            // Individual TLD processing logged in summary
           }
         } catch (error) {
           console.warn(
-            `⚠️ [ADMIN] Failed to fetch pricing for TLD: ${tld}`,
+            `⚠️ [ADMIN] Failed to process pricing for TLD: ${tld}`,
             error
           );
         }
