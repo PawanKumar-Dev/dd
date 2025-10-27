@@ -241,20 +241,40 @@ export default function CheckoutPage() {
             if (verifyResponse.ok) {
               const {
                 successfulDomains,
+                pendingDomains,
+                failedDomains,
                 orderId,
                 invoiceNumber,
-                registrationResults
+                registrationResults,
+                paymentStatus,
+                domainRegistrationStatus,
+                requiresSupport
               } = verifyData;
+
+              // Determine overall status based on payment and domain registration
+              let overallStatus = 'success';
+              let statusMessage = verifyData.message || 'Payment successful!';
+
+              // If domains are pending, show appropriate message
+              if (pendingDomains && pendingDomains.length > 0) {
+                statusMessage = 'Payment successful! Domain registration is being processed by our team.';
+              }
 
               // Store payment result in session storage for cleaner URL
               const paymentResult = {
-                status: 'success',
+                status: overallStatus,
                 orderId: orderId || '',
                 invoiceNumber: invoiceNumber || '',
                 successfulDomains: successfulDomains || [],
+                pendingDomains: pendingDomains || [],
+                failedDomains: failedDomains || [],
                 registrationResults: registrationResults || [],
                 amount: getTotalPrice(),
                 currency: 'INR',
+                paymentStatus: paymentStatus || 'success',
+                domainRegistrationStatus: domainRegistrationStatus || 'completed',
+                message: statusMessage,
+                requiresSupport: requiresSupport || false,
                 timestamp: Date.now()
               };
 
