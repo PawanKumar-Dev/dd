@@ -22,6 +22,7 @@ export interface IOrder extends Document {
         | "customer_created"
         | "contact_created"
         | "domain_registering"
+        | "domain_pending"
         | "domain_registered"
         | "domain_failed"
         | "dns_activated";
@@ -130,6 +131,7 @@ const OrderSchema = new Schema<IOrder>(
                 "customer_created",
                 "contact_created",
                 "domain_registering",
+                "domain_pending",
                 "domain_registered",
                 "domain_failed",
                 "dns_activated",

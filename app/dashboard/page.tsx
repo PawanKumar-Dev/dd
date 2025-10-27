@@ -43,7 +43,7 @@ export default function UserDashboard() {
   const routerRef = useRef(router);
   routerRef.current = router;
   const { items: cartItems } = useCartStore();
-  
+
   // Track if initialization has run to prevent double execution
   const hasInitialized = useRef(false);
 
@@ -51,32 +51,27 @@ export default function UserDashboard() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       sessionStorage.removeItem('isLoggingOut');
-      console.log('🧹 [Dashboard] Cleared isLoggingOut flag on mount');
     }
   }, []);
 
   // Define logout function inline to ensure it's always available
   // Memoized with empty deps to ensure stable reference across re-renders
   const handleLogout = useCallback(async () => {
-    console.log('🚪 [Dashboard] handleLogout CALLED');
-
     // Prevent multiple logout attempts
     if (typeof window !== 'undefined') {
       const alreadyLoggingOut = sessionStorage.getItem('isLoggingOut');
       if (alreadyLoggingOut === 'true') {
-        console.log('⚠️ [Dashboard] Logout already in progress, ignoring...');
         return;
       }
     }
 
     try {
-      console.log('🔐 [Dashboard] Setting isLoggingOut flag...');
       sessionStorage.setItem('isLoggingOut', 'true');
 
       try {
         await signOut({ redirect: false });
       } catch (err) {
-        console.warn('SignOut error:', err);
+        // Silent error handling
       }
 
       localStorage.removeItem('token');
@@ -100,12 +95,10 @@ export default function UserDashboard() {
       });
 
       toast.success('Logged out successfully');
-      console.log('✅ [Dashboard] Redirecting to login...');
 
       // Use replace() for hard redirect (prevents back button issues)
       window.location.replace('/login');
     } catch (error) {
-      console.error('❌ [Dashboard] Logout error:', error);
       // Clear the flag even on error
       sessionStorage.removeItem('isLoggingOut');
       // Force redirect even on error
@@ -113,42 +106,30 @@ export default function UserDashboard() {
     }
   }, []);
 
-  // Debug: Track handleLogout creation and stability
+  // Track handleLogout creation and stability
   const handleLogoutRef = useRef(handleLogout);
   useEffect(() => {
     if (handleLogoutRef.current !== handleLogout) {
-      console.log('🎯 [Dashboard] handleLogout reference changed - This should only happen once!');
       handleLogoutRef.current = handleLogout;
     }
   }, [handleLogout]);
-
-  // Debug: Log component render cycle
-  const renderCount = useRef(0);
-  renderCount.current++;
-  console.log(`🎨 [Dashboard] Render #${renderCount.current} - user: ${!!user}, isAuthLoading: ${isAuthLoading}, isLoading: ${isLoading}`);
 
   // Single initialization effect that runs once
   useEffect(() => {
     // Prevent double execution
     if (hasInitialized.current) {
-      console.log('⚠️ [Dashboard] Already initialized, skipping...');
       return;
     }
-    
-    console.log('🔐 [Dashboard] initializeAuth called, status:', status);
-    
+
     // Wait for session to be fully loaded
     if (status === 'loading') {
-      console.log('⏳ [Dashboard] Session still loading...');
       return;
     }
-    
+
     hasInitialized.current = true;
-    console.log('✅ [Dashboard] Marking as initialized');
 
     // Check for NextAuth session first
     if (session?.user) {
-      console.log('✅ [Dashboard] NextAuth session found:', session.user.email);
       const userObj = {
         id: (session.user as any).id,
         email: session.user.email || "",
@@ -157,7 +138,6 @@ export default function UserDashboard() {
         role: (session.user as any).role || "user",
       };
 
-      console.log('👤 [Dashboard] Setting user from session:', userObj);
       setUser(userObj);
       setIsAuthLoading(false);
       loadDashboardData(userObj);
@@ -165,28 +145,23 @@ export default function UserDashboard() {
     }
 
     // Fallback to localStorage (for credential login users)
-    console.log('🔍 [Dashboard] Checking localStorage for credentials...');
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
 
     if (!token || !userData) {
-      console.log('❌ [Dashboard] No credentials found, redirecting to login');
       setIsAuthLoading(false);
       routerRef.current.push('/login');
       return;
     }
 
-    console.log('✅ [Dashboard] Credentials found in localStorage');
     const userObj = JSON.parse(userData);
 
     // Redirect admin users to admin dashboard
     if (userObj.role === 'admin') {
-      console.log('👨‍💼 [Dashboard] Admin user detected, redirecting...');
       routerRef.current.push('/admin/dashboard');
       return;
     }
 
-    console.log('👤 [Dashboard] Setting user from localStorage:', userObj);
     setUser(userObj);
     setIsAuthLoading(false);
     loadDashboardData(userObj);
@@ -208,7 +183,6 @@ export default function UserDashboard() {
       }
 
       if (!token) {
-        console.warn('No token available for API call');
         setIsLoading(false);
         return;
       }
@@ -257,23 +231,14 @@ export default function UserDashboard() {
   // Redirect to login if no user after auth completes, but keep UserLayout mounted
   useEffect(() => {
     if (!isAuthLoading && !user) {
-      console.log('❌ [Dashboard] No user after auth complete, redirecting to login');
       routerRef.current.push('/login');
     }
   }, [isAuthLoading, user]);
 
-  // Always render UserLayout to maintain stable component tree
-  console.log('🏗️ [Dashboard] Rendering UserLayout with handleLogout:', {
-    hasHandleLogout: !!handleLogout,
-    handleLogoutType: typeof handleLogout,
-    hasUser: !!user,
-    userEmail: user?.email
-  });
-
   return (
-    <UserLayout 
-      user={user} 
-      onLogout={handleLogout} 
+    <UserLayout
+      user={user}
+      onLogout={handleLogout}
       isLoading={isLoading || isAuthLoading}
     >
       <div className="p-6">

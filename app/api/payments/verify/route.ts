@@ -20,7 +20,7 @@ export const dynamic = "force-dynamic";
 export async function POST(request: NextRequest) {
   let user: any = null;
   let cartItems: any[] = [];
-  
+
   try {
     // Check authentication
     user = await AuthService.getUserFromRequest(request);
@@ -29,11 +29,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const {
-      razorpay_order_id,
-      razorpay_payment_id,
-      razorpay_signature,
-    } = body;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body;
     cartItems = body.cartItems;
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
@@ -384,19 +380,7 @@ export async function POST(request: NextRequest) {
             `⏳ [PAYMENT-VERIFY] Domain registration pending: ${item.domainName} - ${result.message}`
           );
 
-          // Create user-friendly message for pending status
-          const userFriendlyMessage =
-            result.message &&
-            result.message.toLowerCase().includes("order locked for processing")
-              ? "Domain registration is being processed. Our team will complete the registration shortly."
-              : `Domain registration pending: ${result.message}`;
-
-          domainBookingStatus.push({
-            step: "domain_pending" as any,
-            message: userFriendlyMessage,
-            timestamp: new Date(),
-            progress: 50,
-          });
+          // Don't add a separate booking status step for pending - "domain_registering" is sufficient
 
           registrationResults.push({
             domainName: item.domainName,
@@ -450,20 +434,22 @@ export async function POST(request: NextRequest) {
             ? result.message
                 ?.toLowerCase()
                 .includes("already exists in our database")
-              ? "Domain registration is being processed. Our team will complete the registration shortly."
+              ? "Domain registration is being processed."
               : "Domain registration pending due to insufficient balance"
             : `Domain registration failed: ${
                 result.message || "Unknown error"
               }`;
 
-          domainBookingStatus.push({
-            step: isInsufficientBalance
-              ? ("domain_pending" as any)
-              : ("domain_failed" as any),
-            message: statusMessage,
-            timestamp: new Date(),
-            progress: isInsufficientBalance ? 50 : 100,
-          });
+          // Only add booking status for failed registrations, not pending ones
+          // "domain_registering" step is sufficient for pending status
+          if (!isInsufficientBalance) {
+            domainBookingStatus.push({
+              step: "domain_failed" as any,
+              message: statusMessage,
+              timestamp: new Date(),
+              progress: 100,
+            });
+          }
 
           registrationResults.push({
             domainName: item.domainName,
@@ -650,15 +636,28 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Create pending domain records in database
+    // Create or update pending domain records in database (upsert to avoid duplicates)
     if (pendingDomainsToCreate.length > 0) {
       console.log(
-        `📝 [PAYMENT-VERIFY] Creating ${pendingDomainsToCreate.length} pending domain records for admin management`
+        `📝 [PAYMENT-VERIFY] Creating/updating ${pendingDomainsToCreate.length} pending domain records for admin management`
       );
       try {
-        await PendingDomain.insertMany(pendingDomainsToCreate);
+        // Use bulkWrite with upsert to handle duplicates gracefully
+        const bulkOps = pendingDomainsToCreate.map((domain) => ({
+          updateOne: {
+            filter: { domainName: domain.domainName },
+            update: { $set: domain },
+            upsert: true,
+          },
+        }));
+
+        const result = await PendingDomain.bulkWrite(bulkOps);
         console.log(
-          `✅ [PAYMENT-VERIFY] Successfully created ${pendingDomainsToCreate.length} pending domain records`
+          `✅ [PAYMENT-VERIFY] Successfully processed ${
+            result.upsertedCount + result.modifiedCount
+          } pending domain records (${result.upsertedCount} new, ${
+            result.modifiedCount
+          } updated)`
         );
       } catch (error) {
         console.error(
@@ -854,16 +853,23 @@ export async function POST(request: NextRequest) {
           const orderId = `ord_${Date.now()}_${Math.random()
             .toString(36)
             .substring(2, 8)}`;
+
+          // Calculate total amount from cart items
+          const totalAmount = cartItems.reduce(
+            (sum, item) => sum + (item.price || 0),
+            0
+          );
+
           const fallbackOrder = new Order({
             orderId,
             userId: user._id,
             paymentId: `pay_${Date.now()}_${Math.random()
               .toString(36)
               .substring(2, 8)}`,
-            razorpayOrderId: "unknown",
-            razorpayPaymentId: "unknown",
-            razorpaySignature: "unknown",
-            amount: 0,
+            razorpayOrderId: "fallback_order",
+            razorpayPaymentId: "fallback_payment",
+            razorpaySignature: "fallback_signature",
+            amount: totalAmount,
             currency: "INR",
             status: "completed",
             domains: cartItems.map((item) => ({
@@ -884,6 +890,13 @@ export async function POST(request: NextRequest) {
               error: "Domain registration pending - Please contact support",
             })),
             successfulDomains: [],
+            paymentVerification: {
+              verifiedAt: new Date(),
+              paymentStatus: "completed",
+              paymentAmount: totalAmount,
+              paymentCurrency: "INR",
+              razorpayOrderId: "fallback_order",
+            },
           });
 
           await fallbackOrder.save();
@@ -893,14 +906,13 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({
             success: true,
             message:
-              "Payment successful! Domain registration is being processed by our team.",
+              "Payment successful! Domain registration is being processed.",
             orderId: fallbackOrder.orderId,
             invoiceNumber: fallbackOrder.invoiceNumber,
             registrationResults: cartItems.map((item) => ({
               domainName: item.domainName,
               status: "pending",
-              error:
-                "Registration pending - Our team will process this shortly",
+              error: "Registration pending",
             })),
             successfulDomains: [],
             pendingDomains: cartItems.map((item) => item.domainName),
