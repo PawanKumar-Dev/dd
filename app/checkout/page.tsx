@@ -63,6 +63,13 @@ export default function CheckoutPage() {
 
     const userObj = JSON.parse(userData);
 
+    // Immediate check - if profile not completed, redirect immediately
+    if (userObj.profileCompleted === false) {
+      toast.error('Please complete your profile before checkout');
+      router.push(`/dashboard/settings?returnUrl=${encodeURIComponent('/checkout')}`);
+      return;
+    }
+
     // Refresh user data from server to get latest profileCompleted status
     const refreshUserData = async () => {
       try {
