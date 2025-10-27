@@ -277,15 +277,6 @@ export default function UserDashboard() {
       isLoading={isLoading || isAuthLoading}
     >
       <div className="p-6">
-        {/* DEBUG: Add a visible indicator */}
-        <div className={`border px-4 py-3 rounded mb-4 ${
-            !isAuthLoading && !!user
-            ? 'bg-green-100 border-green-400 text-green-700'
-            : 'bg-yellow-100 border-yellow-400 text-yellow-700'
-          }`}>
-          <strong>DEBUG:</strong> UserLayout is rendering - User={user ? 'Yes' : 'No'}, AuthLoading={isAuthLoading ? 'Yes' : 'No'}, DataLoading={isLoading ? 'Yes' : 'No'}
-        </div>
-
         {/* Show loading state if auth is still loading */}
         {isAuthLoading ? (
           <PageLoading page="dashboard" />
