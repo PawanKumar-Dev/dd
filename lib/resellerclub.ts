@@ -863,7 +863,7 @@ export class ResellerClubAPI {
               }
             );
 
-            // Process each TLD individually and fetch live pricing
+            // Process each TLD individually - check actual availability and fetch live pricing
             for (const tld of malformedTlds) {
               if (tld && tld.length > 0) {
                 const cleanDomain = `${baseDomain}.${tld}`;
@@ -871,16 +871,76 @@ export class ResellerClubAPI {
                   `🔧 [PRODUCTION] Processing fixed domain: "${cleanDomain}"`
                 );
 
-                // Try to fetch live pricing for this TLD
-                let price = 0;
-                let currency = "INR";
-                let registrationPeriod = 1;
-                let pricingSource: "live" | "fallback" | "unavailable" =
-                  "unavailable";
+                // STEP 1: Check actual availability for this specific domain
+                let isAvailable = false;
+                let domainStatus = "unknown";
 
                 try {
                   console.log(
-                    `💰 [PRODUCTION] Fetching live pricing for fixed domain ${cleanDomain} (TLD: ${tld})`
+                    `🔍 [PRODUCTION] Checking availability for ${cleanDomain}`
+                  );
+
+                  // Make individual API call to check this specific domain
+                  const availabilityResponse = await api.get(
+                    "/api/domains/available.json",
+                    {
+                      params: {
+                        "domain-name": baseDomain,
+                        tlds: tld,
+                      },
+                    }
+                  );
+
+                  console.log(
+                    `📡 [PRODUCTION] Availability check response for ${cleanDomain}:`,
+                    availabilityResponse.data
+                  );
+
+                  // Parse the response to get actual availability
+                  if (
+                    availabilityResponse.data &&
+                    typeof availabilityResponse.data === "object"
+                  ) {
+                    const domainData = availabilityResponse.data[cleanDomain];
+                    if (domainData && typeof domainData === "object") {
+                      domainStatus = domainData.status || "unknown";
+                      isAvailable = domainStatus === "available";
+
+                      console.log(
+                        `✅ [PRODUCTION] Domain ${cleanDomain} status: ${domainStatus} (available: ${isAvailable})`
+                      );
+                    }
+                  }
+                } catch (error) {
+                  console.error(
+                    `❌ [PRODUCTION] Failed to check availability for ${cleanDomain}:`,
+                    error
+                  );
+                  // Skip this domain if we can't verify availability
+                  continue;
+                }
+
+                // Skip if domain is not available
+                if (!isAvailable) {
+                  console.log(
+                    `⏭️ [PRODUCTION] Skipping ${cleanDomain} - not available (status: ${domainStatus})`
+                  );
+                  continue;
+                }
+
+                // STEP 2: Fetch live pricing only for available domains
+                let price = 0;
+                let currency = "INR";
+                let registrationPeriod = 1;
+                let pricingSource:
+                  | "live"
+                  | "fallback"
+                  | "unavailable"
+                  | "taken" = "unavailable";
+
+                try {
+                  console.log(
+                    `💰 [PRODUCTION] Fetching live pricing for available domain ${cleanDomain} (TLD: ${tld})`
                   );
                   const livePricing = await PricingService.getTLDPricing([tld]);
 
@@ -892,7 +952,7 @@ export class ResellerClubAPI {
                     pricingSource = "live";
 
                     console.log(
-                      `✅ [PRODUCTION] Live pricing for fixed domain ${cleanDomain}: ${price} ${currency}`
+                      `✅ [PRODUCTION] Live pricing for available domain ${cleanDomain}: ${price} ${currency}`
                     );
                   } else {
                     console.warn(
@@ -906,22 +966,22 @@ export class ResellerClubAPI {
                   );
                 }
 
-                // Only add domain if we have valid pricing
+                // Only add domain if it's available AND has valid pricing
                 if (price > 0) {
                   results.push({
                     domainName: cleanDomain,
-                    available: true, // Assume available since API returned unknown status
+                    available: isAvailable,
                     price: price,
                     currency: currency,
                     registrationPeriod: registrationPeriod,
                     pricingSource: pricingSource,
                   });
                   console.log(
-                    `✅ [PRODUCTION] Added fixed domain to results: ${cleanDomain} at ${price} ${currency}`
+                    `✅ [PRODUCTION] Added available domain to results: ${cleanDomain} at ${price} ${currency}`
                   );
                 } else {
                   console.warn(
-                    `⚠️ [PRODUCTION] Skipping fixed domain ${cleanDomain} - no valid pricing`
+                    `⚠️ [PRODUCTION] Skipping ${cleanDomain} - no valid pricing`
                   );
                 }
               }

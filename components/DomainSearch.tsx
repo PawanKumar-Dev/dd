@@ -66,6 +66,9 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
   const [searchMode, setSearchMode] = useState<'single' | 'multiple'>('single');
   const [showRequirementsModal, setShowRequirementsModal] = useState(false);
   const [selectedDomainForRequirements, setSelectedDomainForRequirements] = useState<string>('');
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [searchedTlds, setSearchedTlds] = useState<string[]>([]);
+  const [canLoadMore, setCanLoadMore] = useState(false);
   const { addItem } = useCartStore();
   const router = useRouter();
 
@@ -103,42 +106,33 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
 
   const validateDomainInput = (input: string) => {
     const trimmed = input.trim();
-    console.log('🔎 [validateDomainInput] Input:', { input, trimmed });
 
     if (trimmed.includes('.')) {
       const parts = trimmed.split('.');
-      console.log('🔎 [validateDomainInput] Has dot, parts:', parts);
       if (parts.length >= 2 && parts[0].length > 0 && parts[parts.length - 1].length > 0) {
-        const result = {
+        return {
           isValid: true,
           baseDomain: parts[0],
           suggestedTld: parts.slice(1).join('.')
         };
-        console.log('✅ [validateDomainInput] With TLD:', result);
-        return result;
       }
     }
 
     const domainRegex = /^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$/;
     const matches = domainRegex.test(trimmed);
-    console.log('🔎 [validateDomainInput] Regex test:', { trimmed, matches, length: trimmed.length });
-    
+
     if (matches && trimmed.length >= 2) {
-      const result = {
+      return {
         isValid: true,
         baseDomain: trimmed,
         suggestedTld: null
       };
-      console.log('✅ [validateDomainInput] Without TLD (should trigger multiple):', result);
-      return result;
     }
 
-    const result = {
+    return {
       isValid: false,
       warning: 'Please enter a valid domain name (e.g., "example" or "example.com")'
     };
-    console.log('❌ [validateDomainInput] Invalid:', result);
-    return result;
   };
 
   const getSuggestedTlds = (domain: string) => {
@@ -155,18 +149,17 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
 
     // Validate domain input
     const validation = validateDomainInput(searchTerm);
-    console.log('🔍 [DomainSearch] Validation result:', {
-      searchTerm,
-      validation
-    });
 
     if (!validation.isValid) {
-      const errorMessage = 'warning' in validation ? validation.warning : 'Please enter a valid domain name';
+      const errorMessage = ('warning' in validation ? validation.warning : 'Please enter a valid domain name') || 'Please enter a valid domain name';
       toast.error(errorMessage);
       return;
     }
 
-    setBaseDomain('baseDomain' in validation ? validation.baseDomain : '');
+    // Reset states for new search
+    setSearchedTlds([]);
+    setCanLoadMore(false);
+    setBaseDomain(('baseDomain' in validation ? validation.baseDomain : '') || '');
     setIsSearching(true);
     setHasSearched(true);
     setError(null);
@@ -180,15 +173,8 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
       const suggestedTld = 'suggestedTld' in validation ? validation.suggestedTld : null;
       const shouldSearchMultipleTlds = !suggestedTld;
 
-      console.log('🎯 [DomainSearch] Search mode decision:', {
-        shouldSearchMultipleTlds,
-        hasSuggestedTld: !!suggestedTld,
-        suggestedTld
-      });
-
       if (!shouldSearchMultipleTlds) {
         // Single domain search - user specified a TLD
-        console.log('📍 [DomainSearch] Single domain search mode');
         const domainToSearch = searchTerm;
 
         const response = await fetch('/api/domains/search', {
@@ -226,42 +212,29 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
           }
         }
       } else {
-        // Multiple TLD search - use all suggested TLDs automatically
-        console.log('🌐 [DomainSearch] Multiple TLD search mode');
-        const baseDomain = 'baseDomain' in validation ? validation.baseDomain : '';
-        searchTlds = getSuggestedTlds(baseDomain);
-        
-        console.log('📋 [DomainSearch] TLDs to search:', {
-          baseDomain,
-          tlds: searchTlds,
-          count: searchTlds.length
-        });
+        // Multiple TLD search - ONLY search .com initially for fast results
+        const baseDomain = ('baseDomain' in validation ? validation.baseDomain : '') || '';
+        const primaryTld = '.com'; // Start with .com only
+        setBaseDomain(baseDomain);
+        searchTlds = [primaryTld];
+        setSearchedTlds([primaryTld]);
 
-        const requestBody = {
-          domain: baseDomain,
-          tlds: searchTlds
-        };
-        
-        console.log('🚀 [DomainSearch] API Request:', requestBody);
+        // Check if more TLDs are available for "Show More" button
+        const allTlds = getSuggestedTlds(baseDomain);
+        setCanLoadMore(allTlds.length > 1);
 
         const response = await fetch('/api/domains/search', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(requestBody),
+          body: JSON.stringify({
+            domain: baseDomain,
+            tlds: searchTlds
+          }),
         });
 
         const data = await response.json();
-        
-        console.log('✅ [DomainSearch] Multiple TLD API Response:', {
-          ok: response.ok,
-          status: response.status,
-          success: data.success,
-          resultsCount: data.results?.length || 0,
-          results: data.results,
-          error: data.error
-        });
 
         if (response.ok && data.success) {
           setResults(data.results || []);
@@ -292,6 +265,64 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
       toast.error('Network error. Please check your connection and try again.');
     } finally {
       setIsSearching(false);
+    }
+  };
+
+  const handleLoadMoreSuggestions = async () => {
+    if (!baseDomain || isLoadingMore) return;
+
+    setIsLoadingMore(true);
+
+    try {
+      // Get all available TLDs
+      const allTlds = getSuggestedTlds(baseDomain);
+
+      // Filter out already searched TLDs
+      const remainingTlds = allTlds.filter(tld => !searchedTlds.includes(tld));
+
+      // Take next 3-4 TLDs
+      const tldsToSearch = remainingTlds.slice(0, 4);
+
+      if (tldsToSearch.length === 0) {
+        setCanLoadMore(false);
+        toast('No more TLD suggestions available', {
+          icon: 'ℹ️',
+        });
+        return;
+      }
+
+      const response = await fetch('/api/domains/search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          domain: baseDomain,
+          tlds: tldsToSearch
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Append new results to existing results
+        setResults(prevResults => [...prevResults, ...(data.results || [])]);
+
+        // Update searched TLDs
+        setSearchedTlds(prev => [...prev, ...tldsToSearch]);
+
+        // Check if there are more TLDs to load
+        const newRemainingTlds = remainingTlds.slice(tldsToSearch.length);
+        setCanLoadMore(newRemainingTlds.length > 0);
+
+        toast.success(`Found ${data.results?.length || 0} more suggestions`);
+      } else {
+        toast.error(data.error || 'Failed to load more suggestions');
+      }
+    } catch (error) {
+      toast.error('Failed to load more suggestions. Please try again.');
+    } finally {
+      setIsLoadingMore(false);
     }
   };
 
@@ -345,7 +376,7 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
     // Auto-detect search mode based on input
     const validation = validateDomainInput(value);
     const suggestedTld = 'suggestedTld' in validation ? validation.suggestedTld : null;
-    const baseDomain = 'baseDomain' in validation ? validation.baseDomain : '';
+    const baseDomain = (('baseDomain' in validation ? validation.baseDomain : '') || '');
 
     if (validation.isValid && !suggestedTld) {
       // Domain name without TLD - show multiple TLD suggestions
@@ -377,6 +408,9 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
     setHasSearched(false);
     setError(null);
     setBaseDomain('');
+    setSearchedTlds([]);
+    setCanLoadMore(false);
+    setIsLoadingMore(false);
     setShowTldSuggestions(false);
     setSearchMode('single');
     localStorage.removeItem('domainSearchState');
@@ -704,6 +738,40 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
                   </div>
                 ))}
               </div>
+
+              {/* Show More Suggestions Button */}
+              {canLoadMore && !isLoadingMore && (
+                <div className="mt-6 text-center">
+                  <button
+                    onClick={handleLoadMoreSuggestions}
+                    className="px-6 py-3 rounded-lg font-semibold transition-all duration-200 hover:shadow-md flex items-center gap-2 mx-auto"
+                    style={{
+                      backgroundColor: 'var(--google-bg-tertiary)',
+                      color: 'var(--google-blue)',
+                      border: '2px solid var(--google-blue)',
+                      fontFamily: 'Google Sans, system-ui, sans-serif'
+                    }}
+                  >
+                    <TrendingUp className="h-5 w-5" />
+                    <span>Show More Suggestions</span>
+                  </button>
+                  <p className="text-xs text-[var(--google-text-secondary)] mt-2" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
+                    See more TLD options for "{baseDomain}"
+                  </p>
+                </div>
+              )}
+
+              {/* Loading More Indicator */}
+              {isLoadingMore && (
+                <div className="mt-6 text-center">
+                  <div className="flex items-center justify-center gap-2">
+                    <Loader2 className="h-5 w-5 animate-spin text-[var(--google-blue)]" />
+                    <span className="text-sm text-[var(--google-text-secondary)]" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
+                      Loading more suggestions...
+                    </span>
+                  </div>
+                </div>
+              )}
 
             </div>
           )}
