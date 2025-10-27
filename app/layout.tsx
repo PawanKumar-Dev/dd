@@ -34,9 +34,15 @@ export default function RootLayout({
           {children}
         </SessionProvider>
         <Toaster 
-          position="top-right"
+          position="bottom-right"
+          containerStyle={{
+            bottom: '80px',
+            right: '80px',
+          }}
+          containerClassName="toast-container"
           toastOptions={{
             duration: 4000,
+            className: 'toast-notification',
             style: {
               background: '#fff',
               color: '#363636',

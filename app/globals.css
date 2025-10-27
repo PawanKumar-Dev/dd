@@ -289,3 +289,24 @@
 .animate-leave {
   animation: animate-leave 0.15s ease-in forwards;
 }
+
+/* Toast Container Positioning - Bottom Right */
+.toast-container {
+  z-index: 40 !important;
+  position: fixed !important;
+  bottom: 80px !important;
+  right: 80px !important;
+  top: auto !important;
+}
+
+/* Individual Toast Notification */
+.toast-notification {
+  z-index: 40 !important;
+  pointer-events: auto !important;
+}
+
+/* Ensure toasts don't block interactive elements */
+[data-sonner-toaster],
+[data-react-hot-toast] {
+  z-index: 40 !important;
+}
