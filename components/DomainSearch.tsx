@@ -383,47 +383,14 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
           </div>
 
 
-          {searchMode === 'multiple' && baseDomain && (
-            <div className="space-y-4 sm:space-y-6 bg-gray-50 rounded-xl p-4 sm:p-6 border-2 border-gray-200">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="flex items-center gap-3 text-sm text-gray-800 bg-blue-100 px-4 py-3 rounded-lg font-medium" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
-                  <TrendingUp className="h-5 w-5 flex-shrink-0 text-blue-600" />
-                  <span className="text-sm">We'll search all popular domain extensions for you</span>
-                </div>
+          {searchMode === 'multiple' && baseDomain && !hasSearched && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-center gap-3">
+                <TrendingUp className="h-5 w-5 flex-shrink-0 text-blue-600" />
+                <p className="text-sm text-gray-800 font-medium" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
+                  We'll search all popular domain extensions for you
+                </p>
               </div>
-
-              {/* Top TLD Suggestions */}
-              <div className="bg-white rounded-xl p-4 sm:p-5 shadow-md border-2 border-gray-200">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="p-3 bg-blue-100 rounded-xl flex-shrink-0">
-                      <Star className="h-5 w-5 text-blue-600" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="font-semibold text-gray-900 text-lg sm:text-xl" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
-                        Popular Extensions
-                      </h3>
-                      <p className="text-sm text-gray-600" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
-                        We'll search these 7 popular domain extensions
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                  {TOP_TLDS.filter(tld => !isRestrictedTLD(tld)).map((tld) => (
-                    <div
-                      key={tld}
-                      className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white shadow-md"
-                      style={{
-                        fontFamily: 'Google Sans, system-ui, sans-serif'
-                      }}
-                    >
-                      {tld}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
             </div>
           )}
         </form>
