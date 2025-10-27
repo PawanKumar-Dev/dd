@@ -829,11 +829,110 @@ export class ResellerClubAPI {
         });
 
         for (const [domain, data] of Object.entries(response.data)) {
-          // Validate domain name format and base domain match
+          // Check if domain name is malformed (contains commas or other issues) FIRST
+          // This happens when ResellerClub returns a concatenated key like "excelpro.com,net,org"
+          if (domain.includes(",")) {
+            console.warn(
+              `⚠️ [PRODUCTION] Malformed domain name detected: "${domain}"`
+            );
+
+            // Try to split and process individual domains
+            const baseDomain = domainName; // This should be the base domain, not the full domain
+            const parts = domain.split(",").map((part) => part.trim());
+
+            // Extract TLDs: First part is "basedomain.tld", rest are just "tld"
+            // e.g., "excelpro.com,net,org" -> ["excelpro.com", "net", "org"]
+            const malformedTlds: string[] = [];
+
+            if (parts.length > 0 && parts[0].includes(".")) {
+              // Extract TLD from first part (e.g., "excelpro.com" -> "com")
+              const firstTld = parts[0].split(".").slice(1).join(".");
+              if (firstTld) malformedTlds.push(firstTld);
+
+              // Add remaining TLDs
+              malformedTlds.push(...parts.slice(1));
+            }
+
+            console.log(
+              `🔧 [PRODUCTION] Attempting to fix malformed response:`,
+              {
+                baseDomain,
+                malformedTlds,
+                originalDomain: domain,
+                parsedParts: parts,
+              }
+            );
+
+            // Process each TLD individually and fetch live pricing
+            for (const tld of malformedTlds) {
+              if (tld && tld.length > 0) {
+                const cleanDomain = `${baseDomain}.${tld}`;
+                console.log(
+                  `🔧 [PRODUCTION] Processing fixed domain: "${cleanDomain}"`
+                );
+
+                // Try to fetch live pricing for this TLD
+                let price = 0;
+                let currency = "INR";
+                let registrationPeriod = 1;
+                let pricingSource: "live" | "fallback" | "unavailable" =
+                  "unavailable";
+
+                try {
+                  console.log(
+                    `💰 [PRODUCTION] Fetching live pricing for fixed domain ${cleanDomain} (TLD: ${tld})`
+                  );
+                  const livePricing = await PricingService.getTLDPricing([tld]);
+
+                  if (livePricing && livePricing[tld]) {
+                    price = parseFloat(livePricing[tld].price) || 0;
+                    currency = livePricing[tld].currency || "INR";
+                    registrationPeriod =
+                      livePricing[tld].registrationPeriod || 1;
+                    pricingSource = "live";
+
+                    console.log(
+                      `✅ [PRODUCTION] Live pricing for fixed domain ${cleanDomain}: ${price} ${currency}`
+                    );
+                  } else {
+                    console.warn(
+                      `⚠️ [PRODUCTION] No live pricing available for TLD: ${tld}`
+                    );
+                  }
+                } catch (error) {
+                  console.error(
+                    `❌ [PRODUCTION] Failed to fetch pricing for TLD ${tld}:`,
+                    error
+                  );
+                }
+
+                // Only add domain if we have valid pricing
+                if (price > 0) {
+                  results.push({
+                    domainName: cleanDomain,
+                    available: true, // Assume available since API returned unknown status
+                    price: price,
+                    currency: currency,
+                    registrationPeriod: registrationPeriod,
+                    pricingSource: pricingSource,
+                  });
+                  console.log(
+                    `✅ [PRODUCTION] Added fixed domain to results: ${cleanDomain} at ${price} ${currency}`
+                  );
+                } else {
+                  console.warn(
+                    `⚠️ [PRODUCTION] Skipping fixed domain ${cleanDomain} - no valid pricing`
+                  );
+                }
+              }
+            }
+            continue;
+          }
+
+          // Now validate domain name format and base domain match for normal cases
           const domainParts = domain.split(".");
           const isValidFormat =
             domainParts.length >= 2 && // Allow multi-level TLDs like .co.in, .co.uk
-            !domain.includes(",") &&
             !domain.includes("..") &&
             domainParts[0].length > 0 &&
             domainParts[domainParts.length - 1].length > 0; // Check last part (TLD)
@@ -849,81 +948,6 @@ export class ResellerClubAPI {
             continue;
           }
 
-          // Check if domain name is malformed (contains commas or other issues)
-          if (
-            domain.includes(",") ||
-            domain.includes("..") ||
-            domainParts.length < 2
-          ) {
-            console.warn(
-              `⚠️ [PRODUCTION] Malformed domain name detected: "${domain}"`
-            );
-
-            // Try to split and process individual domains
-            const baseDomain = domainName; // This should be the base domain, not the full domain
-            const malformedTlds = domain.split(",").map((part) => part.trim());
-
-            console.log(
-              `🔧 [PRODUCTION] Attempting to fix malformed response:`,
-              {
-                baseDomain,
-                malformedTlds,
-                originalDomain: domain,
-              }
-            );
-
-            // Process each TLD individually
-            for (const tld of malformedTlds) {
-              if (tld && tld.length > 0) {
-                const cleanDomain = `${baseDomain}.${tld}`;
-                console.log(
-                  `🔧 [PRODUCTION] Processing fixed domain: "${cleanDomain}"`
-                );
-
-                // Use fallback pricing for fixed domains
-                const fallbackPrices: {
-                  [key: string]: { price: number; currency: string };
-                } = {
-                  com: { price: 12.99, currency: "INR" },
-                  net: { price: 14.99, currency: "INR" },
-                  org: { price: 13.99, currency: "INR" },
-                  info: { price: 15.99, currency: "INR" },
-                  biz: { price: 16.99, currency: "INR" },
-                  co: { price: 18.99, currency: "INR" },
-                  in: { price: 8.99, currency: "INR" },
-                  "co.in": { price: 9.99, currency: "INR" },
-                  shop: { price: 19.99, currency: "INR" },
-                  store: { price: 19.99, currency: "INR" },
-                  online: { price: 24.99, currency: "INR" },
-                  site: { price: 17.99, currency: "INR" },
-                  website: { price: 22.99, currency: "INR" },
-                  app: { price: 29.99, currency: "INR" },
-                  dev: { price: 19.99, currency: "INR" },
-                  io: { price: 39.99, currency: "INR" },
-                  ai: { price: 49.99, currency: "INR" },
-                  tech: { price: 24.99, currency: "INR" },
-                  digital: { price: 19.99, currency: "INR" },
-                  cloud: { price: 24.99, currency: "INR" },
-                  host: { price: 19.99, currency: "INR" },
-                  space: { price: 17.99, currency: "INR" },
-                };
-
-                const fallback = fallbackPrices[tld] || {
-                  price: 12.99,
-                  currency: "INR",
-                };
-
-                results.push({
-                  domainName: cleanDomain,
-                  available: true, // Assume available for fixed domains
-                  price: fallback.price,
-                  currency: fallback.currency,
-                  registrationPeriod: 1,
-                });
-              }
-            }
-            continue;
-          }
           if (typeof data === "object" && data !== null) {
             const domainData = data as any;
             // Determine domain availability based on status

@@ -4,7 +4,7 @@ import { InputValidator } from "@/lib/validation";
 import { isRestrictedTLD } from "@/lib/domainRequirements";
 
 // Force dynamic rendering - required for API routes
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   const requestId = Math.random().toString(36).substring(7);
@@ -74,10 +74,25 @@ export async function POST(request: NextRequest) {
       baseDomain = domain;
 
       // Use provided TLDs or default to .com
-      if (tlds && typeof tlds === "string") {
-        searchTlds = tlds.split(",").map((tld) => tld.trim());
+      if (tlds && Array.isArray(tlds)) {
+        // Frontend sends array of TLDs with dots like ['.com', '.net', '.org']
+        searchTlds = tlds.map((tld) => tld.replace(/^\./, "").trim()); // Remove leading dots
+        console.log(`📋 [API-${requestId}] Parsed TLDs from array:`, {
+          received: tlds,
+          parsed: searchTlds,
+        });
+      } else if (tlds && typeof tlds === "string") {
+        // Handle comma-separated string for backward compatibility
+        searchTlds = tlds
+          .split(",")
+          .map((tld) => tld.replace(/^\./, "").trim());
+        console.log(`📋 [API-${requestId}] Parsed TLDs from string:`, {
+          received: tlds,
+          parsed: searchTlds,
+        });
       } else {
         searchTlds = ["com"]; // Default to .com only
+        console.log(`📋 [API-${requestId}] Using default TLD: com`);
       }
 
       // Filter out restricted TLDs and warn user
