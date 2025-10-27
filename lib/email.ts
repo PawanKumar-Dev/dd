@@ -346,34 +346,64 @@ export class EmailService {
   ): Promise<boolean> {
     // Determine email subject and status based on registration results
     const hasSuccessfulDomains = orderData.successfulDomains.length > 0;
+    const hasPendingDomains = orderData.allDomains.some(
+      (d) => d.status === "pending"
+    );
+    const hasOnlyPendingOrSuccessful = orderData.allDomains.every(
+      (d) => d.status === "pending" || d.status === "registered"
+    );
 
     let subject: string;
     let statusMessage: string;
     let headerColor: string;
     let headerTitle: string;
 
-    if (hasSuccessfulDomains) {
+    if (hasSuccessfulDomains && !hasPendingDomains) {
       // Complete success
       subject = `Order Confirmation - ${orderData.invoiceNumber}`;
       statusMessage =
         "Your order has been processed successfully. All domains have been registered.";
       headerColor = "#10b981"; // Green
       headerTitle = "Order Confirmation";
-    } else {
-      // Complete failure
-      subject = `Order Failed - ${orderData.invoiceNumber}`;
+    } else if (hasPendingDomains && hasOnlyPendingOrSuccessful) {
+      // Payment successful, domains are being processed
+      subject = `Payment Successful - ${orderData.invoiceNumber}`;
       statusMessage =
-        "We encountered issues while processing your order. None of the domains could be registered.";
-      headerColor = "#ef4444"; // Red
-      headerTitle = "Order Failed";
+        "Your payment has been received successfully! Your domain registration is being processed and will be completed shortly.";
+      headerColor = "#3b82f6"; // Blue
+      headerTitle = "Payment Successful";
+    } else if (hasSuccessfulDomains && hasPendingDomains) {
+      // Mixed: some successful, some pending
+      subject = `Payment Successful - ${orderData.invoiceNumber}`;
+      statusMessage =
+        "Your payment has been received successfully! Some domains have been registered, while others are being processed.";
+      headerColor = "#3b82f6"; // Blue
+      headerTitle = "Payment Successful";
+    } else {
+      // Complete failure (should not happen with successful payment)
+      subject = `Payment Received - ${orderData.invoiceNumber}`;
+      statusMessage =
+        "Your payment has been received. We encountered issues with domain registration. Our team will contact you shortly.";
+      headerColor = "#f59e0b"; // Orange/Amber
+      headerTitle = "Payment Received";
     }
 
     const allDomainsList = orderData.allDomains
       .map((domain) => {
-        const statusColor =
-          domain.status === "registered" ? "#10b981" : "#ef4444";
-        const statusText =
-          domain.status === "registered" ? "✅ Registered" : "❌ Failed";
+        let statusColor: string;
+        let statusText: string;
+
+        if (domain.status === "registered") {
+          statusColor = "#10b981"; // Green
+          statusText = "✅ Registered";
+        } else if (domain.status === "pending") {
+          statusColor = "#3b82f6"; // Blue
+          statusText = "🔄 Processing";
+        } else {
+          statusColor = "#ef4444"; // Red
+          statusText = "⚠️ Contact Support";
+        }
+
         return `
         <tr>
           <td style="padding: 8px; border-bottom: 1px solid #e5e7eb;">
@@ -405,7 +435,7 @@ export class EmailService {
         <div style="background: linear-gradient(135deg, ${headerColor}, ${headerColor}dd); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
           <h1 style="margin: 0; font-size: 28px;">${headerTitle}</h1>
           <p style="margin: 10px 0 0 0; opacity: 0.9;">${
-            hasSuccessfulDomains
+            hasSuccessfulDomains || hasPendingDomains
               ? "Thank you for your purchase!"
               : "We apologize for the inconvenience."
           }</p>

@@ -98,9 +98,24 @@ export default function UserSettings() {
           const data = await response.json();
           setSettings(data);
 
-          // Update user data with profile information
+          // Update user data with profile information - map flat structure to nested
           if (data.profile) {
-            setUser(prev => prev ? { ...prev, ...data.profile } : null);
+            setUser(prev => prev ? {
+              ...prev,
+              firstName: data.profile.firstName || prev.firstName,
+              lastName: data.profile.lastName || prev.lastName,
+              email: data.profile.email || prev.email,
+              phone: data.profile.phone || prev.phone,
+              phoneCc: prev.phoneCc || '+91',
+              companyName: data.profile.company || prev.companyName,
+              address: {
+                line1: data.profile.address || prev.address?.line1 || '',
+                city: data.profile.city || prev.address?.city || '',
+                state: data.profile.state || prev.address?.state || '',
+                country: data.profile.country || prev.address?.country || 'IN',
+                zipcode: data.profile.zipCode || prev.address?.zipcode || '',
+              }
+            } : null);
           }
         } else {
           // Use default settings
@@ -108,6 +123,7 @@ export default function UserSettings() {
         }
 
         // Check if user has existing password (credential user vs social login)
+        // Also refresh complete user data from database
         const meResponse = await fetch('/api/auth/me', {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -116,6 +132,22 @@ export default function UserSettings() {
         if (meResponse.ok) {
           const meData = await meResponse.json();
           setHasExistingPassword(!!meData.user?.password || meData.user?.provider === 'credentials');
+
+          // Update user state with complete data from database
+          if (meData.user) {
+            setUser(prev => ({
+              ...prev,
+              ...meData.user,
+              // Ensure id is set
+              id: meData.user.id || prev?.id,
+            }));
+
+            // Update localStorage with fresh data
+            localStorage.setItem('user', JSON.stringify({
+              ...JSON.parse(localStorage.getItem('user') || '{}'),
+              ...meData.user,
+            }));
+          }
         }
       } catch (error) {
 

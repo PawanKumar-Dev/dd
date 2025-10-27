@@ -299,7 +299,7 @@ export default function UserDashboard() {
                             {domain.status}
                           </span>
                           <p className="text-xs text-gray-500 mt-1">
-                            {domain.status === 'pending' ? 'Awaiting registration' : `Expires ${domain.expiryDate}`}
+                            {domain.status === 'pending' ? 'Processing' : `Expires ${domain.expiryDate}`}
                           </p>
                         </div>
                       </div>
