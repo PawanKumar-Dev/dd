@@ -7,6 +7,7 @@ import Input from './Input';
 import Card from './Card';
 import Logo from './Logo';
 import toast from 'react-hot-toast';
+import { useRecaptcha } from '@/hooks/useRecaptcha';
 
 interface ForgotPasswordFormProps {
   className?: string;
@@ -17,6 +18,7 @@ export default function ForgotPasswordForm({ className = '' }: ForgotPasswordFor
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState('');
+  const { executeRecaptcha } = useRecaptcha();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,12 +26,15 @@ export default function ForgotPasswordForm({ className = '' }: ForgotPasswordFor
     setError(''); // Clear previous errors
 
     try {
+      // Get reCAPTCHA token
+      const recaptchaToken = await executeRecaptcha('forgot_password');
+
       const response = await fetch('/api/auth/forgot-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, recaptchaToken }),
       });
 
       const data = await response.json();

@@ -8,6 +8,7 @@ import Textarea from './Textarea';
 import Card from './Card';
 import toast from 'react-hot-toast';
 import { showSuccessToast, showErrorToast } from '@/lib/toast';
+import { useRecaptcha } from '@/hooks/useRecaptcha';
 
 interface ContactFormProps {
   className?: string;
@@ -22,18 +23,25 @@ export default function ContactForm({ className = '' }: ContactFormProps) {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const { executeRecaptcha } = useRecaptcha();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
+      // Get reCAPTCHA token
+      const recaptchaToken = await executeRecaptcha('contact');
+
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          recaptchaToken,
+        }),
       });
 
       const data = await response.json();

@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
 import { EmailService } from "@/lib/email";
+import { RecaptchaServer } from "@/lib/recaptcha";
 import crypto from "crypto";
 import { rateLimiters } from "@/lib/rate-limit";
 
 // Force dynamic rendering - required for API routes
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,10 +23,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email } = await request.json();
+    const { email, recaptchaToken } = await request.json();
 
     if (!email) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
+    }
+
+    // Verify reCAPTCHA token
+    const recaptchaResult = await RecaptchaServer.verifyToken(
+      recaptchaToken,
+      "forgot_password",
+      0.5 // Minimum score for password reset
+    );
+
+    if (!recaptchaResult.success) {
+      console.warn(
+        "reCAPTCHA verification failed for forgot password:",
+        recaptchaResult.error
+      );
+      return NextResponse.json(
+        { error: "Security verification failed. Please try again." },
+        { status: 403 }
+      );
     }
 
     await connectDB();

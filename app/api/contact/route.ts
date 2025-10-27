@@ -1,13 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
 import { EmailService } from "@/lib/email";
 import { InputValidator } from "@/lib/validation";
+import { RecaptchaServer } from "@/lib/recaptcha";
 
 // Force dynamic rendering - required for API routes
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, email, subject, message } = await request.json();
+    const { name, email, subject, message, recaptchaToken } =
+      await request.json();
+
+    // Verify reCAPTCHA token
+    const recaptchaResult = await RecaptchaServer.verifyToken(
+      recaptchaToken,
+      "contact",
+      0.5 // Minimum score for contact form
+    );
+
+    if (!recaptchaResult.success) {
+      console.warn(
+        "reCAPTCHA verification failed for contact form:",
+        recaptchaResult.error
+      );
+      return NextResponse.json(
+        { error: "Security verification failed. Please try again." },
+        { status: 403 }
+      );
+    }
 
     // Validate all inputs
     const nameValidation = InputValidator.validateName(name, "Name");
@@ -64,13 +84,17 @@ export async function POST(request: NextRequest) {
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #3b82f6;">Thank you for contacting us!</h2>
-          <p>Hello ${InputValidator.sanitizeHtml(nameValidation.sanitized || name)},</p>
+          <p>Hello ${InputValidator.sanitizeHtml(
+            nameValidation.sanitized || name
+          )},</p>
           <p>We have received your message regarding "${InputValidator.sanitizeHtml(
             subjectValidation.sanitized || subject
           )}" and will get back to you within 24 hours.</p>
           <p>Your message:</p>
           <div style="background-color: #f3f4f6; padding: 15px; border-radius: 6px; margin: 20px 0;">
-            ${InputValidator.sanitizeHtml(messageValidation.sanitized || message)}
+            ${InputValidator.sanitizeHtml(
+              messageValidation.sanitized || message
+            )}
           </div>
           <p>If you have any urgent questions, please call us at +91-777-888-9674.</p>
           <br>

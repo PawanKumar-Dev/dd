@@ -1,19 +1,38 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
+import { RecaptchaServer } from "@/lib/recaptcha";
 import bcrypt from "bcryptjs";
 
 // Force dynamic rendering - required for API routes
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
-    const { token, password } = await request.json();
+    const { token, password, recaptchaToken } = await request.json();
 
     if (!token || !password) {
       return NextResponse.json(
         { error: "Token and password are required" },
         { status: 400 }
+      );
+    }
+
+    // Verify reCAPTCHA token
+    const recaptchaResult = await RecaptchaServer.verifyToken(
+      recaptchaToken,
+      "reset_password",
+      0.5 // Minimum score for password reset
+    );
+
+    if (!recaptchaResult.success) {
+      console.warn(
+        "reCAPTCHA verification failed for password reset:",
+        recaptchaResult.error
+      );
+      return NextResponse.json(
+        { error: "Security verification failed. Please try again." },
+        { status: 403 }
       );
     }
 

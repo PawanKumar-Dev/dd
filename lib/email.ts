@@ -533,7 +533,7 @@ export class EmailService {
           </div>
 
           <!-- Support Information -->
-          <div style="border-top: 1px solid #e5e7eb; padding-top: 20px; margin-top: 30px;">
+          <div style="border-top: 1px solid #e5e7eb; padding-top: 20px; margin-top: 30px; text-align: center;">
             <p style="color: #6b7280; font-size: 14px; margin: 0 0 10px 0;">Need help? Contact our support team:</p>
             <p style="color: #6b7280; font-size: 14px; margin: 0;">Email: <a href="mailto:support@exceltechnologies.com" style="color: #3b82f6;">support@exceltechnologies.com</a></p>
           </div>

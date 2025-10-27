@@ -9,6 +9,7 @@ import Card from './Card';
 import Logo from './Logo';
 import SocialLoginButtons from './SocialLoginButtons';
 import toast from 'react-hot-toast';
+import { useRecaptcha } from '@/hooks/useRecaptcha';
 
 interface RegisterFormProps {
   className?: string;
@@ -39,6 +40,7 @@ export default function RegisterForm({ className = '' }: RegisterFormProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const router = useRouter();
+  const { executeRecaptcha } = useRecaptcha();
 
   const totalSteps = 4;
 
@@ -147,6 +149,9 @@ export default function RegisterForm({ className = '' }: RegisterFormProps) {
     }
 
     try {
+      // Get reCAPTCHA token
+      const recaptchaToken = await executeRecaptcha('register');
+
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
@@ -161,6 +166,7 @@ export default function RegisterForm({ className = '' }: RegisterFormProps) {
           phoneCc: formData.phoneCc,
           companyName: formData.companyName,
           address: formData.address,
+          recaptchaToken,
         }),
       });
 

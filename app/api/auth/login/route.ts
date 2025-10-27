@@ -3,6 +3,7 @@ import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
 import { AuthService } from "@/lib/auth";
 import { rateLimiters } from "@/lib/rate-limit";
+import { RecaptchaServer } from "@/lib/recaptcha";
 
 // Force dynamic rendering - required for API routes
 export const dynamic = "force-dynamic";
@@ -21,12 +22,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, password } = await request.json();
+    const { email, password, recaptchaToken } = await request.json();
 
     if (!email || !password) {
       return NextResponse.json(
         { error: "Email and password are required" },
         { status: 400 }
+      );
+    }
+
+    // Verify reCAPTCHA token
+    const recaptchaResult = await RecaptchaServer.verifyToken(
+      recaptchaToken,
+      "login",
+      0.5 // Minimum score for login
+    );
+
+    if (!recaptchaResult.success) {
+      console.warn(
+        "reCAPTCHA verification failed for login:",
+        recaptchaResult.error
+      );
+      return NextResponse.json(
+        { error: "Security verification failed. Please try again." },
+        { status: 403 }
       );
     }
 

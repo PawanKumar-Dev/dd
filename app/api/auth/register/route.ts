@@ -4,6 +4,7 @@ import User from "@/models/User";
 import { AuthService } from "@/lib/auth";
 import { EmailService } from "@/lib/email";
 import { InputValidator } from "@/lib/validation";
+import { RecaptchaServer } from "@/lib/recaptcha";
 import crypto from "crypto";
 
 // Force dynamic rendering - required for API routes
@@ -20,7 +21,26 @@ export async function POST(request: NextRequest) {
       phoneCc,
       companyName,
       address,
+      recaptchaToken,
     } = await request.json();
+
+    // Verify reCAPTCHA token
+    const recaptchaResult = await RecaptchaServer.verifyToken(
+      recaptchaToken,
+      "register",
+      0.5 // Minimum score for registration
+    );
+
+    if (!recaptchaResult.success) {
+      console.warn(
+        "reCAPTCHA verification failed for registration:",
+        recaptchaResult.error
+      );
+      return NextResponse.json(
+        { error: "Security verification failed. Please try again." },
+        { status: 403 }
+      );
+    }
 
     // Validate all inputs
     const emailValidation = InputValidator.validateEmail(email);

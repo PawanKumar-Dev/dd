@@ -10,6 +10,7 @@ import Logo from './Logo';
 import SocialLoginButtons from './SocialLoginButtons';
 import toast from 'react-hot-toast';
 import { showSuccessToast, showErrorToast, showAccountDeactivated } from '@/lib/toast';
+import { useRecaptcha } from '@/hooks/useRecaptcha';
 
 interface LoginFormProps {
   className?: string;
@@ -26,6 +27,7 @@ export default function LoginForm({ className = '' }: LoginFormProps) {
   const [activationMessage, setActivationMessage] = useState('');
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { executeRecaptcha } = useRecaptcha();
 
   // Load form data from localStorage on component mount (excluding password)
   useEffect(() => {
@@ -67,12 +69,18 @@ export default function LoginForm({ className = '' }: LoginFormProps) {
     setIsLoading(true);
 
     try {
+      // Get reCAPTCHA token
+      const recaptchaToken = await executeRecaptcha('login');
+
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          recaptchaToken,
+        }),
       });
 
       const data = await response.json();
