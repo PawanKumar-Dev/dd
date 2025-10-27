@@ -103,31 +103,42 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
 
   const validateDomainInput = (input: string) => {
     const trimmed = input.trim();
+    console.log('🔎 [validateDomainInput] Input:', { input, trimmed });
 
     if (trimmed.includes('.')) {
       const parts = trimmed.split('.');
+      console.log('🔎 [validateDomainInput] Has dot, parts:', parts);
       if (parts.length >= 2 && parts[0].length > 0 && parts[parts.length - 1].length > 0) {
-        return {
+        const result = {
           isValid: true,
           baseDomain: parts[0],
           suggestedTld: parts.slice(1).join('.')
         };
+        console.log('✅ [validateDomainInput] With TLD:', result);
+        return result;
       }
     }
 
     const domainRegex = /^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$/;
-    if (domainRegex.test(trimmed) && trimmed.length >= 2) {
-      return {
+    const matches = domainRegex.test(trimmed);
+    console.log('🔎 [validateDomainInput] Regex test:', { trimmed, matches, length: trimmed.length });
+    
+    if (matches && trimmed.length >= 2) {
+      const result = {
         isValid: true,
         baseDomain: trimmed,
         suggestedTld: null
       };
+      console.log('✅ [validateDomainInput] Without TLD (should trigger multiple):', result);
+      return result;
     }
 
-    return {
+    const result = {
       isValid: false,
       warning: 'Please enter a valid domain name (e.g., "example" or "example.com")'
     };
+    console.log('❌ [validateDomainInput] Invalid:', result);
+    return result;
   };
 
   const getSuggestedTlds = (domain: string) => {
@@ -144,12 +155,18 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
 
     // Validate domain input
     const validation = validateDomainInput(searchTerm);
+    console.log('🔍 [DomainSearch] Validation result:', {
+      searchTerm,
+      validation
+    });
+
     if (!validation.isValid) {
-      toast.error(validation.warning || 'Please enter a valid domain name');
+      const errorMessage = 'warning' in validation ? validation.warning : 'Please enter a valid domain name';
+      toast.error(errorMessage);
       return;
     }
 
-    setBaseDomain(validation.baseDomain || '');
+    setBaseDomain('baseDomain' in validation ? validation.baseDomain : '');
     setIsSearching(true);
     setHasSearched(true);
     setError(null);
@@ -160,10 +177,18 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
       // Determine if this should be a single or multiple TLD search
       // If user provided a TLD (e.g., "example.com"), search only that domain
       // If user provided just a name (e.g., "example"), search multiple TLDs
-      const shouldSearchMultipleTlds = !validation.suggestedTld;
+      const suggestedTld = 'suggestedTld' in validation ? validation.suggestedTld : null;
+      const shouldSearchMultipleTlds = !suggestedTld;
+
+      console.log('🎯 [DomainSearch] Search mode decision:', {
+        shouldSearchMultipleTlds,
+        hasSuggestedTld: !!suggestedTld,
+        suggestedTld
+      });
 
       if (!shouldSearchMultipleTlds) {
         // Single domain search - user specified a TLD
+        console.log('📍 [DomainSearch] Single domain search mode');
         const domainToSearch = searchTerm;
 
         const response = await fetch('/api/domains/search', {
@@ -202,20 +227,41 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
         }
       } else {
         // Multiple TLD search - use all suggested TLDs automatically
-        searchTlds = getSuggestedTlds(validation.baseDomain || '');
+        console.log('🌐 [DomainSearch] Multiple TLD search mode');
+        const baseDomain = 'baseDomain' in validation ? validation.baseDomain : '';
+        searchTlds = getSuggestedTlds(baseDomain);
+        
+        console.log('📋 [DomainSearch] TLDs to search:', {
+          baseDomain,
+          tlds: searchTlds,
+          count: searchTlds.length
+        });
+
+        const requestBody = {
+          domain: baseDomain,
+          tlds: searchTlds
+        };
+        
+        console.log('🚀 [DomainSearch] API Request:', requestBody);
 
         const response = await fetch('/api/domains/search', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            domain: validation.baseDomain,
-            tlds: searchTlds
-          }),
+          body: JSON.stringify(requestBody),
         });
 
         const data = await response.json();
+        
+        console.log('✅ [DomainSearch] Multiple TLD API Response:', {
+          ok: response.ok,
+          status: response.status,
+          success: data.success,
+          resultsCount: data.results?.length || 0,
+          results: data.results,
+          error: data.error
+        });
 
         if (response.ok && data.success) {
           setResults(data.results || []);
@@ -298,23 +344,25 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
 
     // Auto-detect search mode based on input
     const validation = validateDomainInput(value);
+    const suggestedTld = 'suggestedTld' in validation ? validation.suggestedTld : null;
+    const baseDomain = 'baseDomain' in validation ? validation.baseDomain : '';
 
-    if (validation.isValid && !validation.suggestedTld) {
+    if (validation.isValid && !suggestedTld) {
       // Domain name without TLD - show multiple TLD suggestions
       setSearchMode('multiple');
       setShowTldSuggestions(true);
-      setBaseDomain(validation.baseDomain || '');
+      setBaseDomain(baseDomain);
       // Clear any previous search results when switching to multiple mode
       if (hasSearched) {
         setResults([]);
         setHasSearched(false);
         setError(null);
       }
-    } else if (validation.suggestedTld) {
+    } else if (suggestedTld) {
       // Domain name with TLD - single search
       setSearchMode('single');
       setShowTldSuggestions(false);
-      setBaseDomain(validation.baseDomain || '');
+      setBaseDomain(baseDomain);
     } else {
       // Invalid input
       setSearchMode('single');
