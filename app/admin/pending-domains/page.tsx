@@ -100,16 +100,37 @@ export default function AdminPendingDomainsPage() {
   const [showDetails, setShowDetails] = useState<string | null>(null);
   const [adminNotes, setAdminNotes] = useState<{ [key: string]: string }>({});
 
-  // Authentication check
-  useEffect(() => {
+  // Helper function to get authentication token
+  const getAuthToken = () => {
     const getCookieValue = (name: string) => {
       const value = `; ${document.cookie}`;
       const parts = value.split(`; ${name}=`);
       if (parts.length === 2) return parts.pop()?.split(';').shift();
       return null;
     };
+    return getCookieValue('token') || localStorage.getItem('token');
+  };
 
-    const token = getCookieValue('token') || localStorage.getItem('token');
+  // Helper function to handle authentication errors
+  const handleAuthError = (status: number) => {
+    if (status === 401) {
+      toast.error("Session expired. Please login again.");
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      router.push('/login');
+      return true;
+    }
+    if (status === 403) {
+      toast.error("Access denied. Admin privileges required.");
+      router.push('/dashboard');
+      return true;
+    }
+    return false;
+  };
+
+  // Authentication check
+  useEffect(() => {
+    const token = getAuthToken();
     const userData = localStorage.getItem('user');
 
     if (!token || !userData) {
@@ -140,6 +161,15 @@ export default function AdminPendingDomainsPage() {
   const fetchPendingDomains = async () => {
     try {
       setLoading(true);
+
+      const token = getAuthToken();
+
+      // If no token, redirect to login
+      if (!token) {
+        router.push('/login');
+        return;
+      }
+
       const params = new URLSearchParams({
         page: pagination.page.toString(),
         limit: pagination.limit.toString(),
@@ -147,46 +177,74 @@ export default function AdminPendingDomainsPage() {
         ...(searchTerm && { search: searchTerm }),
       });
 
-      const response = await fetch(`/api/admin/pending-domains?${params}`);
+      const response = await fetch(`/api/admin/pending-domains?${params}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      // Handle authentication errors
+      if (handleAuthError(response.status)) {
+        return;
+      }
+
       const data = await response.json();
 
-      if (data.success) {
+      if (response.ok && data.success) {
         setPendingDomains(data.pendingDomains);
         setStatusSummary(data.statusSummary);
         setPagination(data.pagination);
       } else {
-        toast.error("Failed to fetch pending domains");
+        toast.error(data.error || "Failed to fetch pending domains");
       }
     } catch (error) {
-      console.error("Error fetching pending domains:", error);
-      toast.error("Failed to fetch pending domains");
+      // Only log generic error message, don't expose details
+      toast.error("Unable to load pending domains. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchPendingDomains();
-  }, [pagination.page, selectedStatus, searchTerm]);
+    // Only fetch if user is authenticated
+    if (!isLoading && user) {
+      fetchPendingDomains();
+    }
+  }, [pagination.page, selectedStatus, searchTerm, user, isLoading]);
 
   // Handle domain registration
   const handleRegisterDomain = async (domainId: string) => {
     try {
       setActionLoading(domainId);
+      const token = getAuthToken();
+      if (!token) {
+        router.push('/login');
+        return;
+      }
+
       const response = await fetch(`/api/admin/pending-domains/${domainId}/register`, {
         method: "POST",
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
+
+      if (handleAuthError(response.status)) {
+        return;
+      }
+
       const data = await response.json();
 
-      if (data.success) {
+      if (response.ok && data.success) {
         toast.success("Domain registered successfully");
         fetchPendingDomains();
       } else {
-        toast.error(data.message || "Failed to register domain");
+        toast.error(data.message || data.error || "Failed to register domain");
       }
     } catch (error) {
-      console.error("Error registering domain:", error);
-      toast.error("Failed to register domain");
+      toast.error("Unable to register domain. Please try again.");
     } finally {
       setActionLoading(null);
     }
@@ -196,24 +254,35 @@ export default function AdminPendingDomainsPage() {
   const handleVerifyDomains = async (domainIds: string[]) => {
     try {
       setActionLoading("verify");
+      const token = getAuthToken();
+      if (!token) {
+        router.push('/login');
+        return;
+      }
+
       const response = await fetch("/api/admin/pending-domains/verify", {
         method: "POST",
         headers: {
+          'Authorization': `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ domainIds }),
       });
+
+      if (handleAuthError(response.status)) {
+        return;
+      }
+
       const data = await response.json();
 
-      if (data.success) {
+      if (response.ok && data.success) {
         toast.success(`Verified ${data.summary.total} domains`);
         fetchPendingDomains();
       } else {
-        toast.error("Failed to verify domains");
+        toast.error(data.error || "Failed to verify domains");
       }
     } catch (error) {
-      console.error("Error verifying domains:", error);
-      toast.error("Failed to verify domains");
+      toast.error("Unable to verify domains. Please try again.");
     } finally {
       setActionLoading(null);
     }
@@ -223,9 +292,16 @@ export default function AdminPendingDomainsPage() {
   const handleUpdateStatus = async (domainId: string, status: string) => {
     try {
       setActionLoading(domainId);
+      const token = getAuthToken();
+      if (!token) {
+        router.push('/login');
+        return;
+      }
+
       const response = await fetch(`/api/admin/pending-domains/${domainId}`, {
         method: "PUT",
         headers: {
+          'Authorization': `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -233,17 +309,21 @@ export default function AdminPendingDomainsPage() {
           adminNotes: adminNotes[domainId],
         }),
       });
+
+      if (handleAuthError(response.status)) {
+        return;
+      }
+
       const data = await response.json();
 
-      if (data.success) {
+      if (response.ok && data.success) {
         toast.success("Domain status updated successfully");
         fetchPendingDomains();
       } else {
-        toast.error("Failed to update domain status");
+        toast.error(data.error || "Failed to update domain status");
       }
     } catch (error) {
-      console.error("Error updating domain status:", error);
-      toast.error("Failed to update domain status");
+      toast.error("Unable to update domain status. Please try again.");
     } finally {
       setActionLoading(null);
     }
@@ -257,20 +337,34 @@ export default function AdminPendingDomainsPage() {
 
     try {
       setActionLoading(domainId);
+      const token = getAuthToken();
+      if (!token) {
+        router.push('/login');
+        return;
+      }
+
       const response = await fetch(`/api/admin/pending-domains/${domainId}`, {
         method: "DELETE",
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
+
+      if (handleAuthError(response.status)) {
+        return;
+      }
+
       const data = await response.json();
 
-      if (data.success) {
+      if (response.ok && data.success) {
         toast.success("Domain deleted successfully");
         fetchPendingDomains();
       } else {
-        toast.error("Failed to delete domain");
+        toast.error(data.error || "Failed to delete domain");
       }
     } catch (error) {
-      console.error("Error deleting domain:", error);
-      toast.error("Failed to delete domain");
+      toast.error("Unable to delete domain. Please try again.");
     } finally {
       setActionLoading(null);
     }

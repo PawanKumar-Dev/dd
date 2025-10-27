@@ -160,9 +160,19 @@ export async function GET(request: NextRequest) {
       statusSummary,
     });
   } catch (error) {
-    console.error("Admin pending domains fetch error:", error);
+    // Log detailed error server-side only
+    console.error("[ADMIN-PENDING-DOMAINS] Error fetching pending domains:", {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString(),
+    });
+
+    // Return generic error to client (don't expose internal details)
     return NextResponse.json(
-      { error: "Failed to fetch pending domains" },
+      {
+        success: false,
+        error: "Unable to fetch pending domains. Please try again later.",
+      },
       { status: 500 }
     );
   }
@@ -254,9 +264,19 @@ export async function POST(request: NextRequest) {
       pendingDomain,
     });
   } catch (error) {
-    console.error("Admin pending domain creation error:", error);
+    // Log detailed error server-side only
+    console.error("[ADMIN-PENDING-DOMAINS] Error creating pending domain:", {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      timestamp: new Date().toISOString(),
+    });
+
+    // Return generic error to client (don't expose internal details)
     return NextResponse.json(
-      { error: "Failed to create pending domain" },
+      {
+        success: false,
+        error: "Unable to create pending domain. Please try again later.",
+      },
       { status: 500 }
     );
   }
