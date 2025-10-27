@@ -126,6 +126,13 @@ export default function CartPage() {
       return;
     }
 
+    // Check if profile is completed
+    if (!user.profileCompleted) {
+      toast.error('Please complete your profile before proceeding to checkout');
+      router.push(`/dashboard/settings?returnUrl=${encodeURIComponent('/checkout')}`);
+      return;
+    }
+
     // Redirect to checkout page
     router.push('/checkout');
   };
