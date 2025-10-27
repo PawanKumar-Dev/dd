@@ -67,12 +67,15 @@ export default function AdminTLDPricing() {
   const [isLoading, setIsLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<string>('');
   const [pricingSource, setPricingSource] = useState<string>('');
+  const [isCached, setIsCached] = useState(false);
+  const [cachedAt, setCachedAt] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('tld');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [priceRange, setPriceRange] = useState<{ min: number, max: number }>({ min: 0, max: 100000 });
   const [showOnlyWithMargin, setShowOnlyWithMargin] = useState<boolean>(false);
+  const [isPurgingCache, setIsPurgingCache] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -113,10 +116,12 @@ export default function AdminTLDPricing() {
       });
 
       if (response.ok) {
-        const data: TLDPricingResponse = await response.json();
+        const data: TLDPricingResponse & { cached?: boolean; cachedAt?: string } = await response.json();
         setTldPricing(data.tldPricing || []);
         setLastUpdated(data.lastUpdated || '');
         setPricingSource(data.pricingSource || '');
+        setIsCached(data.cached || false);
+        setCachedAt(data.cachedAt || '');
       } else {
         console.error('Failed to load TLD pricing:', response.statusText);
         setTldPricing([]);
@@ -126,6 +131,31 @@ export default function AdminTLDPricing() {
       setTldPricing([]);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const purgeCache = async () => {
+    setIsPurgingCache(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/admin/tld-pricing/cache', {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        console.log('Cache purged successfully');
+        // Reload pricing data
+        await loadTLDPricing();
+      } else {
+        console.error('Failed to purge cache');
+      }
+    } catch (error) {
+      console.error('Error purging cache:', error);
+    } finally {
+      setIsPurgingCache(false);
     }
   };
 
@@ -302,20 +332,46 @@ export default function AdminTLDPricing() {
         {/* Page Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">TLD Pricing Management</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold text-gray-900">TLD Pricing Management</h1>
+              {isCached && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  Cached
+                </span>
+              )}
+            </div>
             <p className="text-gray-600">
               Live domain pricing from {pricingSource} - {tldPricing.length} TLDs available
             </p>
             {lastUpdated && (
               <p className="text-sm text-gray-500 mt-1">
                 Last updated: {formatIndianDateTime(lastUpdated)}
+                {isCached && cachedAt && (
+                  <span className="ml-2 text-xs text-green-600">
+                    (Cached at: {formatIndianDateTime(cachedAt)})
+                  </span>
+                )}
               </p>
             )}
           </div>
           <div className="flex space-x-3">
+            {isCached && (
+              <button
+                onClick={purgeCache}
+                disabled={isPurgingCache}
+                className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <RefreshCw className={`h-4 w-4 mr-2 ${isPurgingCache ? 'animate-spin' : ''}`} />
+                {isPurgingCache ? 'Purging...' : 'Purge Cache'}
+              </button>
+            )}
             <button
               onClick={loadTLDPricing}
-              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              disabled={isLoading || isPurgingCache}
+              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <RefreshCw className="h-4 w-4 mr-2" />
               Refresh Pricing

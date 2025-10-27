@@ -54,6 +54,12 @@ export default function AdminSettings() {
   const [lastChecked, setLastChecked] = useState<Date | null>(null);
   const [user, setUser] = useState<{ firstName: string; lastName: string; role: string } | null>(null);
 
+  // Cache settings state
+  const [cacheEnabled, setCacheEnabled] = useState(true);
+  const [cacheTTL, setCacheTTL] = useState(60);
+  const [cacheStatus, setCacheStatus] = useState<any>(null);
+  const [cacheLoading, setCacheLoading] = useState(false);
+
   useEffect(() => {
     // Check for admin authentication
     const getCookieValue = (name: string) => {
@@ -79,6 +85,7 @@ export default function AdminSettings() {
 
     setUser(userObj);
     loadSavedIPData();
+    loadCacheSettings();
   }, [router]);
 
   const loadSavedIPData = async () => {
@@ -107,6 +114,110 @@ export default function AdminSettings() {
       console.error('Error loading saved IP data:', error);
     } finally {
       setIsInitialLoading(false);
+    }
+  };
+
+  const loadCacheSettings = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      // Load cache status
+      const statusResponse = await fetch('/api/admin/tld-pricing/cache', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (statusResponse.ok) {
+        const statusData = await statusResponse.json();
+        setCacheStatus(statusData.cache);
+        setCacheTTL(statusData.ttl || 60);
+      }
+
+      // Load cache enabled setting
+      const settingsResponse = await fetch('/api/admin/settings', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (settingsResponse.ok) {
+        const settingsData = await settingsResponse.json();
+        const cacheEnabledSetting = settingsData.settings?.tld_pricing_cache_enabled;
+        if (cacheEnabledSetting !== undefined) {
+          setCacheEnabled(cacheEnabledSetting.value !== false);
+        }
+        const cacheTTLSetting = settingsData.settings?.tld_pricing_cache_ttl;
+        if (cacheTTLSetting !== undefined) {
+          setCacheTTL(parseInt(cacheTTLSetting.value) || 60);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading cache settings:', error);
+    }
+  };
+
+  const updateCacheSettings = async () => {
+    setCacheLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const response = await fetch('/api/admin/tld-pricing/cache', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          enabled: cacheEnabled,
+          ttlMinutes: cacheTTL,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        showSuccessToast('Cache settings updated successfully');
+        await loadCacheSettings();
+      } else {
+        showErrorToast('Failed to update cache settings');
+      }
+    } catch (error) {
+      console.error('Error updating cache settings:', error);
+      showErrorToast('Failed to update cache settings');
+    } finally {
+      setCacheLoading(false);
+    }
+  };
+
+  const purgeCache = async () => {
+    setCacheLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const response = await fetch('/api/admin/tld-pricing/cache', {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        showSuccessToast('Cache purged successfully');
+        await loadCacheSettings();
+      } else {
+        showErrorToast('Failed to purge cache');
+      }
+    } catch (error) {
+      console.error('Error purging cache:', error);
+      showErrorToast('Failed to purge cache');
+    } finally {
+      setCacheLoading(false);
     }
   };
 
@@ -447,6 +558,159 @@ export default function AdminSettings() {
                 )}
               </motion.div>
             )}
+          </CardContent>
+        </Card>
+
+        {/* TLD Pricing Cache Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Server className="h-5 w-5 text-purple-600" />
+              TLD Pricing Cache
+            </CardTitle>
+            <CardDescription>
+              Configure caching for TLD pricing data to improve performance and reduce API calls
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Cache Status */}
+            {cacheStatus && (
+              <div className="p-4 bg-purple-50 rounded-lg">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h4 className="font-semibold text-purple-900">Cache Status</h4>
+                    <p className="text-sm text-purple-700 mt-1">
+                      {cacheStatus.isCached ? (
+                        <>
+                          Active • {cacheStatus.itemCount} TLDs cached •
+                          Expires in {Math.floor(cacheStatus.remainingTime / 60)} minutes
+                        </>
+                      ) : (
+                        'No active cache'
+                      )}
+                    </p>
+                  </div>
+                  <Badge className={`${cacheStatus.isCached ? 'bg-green-500' : 'bg-gray-500'} text-white`}>
+                    {cacheStatus.isCached ? 'Cached' : 'Empty'}
+                  </Badge>
+                </div>
+
+                {cacheStatus.isCached && (
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <p className="text-purple-600 font-medium">Cached At</p>
+                      <p className="text-purple-900">
+                        {new Date(cacheStatus.cachedAt).toLocaleString('en-IN', {
+                          timeZone: 'Asia/Kolkata',
+                          dateStyle: 'medium',
+                          timeStyle: 'short',
+                        })}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-purple-600 font-medium">Expires At</p>
+                      <p className="text-purple-900">
+                        {new Date(cacheStatus.expiresAt).toLocaleString('en-IN', {
+                          timeZone: 'Asia/Kolkata',
+                          dateStyle: 'medium',
+                          timeStyle: 'short',
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Cache Settings */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="font-medium text-gray-900">Enable Cache</p>
+                  <p className="text-sm text-gray-500">Cache TLD pricing data to reduce API calls</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={cacheEnabled}
+                    onChange={(e) => setCacheEnabled(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                </label>
+              </div>
+
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <label className="block">
+                  <p className="font-medium text-gray-900 mb-2">Cache TTL (Time To Live)</p>
+                  <p className="text-sm text-gray-500 mb-3">How long to cache data before refreshing (in minutes)</p>
+                  <div className="flex items-center gap-4">
+                    <input
+                      type="number"
+                      min="1"
+                      max="1440"
+                      value={cacheTTL}
+                      onChange={(e) => setCacheTTL(parseInt(e.target.value) || 60)}
+                      className="w-24 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                    <span className="text-gray-600">minutes</span>
+                    <span className="text-sm text-gray-500">
+                      ({Math.floor(cacheTTL / 60)} hour{cacheTTL >= 120 ? 's' : ''} {cacheTTL % 60} min)
+                    </span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-3">
+              <Button
+                onClick={updateCacheSettings}
+                disabled={cacheLoading}
+                className="flex items-center gap-2"
+              >
+                {cacheLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Updating...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="h-4 w-4" />
+                    Save Settings
+                  </>
+                )}
+              </Button>
+
+              <Button
+                onClick={purgeCache}
+                disabled={cacheLoading || !cacheStatus?.isCached}
+                variant="outline"
+                className="flex items-center gap-2 border-red-300 text-red-700 hover:bg-red-50"
+              >
+                {cacheLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Purging...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="h-4 w-4" />
+                    Purge Cache
+                  </>
+                )}
+              </Button>
+
+              <Button
+                onClick={loadCacheSettings}
+                disabled={cacheLoading}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <RefreshCw className="h-4 w-4" />
+                Refresh Status
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

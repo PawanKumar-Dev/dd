@@ -2,9 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { AuthService } from "@/lib/auth";
 import { PricingService } from "@/lib/pricing-service";
 import { formatIndianCurrency, formatIndianNumber } from "@/lib/dateUtils";
+import { tldPricingCache } from "@/lib/tld-pricing-cache";
+import Settings from "@/models/Settings";
+import { connectToDatabase } from "@/lib/mongoose";
 
 // Force dynamic rendering - required for API routes
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,8 +17,40 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Check if caching is enabled
+    await connectToDatabase();
+    const cacheEnabledSetting = await Settings.findOne({
+      key: "tld_pricing_cache_enabled",
+    });
+    const cacheEnabled = cacheEnabledSetting?.value !== false; // Default to true if not set
+
+    // Get TTL setting
+    const cacheTTLSetting = await Settings.findOne({
+      key: "tld_pricing_cache_ttl",
+    });
+    if (cacheTTLSetting?.value) {
+      tldPricingCache.setTTL(parseInt(cacheTTLSetting.value));
+    }
+
+    // Check cache first if enabled
+    if (cacheEnabled) {
+      const cachedData = tldPricingCache.get();
+      if (cachedData) {
+        console.log("✅ [ADMIN] Returning cached TLD pricing data");
+        return NextResponse.json({
+          success: true,
+          tldPricing: cachedData.tldPricing,
+          totalCount: cachedData.totalCount,
+          lastUpdated: cachedData.lastUpdated,
+          pricingSource: cachedData.pricingSource + " (Cached)",
+          cached: true,
+          cachedAt: new Date(cachedData.cachedAt).toISOString(),
+        });
+      }
+    }
+
     console.log(
-      "💰 [ADMIN] Fetching TLD pricing for admin panel (Customer + Reseller pricing comparison)"
+      "💰 [ADMIN] Fetching TLD pricing from API (Customer + Reseller pricing comparison)"
     );
 
     // Get all domain pricing from ResellerClub API
@@ -158,7 +193,6 @@ export async function GET(request: NextRequest) {
           tldPricing.length
         : 0;
 
-
     console.log(`✅ [ADMIN] Fetched pricing for ${tldPricing.length} TLDs`);
     console.log(
       `📊 [ADMIN] Pricing Summary: Total Customer ${formatIndianCurrency(
@@ -168,17 +202,33 @@ export async function GET(request: NextRequest) {
       )}, Avg Margin ${avgMargin > 0 ? "+" : ""}${avgMargin.toFixed(1)}%`
     );
 
-    return NextResponse.json({
+    const responseData = {
       success: true,
       tldPricing,
       totalCount: tldPricing.length,
       lastUpdated: new Date().toISOString(),
       pricingSource: "ResellerClub API (Indian Pricing)",
-    });
+      cached: false,
+    };
+
+    // Cache the data if caching is enabled
+    if (cacheEnabled) {
+      tldPricingCache.set({
+        tldPricing,
+        totalCount: tldPricing.length,
+        lastUpdated: responseData.lastUpdated,
+        pricingSource: responseData.pricingSource,
+      });
+    }
+
+    return NextResponse.json(responseData);
   } catch (error) {
     console.error("❌ [ADMIN] Failed to fetch TLD pricing:", error);
     return NextResponse.json(
-      { error: "Failed to fetch TLD pricing" },
+      {
+        success: false,
+        error: "Failed to fetch TLD pricing",
+      },
       { status: 500 }
     );
   }
