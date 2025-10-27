@@ -46,8 +46,28 @@ interface SearchResult {
 }
 
 
-// Top popular TLDs for quick suggestions (max 7)
-const TOP_TLDS = ['.com', '.net', '.org', '.co', '.io', '.ai', '.app'];
+// Comprehensive TLD list including common and non-common TLDs
+const TOP_TLDS = [
+  // Most Popular
+  '.com', '.net', '.org', '.co', '.io',
+  // Tech & Innovation
+  '.ai', '.app', '.dev', '.tech', '.digital', '.online', '.site', '.website', '.software', '.cloud',
+  // Business & Professional
+  '.biz', '.store', '.shop', '.business', '.company', '.solutions', '.services', '.agency', '.consulting',
+  // Creative & Media
+  '.design', '.art', '.media', '.studio', '.video', '.photography', '.graphics', '.music',
+  // Location-based
+  '.in', '.us', '.uk', '.ca', '.au', '.de', '.fr', '.jp',
+  // New & Trending
+  '.xyz', '.info', '.pro', '.name', '.email', '.work', '.live', '.space', '.fun',
+  // Niche & Specialized
+  '.blog', '.news', '.academy', '.education', '.school', '.university', '.training',
+  '.health', '.fitness', '.life', '.style', '.fashion', '.beauty',
+  '.food', '.cafe', '.restaurant', '.pizza', '.coffee',
+  '.travel', '.tours', '.vacation', '.hotel', '.flights',
+  '.finance', '.money', '.capital', '.ventures', '.credit',
+  '.realestate', '.properties', '.construction', '.marketing', '.legal'
+];
 
 /**
  * Domain Search Component
@@ -139,8 +159,8 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
     // Filter out restricted TLDs from top TLDs
     const filteredSuggestions = TOP_TLDS.filter(tld => !isRestrictedTLD(tld));
 
-    // Return all available suggestions (max 7)
-    return filteredSuggestions.slice(0, 7);
+    // Return more suggestions for "Show More" functionality (up to 20)
+    return filteredSuggestions.slice(0, 20);
   };
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -280,8 +300,8 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
       // Filter out already searched TLDs
       const remainingTlds = allTlds.filter(tld => !searchedTlds.includes(tld));
 
-      // Take next 3-4 TLDs
-      const tldsToSearch = remainingTlds.slice(0, 4);
+      // Take next 6 TLDs for better coverage of expanded TLD list
+      const tldsToSearch = remainingTlds.slice(0, 6);
 
       if (tldsToSearch.length === 0) {
         setCanLoadMore(false);

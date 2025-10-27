@@ -920,11 +920,19 @@ export class ResellerClubAPI {
                   continue;
                 }
 
-                // Skip if domain is not available
+                // Handle unavailable domains - add them to results with "taken" status
                 if (!isAvailable) {
                   console.log(
-                    `⏭️ [PRODUCTION] Skipping ${cleanDomain} - not available (status: ${domainStatus})`
+                    `📋 [PRODUCTION] Adding unavailable domain to results: ${cleanDomain} (status: ${domainStatus})`
                   );
+                  results.push({
+                    domainName: cleanDomain,
+                    available: false,
+                    price: 0,
+                    currency: "INR",
+                    registrationPeriod: 1,
+                    pricingSource: "taken",
+                  });
                   continue;
                 }
 
