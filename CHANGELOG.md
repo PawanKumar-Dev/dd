@@ -60,6 +60,8 @@
 
 #### User Interface Improvements
 
+- **Refresh Button Standardization**: Unified all Refresh buttons across the entire application with consistent styling - outlined design with blue hover effects for better visual consistency and improved UX
+- **Action Button Enhancement**: Enlarged action buttons (View/Download) from 16px to 20px with padding and hover backgrounds for better clickability and user experience
 - **Payment Success Page**: Removed "Domains Being Processed" section to provide cleaner, simpler user experience without overwhelming technical details
 - **Admin Pending Domains**: Removed status summary stat cards for more focused domain management interface
 - **DNS Management**: Added validation to prevent DNS activation for domains in pending or processing status

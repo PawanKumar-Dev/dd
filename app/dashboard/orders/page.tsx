@@ -191,9 +191,9 @@ export default function UserOrders() {
               <div className="flex space-x-3">
                 <button
                   onClick={loadOrders}
-                  className="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200"
                 >
-                  <RefreshCw className="h-4 w-4 mr-2" />
+                  <RefreshCw className="h-4 w-4" />
                   Refresh
                 </button>
               </div>
@@ -316,21 +316,21 @@ export default function UserOrders() {
                           ₹{(order.amount || 0).toLocaleString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <div className="flex space-x-2">
+                          <div className="flex space-x-3">
                             <button
                               onClick={() => handleViewOrder(order)}
-                              className="text-blue-600 hover:text-blue-900"
+                              className="p-2 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-colors"
                               title="View Details"
                             >
-                              <Eye className="h-4 w-4" />
+                              <Eye className="h-5 w-5" />
                             </button>
                             {order.invoiceNumber && (
                               <button
                                 onClick={() => handleDownloadInvoice(order)}
-                                className="text-green-600 hover:text-green-900"
+                                className="p-2 text-green-600 hover:text-green-900 hover:bg-green-50 rounded-lg transition-colors"
                                 title="Download Invoice"
                               >
-                                <Download className="h-4 w-4" />
+                                <Download className="h-5 w-5" />
                               </button>
                             )}
                           </div>

@@ -460,7 +460,7 @@ export default function AdminPendingDomainsPage() {
               )}
               <button
                 onClick={fetchPendingDomains}
-                className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 flex items-center gap-2"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200"
               >
                 <RefreshCw className="h-4 w-4" />
                 Refresh

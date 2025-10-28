@@ -516,9 +516,9 @@ export default function AdminDNSManagementPage() {
             </div>
             <button
               onClick={loadAllDomains}
-              className="flex items-center justify-center px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors w-full sm:w-auto"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 w-full sm:w-auto"
             >
-              <RefreshCw className="h-4 w-4 mr-2" />
+              <RefreshCw className="h-4 w-4" />
               Refresh
             </button>
           </div>
@@ -634,9 +634,9 @@ export default function AdminDNSManagementPage() {
                     <button
                       onClick={() => loadNameservers(selectedDomain)}
                       disabled={isNameserverLoading}
-                      className="flex items-center justify-center px-3 py-1 text-xs sm:text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50 w-full sm:w-auto"
+                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 w-full sm:w-auto"
                     >
-                      <RefreshCw className={`h-3 w-3 sm:h-4 sm:w-4 mr-1 ${isNameserverLoading ? 'animate-spin' : ''}`} />
+                      <RefreshCw className={`h-4 w-4 ${isNameserverLoading ? 'animate-spin' : ''}`} />
                       Refresh
                     </button>
                   </div>
