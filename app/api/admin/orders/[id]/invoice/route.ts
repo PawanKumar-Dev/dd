@@ -73,8 +73,18 @@ export async function GET(
       align: "center",
     });
 
-    // Invoice details section
-    const invoiceDetailsY = 80;
+    // Purchase Order number (if available)
+    if (order.purchaseOrderNumber) {
+      pdf.setFontSize(11);
+      pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+      pdf.text(`PO: ${order.purchaseOrderNumber}`, pageWidth / 2, 73, {
+        align: "center",
+      });
+      pdf.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
+    }
+
+    // Invoice details section (adjust Y position if PO number exists)
+    const invoiceDetailsY = order.purchaseOrderNumber ? 85 : 80;
     pdf.setFillColor(248, 250, 252);
     pdf.rect(20, invoiceDetailsY, pageWidth - 40, 50, "F");
 

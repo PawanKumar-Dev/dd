@@ -698,46 +698,65 @@ export async function POST(request: NextRequest) {
     console.log(`✅ [PAYMENT-VERIFY] Order saved to database: ${orderId}`);
 
     console.log(`✅ Order created: ${orderId} with status: ${orderStatus}`);
+    console.log(`📦 Purchase Order Number: ${order.purchaseOrderNumber}`);
 
-    // Send order confirmation email
-    try {
-      const emailSent = await EmailService.sendOrderConfirmationEmail(
-        user.email,
-        `${user.firstName} ${user.lastName}`,
-        {
-          orderId: order.orderId,
-          invoiceNumber: order.invoiceNumber || "",
-          amount: order.amount,
-          subtotal: (order as any).subtotal,
-          currency: order.currency,
-          successfulDomains: orderDomains
-            .filter((d) => d.status === "registered")
-            .map((d) => ({
+    // Only send order confirmation email if at least one domain is successfully registered
+    // Don't send emails for pending/processing orders - they will be sent when domains are registered
+    const hasRegisteredDomains = orderDomains.some(
+      (d) => d.status === "registered"
+    );
+
+    if (hasRegisteredDomains) {
+      console.log(
+        `📧 [EMAIL] Sending order confirmation - ${successfulDomains.length} domain(s) successfully registered`
+      );
+      try {
+        const emailSent = await EmailService.sendOrderConfirmationEmail(
+          user.email,
+          `${user.firstName} ${user.lastName}`,
+          {
+            orderId: order.orderId,
+            purchaseOrderNumber: order.purchaseOrderNumber,
+            invoiceNumber: order.invoiceNumber || "",
+            amount: order.amount,
+            subtotal: (order as any).subtotal,
+            currency: order.currency,
+            successfulDomains: orderDomains
+              .filter((d) => d.status === "registered")
+              .map((d) => ({
+                domainName: d.domainName,
+                price: d.price,
+                registrationPeriod: d.registrationPeriod,
+              })),
+            allDomains: orderDomains.map((d) => ({
               domainName: d.domainName,
               price: d.price,
               registrationPeriod: d.registrationPeriod,
+              status: d.status,
             })),
-          allDomains: orderDomains.map((d) => ({
-            domainName: d.domainName,
-            price: d.price,
-            registrationPeriod: d.registrationPeriod,
-            status: d.status,
-          })),
-          paymentId: order.paymentId,
-          createdAt: order.createdAt,
-        } as any
-      );
-
-      if (emailSent) {
-        console.log(`✅ Order confirmation email sent to ${user.email}`);
-      } else {
-        console.error(
-          `❌ Failed to send order confirmation email to ${user.email}`
+            paymentId: order.paymentId,
+            createdAt: order.createdAt,
+          } as any
         );
+
+        if (emailSent) {
+          console.log(`✅ Order confirmation email sent to ${user.email}`);
+        } else {
+          console.error(
+            `❌ Failed to send order confirmation email to ${user.email}`
+          );
+        }
+      } catch (emailError) {
+        console.error("Email sending error:", emailError);
+        // Don't fail the payment verification if email fails
       }
-    } catch (emailError) {
-      console.error("Email sending error:", emailError);
-      // Don't fail the payment verification if email fails
+    } else {
+      console.log(
+        `⏭️ [EMAIL] Skipping order confirmation email - No registered domains yet (${pendingDomains.length} pending, ${failedDomains.length} failed)`
+      );
+      console.log(
+        `📝 [EMAIL] Confirmation will be sent when domains are registered by admin`
+      );
     }
 
     // Send admin notification email
