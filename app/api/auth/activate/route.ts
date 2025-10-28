@@ -72,6 +72,7 @@ export async function POST(request: NextRequest) {
         role: user.role,
         isActivated: user.isActivated,
         profileCompleted: user.profileCompleted,
+        provider: user.provider, // Include provider info for password detection
         // Include complete profile data to prevent data loss
         phone: user.phone,
         phoneCc: user.phoneCc,
