@@ -45,6 +45,7 @@ export { default as Modal } from "./Modal";
 // Transition Components
 export { default as PageTransition } from "./PageTransition";
 export { default as LoadingPage } from "./LoadingPage";
+export { default as CenteredLoading, InlineLoader } from "./CenteredLoading";
 
 // Enhanced Components
 export { default as EnhancedToast, ToastContainer } from "./EnhancedToast";
