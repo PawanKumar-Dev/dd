@@ -472,9 +472,11 @@ export default function AdminPendingDomainsPage() {
         {/* Pending Domains Table */}
         <div className="bg-white rounded-lg shadow border overflow-hidden">
           {loading ? (
-            <div className="p-8 text-center">
-              <RefreshCw className="h-8 w-8 animate-spin mx-auto text-gray-400" />
-              <p className="mt-2 text-gray-500">Loading pending domains...</p>
+            <div className="flex items-center justify-center min-h-[300px]">
+              <div className="text-center">
+                <RefreshCw className="h-10 w-10 animate-spin mx-auto text-blue-600 mb-3" />
+                <p className="text-gray-600">Loading pending domains...</p>
+              </div>
             </div>
           ) : pendingDomains.length === 0 ? (
             <div className="p-8 text-center">
