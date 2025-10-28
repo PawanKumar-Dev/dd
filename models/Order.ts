@@ -2,6 +2,7 @@ import mongoose, { Document, Schema } from "mongoose";
 
 export interface IOrder extends Document {
   orderId: string;
+  purchaseOrderNumber: string; // PO number for all purchases
   userId: Schema.Types.ObjectId;
   paymentId: string;
   razorpayOrderId: string;
@@ -60,6 +61,12 @@ const OrderSchema = new Schema<IOrder>(
       type: String,
       required: true,
       unique: true,
+      index: true,
+    },
+    purchaseOrderNumber: {
+      type: String,
+      unique: true,
+      sparse: true,
       index: true,
     },
     userId: {
@@ -208,8 +215,16 @@ const OrderSchema = new Schema<IOrder>(
   }
 );
 
-// Generate invoice number before saving
+// Generate PO number and invoice number before saving
 OrderSchema.pre("save", function (next) {
+  // Generate PO number for all new orders (successful or failed)
+  if (this.isNew && !this.purchaseOrderNumber) {
+    const timestamp = Date.now().toString().slice(-6);
+    const random = Math.random().toString(36).substring(2, 5).toUpperCase();
+    this.purchaseOrderNumber = `PO-${timestamp}-${random}`;
+  }
+
+  // Generate invoice number only for completed orders
   if (this.isNew && this.status === "completed" && !this.invoiceNumber) {
     const timestamp = Date.now().toString().slice(-6);
     const random = Math.random().toString(36).substring(2, 5).toUpperCase();

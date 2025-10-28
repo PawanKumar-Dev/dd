@@ -326,6 +326,7 @@ export class EmailService {
     userName: string,
     orderData: {
       orderId: string;
+      purchaseOrderNumber: string;
       invoiceNumber: string;
       amount: number;
       currency: string;
@@ -451,7 +452,13 @@ export class EmailService {
             <h3 style="color: #1f2937; margin: 0 0 15px 0;">Order Information</h3>
             <table style="width: 100%; border-collapse: collapse;">
               <tr>
-                <td style="padding: 8px 0; color: #6b7280; width: 150px;">Order ID:</td>
+                <td style="padding: 8px 0; color: #6b7280; width: 150px;">Purchase Order:</td>
+                <td style="padding: 8px 0; font-weight: 700; color: #3b82f6; font-size: 15px;">${
+                  orderData.purchaseOrderNumber
+                }</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280;">Order ID:</td>
                 <td style="padding: 8px 0; font-weight: 600; color: #1f2937;">${
                   orderData.orderId
                 }</td>
