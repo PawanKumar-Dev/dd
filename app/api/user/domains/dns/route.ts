@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { AuthService } from "@/lib/auth";
 import connectDB from "@/lib/mongodb";
 import Order from "@/models/Order";
-import User from "@/models/User";
 
 // Force dynamic rendering - required for API routes
 export const dynamic = "force-dynamic";
@@ -22,7 +21,7 @@ export async function GET(request: NextRequest) {
       .sort({ createdAt: -1 })
       .populate("userId", "email firstName lastName");
 
-    // Extract domains from orders
+    // Extract domains from orders - ONLY REGISTERED domains for DNS management
     const domains = [];
     const domainMap = new Map();
 
@@ -30,8 +29,12 @@ export async function GET(request: NextRequest) {
       order.domains.forEach((domain: any) => {
         const domainKey = domain.domainName;
 
-        // Show ALL domains regardless of status (pending, processing, registered, failed, etc.)
-        // This is for the user's domain list, not DNS management
+        // Only include domains with "registered" status for DNS management
+        // Exclude pending, processing, failed, and cancelled domains
+        if (domain.status !== "registered") {
+          return; // Skip non-registered domains
+        }
+
         // Only add if not already processed or if this is a more recent status
         if (
           !domainMap.has(domainKey) ||
@@ -71,10 +74,11 @@ export async function GET(request: NextRequest) {
       total: domainArray.length,
     });
   } catch (error) {
-    console.error("Error fetching user domains:", error);
+    console.error("Error fetching user DNS domains:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
     );
   }
 }
+

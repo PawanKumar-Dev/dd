@@ -107,7 +107,8 @@ export default function DNSManagementPage() {
     setIsLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/user/domains', {
+      // Use DNS-specific endpoint that only returns registered domains
+      const response = await fetch('/api/user/domains/dns', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
