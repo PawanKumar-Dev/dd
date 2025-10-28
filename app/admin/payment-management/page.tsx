@@ -249,10 +249,10 @@ export default function AdminPayments() {
         <div className="flex items-center space-x-2">
           <button
             onClick={() => handleViewPayment(row.id)}
-            className="text-gray-400 hover:text-blue-600 transition-colors"
-            title="View Details"
+            className="p-2 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-colors"
+            title="View Payment Details"
           >
-            <Eye className="h-4 w-4" />
+            <Eye className="h-5 w-5" />
           </button>
         </div>
       )

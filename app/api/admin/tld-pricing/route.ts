@@ -210,6 +210,10 @@ export async function GET(request: NextRequest) {
               }
             }
 
+            // Ensure prices are valid numbers (not NaN)
+            if (isNaN(customerPrice)) customerPrice = 0;
+            if (isNaN(resellerPrice)) resellerPrice = 0;
+
             // Only add TLDs that have valid pricing
             if (customerPrice > 0 || resellerPrice > 0) {
               const margin =

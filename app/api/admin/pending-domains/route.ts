@@ -126,6 +126,10 @@ export async function GET(request: NextRequest) {
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
+    // Debug: Check if userId is populated
+    console.log('[DEBUG] Sample domain userId:', allPendingDomains[0]?.userId);
+    console.log('[DEBUG] Is userId an object?', typeof allPendingDomains[0]?.userId === 'object');
+
     // STEP 4: Apply pagination
     const skip = (page - 1) * limit;
     const paginatedDomains = allPendingDomains.slice(skip, skip + limit);
