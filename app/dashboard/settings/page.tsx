@@ -133,13 +133,8 @@ export default function UserSettings() {
           const meData = await meResponse.json();
 
           // Check if user has a password - the API returns password as a boolean
-          // A user has a password if:
-          // 1. The password field is explicitly true, OR
-          // 2. The provider is 'credentials' (they registered with email/password), OR  
-          // 3. The provider is null/undefined (old accounts default to credentials)
-          const hasPassword = meData.user?.password === true ||
-            meData.user?.provider === 'credentials' ||
-            !meData.user?.provider;
+          // Allow all users to set/change password regardless of login method
+          const hasPassword = meData.user?.password === true;
 
           setHasExistingPassword(hasPassword);
 
@@ -724,7 +719,19 @@ export default function UserSettings() {
                               <AlertCircle className="h-5 w-5 text-blue-400 mr-2 flex-shrink-0" />
                               <div>
                                 <p className="text-sm text-blue-700">
-                                  You signed in with social login. Set a password to enable email/password login.
+                                  Set a password to enable email/password login in addition to your social login.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        {hasExistingPassword && (
+                          <div className="bg-gray-50 border-l-4 border-gray-400 p-4 mb-4">
+                            <div className="flex">
+                              <AlertCircle className="h-5 w-5 text-gray-400 mr-2 flex-shrink-0" />
+                              <div>
+                                <p className="text-sm text-gray-600">
+                                  Change your account password. You can use either password or social login to access your account.
                                 </p>
                               </div>
                             </div>
