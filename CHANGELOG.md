@@ -11,7 +11,10 @@
 - **Automatic Expiry**: MongoDB cache includes automatic expiration handling
 - **Enhanced Reliability**: Shared cache across multiple server instances (for horizontal scaling)
 - **Performance**: Maintains fast cache access while providing persistent storage
-- **All TLDs Support**: Fixed to process all 400+ TLDs from ResellerClub API instead of just hardcoded common TLDs
+- **Smart TLD Conversion**: Automatically converts ResellerClub API TLD keys (e.g., `dotio`, `dotin`, `codotuk`) to readable formats (e.g., `.io`, `.in`, `.co.uk`). Filters out obscure internal codes (e.g., `centralniczacom`) and non-TLD service entries
+- **Empty Cache Detection**: Automatically detects and purges empty cache, refetches fresh data to prevent serving stale/empty results
+- **Enhanced Price Extraction**: Fixed nested reseller pricing structure (`data["0"].pricing.addnewdomain["1"]`) to correctly extract both customer and reseller prices
+- **Debug Logging**: Added comprehensive debugging to show actual API data structure for troubleshooting
 
 #### Purchase Order (PO) System & Improved Payment Flow
 

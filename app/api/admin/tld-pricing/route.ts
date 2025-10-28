@@ -36,18 +36,31 @@ export async function GET(request: NextRequest) {
     if (cacheEnabled) {
       const cachedData = await tldPricingCache.get();
       if (cachedData) {
-        console.log(
-          "✅ [ADMIN] Returning cached TLD pricing data from MongoDB"
-        );
-        return NextResponse.json({
-          success: true,
-          tldPricing: cachedData.tldPricing,
-          totalCount: cachedData.totalCount,
-          lastUpdated: cachedData.lastUpdated,
-          pricingSource: cachedData.pricingSource + " (Cached from MongoDB)",
-          cached: true,
-          cachedAt: new Date(cachedData.cachedAt).toISOString(),
-        });
+        // Check if cached data is empty (data quality check)
+        if (
+          cachedData.totalCount === 0 ||
+          !cachedData.tldPricing ||
+          cachedData.tldPricing.length === 0
+        ) {
+          console.warn(
+            "⚠️ [CACHE] Cached data is empty! Auto-purging and refetching..."
+          );
+          await tldPricingCache.purge();
+          // Continue to fetch fresh data below
+        } else {
+          console.log(
+            `✅ [ADMIN] Returning cached TLD pricing data from MongoDB (${cachedData.totalCount} TLDs)`
+          );
+          return NextResponse.json({
+            success: true,
+            tldPricing: cachedData.tldPricing,
+            totalCount: cachedData.totalCount,
+            lastUpdated: cachedData.lastUpdated,
+            pricingSource: cachedData.pricingSource + " (Cached from MongoDB)",
+            cached: true,
+            cachedAt: new Date(cachedData.cachedAt).toISOString(),
+          });
+        }
       }
     }
 
@@ -88,20 +101,114 @@ export async function GET(request: NextRequest) {
         `🔍 [ADMIN] Processing ${allTlds.size} TLDs from API response`
       );
 
+      // Log first 20 TLD keys to understand the naming pattern
+      const tldArray = Array.from(allTlds).slice(0, 20);
+      console.log(`📋 [DEBUG] First 20 TLD keys from API:`, tldArray);
+
+      // Log sample data structure for debugging (first TLD)
+      const sampleTld = tldArray[0];
+      if (sampleTld) {
+        console.log(
+          `📋 [DEBUG] Sample TLD "${sampleTld}" structure:`,
+          JSON.stringify(
+            {
+              customer: customerPricing[sampleTld],
+              reseller: resellerPricing[sampleTld],
+            },
+            null,
+            2
+          )
+        );
+      }
+
+      // Helper function to convert API TLD key to readable TLD
+      const convertApiKeyToTld = (apiKey: string): string | null => {
+        // Skip service entries
+        if (apiKey === "privacy-protection" || apiKey === "premium_dns") {
+          return null;
+        }
+
+        // Skip obscure internal codes (that don't follow the pattern)
+        if (!apiKey.startsWith("dot") && !apiKey.startsWith("codot")) {
+          return null;
+        }
+
+        // Convert: dotio → io, dotin → in, dotcom → com
+        if (apiKey.startsWith("dot")) {
+          return apiKey.replace("dot", "");
+        }
+
+        // Convert: codotde → co.de, codotuk → co.uk
+        if (apiKey.startsWith("codot")) {
+          const tldPart = apiKey.replace("codot", "");
+          return `co.${tldPart}`;
+        }
+
+        return null;
+      };
+
       // Process all TLDs from the API response
       for (const tld of allTlds) {
         try {
+          // Convert API key to readable TLD
+          const readableTld = convertApiKeyToTld(tld);
+
+          // Skip if conversion failed or TLD is not recognizable
+          if (!readableTld) {
+            continue;
+          }
+
           // Use the already-fetched pricing data
           const customerTldData = customerPricing[tld];
           const resellerTldData = resellerPricing[tld];
 
           if (customerTldData || resellerTldData) {
-            const customerPrice = customerTldData
-              ? parseFloat(customerTldData["1"] || customerTldData.price || "0")
-              : 0;
-            const resellerPrice = resellerTldData
-              ? parseFloat(resellerTldData["1"] || resellerTldData.price || "0")
-              : 0;
+            // Try multiple possible price field locations
+            let customerPrice = 0;
+            let resellerPrice = 0;
+
+            // Extract customer price - structure: data.addnewdomain["1"]
+            if (customerTldData) {
+              if (typeof customerTldData === "object") {
+                customerPrice = parseFloat(
+                  customerTldData.addnewdomain?.["1"] ||
+                    customerTldData.addnewdomain ||
+                    customerTldData["1"] ||
+                    customerTldData.price ||
+                    "0"
+                );
+              } else {
+                customerPrice = parseFloat(String(customerTldData));
+              }
+            }
+
+            // Extract reseller price - structure: data["0"].pricing.addnewdomain["1"]
+            if (resellerTldData) {
+              if (typeof resellerTldData === "object") {
+                // Check for nested structure first
+                const nestedPricing = resellerTldData["0"]?.pricing;
+                if (nestedPricing && typeof nestedPricing === "object") {
+                  resellerPrice = parseFloat(
+                    nestedPricing.addnewdomain?.["1"] ||
+                      nestedPricing.addnewdomain ||
+                      nestedPricing["1"] ||
+                      nestedPricing.price ||
+                      "0"
+                  );
+                } else {
+                  // Fallback to direct structure
+                  resellerPrice = parseFloat(
+                    resellerTldData.addnewdomain?.["1"] ||
+                      resellerTldData.addnewdomain ||
+                      resellerTldData["1"] ||
+                      resellerTldData.price ||
+                      "0"
+                  );
+                }
+              } else {
+                resellerPrice = parseFloat(String(resellerTldData));
+              }
+            }
 
             // Only add TLDs that have valid pricing
             if (customerPrice > 0 || resellerPrice > 0) {
@@ -111,12 +218,12 @@ export async function GET(request: NextRequest) {
                   : 0;
 
               tldPricing.push({
-                tld: `.${tld}`,
+                tld: `.${readableTld}`,
                 customerPrice: customerPrice,
                 resellerPrice: resellerPrice,
                 currency: "INR",
-                category: getTldCategory(tld),
-                description: getTldDescription(tld),
+                category: getTldCategory(readableTld),
+                description: getTldDescription(readableTld),
                 margin: margin,
               });
             }
@@ -165,14 +272,24 @@ export async function GET(request: NextRequest) {
       cached: false,
     };
 
-    // Cache the data if caching is enabled
+    // Cache the data if caching is enabled AND data is valid
     if (cacheEnabled) {
-      await tldPricingCache.set({
-        tldPricing,
-        totalCount: tldPricing.length,
-        lastUpdated: responseData.lastUpdated,
-        pricingSource: responseData.pricingSource,
-      });
+      if (tldPricing.length > 0) {
+        await tldPricingCache.set({
+          tldPricing,
+          totalCount: tldPricing.length,
+          lastUpdated: responseData.lastUpdated,
+          pricingSource: responseData.pricingSource,
+        });
+        console.log(`✅ [CACHE] Successfully cached ${tldPricing.length} TLDs`);
+      } else {
+        console.error(
+          `❌ [CACHE] Refusing to cache empty data! Check data extraction logic.`
+        );
+        // Purge any existing empty cache
+        await tldPricingCache.purge();
+        console.log(`🗑️ [CACHE] Purged empty cache to prevent stale data`);
+      }
     }
 
     return NextResponse.json(responseData);
