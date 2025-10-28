@@ -7,7 +7,7 @@ import jsPDF from "jspdf";
 import { formatIndianDate } from "@/lib/dateUtils";
 
 // Force dynamic rendering - required for API routes
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function GET(
   request: NextRequest,
@@ -241,11 +241,15 @@ export async function GET(
           0
         );
 
-    const summaryY = Math.max(currentY + 20, pageHeight - 80);
+    // Calculate GST breakdown (18%)
+    const baseAmount = total / 1.18;
+    const gstAmount = total - baseAmount;
 
-    // Summary box with better positioning
+    const summaryY = Math.max(currentY + 20, pageHeight - 100);
+
+    // Summary box with better positioning (increased height for GST breakdown)
     const summaryWidth = 100;
-    const summaryHeight = 50;
+    const summaryHeight = 70;
     const summaryX = pageWidth - summaryWidth - 20;
 
     pdf.setFillColor(248, 250, 252);
@@ -264,14 +268,43 @@ export async function GET(
     pdf.setFontSize(10);
     pdf.setFont("helvetica", "normal");
 
-    // Total
+    // Subtotal (Base Amount)
+    pdf.text(`Subtotal:`, summaryX + 5, summaryY + 22);
+    pdf.text(
+      `₹${baseAmount.toFixed(2)}`,
+      summaryX + summaryWidth - 5,
+      summaryY + 22,
+      { align: "right" }
+    );
+
+    // GST (18%)
+    pdf.text(`GST (18%):`, summaryX + 5, summaryY + 32);
+    pdf.text(
+      `₹${gstAmount.toFixed(2)}`,
+      summaryX + summaryWidth - 5,
+      summaryY + 32,
+      { align: "right" }
+    );
+
+    // Divider line
+    pdf.setDrawColor(lightGray[0], lightGray[1], lightGray[2]);
+    pdf.setLineWidth(0.3);
+    pdf.line(
+      summaryX + 5,
+      summaryY + 37,
+      summaryX + summaryWidth - 5,
+      summaryY + 37
+    );
+
+    // Total (with GST)
     pdf.setFontSize(12);
     pdf.setFont("helvetica", "bold");
-    pdf.text(`Total:`, summaryX + 5, summaryY + 20);
+    pdf.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+    pdf.text(`Total:`, summaryX + 5, summaryY + 47);
     pdf.text(
       `₹${total.toFixed(2)} ${order.currency}`,
       summaryX + summaryWidth - 5,
-      summaryY + 20,
+      summaryY + 47,
       { align: "right" }
     );
 
@@ -280,10 +313,10 @@ export async function GET(
     pdf.setFont("helvetica", "normal");
     pdf.setTextColor(lightGray[0], lightGray[1], lightGray[2]);
     pdf.text(
-      "*All prices include 18% GST",
-      summaryX + summaryWidth - 5,
-      summaryY + 30,
-      { align: "right" }
+      "*GST (18%) included in total",
+      summaryX + summaryWidth / 2,
+      summaryY + 60,
+      { align: "center" }
     );
 
     // Footer

@@ -7,7 +7,7 @@ import jsPDF from "jspdf";
 import { formatIndianDate } from "@/lib/dateUtils";
 
 // Force dynamic rendering - required for API routes
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function GET(
   request: NextRequest,
@@ -288,7 +288,12 @@ export async function GET(
     // Divider line
     pdf.setDrawColor(lightGray[0], lightGray[1], lightGray[2]);
     pdf.setLineWidth(0.3);
-    pdf.line(summaryX + 5, summaryY + 37, summaryX + summaryWidth - 5, summaryY + 37);
+    pdf.line(
+      summaryX + 5,
+      summaryY + 37,
+      summaryX + summaryWidth - 5,
+      summaryY + 37
+    );
 
     // Total (with GST)
     pdf.setFontSize(12);

@@ -502,11 +502,16 @@ export class EmailService {
             <table style="width: 100%; border-collapse: collapse;">
               <tr>
                 <td style="padding: 8px 0; color: #6b7280;">Subtotal:</td>
-                <td style="padding: 8px 0; text-align: right; color: #1f2937; font-weight: 500;">₹${(total / 1.18).toFixed(2)}</td>
+                <td style="padding: 8px 0; text-align: right; color: #1f2937; font-weight: 500;">₹${(
+                  total / 1.18
+                ).toFixed(2)}</td>
               </tr>
               <tr>
                 <td style="padding: 8px 0; color: #6b7280;">GST (18%):</td>
-                <td style="padding: 8px 0; text-align: right; color: #1f2937; font-weight: 500;">₹${(total - (total / 1.18)).toFixed(2)}</td>
+                <td style="padding: 8px 0; text-align: right; color: #1f2937; font-weight: 500;">₹${(
+                  total -
+                  total / 1.18
+                ).toFixed(2)}</td>
               </tr>
               <tr style="border-top: 2px solid #e5e7eb;">
                 <td style="padding: 12px 0; font-size: 18px; font-weight: 700; color: #1f2937;">Total (incl. GST):</td>
