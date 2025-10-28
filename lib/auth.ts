@@ -123,7 +123,9 @@ export class AuthService {
       }
 
       await connectDB();
-      const user = await User.findById(payload.userId).select("-password");
+      // Fetch user WITH password field so we can check if it exists
+      // Individual API endpoints are responsible for not exposing the password hash
+      const user = await User.findById(payload.userId);
 
       if (!user || !user.isActive) {
         return null;
