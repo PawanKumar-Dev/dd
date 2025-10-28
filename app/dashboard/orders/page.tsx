@@ -392,11 +392,24 @@ export default function UserOrders() {
 
                     <div className="border-t pt-4">
                       <div className="space-y-2">
-                        <div className="flex justify-between items-center border-t pt-2">
-                          <span className="text-lg font-semibold text-gray-900">Total</span>
-                          <span className="text-lg font-bold text-gray-900">₹{(selectedOrder.amount || 0).toLocaleString()}</span>
+                        {/* Subtotal */}
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">Subtotal</span>
+                          <span className="text-sm text-gray-900">₹{((selectedOrder.amount || 0) / 1.18).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                         </div>
-                        <p className="text-xs text-gray-500 text-right">*All prices include 18% GST</p>
+
+                        {/* GST (18%) */}
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">GST (18%)</span>
+                          <span className="text-sm text-gray-900">₹{((selectedOrder.amount || 0) - ((selectedOrder.amount || 0) / 1.18)).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        </div>
+
+                        {/* Total */}
+                        <div className="flex justify-between items-center border-t pt-2">
+                          <span className="text-lg font-semibold text-gray-900">Total (incl. GST)</span>
+                          <span className="text-lg font-bold text-blue-600">₹{(selectedOrder.amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        </div>
+                        <p className="text-xs text-gray-500 text-right">*GST (18%) is included in the total amount</p>
                       </div>
                     </div>
                   </div>

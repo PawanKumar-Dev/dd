@@ -699,19 +699,34 @@ export default function AdminOrdersPage() {
                 {/* Payment Info */}
                 <div className="border-t pt-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Payment Information</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="text-sm font-medium text-gray-500">Amount</label>
-                      <p className="text-lg font-semibold">₹{selectedOrder.amount.toFixed(2)} {selectedOrder.currency}</p>
-                      <p className="text-xs text-gray-500 mt-1">*All prices include 18% GST</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Payment Details */}
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-sm font-medium text-gray-500">Payment ID</label>
+                        <p className="text-lg font-mono">{selectedOrder.paymentId}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-gray-500">Date</label>
+                        <p className="text-lg">{formatIndianDateTime(selectedOrder.createdAt)}</p>
+                      </div>
                     </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-500">Payment ID</label>
-                      <p className="text-lg font-mono">{selectedOrder.paymentId}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-500">Date</label>
-                      <p className="text-lg">{formatIndianDateTime(selectedOrder.createdAt)}</p>
+
+                    {/* Amount Breakdown */}
+                    <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-600">Subtotal</span>
+                        <span className="text-gray-900">₹{(selectedOrder.amount / 1.18).toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-600">GST (18%)</span>
+                        <span className="text-gray-900">₹{(selectedOrder.amount - (selectedOrder.amount / 1.18)).toFixed(2)}</span>
+                      </div>
+                      <div className="border-t pt-2 flex justify-between items-center">
+                        <span className="font-semibold text-gray-900">Total (incl. GST)</span>
+                        <span className="text-lg font-bold text-blue-600">₹{selectedOrder.amount.toFixed(2)} {selectedOrder.currency}</span>
+                      </div>
+                      <p className="text-xs text-gray-500 text-right">*GST (18%) is included in the total amount</p>
                     </div>
                   </div>
                 </div>

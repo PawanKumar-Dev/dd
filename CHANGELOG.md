@@ -21,6 +21,15 @@
 
 ### Fixed
 
+#### GST Breakdown UI Display
+
+- **Order Details Modal**: Added comprehensive GST breakdown in user order details modal showing Subtotal, GST (18%), and Total
+- **Admin Order Management**: Enhanced payment information section with detailed GST breakdown display
+- **Admin Payment Management**: Updated payment details to show complete tax breakdown
+- **Cart Page**: Improved order summary to display actual GST amount instead of just "Included"
+- **Payment Success Page**: Added detailed GST breakdown with highlighted box on payment confirmation page
+- **Consistent Formatting**: Standardized GST display across all user-facing pages for better tax transparency
+
 #### Domain Visibility & Status Sync
 
 - **User Domain List**: Fixed critical issue where users couldn't see failed/pending domains in their domain list

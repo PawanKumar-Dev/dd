@@ -211,12 +211,20 @@ export default function PaymentResultPage() {
                   </div>
                 )}
                 {result.amount && (
-                  <div className="flex justify-between">
-                    <span className="text-green-700">Amount:</span>
-                    <div className="text-right">
-                      <span className="font-semibold text-green-800">₹{result.amount.toFixed(2)} {result.currency}</span>
-                      <p className="text-xs text-green-600 mt-1">*All prices include 18% GST</p>
+                  <div className="space-y-2 bg-green-100 p-3 rounded-lg">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-green-700">Subtotal:</span>
+                      <span className="text-green-800">₹{(result.amount / 1.18).toFixed(2)}</span>
                     </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-green-700">GST (18%):</span>
+                      <span className="text-green-800">₹{(result.amount - (result.amount / 1.18)).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between border-t border-green-300 pt-2">
+                      <span className="font-semibold text-green-700">Total (incl. GST):</span>
+                      <span className="font-bold text-green-900">₹{result.amount.toFixed(2)} {result.currency}</span>
+                    </div>
+                    <p className="text-xs text-green-600 text-right">*GST (18%) is included in the total amount</p>
                   </div>
                 )}
                 <div className="flex justify-between">

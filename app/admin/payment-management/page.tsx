@@ -364,9 +364,22 @@ export default function AdminPayments() {
                     </span>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Amount</label>
-                    <p className="text-lg font-semibold">₹{selectedPayment.amount.toFixed(2)} {selectedPayment.currency}</p>
-                    <p className="text-xs text-gray-500 mt-1">*All prices include 18% GST</p>
+                    <label className="text-sm font-medium text-gray-500 mb-2 block">Amount Breakdown</label>
+                    <div className="bg-gray-50 p-3 rounded-lg space-y-1.5">
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="text-gray-600">Subtotal:</span>
+                        <span className="text-gray-900">₹{(selectedPayment.amount / 1.18).toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="text-gray-600">GST (18%):</span>
+                        <span className="text-gray-900">₹{(selectedPayment.amount - (selectedPayment.amount / 1.18)).toFixed(2)}</span>
+                      </div>
+                      <div className="border-t pt-1.5 flex justify-between items-center">
+                        <span className="text-sm font-semibold text-gray-900">Total:</span>
+                        <span className="text-base font-bold text-blue-600">₹{selectedPayment.amount.toFixed(2)} {selectedPayment.currency}</span>
+                      </div>
+                      <p className="text-xs text-gray-500 text-right">*GST included</p>
+                    </div>
                   </div>
                 </div>
 

@@ -381,18 +381,18 @@ export default function CartPage() {
                   <div className="space-y-4 mb-6">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Subtotal ({getItemCount()} items)</span>
-                      <span className="text-gray-900">₹{getSubtotalPrice().toFixed(2)}</span>
+                      <span className="text-gray-900">₹{(getTotalPrice() / 1.18).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">GST (18%)</span>
-                      <span className="text-gray-900">Included</span>
+                      <span className="text-gray-900">₹{(getTotalPrice() - (getTotalPrice() / 1.18)).toFixed(2)}</span>
                     </div>
                     <div className="border-t border-gray-200 pt-4">
                       <div className="flex justify-between text-lg font-bold">
-                        <span>Total</span>
+                        <span>Total (incl. GST)</span>
                         <span className="text-primary-600">₹{getTotalPrice().toFixed(2)}</span>
                       </div>
-                      <p className="text-xs text-gray-500 mt-2 text-center">All prices include 18% GST</p>
+                      <p className="text-xs text-gray-500 mt-2 text-center">*GST (18%) is included in the total amount</p>
                     </div>
                   </div>
 
@@ -400,8 +400,8 @@ export default function CartPage() {
                     onClick={handleCheckout}
                     disabled={user ? user.profileCompleted !== true : false}
                     className={`w-full font-semibold py-3 px-4 rounded-lg transition-all duration-200 mb-4 flex items-center justify-center space-x-2 ${user && user.profileCompleted !== true
-                        ? 'bg-gray-400 cursor-not-allowed opacity-60'
-                        : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-xl transform hover:scale-105'
+                      ? 'bg-gray-400 cursor-not-allowed opacity-60'
+                      : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-xl transform hover:scale-105'
                       }`}
                     title={user && user.profileCompleted !== true ? 'Complete your profile first' : ''}
                   >
