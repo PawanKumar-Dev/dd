@@ -4,7 +4,7 @@ import connectDB from "@/lib/mongodb";
 import Order from "@/models/Order";
 
 // Force dynamic rendering - required for API routes
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
@@ -54,10 +54,11 @@ export async function POST(request: NextRequest) {
 
     // Check if domain is registered
     if (domain.status !== "registered") {
-      return NextResponse.json(
-        { error: "Domain must be registered to activate DNS management" },
-        { status: 400 }
-      );
+      const statusMessage =
+        domain.status === "pending" || domain.status === "processing"
+          ? `Cannot activate DNS - domain is currently ${domain.status}. Please wait for registration to complete.`
+          : "Domain must be registered to activate DNS management";
+      return NextResponse.json({ error: statusMessage }, { status: 400 });
     }
 
     // Check if DNS is already activated

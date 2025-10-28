@@ -596,7 +596,7 @@ export default function AdminDNSManagementPage() {
                       </div>
                     </div>
 
-                    {!domain.dnsActivated && domain.resellerClubOrderId && (
+                    {!domain.dnsActivated && domain.resellerClubOrderId && domain.status !== 'pending' && domain.status !== 'processing' && (
                       <div className="mt-2 ml-6 sm:ml-7">
                         <button
                           onClick={(e) => {
@@ -608,6 +608,13 @@ export default function AdminDNSManagementPage() {
                         >
                           {isActivating ? 'Activating...' : 'Activate DNS'}
                         </button>
+                      </div>
+                    )}
+                    {!domain.dnsActivated && domain.resellerClubOrderId && (domain.status === 'pending' || domain.status === 'processing') && (
+                      <div className="mt-2 ml-6 sm:ml-7">
+                        <div className="w-full px-2 sm:px-3 py-1 text-xs bg-gray-100 text-gray-500 rounded text-center border border-gray-300">
+                          DNS activation unavailable (Domain {domain.status})
+                        </div>
                       </div>
                     )}
                   </div>
