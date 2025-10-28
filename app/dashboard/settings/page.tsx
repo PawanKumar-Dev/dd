@@ -131,7 +131,23 @@ export default function UserSettings() {
         });
         if (meResponse.ok) {
           const meData = await meResponse.json();
-          setHasExistingPassword(!!meData.user?.password || meData.user?.provider === 'credentials');
+
+          // Check if user has a password - the API returns password as a boolean
+          // A user has a password if:
+          // 1. The password field is explicitly true, OR
+          // 2. The provider is 'credentials' (they registered with email/password), OR  
+          // 3. The provider is null/undefined (old accounts default to credentials)
+          const hasPassword = meData.user?.password === true ||
+            meData.user?.provider === 'credentials' ||
+            !meData.user?.provider;
+
+          setHasExistingPassword(hasPassword);
+
+          console.log('🔍 Password check:', {
+            password: meData.user?.password,
+            provider: meData.user?.provider,
+            hasPassword,
+          });
 
           // Update user state with complete data from database
           if (meData.user) {
