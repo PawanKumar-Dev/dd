@@ -7,19 +7,26 @@
 
 ### Major Fixes & Improvements
 
-#### 1. **Authentication System Overhaul**
+#### 1. **GST Tax Breakdown & Transparency** 🆕
+
+- ✅ **Invoice GST Breakdown** - All PDF invoices now show detailed GST (18%) breakdown with Subtotal, GST amount, and Total
+- ✅ **Email Tax Display** - Order confirmation emails include complete price breakdown
+- ✅ **Invoice Modal Update** - Invoice preview component shows GST calculation
+- ✅ **Tax Compliance** - Clear indication that 18% GST is included in all prices as per Indian regulations
+
+#### 2. **Authentication System Overhaul**
 
 - ✅ **Fixed Password Detection Issue** - Resolved critical bug where password existence wasn't properly detected for users
 - ✅ **Hybrid Authentication Support** - All users can now set passwords regardless of login method (social or credentials)
 - ✅ **Enhanced Account Settings** - Fixed false warnings and improved password management UI
 
-#### 2. **Streamlined User Experience**
+#### 3. **Streamlined User Experience**
 
 - ✅ **Simplified Payment Success Page** - Removed overwhelming technical details for cleaner user experience
 - ✅ **Cleaner Admin Interface** - Removed unnecessary stat cards from pending domains page
 - ✅ **Better Console Hygiene** - Removed debug logs for production-ready application
 
-#### 3. **DNS Management Improvements**
+#### 4. **DNS Management Improvements**
 
 - ✅ **Smart DNS Activation** - DNS can only be activated for fully registered domains
 - ✅ **Status-Based Validation** - Pending/processing domains show helpful disabled state
@@ -28,6 +35,41 @@
 ---
 
 ## 🔧 Technical Changes
+
+### GST Tax Implementation
+
+#### Invoice and Email GST Breakdown
+
+**Objective:** Provide complete tax transparency and comply with Indian GST regulations by showing detailed price breakdown.
+
+**Implementation:**
+
+```typescript
+// Calculate GST breakdown (18%)
+const baseAmount = total / 1.18; // Subtotal before tax
+const gstAmount = total - baseAmount; // 18% GST
+
+// Display in invoices and emails:
+// Subtotal: ₹{baseAmount}
+// GST (18%): ₹{gstAmount}
+// Total (incl. GST): ₹{total}
+```
+
+**Files Modified:**
+
+- `app/api/orders/[id]/invoice/route.ts` - User invoice PDF with GST breakdown
+- `app/api/admin/orders/[id]/invoice/route.ts` - Admin invoice PDF with GST breakdown
+- `components/Invoice.tsx` - Invoice modal component with GST display
+- `lib/email.ts` - Order confirmation email with GST table
+
+**Benefits:**
+
+- Complete transparency for customers
+- Compliance with Indian tax regulations
+- Professional invoice presentation
+- Easier accounting and tax filing
+
+---
 
 ### Authentication & Security
 

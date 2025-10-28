@@ -2,6 +2,15 @@
 
 ## [2.7.0] - 2025-10-28
 
+### Added
+
+#### GST Transparency & Tax Breakdown
+
+- **Invoice GST Breakdown**: All PDF invoices now show detailed GST (18%) breakdown with Subtotal, GST amount, and Total
+- **Email GST Breakdown**: Order confirmation emails display complete price breakdown including GST calculation
+- **Tax Compliance**: Clear indication that 18% GST is included in all prices as per Indian tax regulations
+- **Professional Formatting**: Enhanced invoice and email layouts with proper GST line items
+
 ### Fixed
 
 #### Authentication & Security
@@ -88,10 +97,18 @@
 - `app/loading.tsx` - Updated to use CenteredLoading component
 - `app/checkout/page.tsx` - Improved loading message
 
+**GST & Tax Breakdown:**
+
+- `app/api/orders/[id]/invoice/route.ts` - Added GST breakdown calculation and display in user invoices
+- `app/api/admin/orders/[id]/invoice/route.ts` - Added GST breakdown calculation and display in admin invoices
+- `components/Invoice.tsx` - Updated invoice modal component with GST breakdown
+- `lib/email.ts` - Updated email template with GST breakdown in order summary
+
 **Documentation:**
 
 - `LOADING_GUIDELINES.md` - NEW: Comprehensive loading state implementation guide
 - `LOADING_IMPROVEMENTS_v2.7.0.md` - NEW: Detailed improvements documentation
+- `GST_IMPLEMENTATION.md` - NEW: Complete GST breakdown implementation guide
 
 ## [2.6.0] - 2025-01-26
 
