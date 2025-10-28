@@ -1,5 +1,68 @@
 # Changelog
 
+## [2.7.0] - 2025-10-28
+
+### Fixed
+
+#### Authentication & Security
+
+- **Password Detection System**: Fixed issue where `getUserFromRequest` was excluding password field with `.select("-password")`, causing incorrect password status detection
+- **Social Login Password Support**: Enhanced system to allow all users (both social login and credential-based) to set/change passwords, enabling hybrid authentication
+- **Account Settings UI**: Fixed false warning messages for users who have passwords set but logged in via social auth
+- **API Consistency**: Added `provider` field to all authentication endpoints (login, register, activate) for consistent user data
+
+#### User Interface Improvements
+
+- **Payment Success Page**: Removed "Domains Being Processed" section to provide cleaner, simpler user experience without overwhelming technical details
+- **Admin Pending Domains**: Removed status summary stat cards for more focused domain management interface
+- **DNS Management**: Added validation to prevent DNS activation for domains in pending or processing status
+- **Console Logs Cleanup**: Removed debug logs from browser console for cleaner production experience
+
+#### Security Enhancements
+
+- **Password Field Handling**: Improved password field handling to check existence without exposing actual hash values
+- **API Response Security**: Ensured all endpoints return password as boolean instead of exposing hash
+- **Validation Messages**: Enhanced error messages to be more specific about domain status in DNS activation
+
+### Changed
+
+#### DNS Management System
+
+- **DNS Activation Rules**: DNS activation button now only appears for fully registered domains
+- **Status-Based UI**: Pending/processing domains show disabled state with helpful message: "DNS activation unavailable (Domain pending/processing)"
+- **API Validation**: Enhanced backend validation with specific error messages for different domain states
+- **User Guidance**: Improved messaging to guide admins to wait for registration completion before DNS activation
+
+#### Account Settings
+
+- **Password Management**: Unified password management interface for all users regardless of login method
+- **Info Messages**: Updated warning messages to be more accurate and helpful:
+  - Without password: "Set a password to enable email/password login in addition to your social login"
+  - With password: "Change your account password. You can use either password or social login to access your account"
+- **Form Behavior**: Correctly shows "Set Password" vs "Change Password" based on actual password existence
+
+### Improved
+
+- **Code Quality**: Removed unused imports, state variables, and functions after UI simplification
+- **Performance**: Reduced unnecessary API calls and data fetching for removed features
+- **User Experience**: Streamlined interfaces by removing redundant information displays
+- **Developer Experience**: Cleaner console output without debug logs in production
+
+### Technical Details
+
+#### Files Modified
+
+- `lib/auth.ts` - Removed `.select("-password")` to allow password existence checking
+- `app/api/auth/me/route.ts` - Added password field existence check and debug logging cleanup
+- `app/api/auth/login/route.ts` - Added provider field to response
+- `app/api/auth/register/route.ts` - Added provider field to response
+- `app/api/auth/activate/route.ts` - Added provider field to response
+- `app/dashboard/settings/page.tsx` - Fixed password detection logic and cleaned up console logs
+- `app/payment-success/page.tsx` - Removed processing domains section and related code
+- `app/admin/pending-domains/page.tsx` - Removed status summary cards
+- `app/admin/dns-management/page.tsx` - Added status-based DNS activation controls
+- `app/api/admin/domains/activate-dns/route.ts` - Enhanced validation with specific error messages
+
 ## [2.6.0] - 2025-01-26
 
 ### Added
@@ -186,6 +249,8 @@
 
 ## Version History
 
+- **2.7.0** - Authentication Fixes & UI Improvements
+- **2.6.0** - Enhanced UX & Animations
 - **2.5.0** - Pending Domains Management System
 - **2.4.0** - DNS Management & Social Login
 - **2.3.0** - Enhanced Registration & Cart System
