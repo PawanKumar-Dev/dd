@@ -4,6 +4,14 @@
 
 ### Added
 
+#### MongoDB-Persisted TLD Pricing Cache
+
+- **Database Persistence**: TLD pricing cache now persists in MongoDB instead of in-memory storage
+- **Server Restart Resilience**: Cache survives server restarts and deployments
+- **Automatic Expiry**: MongoDB cache includes automatic expiration handling
+- **Enhanced Reliability**: Shared cache across multiple server instances (for horizontal scaling)
+- **Performance**: Maintains fast cache access while providing persistent storage
+
 #### Purchase Order (PO) System & Improved Payment Flow
 
 - **PO Number Generation**: Every purchase now automatically generates a unique Purchase Order (PO) number

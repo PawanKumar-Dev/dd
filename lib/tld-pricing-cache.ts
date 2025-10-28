@@ -1,9 +1,12 @@
 /**
  * TLD Pricing Cache Service
  *
- * Provides in-memory caching for TLD pricing data to reduce API calls
- * and improve performance. Includes configurable TTL and manual purge capability.
+ * Provides MongoDB-persisted caching for TLD pricing data to reduce API calls
+ * and improve performance. Cache survives server restarts and includes configurable TTL.
  */
+
+import TLDPricingCache from "@/models/TLDPricingCache";
+import { connectToDatabase } from "@/lib/mongoose";
 
 interface CachedPricingData {
   tldPricing: Array<{
@@ -21,86 +24,169 @@ interface CachedPricingData {
   cachedAt: number;
 }
 
-class TLDPricingCache {
-  private cache: CachedPricingData | null = null;
-  private defaultTTL: number = 3600000; // 1 hour in milliseconds
+class TLDPricingCacheService {
+  private defaultTTL: number = 60; // 60 minutes default
 
   /**
    * Get cached pricing data if available and not expired
    */
-  get(): CachedPricingData | null {
-    if (!this.cache) {
+  async get(): Promise<CachedPricingData | null> {
+    try {
+      await connectToDatabase();
+
+      const cache = await TLDPricingCache.findOne({ key: "tld_pricing_cache" });
+
+      if (!cache) {
+        console.log("ℹ️ [CACHE] No cache found in MongoDB");
+        return null;
+      }
+
+      const now = new Date();
+
+      // Check if cache has expired
+      if (now > cache.expiresAt) {
+        console.log("🗑️ [CACHE] TLD pricing cache expired, clearing...");
+        await TLDPricingCache.deleteOne({ key: "tld_pricing_cache" });
+        return null;
+      }
+
+      const remainingTime = Math.floor(
+        (cache.expiresAt.getTime() - now.getTime()) / 1000 / 60
+      );
+      console.log(
+        `✅ [CACHE] Returning cached TLD pricing data from MongoDB (${remainingTime} minutes remaining)`
+      );
+
+      return {
+        tldPricing: cache.tldPricing,
+        totalCount: cache.totalCount,
+        lastUpdated: cache.lastUpdated,
+        pricingSource: cache.pricingSource,
+        cachedAt: cache.cachedAt.getTime(),
+      };
+    } catch (error) {
+      console.error("[CACHE] Error reading from MongoDB:", error);
       return null;
     }
-
-    const now = Date.now();
-    const age = now - this.cache.cachedAt;
-
-    // Check if cache has expired
-    if (age > this.defaultTTL) {
-      console.log("🗑️ [CACHE] TLD pricing cache expired, clearing...");
-      this.cache = null;
-      return null;
-    }
-
-    const remainingTime = Math.floor((this.defaultTTL - age) / 1000 / 60);
-    console.log(
-      `✅ [CACHE] Returning cached TLD pricing data (${remainingTime} minutes remaining)`
-    );
-    return this.cache;
   }
 
   /**
    * Set pricing data in cache
    */
-  set(data: Omit<CachedPricingData, "cachedAt">): void {
-    this.cache = {
-      ...data,
-      cachedAt: Date.now(),
-    };
-    console.log(
-      `💾 [CACHE] Cached TLD pricing data (${
-        data.totalCount
-      } TLDs, expires in ${this.defaultTTL / 1000 / 60} minutes)`
-    );
+  async set(data: Omit<CachedPricingData, "cachedAt">): Promise<void> {
+    try {
+      await connectToDatabase();
+
+      const now = new Date();
+      const expiresAt = new Date(now.getTime() + this.defaultTTL * 60 * 1000);
+
+      await TLDPricingCache.findOneAndUpdate(
+        { key: "tld_pricing_cache" },
+        {
+          key: "tld_pricing_cache",
+          tldPricing: data.tldPricing,
+          totalCount: data.totalCount,
+          lastUpdated: data.lastUpdated,
+          pricingSource: data.pricingSource,
+          cachedAt: now,
+          expiresAt: expiresAt,
+          ttlMinutes: this.defaultTTL,
+        },
+        { upsert: true, new: true }
+      );
+
+      console.log(
+        `💾 [CACHE] Cached TLD pricing data to MongoDB (${data.totalCount} TLDs, expires in ${this.defaultTTL} minutes)`
+      );
+    } catch (error) {
+      console.error("[CACHE] Error saving to MongoDB:", error);
+    }
   }
 
   /**
    * Manually purge the cache
    */
-  purge(): void {
-    if (this.cache) {
-      console.log("🗑️ [CACHE] Manually purging TLD pricing cache");
-      this.cache = null;
-    } else {
-      console.log("ℹ️ [CACHE] Cache already empty, nothing to purge");
+  async purge(): Promise<void> {
+    try {
+      await connectToDatabase();
+
+      const result = await TLDPricingCache.deleteOne({
+        key: "tld_pricing_cache",
+      });
+
+      if (result.deletedCount > 0) {
+        console.log(
+          "🗑️ [CACHE] Manually purged TLD pricing cache from MongoDB"
+        );
+      } else {
+        console.log("ℹ️ [CACHE] Cache already empty, nothing to purge");
+      }
+    } catch (error) {
+      console.error("[CACHE] Error purging cache:", error);
     }
   }
 
   /**
    * Check if cache exists and is valid
    */
-  isValid(): boolean {
-    if (!this.cache) {
+  async isValid(): Promise<boolean> {
+    try {
+      await connectToDatabase();
+
+      const cache = await TLDPricingCache.findOne({ key: "tld_pricing_cache" });
+
+      if (!cache) {
+        return false;
+      }
+
+      const now = new Date();
+      return now <= cache.expiresAt;
+    } catch (error) {
+      console.error("[CACHE] Error checking cache validity:", error);
       return false;
     }
-
-    const now = Date.now();
-    const age = now - this.cache.cachedAt;
-    return age <= this.defaultTTL;
   }
 
   /**
    * Get cache status information
    */
-  getStatus(): {
+  async getStatus(): Promise<{
     isCached: boolean;
     cachedAt: string | null;
     expiresAt: string | null;
     remainingTime: number | null;
     itemCount: number | null;
-  } {
-    if (!this.cache) {
+  }> {
+    try {
+      await connectToDatabase();
+
+      const cache = await TLDPricingCache.findOne({ key: "tld_pricing_cache" });
+
+      if (!cache) {
+        return {
+          isCached: false,
+          cachedAt: null,
+          expiresAt: null,
+          remainingTime: null,
+          itemCount: null,
+        };
+      }
+
+      const now = new Date();
+      const remainingTime = Math.max(
+        0,
+        cache.expiresAt.getTime() - now.getTime()
+      );
+
+      return {
+        isCached: true,
+        cachedAt: cache.cachedAt.toISOString(),
+        expiresAt: cache.expiresAt.toISOString(),
+        remainingTime: Math.floor(remainingTime / 1000), // in seconds
+        itemCount: cache.totalCount,
+      };
+    } catch (error) {
+      console.error("[CACHE] Error getting cache status:", error);
       return {
         isCached: false,
         cachedAt: null,
@@ -109,26 +195,13 @@ class TLDPricingCache {
         itemCount: null,
       };
     }
-
-    const now = Date.now();
-    const age = now - this.cache.cachedAt;
-    const remainingTime = Math.max(0, this.defaultTTL - age);
-    const expiresAt = new Date(this.cache.cachedAt + this.defaultTTL);
-
-    return {
-      isCached: true,
-      cachedAt: new Date(this.cache.cachedAt).toISOString(),
-      expiresAt: expiresAt.toISOString(),
-      remainingTime: Math.floor(remainingTime / 1000), // in seconds
-      itemCount: this.cache.totalCount,
-    };
   }
 
   /**
    * Update cache TTL
    */
   setTTL(ttlInMinutes: number): void {
-    this.defaultTTL = ttlInMinutes * 60 * 1000;
+    this.defaultTTL = ttlInMinutes;
     console.log(`⏱️ [CACHE] Updated cache TTL to ${ttlInMinutes} minutes`);
   }
 
@@ -136,9 +209,9 @@ class TLDPricingCache {
    * Get current TTL in minutes
    */
   getTTL(): number {
-    return this.defaultTTL / 1000 / 60;
+    return this.defaultTTL;
   }
 }
 
 // Export singleton instance
-export const tldPricingCache = new TLDPricingCache();
+export const tldPricingCache = new TLDPricingCacheService();

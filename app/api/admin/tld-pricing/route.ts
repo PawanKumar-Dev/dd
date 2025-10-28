@@ -34,15 +34,17 @@ export async function GET(request: NextRequest) {
 
     // Check cache first if enabled
     if (cacheEnabled) {
-      const cachedData = tldPricingCache.get();
+      const cachedData = await tldPricingCache.get();
       if (cachedData) {
-        console.log("✅ [ADMIN] Returning cached TLD pricing data");
+        console.log(
+          "✅ [ADMIN] Returning cached TLD pricing data from MongoDB"
+        );
         return NextResponse.json({
           success: true,
           tldPricing: cachedData.tldPricing,
           totalCount: cachedData.totalCount,
           lastUpdated: cachedData.lastUpdated,
-          pricingSource: cachedData.pricingSource + " (Cached)",
+          pricingSource: cachedData.pricingSource + " (Cached from MongoDB)",
           cached: true,
           cachedAt: new Date(cachedData.cachedAt).toISOString(),
         });
@@ -223,7 +225,7 @@ export async function GET(request: NextRequest) {
 
     // Cache the data if caching is enabled
     if (cacheEnabled) {
-      tldPricingCache.set({
+      await tldPricingCache.set({
         tldPricing,
         totalCount: tldPricing.length,
         lastUpdated: responseData.lastUpdated,

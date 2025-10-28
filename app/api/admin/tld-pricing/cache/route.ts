@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const cacheStatus = tldPricingCache.getStatus();
+    const cacheStatus = await tldPricingCache.getStatus();
 
     return NextResponse.json({
       success: true,
@@ -50,7 +50,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    tldPricingCache.purge();
+    await tldPricingCache.purge();
 
     console.log(`🗑️ [CACHE-API] Cache purged by admin: ${user.email}`);
 
@@ -110,7 +110,7 @@ export async function PUT(request: NextRequest) {
 
       // If disabling, purge the cache
       if (!enabled) {
-        tldPricingCache.purge();
+        await tldPricingCache.purge();
       }
     }
 
