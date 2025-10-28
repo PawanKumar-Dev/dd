@@ -138,12 +138,6 @@ export default function UserSettings() {
 
           setHasExistingPassword(hasPassword);
 
-          console.log('🔍 Password check:', {
-            password: meData.user?.password,
-            provider: meData.user?.provider,
-            hasPassword,
-          });
-
           // Update user state with complete data from database
           if (meData.user) {
             setUser(prev => ({
