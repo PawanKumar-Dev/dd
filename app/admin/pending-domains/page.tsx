@@ -59,14 +59,6 @@ interface PendingDomain {
   updatedAt: string;
 }
 
-interface StatusSummary {
-  total: number;
-  pending: number;
-  processing: number;
-  completed: number;
-  failed: number;
-}
-
 interface Pagination {
   page: number;
   limit: number;
@@ -79,13 +71,6 @@ export default function AdminPendingDomainsPage() {
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [pendingDomains, setPendingDomains] = useState<PendingDomain[]>([]);
-  const [statusSummary, setStatusSummary] = useState<StatusSummary>({
-    total: 0,
-    pending: 0,
-    processing: 0,
-    completed: 0,
-    failed: 0,
-  });
   const [pagination, setPagination] = useState<Pagination>({
     page: 1,
     limit: 20,
@@ -193,7 +178,6 @@ export default function AdminPendingDomainsPage() {
 
       if (response.ok && data.success) {
         setPendingDomains(data.pendingDomains);
-        setStatusSummary(data.statusSummary);
         setPagination(data.pagination);
       } else {
         toast.error(data.error || "Failed to fetch pending domains");
@@ -428,55 +412,6 @@ export default function AdminPendingDomainsPage() {
               <p className="text-gray-600 mt-2">
                 Manage domains that failed registration due to insufficient funds or other issues
               </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Status Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-          <div className="bg-white p-4 rounded-lg shadow border">
-            <div className="flex items-center">
-              <AlertTriangle className="h-8 w-8 text-gray-500" />
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-500">Total</p>
-                <p className="text-2xl font-bold text-gray-900">{statusSummary.total}</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow border">
-            <div className="flex items-center">
-              <Clock className="h-8 w-8 text-yellow-500" />
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-500">Pending</p>
-                <p className="text-2xl font-bold text-yellow-600">{statusSummary.pending}</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow border">
-            <div className="flex items-center">
-              <RefreshCw className="h-8 w-8 text-blue-500" />
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-500">Processing</p>
-                <p className="text-2xl font-bold text-blue-600">{statusSummary.processing}</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow border">
-            <div className="flex items-center">
-              <CheckCircle className="h-8 w-8 text-green-500" />
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-500">Completed</p>
-                <p className="text-2xl font-bold text-green-600">{statusSummary.completed}</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white p-4 rounded-lg shadow border">
-            <div className="flex items-center">
-              <XCircle className="h-8 w-8 text-red-500" />
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-500">Failed</p>
-                <p className="text-2xl font-bold text-red-600">{statusSummary.failed}</p>
-              </div>
             </div>
           </div>
         </div>
