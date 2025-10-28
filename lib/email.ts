@@ -496,17 +496,26 @@ export class EmailService {
             </table>
           </div>
 
-          <!-- Summary -->
+          <!-- Summary with GST Breakdown -->
           <div style="background-color: #f8fafc; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
             <h3 style="color: #1f2937; margin: 0 0 15px 0;">Order Summary</h3>
             <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280;">Subtotal:</td>
+                <td style="padding: 8px 0; text-align: right; color: #1f2937; font-weight: 500;">₹${(total / 1.18).toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280;">GST (18%):</td>
+                <td style="padding: 8px 0; text-align: right; color: #1f2937; font-weight: 500;">₹${(total - (total / 1.18)).toFixed(2)}</td>
+              </tr>
               <tr style="border-top: 2px solid #e5e7eb;">
-                <td style="padding: 12px 0; font-size: 18px; font-weight: 700; color: #1f2937;">Total:</td>
-                <td style="padding: 12px 0; text-align: right; font-size: 18px; font-weight: 700; color: #1f2937;">₹${total.toFixed(
+                <td style="padding: 12px 0; font-size: 18px; font-weight: 700; color: #1f2937;">Total (incl. GST):</td>
+                <td style="padding: 12px 0; text-align: right; font-size: 18px; font-weight: 700; color: #3b82f6;">₹${total.toFixed(
                   2
                 )} ${orderData.currency}</td>
               </tr>
             </table>
+            <p style="margin: 10px 0 0 0; color: #9ca3af; font-size: 12px; text-align: right;">*GST (18%) is included in the total amount</p>
           </div>
 
           <!-- Status Messages -->
