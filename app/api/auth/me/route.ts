@@ -13,12 +13,18 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
+    const hasPassword = !!user.password;
+
     console.log("🔍 Server Debug - /api/auth/me: User found:", {
       id: user._id,
       email: user.email,
       role: user.role,
       profileCompleted: user.profileCompleted,
       isActivated: user.isActivated,
+      provider: user.provider,
+      passwordExists: hasPassword,
+      passwordType: typeof user.password,
+      passwordLength: user.password ? user.password.length : 0,
     });
 
     return NextResponse.json({
@@ -32,7 +38,7 @@ export async function GET(request: NextRequest) {
         isActive: user.isActive,
         profileCompleted: user.profileCompleted,
         provider: user.provider,
-        password: !!user.password, // Boolean indicating if password exists
+        password: hasPassword, // Boolean indicating if password exists
         // Include complete profile data to prevent data loss
         phone: user.phone,
         phoneCc: user.phoneCc,
