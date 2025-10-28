@@ -15,18 +15,6 @@ export async function GET(request: NextRequest) {
 
     const hasPassword = !!user.password;
 
-    console.log("🔍 Server Debug - /api/auth/me: User found:", {
-      id: user._id,
-      email: user.email,
-      role: user.role,
-      profileCompleted: user.profileCompleted,
-      isActivated: user.isActivated,
-      provider: user.provider,
-      passwordExists: hasPassword,
-      passwordType: typeof user.password,
-      passwordLength: user.password ? user.password.length : 0,
-    });
-
     return NextResponse.json({
       user: {
         id: user._id,
