@@ -11,6 +11,7 @@
 - **Automatic Expiry**: MongoDB cache includes automatic expiration handling
 - **Enhanced Reliability**: Shared cache across multiple server instances (for horizontal scaling)
 - **Performance**: Maintains fast cache access while providing persistent storage
+- **All TLDs Support**: Fixed to process all 400+ TLDs from ResellerClub API instead of just hardcoded common TLDs
 
 #### Purchase Order (PO) System & Improved Payment Flow
 
@@ -60,7 +61,7 @@
 
 #### User Interface Improvements
 
-- **Refresh Button Standardization**: Unified all Refresh buttons across the entire application with consistent styling - outlined design with blue hover effects for better visual consistency and improved UX
+- **Refresh Button Standardization**: Unified all 10+ Refresh buttons across the entire application (User Orders, Domains, DNS Management, Admin Order Management, Payment Management, User Management, Pricing Management, Pending Domains, DNS Management, Settings) with consistent outlined design and blue hover effects for better visual consistency and improved UX
 - **Action Button Enhancement**: Enlarged action buttons (View/Download) from 16px to 20px with padding and hover backgrounds for better clickability and user experience
 - **Payment Success Page**: Removed "Domains Being Processed" section to provide cleaner, simpler user experience without overwhelming technical details
 - **Admin Pending Domains**: Removed status summary stat cards for more focused domain management interface

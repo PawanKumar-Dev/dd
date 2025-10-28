@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { CreditCard, Search, Filter, MoreVertical, Eye, CheckCircle, XCircle, Clock, RotateCcw } from 'lucide-react';
+import { CreditCard, Search, Filter, MoreVertical, Eye, CheckCircle, XCircle, Clock, RotateCcw, RefreshCw } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayoutNew';
 import AdminDataTable from '@/components/admin/AdminDataTable';
 import { formatIndianDate, formatIndianTime, formatIndianDateTime, formatIndianCurrency } from '@/lib/dateUtils';
@@ -282,9 +282,9 @@ export default function AdminPayments() {
           </div>
           <button
             onClick={() => loadPayments(currentPage, searchTerm)}
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200"
           >
-            <CreditCard className="h-4 w-4 mr-2" />
+            <RefreshCw className="h-4 w-4" />
             Refresh Payments
           </button>
         </div>

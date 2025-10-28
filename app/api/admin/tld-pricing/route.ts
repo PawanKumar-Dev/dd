@@ -78,81 +78,20 @@ export async function GET(request: NextRequest) {
       const customerPricing = pricingData.customerPricing;
       const resellerPricing = pricingData.resellerPricing;
 
-      // Common TLDs to display
-      const commonTlds = [
-        "com",
-        "net",
-        "org",
-        "info",
-        "biz",
-        "co",
-        "in",
-        "co.in",
-        "shop",
-        "store",
-        "online",
-        "site",
-        "website",
-        "app",
-        "dev",
-        "io",
-        "ai",
-        "tech",
-        "digital",
-        "cloud",
-        "host",
-        "space",
-        "me",
-        "tv",
-        "cc",
-        "mobi",
-        "name",
-        "pro",
-        "asia",
-        "us",
-        "uk",
-        "ca",
-        "au",
-        "de",
-        "eu",
-        "fr",
-        "it",
-        "es",
-        "nl",
-        "be",
-        "ch",
-        "at",
-        "se",
-        "no",
-        "dk",
-        "fi",
-        "pl",
-        "cz",
-        "hu",
-        "ro",
-        "bg",
-        "hr",
-        "si",
-        "sk",
-        "lt",
-        "lv",
-        "ee",
-        "lu",
-        "ie",
-        "pt",
-        "gr",
-        "cy",
-        "mt",
-        "li",
-        "is",
-        "fo",
-        "gl",
-      ];
+      // Get all unique TLDs from both customer and reseller pricing
+      const allTlds = new Set([
+        ...Object.keys(customerPricing),
+        ...Object.keys(resellerPricing),
+      ]);
 
-      // Process pricing data that was already fetched
-      for (const tld of commonTlds) {
+      console.log(
+        `🔍 [ADMIN] Processing ${allTlds.size} TLDs from API response`
+      );
+
+      // Process all TLDs from the API response
+      for (const tld of allTlds) {
         try {
-          // Use the already-fetched pricing data instead of making individual API calls
+          // Use the already-fetched pricing data
           const customerTldData = customerPricing[tld];
           const resellerTldData = resellerPricing[tld];
 
@@ -164,20 +103,23 @@ export async function GET(request: NextRequest) {
               ? parseFloat(resellerTldData["1"] || resellerTldData.price || "0")
               : 0;
 
-            const margin =
-              customerPrice > 0 && resellerPrice > 0
-                ? ((customerPrice - resellerPrice) / customerPrice) * 100
-                : 0;
+            // Only add TLDs that have valid pricing
+            if (customerPrice > 0 || resellerPrice > 0) {
+              const margin =
+                customerPrice > 0 && resellerPrice > 0
+                  ? ((customerPrice - resellerPrice) / customerPrice) * 100
+                  : 0;
 
-            tldPricing.push({
-              tld: `.${tld}`,
-              customerPrice: customerPrice,
-              resellerPrice: resellerPrice,
-              currency: "INR",
-              category: getTldCategory(tld),
-              description: getTldDescription(tld),
-              margin: margin,
-            });
+              tldPricing.push({
+                tld: `.${tld}`,
+                customerPrice: customerPrice,
+                resellerPrice: resellerPrice,
+                currency: "INR",
+                category: getTldCategory(tld),
+                description: getTldDescription(tld),
+                margin: margin,
+              });
+            }
           }
         } catch (error) {
           console.warn(

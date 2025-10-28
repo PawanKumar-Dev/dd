@@ -19,7 +19,8 @@ import {
   Trash2,
   AlertTriangle,
   Archive,
-  RotateCcw
+  RotateCcw,
+  RefreshCw
 } from 'lucide-react';
 import AdminLayout from '@/components/admin/AdminLayoutNew';
 import { formatIndianDate, formatIndianDateTime } from '@/lib/dateUtils';
@@ -574,8 +575,9 @@ export default function AdminOrdersPage() {
             <div className="flex items-center space-x-3">
               <button
                 onClick={loadOrders}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200"
               >
+                <RefreshCw className="h-4 w-4" />
                 Refresh
               </button>
             </div>
