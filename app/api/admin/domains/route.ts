@@ -4,7 +4,7 @@ import connectDB from "@/lib/mongodb";
 import Order from "@/models/Order";
 
 // Force dynamic rendering - required for API routes
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   try {
@@ -28,9 +28,16 @@ export async function GET(request: NextRequest) {
       .sort({ createdAt: -1 });
 
     // Flatten domains with customer information
+    // Only include registered domains for DNS management
     const domains = [];
     for (const order of orders) {
       for (const domain of order.domains) {
+        // Filter: Only include domains with "registered" status
+        // Exclude pending, processing, failed, and cancelled domains
+        if (domain.status !== "registered") {
+          continue;
+        }
+
         domains.push({
           id: domain._id.toString(),
           name: domain.domainName || domain.name,

@@ -21,6 +21,12 @@
 
 ### Fixed
 
+#### DNS Management
+
+- **Pending Domain Filter**: Fixed issue where pending/processing domains were showing up in DNS management for both admin and users
+- **Status-Based Access**: DNS management now only displays domains with "registered" status
+- **Clean Interface**: Removed clutter by excluding non-registered domains from DNS management pages
+
 #### Authentication & Security
 
 - **Password Detection System**: Fixed issue where `getUserFromRequest` was excluding password field with `.select("-password")`, causing incorrect password status detection
@@ -95,6 +101,8 @@
 
 **DNS Management:**
 
+- `app/api/admin/domains/route.ts` - Added filter to only return registered domains for DNS management
+- `app/api/user/domains/route.ts` - Added filter to only return registered domains for DNS management
 - `app/admin/dns-management/page.tsx` - Added status-based DNS activation controls and improved loading states
 - `app/api/admin/domains/activate-dns/route.ts` - Enhanced validation with specific error messages
 

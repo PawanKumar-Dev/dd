@@ -5,7 +5,7 @@ import Order from "@/models/Order";
 import User from "@/models/User";
 
 // Force dynamic rendering - required for API routes
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   try {
@@ -29,6 +29,12 @@ export async function GET(request: NextRequest) {
     orders.forEach((order) => {
       order.domains.forEach((domain: any) => {
         const domainKey = domain.domainName;
+
+        // Only include domains with "registered" status for DNS management
+        // Exclude pending, processing, failed, and cancelled domains
+        if (domain.status !== "registered") {
+          return; // Skip non-registered domains
+        }
 
         // Only add if not already processed or if this is a more recent status
         if (
