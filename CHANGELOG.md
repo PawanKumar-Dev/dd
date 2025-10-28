@@ -4,6 +4,14 @@
 
 ### Added
 
+#### Purchase Order (PO) System & Improved Payment Flow
+
+- **PO Number Generation**: Every purchase now automatically generates a unique Purchase Order (PO) number
+- **PO Tracking**: PO numbers are displayed in invoices, emails, and order records for better tracking
+- **Smart Email Logic**: Order confirmation emails are only sent when domains are successfully registered
+- **No Spam for Pending Orders**: Emails are not sent for pending/processing domains - users get notified only when registration is complete
+- **Unified Order Tracking**: Both successful and failed payments receive PO numbers for complete audit trail
+
 #### GST Transparency & Tax Breakdown
 
 - **Invoice GST Breakdown**: All PDF invoices now show detailed GST (18%) breakdown with Subtotal, GST amount, and Total
@@ -97,6 +105,14 @@
 - `app/loading.tsx` - Updated to use CenteredLoading component
 - `app/checkout/page.tsx` - Improved loading message
 
+**Purchase Order System:**
+
+- `models/Order.ts` - Added `purchaseOrderNumber` field to Order schema with auto-generation logic
+- `app/api/payments/verify/route.ts` - Added PO number generation and smart email logic (only send for registered domains)
+- `app/api/orders/[id]/invoice/route.ts` - Added PO number display in user invoices
+- `app/api/admin/orders/[id]/invoice/route.ts` - Added PO number display in admin invoices
+- `lib/email.ts` - Added PO number to order confirmation emails
+
 **GST & Tax Breakdown:**
 
 - `app/api/orders/[id]/invoice/route.ts` - Added GST breakdown calculation and display in user invoices
@@ -106,8 +122,7 @@
 
 **Documentation:**
 
-- `LOADING_GUIDELINES.md` - NEW: Comprehensive loading state implementation guide
-- `LOADING_IMPROVEMENTS_v2.7.0.md` - NEW: Detailed improvements documentation
+- `PURCHASE_ORDER_IMPLEMENTATION.md` - NEW: Complete PO system and smart email logic guide
 - `GST_IMPLEMENTATION.md` - NEW: Complete GST breakdown implementation guide
 
 ## [2.6.0] - 2025-01-26
