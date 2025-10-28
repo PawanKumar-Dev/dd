@@ -21,11 +21,18 @@
 
 ### Fixed
 
+#### Domain Visibility & Status Sync
+
+- **User Domain List**: Fixed critical issue where users couldn't see failed/pending domains in their domain list
+- **DNS Management Filtering**: Created separate endpoint for DNS management to show only registered domains
+- **Status Synchronization**: Admin pending domain status updates now sync with Order collection automatically
+- **Failed Domain Visibility**: Users can now see all their domains regardless of status (pending, processing, registered, failed)
+
 #### DNS Management
 
-- **Pending Domain Filter**: Fixed issue where pending/processing domains were showing up in DNS management for both admin and users
-- **Status-Based Access**: DNS management now only displays domains with "registered" status
-- **Clean Interface**: Removed clutter by excluding non-registered domains from DNS management pages
+- **Pending Domain Filter**: DNS management now only displays domains with "registered" status
+- **Status-Based Access**: Separated DNS management from general domain list
+- **Clean Interface**: DNS operations only available for fully registered domains
 
 #### Authentication & Security
 
@@ -99,10 +106,16 @@
 - `app/payment-success/page.tsx` - Removed processing domains section and related code
 - `app/admin/pending-domains/page.tsx` - Removed status summary cards and improved loading centering
 
+**Domain Visibility & Sync:**
+
+- `app/api/user/domains/route.ts` - **FIXED**: Now returns ALL domain statuses (not just registered) for user's domain list
+- `app/api/user/domains/dns/route.ts` - **NEW**: Dedicated endpoint for DNS management (registered domains only)
+- `app/dashboard/dns-management/page.tsx` - Updated to use new DNS-specific endpoint
+- `app/api/admin/pending-domains/[id]/route.ts` - Added Order collection sync when admin updates pending domain status
+
 **DNS Management:**
 
 - `app/api/admin/domains/route.ts` - Added filter to only return registered domains for DNS management
-- `app/api/user/domains/route.ts` - Added filter to only return registered domains for DNS management
 - `app/admin/dns-management/page.tsx` - Added status-based DNS activation controls and improved loading states
 - `app/api/admin/domains/activate-dns/route.ts` - Enhanced validation with specific error messages
 

@@ -5,7 +5,7 @@ import PendingDomain from "@/models/PendingDomain";
 import Order from "@/models/Order";
 
 // Force dynamic rendering - required for API routes
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function GET(
   request: NextRequest,
@@ -100,7 +100,7 @@ export async function PUT(
     if (status && pendingDomain.orderId) {
       try {
         const order = await Order.findOne({ orderId: pendingDomain.orderId });
-        
+
         if (order) {
           // Find and update the matching domain in the order
           const domainIndex = order.domains.findIndex(
@@ -109,32 +109,41 @@ export async function PUT(
 
           if (domainIndex !== -1) {
             // Map pending domain status to order domain status
-            const domainStatus = status === "registered" ? "registered" : "failed";
-            
+            const domainStatus =
+              status === "registered" ? "registered" : "failed";
+
             order.domains[domainIndex].status = domainStatus;
-            
+
             // Update error message if status is failed
             if (status === "failed" && reason) {
               order.domains[domainIndex].error = reason;
             }
-            
+
             // Add booking status update
-            order.domains[domainIndex].bookingStatus = order.domains[domainIndex].bookingStatus || [];
+            order.domains[domainIndex].bookingStatus =
+              order.domains[domainIndex].bookingStatus || [];
             order.domains[domainIndex].bookingStatus.push({
-              step: status === "registered" ? "domain_registered" : "domain_failed",
-              message: status === "registered" 
-                ? "Domain registered by admin" 
-                : `Domain registration failed: ${reason || "Unknown reason"}`,
+              step:
+                status === "registered" ? "domain_registered" : "domain_failed",
+              message:
+                status === "registered"
+                  ? "Domain registered by admin"
+                  : `Domain registration failed: ${reason || "Unknown reason"}`,
               timestamp: new Date(),
               progress: status === "registered" ? 100 : 0,
             });
 
             await order.save();
-            console.log(`✅ Synced pending domain status to Order collection: ${pendingDomain.domainName} -> ${domainStatus}`);
+            console.log(
+              `✅ Synced pending domain status to Order collection: ${pendingDomain.domainName} -> ${domainStatus}`
+            );
           }
         }
       } catch (syncError) {
-        console.error("Failed to sync pending domain status with Order:", syncError);
+        console.error(
+          "Failed to sync pending domain status with Order:",
+          syncError
+        );
         // Don't fail the request if sync fails - pending domain is still updated
       }
     }

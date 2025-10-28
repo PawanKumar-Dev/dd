@@ -1,3 +1,40 @@
+# API Documentation
+
+**Current Version:** 2.7.0  
+**Last Updated:** October 28, 2025
+
+## What's New in v2.7.0
+
+### 🎉 Purchase Order (PO) System
+
+- **Automatic PO Generation**: Every purchase now gets a unique PO number (format: `PO-{timestamp}-{random}`)
+- **Universal Tracking**: PO numbers generated for all orders (successful or failed)
+- **Invoice Integration**: PO numbers displayed prominently on invoices and emails
+- **Audit Trail**: Complete tracking for all transactions
+
+### 💰 GST Breakdown & Tax Transparency
+
+- **Invoice GST Display**: All invoices show Subtotal, GST (18%), and Total separately
+- **Email GST Details**: Order confirmation emails include complete tax breakdown
+- **Tax Compliance**: Meets Indian GST regulations and requirements
+- **Professional Format**: Enhanced invoice layout with clear pricing structure
+
+### 📧 Smart Email Logic
+
+- **Selective Notifications**: Emails only sent when domains are successfully registered
+- **No Spam**: Pending/processing orders don't trigger immediate emails
+- **Deferred Confirmations**: Users notified when admin completes registration
+- **Better UX**: Eliminates confusion about order status
+
+### 🔒 DNS Management Filtering
+
+- **Registered Only**: DNS management shows only fully registered domains
+- **Clean Interface**: Pending/processing domains excluded from DNS pages
+- **Status-Based Access**: Prevents DNS operations on non-registered domains
+- **Admin & User**: Filtering applied to both admin and user DNS management
+
+---
+
 ## Base URL
 
 - **Local Development**: `http://localhost:3000`
@@ -263,6 +300,91 @@ Complete profile for social login users.
 ---
 
 ## Domain Endpoints
+
+### GET /api/user/domains
+
+Get all user's domains (for domain list page).
+
+**Headers:**
+
+- `Authorization: Bearer <token>`
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "domains": [
+    {
+      "id": "string",
+      "name": "string",
+      "status": "registered|pending|processing|failed|cancelled",
+      "registrationDate": "string",
+      "expiryDate": "string",
+      "registrar": "string",
+      "nameservers": [],
+      "autoRenew": boolean,
+      "bookingStatus": [],
+      "orderId": "string",
+      "resellerClubOrderId": "string",
+      "resellerClubCustomerId": "string",
+      "resellerClubContactId": "string",
+      "dnsActivated": boolean,
+      "dnsActivatedAt": "string",
+      "error": "string"
+    }
+  ],
+  "total": number
+}
+```
+
+**Important (v2.7.0):**
+
+- **Returns ALL domain statuses** (registered, pending, processing, failed, cancelled)
+- Users can see complete domain portfolio including failed registrations
+- Use for general domain list display
+
+### GET /api/user/domains/dns
+
+Get user's registered domains for DNS management only.
+
+**Headers:**
+
+- `Authorization: Bearer <token>`
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "domains": [
+    {
+      "id": "string",
+      "name": "string",
+      "status": "registered",
+      "registrationDate": "string",
+      "expiryDate": "string",
+      "registrar": "string",
+      "nameservers": [],
+      "autoRenew": boolean,
+      "bookingStatus": [],
+      "orderId": "string",
+      "resellerClubOrderId": "string",
+      "resellerClubCustomerId": "string",
+      "resellerClubContactId": "string",
+      "dnsActivated": boolean,
+      "dnsActivatedAt": "string"
+    }
+  ],
+  "total": number
+}
+```
+
+**Important (v2.7.0):**
+
+- **Only returns domains with "registered" status**
+- Used specifically for DNS management interface
+- Prevents DNS operations on non-ready domains
 
 ### GET /api/domains/search
 
@@ -533,6 +655,9 @@ Get user's order history.
 "orders": [
   {
     "id": "string",
+    "orderId": "string",
+    "purchaseOrderNumber": "string",
+    "invoiceNumber": "string",
     "status": "string",
     "totalAmount": number,
     "currency": "string",
@@ -549,6 +674,11 @@ Get user's order history.
 }
 ```
 
+**New in v2.7.0:**
+
+- `purchaseOrderNumber`: Unique PO number for every order (format: `PO-{timestamp}-{random}`)
+- `invoiceNumber`: Generated only for completed orders (format: `INV-{timestamp}-{random}`)
+
 ### GET /api/orders/[id]
 
 Get specific order details.
@@ -564,6 +694,9 @@ Get specific order details.
   "success": true,
 "order": {
   "id": "string",
+  "orderId": "string",
+  "purchaseOrderNumber": "string",
+  "invoiceNumber": "string",
   "status": "string",
   "totalAmount": number,
   "currency": "string",
@@ -587,9 +720,14 @@ Get specific order details.
 }
 ```
 
+**New in v2.7.0:**
+
+- `purchaseOrderNumber`: Every order gets a unique PO number for tracking
+- Purchase Orders are generated for all orders (successful or failed payments)
+
 ### GET /api/orders/[id]/invoice
 
-Download order invoice as PDF.
+Download order invoice as PDF with GST breakdown.
 
 **Headers:**
 
@@ -599,6 +737,29 @@ Download order invoice as PDF.
 
 - Content-Type: `application/pdf`
 - File download
+
+**Invoice Features (v2.7.0):**
+
+- **Purchase Order Number**: Displayed prominently on invoice
+- **GST Breakdown**: Shows Subtotal, GST (18%), and Total separately
+- **Professional Format**: Enhanced layout with clear tax information
+- **Tax Compliance**: Meets Indian GST regulations
+
+**Invoice Structure:**
+
+```
+Excel Technologies
+Domain Management System
+
+INVOICE
+#INV-123456-ABC
+PO: PO-123456-DEF
+
+Order Summary:
+- Subtotal:      ₹1,000.00
+- GST (18%):     ₹180.00
+- Total:         ₹1,180.00 INR
+```
 
 ---
 
@@ -648,7 +809,7 @@ Verify payment and process domain registration.
 "razorpay_order_id": "string",
 "razorpay_payment_id": "string",
 "razorpay_signature": "string",
-"domains": [
+"cartItems": [
   {
     "domainName": "string",
     "price": number,
@@ -666,9 +827,40 @@ Verify payment and process domain registration.
   "success": true,
   "message": "Payment verified and domains registered",
   "orderId": "string",
-  "registeredDomains": ["string"]
+  "purchaseOrderNumber": "string",
+  "invoiceNumber": "string",
+  "successfulDomains": ["string"],
+  "pendingDomains": ["string"],
+  "failedDomains": [
+    {
+      "domainName": "string",
+      "error": "string"
+    }
+  ]
 }
 ```
+
+**Smart Email Logic (v2.7.0):**
+
+- **Order confirmation emails** are sent ONLY when at least one domain is successfully registered
+- **No emails sent** for pending/processing domains
+- **Deferred notifications**: Users receive confirmation when domains are registered by admin
+- **Prevents spam**: No confusing emails about pending orders
+
+**Purchase Order System (v2.7.0):**
+
+- Every payment verification generates a unique **Purchase Order (PO) number**
+- Format: `PO-{timestamp}-{random}` (e.g., `PO-123456-ABC`)
+- PO numbers are generated for both successful and failed payments
+- Provides complete audit trail for all transactions
+
+**Order Confirmation Email Includes:**
+
+- Purchase Order Number (prominently displayed)
+- Invoice Number (for completed orders)
+- GST Breakdown (Subtotal + 18% GST + Total)
+- Domain registration details
+- Payment confirmation
 
 ---
 
@@ -737,6 +929,48 @@ Get all orders (Admin only).
   ]
 }
 ```
+
+### GET /api/admin/domains
+
+Get all registered domains for DNS management (Admin only).
+
+**Headers:**
+
+- `Authorization: Bearer <admin-token>`
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "domains": [
+    {
+      "id": "string",
+      "name": "string",
+      "status": "registered",
+      "price": number,
+      "currency": "string",
+      "registrationPeriod": number,
+      "expiresAt": "string",
+      "resellerClubOrderId": "string",
+      "resellerClubCustomerId": "string",
+      "dnsActivated": boolean,
+      "dnsActivatedAt": "string",
+      "customerName": "string",
+      "customerEmail": "string",
+      "orderId": "string",
+      "createdAt": "string"
+    }
+  ],
+  "total": number
+}
+```
+
+**Important (v2.7.0):**
+
+- **Only returns domains with "registered" status**
+- Pending, processing, failed, and cancelled domains are excluded
+- This ensures DNS management is only available for fully registered domains
 
 ### GET /api/admin/payments
 
@@ -931,11 +1165,20 @@ Update pending domain status and notes (Admin only).
 
 ```json
 {
-  "status": "pending|processing|completed|failed",
+  "status": "pending|processing|registered|failed",
   "adminNotes": "string",
   "reason": "string"
 }
 ```
+
+**Automatic Sync (v2.7.0):**
+
+- **Order Collection Sync**: When admin updates pending domain status, it automatically syncs with the Order collection
+- **Status Mapping**:
+  - `registered` → Updates domain status to "registered" in Order
+  - `failed` → Updates domain status to "failed" in Order
+- **User Visibility**: Status changes immediately reflect in user's domain list
+- **Booking Status**: Adds tracking entry with reason and timestamp
 
 **Response:**
 

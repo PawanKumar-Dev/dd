@@ -8,6 +8,8 @@ A comprehensive, enterprise-grade domain registration and management platform bu
 - **Live Pricing Integration** - Real-time pricing from ResellerClub API with 200+ comprehensive TLD mappings
 - **Multi-stage Registration** - Step-by-step user registration process with geolocation support
 - **DNS Management** - Complete DNS record management with RDAP nameserver lookup, full CRUD operations, and priority field support for MX/SRV records
+  - **Registered Domains Only** - DNS management shows only fully registered domains (v2.7.0)
+  - **Smart Filtering** - Pending/processing domains excluded from DNS interface (v2.7.0)
 - **Domain Renewal** - Easy domain renewal with automated notifications
 - **Cart System** - Add multiple domains to cart for bulk registration
 - **Pending Domains Detection** - Automatic detection of failed registrations due to insufficient funds or processing issues
@@ -24,9 +26,12 @@ A comprehensive, enterprise-grade domain registration and management platform bu
 
 ### Payment & Order System
 
+- **Purchase Order (PO) System** - Automatic PO generation for every purchase with unique tracking numbers (v2.7.0)
+- **GST Breakdown** - Detailed GST (18%) breakdown in invoices and emails for tax transparency (v2.7.0)
+- **Smart Email Logic** - Order confirmations sent only when domains are successfully registered (v2.7.0)
 - **Razorpay Integration** - Secure payment processing with Indian payment gateway
 - **Order Management** - Complete order tracking with real-time status updates
-- **PDF Invoice Generation** - Automated invoice generation and download
+- **PDF Invoice Generation** - Automated invoice generation with PO number and GST breakdown
 - **Payment Verification** - Secure payment verification and domain registration automation
 
 ### User Management & Authentication
