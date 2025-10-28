@@ -1,14 +1,9 @@
-'use client';
+import CenteredLoading from '@/components/CenteredLoading';
 
-import { Loader2 } from 'lucide-react';
-
+/**
+ * Global loading component for Next.js route transitions
+ * Automatically centers content on all screen sizes
+ */
 export default function Loading() {
-  return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center">
-        <Loader2 className="h-12 w-12 text-primary-600 animate-spin mx-auto mb-4" />
-        <p className="text-gray-600">Loading...</p>
-      </div>
-    </div>
-  );
+  return <CenteredLoading message="Loading page" size="lg" fullScreen={true} />;
 }

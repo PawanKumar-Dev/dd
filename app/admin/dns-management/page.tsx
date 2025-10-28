@@ -494,7 +494,7 @@ export default function AdminDNSManagementPage() {
   if (isLoading) {
     return (
       <AdminLayoutNew user={user} onLogout={handleLogout}>
-        <div className="flex items-center justify-center py-12">
+        <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
             <p className="text-gray-600">Loading domains...</p>
@@ -642,8 +642,8 @@ export default function AdminDNSManagementPage() {
                   </div>
 
                   {isNameserverLoading ? (
-                    <div className="flex items-center justify-center py-3">
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                    <div className="flex items-center justify-center py-8">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
                     </div>
                   ) : nameservers.length > 0 ? (
                     <div className="space-y-1.5">
@@ -727,8 +727,8 @@ export default function AdminDNSManagementPage() {
                   </div>
 
                   {isDNSLoading ? (
-                    <div className="flex items-center justify-center py-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                    <div className="flex items-center justify-center py-12">
+                      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
                     </div>
                   ) : dnsRecords.length > 0 ? (
                     <div className="overflow-x-auto">
