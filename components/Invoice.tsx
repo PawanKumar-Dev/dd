@@ -201,18 +201,26 @@ export default function Invoice({ order, isOpen, onClose }: InvoiceProps) {
               </div>
             </div>
 
-            {/* Summary */}
+            {/* Summary with GST Breakdown */}
             <div className="flex justify-end mb-8">
               <div className="w-80">
                 <div className="bg-gray-50 p-6 rounded-lg">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
                   <div className="space-y-2">
+                    <div className="flex justify-between text-gray-700">
+                      <span>Subtotal:</span>
+                      <span>₹{(total / 1.18).toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-gray-700">
+                      <span>GST (18%):</span>
+                      <span>₹{(total - (total / 1.18)).toFixed(2)}</span>
+                    </div>
                     <div className="border-t border-gray-300 pt-2">
                       <div className="flex justify-between text-lg font-semibold text-gray-900">
-                        <span>Total:</span>
-                        <span>₹{total.toFixed(2)} {order.currency}</span>
+                        <span>Total (incl. GST):</span>
+                        <span className="text-blue-600">₹{total.toFixed(2)} {order.currency}</span>
                       </div>
-                      <p className="text-xs text-gray-500 text-right mt-1">*All prices include 18% GST</p>
+                      <p className="text-xs text-gray-500 text-right mt-1">*GST (18%) is included in the total amount</p>
                     </div>
                   </div>
                 </div>
