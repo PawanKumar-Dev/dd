@@ -48,9 +48,21 @@
 - **User Experience**: Streamlined interfaces by removing redundant information displays
 - **Developer Experience**: Cleaner console output without debug logs in production
 
+#### Loading States & UI Consistency
+
+- **Perfect Centering**: All loading indicators now perfectly centered on all screen sizes using Flexbox with minimum heights
+- **Consistent Sizing**: Standardized loading spinner sizes across the app (sm: 4-6px, md: 8-10px, lg: 12-14px, xl: 16-20px)
+- **CenteredLoading Component**: New reusable component with full-screen and inline modes, multiple sizes, and smooth animations
+- **Loading Guidelines**: Comprehensive documentation for implementing consistent loading states
+- **Responsive Design**: Loading states optimized for mobile, tablet, and desktop screens
+- **Visual Improvements**: Changed spinner colors to blue (`text-blue-600`) for better brand consistency and visibility
+- **Better Messaging**: Updated loading messages to be more descriptive and professional
+
 ### Technical Details
 
 #### Files Modified
+
+**Authentication & Security:**
 
 - `lib/auth.ts` - Removed `.select("-password")` to allow password existence checking
 - `app/api/auth/me/route.ts` - Added password field existence check and debug logging cleanup
@@ -58,10 +70,28 @@
 - `app/api/auth/register/route.ts` - Added provider field to response
 - `app/api/auth/activate/route.ts` - Added provider field to response
 - `app/dashboard/settings/page.tsx` - Fixed password detection logic and cleaned up console logs
+
+**UI Simplification:**
+
 - `app/payment-success/page.tsx` - Removed processing domains section and related code
-- `app/admin/pending-domains/page.tsx` - Removed status summary cards
-- `app/admin/dns-management/page.tsx` - Added status-based DNS activation controls
+- `app/admin/pending-domains/page.tsx` - Removed status summary cards and improved loading centering
+
+**DNS Management:**
+
+- `app/admin/dns-management/page.tsx` - Added status-based DNS activation controls and improved loading states
 - `app/api/admin/domains/activate-dns/route.ts` - Enhanced validation with specific error messages
+
+**Loading States:**
+
+- `components/CenteredLoading.tsx` - NEW: Unified loading component with perfect centering
+- `components/index.ts` - Added CenteredLoading exports
+- `app/loading.tsx` - Updated to use CenteredLoading component
+- `app/checkout/page.tsx` - Improved loading message
+
+**Documentation:**
+
+- `LOADING_GUIDELINES.md` - NEW: Comprehensive loading state implementation guide
+- `LOADING_IMPROVEMENTS_v2.7.0.md` - NEW: Detailed improvements documentation
 
 ## [2.6.0] - 2025-01-26
 
