@@ -173,41 +173,41 @@ export default function CartPage() {
         </div>
 
         {/* Trust Indicators */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg p-4 border border-gray-200 flex items-center space-x-3">
-            <div className="bg-green-100 p-2 rounded-full">
-              <Shield className="h-5 w-5 text-green-600" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 md:gap-6 mb-4 md:mb-8">
+          <div className="bg-white rounded-lg p-2 sm:p-3 md:p-4 border border-gray-200 flex items-center space-x-2 sm:space-x-3">
+            <div className="bg-green-100 p-1.5 sm:p-2 rounded-full flex-shrink-0">
+              <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
             </div>
-            <div>
-              <p className="text-sm font-medium text-gray-900">Secure Payment</p>
-              <p className="text-xs text-gray-600">SSL Protected</p>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg p-4 border border-gray-200 flex items-center space-x-3">
-            <div className="bg-blue-100 p-2 rounded-full">
-              <Clock className="h-5 w-5 text-blue-600" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-900">Instant Setup</p>
-              <p className="text-xs text-gray-600">24/7 Support</p>
+            <div className="min-w-0">
+              <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">Secure Payment</p>
+              <p className="text-[10px] sm:text-xs text-gray-600">SSL Protected</p>
             </div>
           </div>
-          <div className="bg-white rounded-lg p-4 border border-gray-200 flex items-center space-x-3">
-            <div className="bg-purple-100 p-2 rounded-full">
-              <Users className="h-5 w-5 text-purple-600" />
+          <div className="bg-white rounded-lg p-2 sm:p-3 md:p-4 border border-gray-200 flex items-center space-x-2 sm:space-x-3">
+            <div className="bg-blue-100 p-1.5 sm:p-2 rounded-full flex-shrink-0">
+              <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
             </div>
-            <div>
-              <p className="text-sm font-medium text-gray-900">10,000+ Customers</p>
-              <p className="text-xs text-gray-600">Trusted in India</p>
+            <div className="min-w-0">
+              <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">Instant Setup</p>
+              <p className="text-[10px] sm:text-xs text-gray-600">24/7 Support</p>
             </div>
           </div>
-          <div className="bg-white rounded-lg p-4 border border-gray-200 flex items-center space-x-3">
-            <div className="bg-yellow-100 p-2 rounded-full">
-              <Award className="h-5 w-5 text-yellow-600" />
+          <div className="bg-white rounded-lg p-2 sm:p-3 md:p-4 border border-gray-200 flex items-center space-x-2 sm:space-x-3">
+            <div className="bg-purple-100 p-1.5 sm:p-2 rounded-full flex-shrink-0">
+              <Users className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
             </div>
-            <div>
-              <p className="text-sm font-medium text-gray-900">Premium Service</p>
-              <p className="text-xs text-gray-600">99.9% Uptime</p>
+            <div className="min-w-0">
+              <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">10,000+ Customers</p>
+              <p className="text-[10px] sm:text-xs text-gray-600">Trusted in India</p>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg p-2 sm:p-3 md:p-4 border border-gray-200 flex items-center space-x-2 sm:space-x-3">
+            <div className="bg-yellow-100 p-1.5 sm:p-2 rounded-full flex-shrink-0">
+              <Award className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">Premium Service</p>
+              <p className="text-[10px] sm:text-xs text-gray-600">99.9% Uptime</p>
             </div>
           </div>
         </div>
