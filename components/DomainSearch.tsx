@@ -440,9 +440,9 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
   return (
     <div className={`w-full ${className}`}>
       {/* Google Workspace Style Search Form - Always Visible */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-4 md:p-6 mb-4 sm:mb-6 w-full max-w-8xl mx-auto">
-        <div className="text-center mb-4 sm:mb-4 md:mb-6">
-          <h2 className="text-xl sm:text-xl md:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>Find Your Perfect Domain</h2>
+      <div className="bg-white rounded-xl shadow-lg border-2 border-gray-100 p-5 sm:p-4 md:p-6 mb-5 sm:mb-6 w-full max-w-8xl mx-auto">
+        <div className="text-center mb-5 sm:mb-4 md:mb-6">
+          <h2 className="text-2xl sm:text-xl md:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>Find Your Perfect Domain</h2>
         </div>
 
         <form onSubmit={handleSearch} className="space-y-4 sm:space-y-4">
@@ -450,14 +450,14 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-3 w-full max-w-6xl mx-auto">
             <div className="flex-1">
               <div className="relative group">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 sm:h-4 sm:w-4 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 sm:h-4 sm:w-4 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
                 <Input
                   id="domain-input"
                   type="text"
                   value={searchTerm}
                   onChange={handleInputChange}
                   placeholder="Enter domain name (e.g., example)"
-                  className="pl-11 pr-4 py-3 sm:py-3 text-sm sm:text-sm border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 rounded-lg transition-all duration-200 hover:border-gray-400 bg-white text-gray-900 placeholder-gray-500 h-12 sm:h-12 w-full"
+                  className="pl-12 pr-4 py-4 sm:py-3 text-base sm:text-sm border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 rounded-xl transition-all duration-200 hover:border-gray-400 bg-white text-gray-900 placeholder-gray-500 h-14 sm:h-12 w-full font-medium"
                   disabled={isSearching}
                   style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}
                 />
@@ -469,19 +469,19 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
                 variant="primary"
                 size="md"
                 disabled={isSearching || !searchTerm.trim()}
-                className="w-full sm:w-auto px-6 sm:px-6 py-3 sm:py-3 text-sm sm:text-sm font-semibold rounded-lg shadow-sm hover:shadow-md transition-all duration-200 bg-blue-600 hover:bg-blue-700 text-white border-0 h-12 sm:h-12 flex items-center justify-center"
+                className="w-full sm:w-auto px-8 sm:px-6 py-4 sm:py-3 text-base sm:text-sm font-bold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 bg-blue-600 hover:bg-blue-700 text-white border-0 h-14 sm:h-12 flex items-center justify-center"
                 style={{
                   fontFamily: 'Google Sans, system-ui, sans-serif'
                 }}
               >
                 {isSearching ? (
                   <>
-                    <Loader2 className="h-4 w-4 sm:h-4 sm:w-4 mr-2 sm:mr-2 animate-spin" />
+                    <Loader2 className="h-5 w-5 sm:h-4 sm:w-4 mr-2 sm:mr-2 animate-spin" />
                     <span>Searching...</span>
                   </>
                 ) : (
                   <>
-                    <Search className="h-4 w-4 sm:h-4 sm:w-4 mr-2 sm:mr-2" />
+                    <Search className="h-5 w-5 sm:h-4 sm:w-4 mr-2 sm:mr-2" />
                     <span>Search</span>
                   </>
                 )}

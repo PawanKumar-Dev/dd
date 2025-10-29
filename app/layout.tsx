@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast';
 import ClientOnly from '@/components/ClientOnly';
 import SessionProvider from '@/components/SessionProvider';
 import AuthSync from '@/components/AuthSync';
+import FloatingCart from '@/components/FloatingCart';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -32,12 +33,13 @@ export default function RootLayout({
         <SessionProvider>
           <AuthSync />
           {children}
+          <FloatingCart />
         </SessionProvider>
-        <Toaster 
+        <Toaster
           position="bottom-right"
           containerStyle={{
-            bottom: '80px',
-            right: '80px',
+            bottom: '100px',
+            right: '24px',
           }}
           containerClassName="toast-container"
           toastOptions={{

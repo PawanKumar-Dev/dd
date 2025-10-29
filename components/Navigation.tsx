@@ -187,10 +187,10 @@ export default function Navigation({
 
           {/* Action Buttons */}
           <div className="flex items-center space-x-2 sm:space-x-3">
-            {/* Cart Icon */}
+            {/* Cart Icon - Hidden on mobile, shown in menu instead */}
             <Link
               href="/cart"
-              className="relative p-1.5 text-[var(--google-text-secondary)] hover:text-[var(--google-blue)] transition-colors duration-200"
+              className="hidden md:flex relative p-1.5 text-[var(--google-text-secondary)] hover:text-[var(--google-blue)] transition-colors duration-200"
               title="Shopping Cart"
             >
               <ShoppingCart className="h-6 w-6" />
@@ -284,15 +284,6 @@ export default function Navigation({
               Contact Us
             </Link>
             <div className="flex flex-col space-y-2 pt-4 border-t border-[var(--google-border-light)]">
-              <Link
-                href="/cart"
-                onClick={closeMobileMenu}
-                className="flex items-center justify-center px-4 py-2 rounded-lg font-medium text-[var(--google-text-primary)] hover:text-[var(--google-blue)] hover:bg-[var(--google-bg-secondary)] transition-colors duration-200"
-                style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}
-              >
-                <ShoppingCart className="h-5 w-5 mr-2" />
-                Cart {isMounted && cartCount > 0 && `(${cartCount})`}
-              </Link>
               {isLoggedIn ? (
                 <Link
                   href="/dashboard"
