@@ -58,24 +58,24 @@ export default function HomePage() {
           background="image"
           backgroundImage="/domain-1.jpeg"
           overlayOpacity={0.9}
-          className="min-h-[60vh] sm:min-h-[70vh] flex items-center"
+          className="min-h-[75vh] sm:min-h-[70vh] flex items-center"
         >
-          <div className="text-center w-full px-2 sm:px-4">
-            <div className="flex justify-center mb-3 sm:mb-4">
-              <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-full p-2 sm:p-3 border border-white border-opacity-30">
-                <Globe className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+          <div className="text-center w-full px-4 sm:px-4">
+            <div className="flex justify-center mb-4 sm:mb-4">
+              <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-full p-3 sm:p-3 border border-white border-opacity-30">
+                <Globe className="h-8 w-8 sm:h-8 sm:w-8 text-white" />
               </div>
             </div>
-            <h1 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold mb-2 sm:mb-3 md:mb-4 drop-shadow-lg px-2" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
+            <h1 className="text-2xl sm:text-2xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-3 md:mb-4 drop-shadow-lg px-2" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
               Buy & Manage Your Domain Names
             </h1>
-            <p className="text-xs sm:text-sm md:text-base lg:text-lg mb-3 sm:mb-4 md:mb-6 text-white drop-shadow-md max-w-3xl mx-auto px-2" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
+            <p className="text-sm sm:text-sm md:text-base lg:text-lg mb-4 sm:mb-4 md:mb-6 text-white drop-shadow-md max-w-3xl mx-auto px-3" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
               Search, purchase, and manage domain names with complete DNS control
             </p>
 
             {/* Domain Search Feature */}
-            <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-1 sm:p-2 border border-white border-opacity-20 w-full max-w-6xl mx-auto">
-              <DomainSearch className="mb-2 sm:mb-4" />
+            <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-2 sm:p-2 border border-white border-opacity-20 w-full max-w-6xl mx-auto">
+              <DomainSearch className="mb-3 sm:mb-4" />
             </div>
 
           </div>
