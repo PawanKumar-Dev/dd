@@ -440,14 +440,14 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
   return (
     <div className={`w-full ${className}`}>
       {/* Google Workspace Style Search Form - Always Visible */}
-      <div className="bg-white rounded-2xl shadow-2xl border-2 border-gray-100 p-4 sm:p-4 md:p-6 mb-4 sm:mb-6 w-full max-w-8xl mx-auto">
-        <div className="text-center mb-4 sm:mb-4 md:mb-6">
+      <div className="bg-white rounded-2xl shadow-2xl border-2 border-gray-100 p-3 sm:p-4 md:p-6 mb-4 sm:mb-6 w-full max-w-8xl mx-auto">
+        <div className="text-center mb-3 sm:mb-4 md:mb-6">
           <h2 className="text-xl sm:text-xl md:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>Find Your Perfect Domain</h2>
         </div>
 
         <form onSubmit={handleSearch} className="space-y-4 sm:space-y-4">
           {/* Domain Input */}
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-3 w-full max-w-6xl mx-auto">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-3 w-full max-w-full sm:max-w-6xl mx-auto">
             <div className="flex-1">
               <div className="relative group">
                 <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 h-6 w-6 sm:h-4 sm:w-4 text-gray-400 group-focus-within:text-blue-600 transition-colors" />

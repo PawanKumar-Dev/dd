@@ -342,3 +342,20 @@
 .animate-slideInRight {
   animation: slideInRight 0.3s ease-out;
 }
+
+/* reCAPTCHA Badge Positioning - Move to bottom-left above scroll-to-top button */
+.grecaptcha-badge {
+  left: 4px !important;
+  right: auto !important;
+  bottom: 80px !important;
+  z-index: 30 !important;
+}
+
+/* Adjust reCAPTCHA badge on mobile */
+@media (max-width: 768px) {
+  .grecaptcha-badge {
+    left: 4px !important;
+    right: auto !important;
+    bottom: 80px !important;
+  }
+}

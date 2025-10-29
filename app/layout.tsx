@@ -6,6 +6,7 @@ import ClientOnly from '@/components/ClientOnly';
 import SessionProvider from '@/components/SessionProvider';
 import AuthSync from '@/components/AuthSync';
 import FloatingCart from '@/components/FloatingCart';
+import ScrollToTop from '@/components/ScrollToTop';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -34,6 +35,7 @@ export default function RootLayout({
           <AuthSync />
           {children}
           <FloatingCart />
+          <ScrollToTop />
         </SessionProvider>
         <Toaster
           position="bottom-right"

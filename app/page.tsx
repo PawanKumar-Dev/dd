@@ -60,7 +60,7 @@ export default function HomePage() {
           overlayOpacity={0.9}
           className="min-h-[60vh] sm:min-h-[70vh] flex items-center py-8 sm:py-12"
         >
-          <div className="text-center w-full px-4 sm:px-4">
+          <div className="text-center w-full px-2 sm:px-4">
             <div className="flex justify-center mb-3 sm:mb-4">
               <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-full p-3 sm:p-3 border-2 border-white border-opacity-30">
                 <Globe className="h-8 w-8 sm:h-8 sm:w-8 text-white" />
@@ -74,7 +74,7 @@ export default function HomePage() {
             </p>
 
             {/* Domain Search Feature */}
-            <div className="bg-white bg-opacity-10 backdrop-blur-md rounded-2xl p-2 sm:p-2 border-2 border-white border-opacity-30 w-full max-w-6xl mx-auto shadow-xl">
+            <div className="bg-white bg-opacity-10 backdrop-blur-md rounded-2xl p-2 sm:p-2 border-2 border-white border-opacity-30 w-full max-w-full sm:max-w-6xl mx-auto shadow-xl">
               <DomainSearch className="mb-0 sm:mb-4" />
             </div>
 
