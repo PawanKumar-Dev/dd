@@ -48,29 +48,29 @@ export default function AboutPage() {
         background="image"
         backgroundImage="/about-us-hero.jpg"
         overlayOpacity={0.8}
-        className="min-h-[60vh] flex items-center"
+        className="min-h-[50vh] sm:min-h-[60vh] flex items-center py-6 sm:py-8"
       >
-        <div className="text-center">
-          <div className="flex justify-center mb-6">
-            <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-full p-4 border border-white border-opacity-30">
-              <Award className="h-12 w-12 text-white" />
+        <div className="text-center px-4">
+          <div className="flex justify-center mb-3 sm:mb-6">
+            <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-full p-3 sm:p-4 border border-white border-opacity-30">
+              <Award className="h-10 w-10 sm:h-12 sm:w-12 text-white" />
             </div>
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 drop-shadow-lg">
+          <h1 className="text-4xl md:text-6xl font-bold mb-3 sm:mb-6 drop-shadow-lg">
             About Excel Technologies
           </h1>
-          <p className="text-xl md:text-2xl text-white max-w-3xl mx-auto drop-shadow-md">
+          <p className="text-xl md:text-2xl text-white max-w-3xl mx-auto drop-shadow-md px-2">
             Leading the way in domain management solutions with innovation, security, and exceptional service.
           </p>
         </div>
       </HeroSection>
 
-      <Section background="white">
+      <Section background="white" padding="md">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4 sm:mb-6">
             Our Story
           </h2>
-          <p className="text-lg text-gray-600 mb-8">
+          <p className="text-lg text-gray-600 mb-4 sm:mb-8">
             Excel Technologies was founded with a simple mission: to make domain management
             simple, secure, and accessible for businesses of all sizes. We recognized the
             need for a comprehensive platform that integrates seamlessly with industry-leading
@@ -83,9 +83,9 @@ export default function AboutPage() {
         </div>
       </Section>
 
-      <Section background="gray">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+      <Section background="gray" padding="md">
+        <div className="text-center mb-8 sm:mb-12 lg:mb-16">
+          <h2 className="text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
             Our Mission & Vision
           </h2>
           <p className="text-xl text-gray-600">
@@ -93,12 +93,12 @@ export default function AboutPage() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-12">
+        <div className="grid md:grid-cols-2 gap-8 sm:gap-10 lg:gap-12">
           <div className="text-center">
-            <div className="bg-primary-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
-              <Target className="h-10 w-10 text-primary-600" />
+            <div className="bg-primary-100 rounded-full w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center mx-auto mb-4 sm:mb-6">
+              <Target className="h-8 w-8 sm:h-10 sm:w-10 text-primary-600" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">Our Mission</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3 sm:mb-4">Our Mission</h3>
             <p className="text-lg text-gray-600">
               To provide cutting-edge domain management solutions that empower businesses
               to establish and maintain their digital presence with confidence, security,
@@ -107,10 +107,10 @@ export default function AboutPage() {
           </div>
 
           <div className="text-center">
-            <div className="bg-primary-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
-              <Lightbulb className="h-10 w-10 text-primary-600" />
+            <div className="bg-primary-100 rounded-full w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center mx-auto mb-4 sm:mb-6">
+              <Lightbulb className="h-8 w-8 sm:h-10 sm:w-10 text-primary-600" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">Our Vision</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3 sm:mb-4">Our Vision</h3>
             <p className="text-lg text-gray-600">
               To become the global leader in domain management technology, setting new
               standards for security, reliability, and customer satisfaction in the
@@ -120,9 +120,9 @@ export default function AboutPage() {
         </div>
       </Section>
 
-      <Section background="white">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+      <Section background="white" padding="md">
+        <div className="text-center mb-8 sm:mb-12 lg:mb-16">
+          <h2 className="text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
             What Sets Us Apart
           </h2>
           <p className="text-xl text-gray-600">
@@ -130,7 +130,7 @@ export default function AboutPage() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-6 sm:gap-8">
           <FeatureCard
             icon={<TrendingDown className="h-8 w-8" />}
             title="Best Domain Prices"

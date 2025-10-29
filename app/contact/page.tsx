@@ -49,32 +49,32 @@ export default function ContactPage() {
         background="image"
         backgroundImage="/contact-us-hero.jpeg"
         overlayOpacity={0.8}
-        className="min-h-[60vh] flex items-center"
+        className="min-h-[50vh] sm:min-h-[60vh] flex items-center py-6 sm:py-8"
       >
-        <div className="text-center">
-          <div className="flex justify-center mb-6">
-            <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-full p-4 border border-white border-opacity-30">
-              <Mail className="h-12 w-12 text-white" />
+        <div className="text-center px-4">
+          <div className="flex justify-center mb-3 sm:mb-6">
+            <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-full p-3 sm:p-4 border border-white border-opacity-30">
+              <Mail className="h-10 w-10 sm:h-12 sm:w-12 text-white" />
             </div>
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 drop-shadow-lg">
+          <h1 className="text-4xl md:text-6xl font-bold mb-3 sm:mb-6 drop-shadow-lg">
             Contact Us
           </h1>
-          <p className="text-xl md:text-2xl text-white max-w-3xl mx-auto drop-shadow-md">
+          <p className="text-xl md:text-2xl text-white max-w-3xl mx-auto drop-shadow-md px-2">
             Get in touch with our team. We're here to help with all your domain management needs.
           </p>
         </div>
       </HeroSection>
 
-      <Section background="white">
-        <div className="grid lg:grid-cols-2 gap-12">
+      <Section background="white" padding="md">
+        <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12">
           <ContactInfo />
           <ContactForm />
         </div>
       </Section>
 
       {/* Map Section */}
-      <Section background="gray">
+      <Section background="gray" padding="md">
         <ContactMap />
       </Section>
 
