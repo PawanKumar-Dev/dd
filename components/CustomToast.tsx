@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { X } from 'lucide-react';
-import toast from 'react-hot-toast';
+import toast, { Toast } from 'react-hot-toast';
 
 interface CustomToastProps {
   type: 'success' | 'error' | 'loading';
@@ -12,23 +12,21 @@ interface CustomToastProps {
   dismissible?: boolean;
 }
 
-export const showCustomToast = ({ 
-  type, 
-  title, 
-  message, 
-  duration = 4000, 
-  dismissible = true 
+export const showCustomToast = ({
+  type,
+  title,
+  message,
+  duration = 4000,
+  dismissible = true
 }: CustomToastProps) => {
   const toastId = toast.custom(
-    (t) => (
+    (t: Toast) => (
       <div
-        className={`${
-          t.visible ? 'animate-enter' : 'animate-leave'
-        } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden ${
-          type === 'error' ? 'border-l-4 border-red-500' : 
-          type === 'success' ? 'border-l-4 border-green-500' : 
-          'border-l-4 border-blue-500'
-        }`}
+        className={`${t.visible ? 'animate-enter' : 'animate-leave'
+          } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden ${type === 'error' ? 'border-l-4 border-red-500' :
+            type === 'success' ? 'border-l-4 border-green-500' :
+              'border-l-4 border-blue-500'
+          }`}
       >
         {/* Toast Content */}
         <div className="flex">
@@ -57,19 +55,17 @@ export const showCustomToast = ({
               </div>
               <div className="ml-3 flex-1">
                 {title && (
-                  <p className={`text-sm font-medium ${
-                    type === 'error' ? 'text-red-800' : 
-                    type === 'success' ? 'text-green-800' : 
-                    'text-blue-800'
-                  }`}>
+                  <p className={`text-sm font-medium ${type === 'error' ? 'text-red-800' :
+                      type === 'success' ? 'text-green-800' :
+                        'text-blue-800'
+                    }`}>
                     {title}
                   </p>
                 )}
-                <div className={`text-sm ${
-                  type === 'error' ? 'text-red-700' : 
-                  type === 'success' ? 'text-green-700' : 
-                  'text-blue-700'
-                }`}>
+                <div className={`text-sm ${type === 'error' ? 'text-red-700' :
+                    type === 'success' ? 'text-green-700' :
+                      'text-blue-700'
+                  }`}>
                   {message}
                 </div>
               </div>
@@ -86,16 +82,15 @@ export const showCustomToast = ({
             </div>
           )}
         </div>
-        
+
         {/* Progress Bar - Only show for non-infinite duration */}
         {duration !== Infinity && t.visible && (
           <div className="h-1 w-full bg-gray-100">
             <div
-              className={`h-full transition-all ease-linear ${
-                type === 'error' ? 'bg-red-500' : 
-                type === 'success' ? 'bg-green-500' : 
-                'bg-blue-500'
-              }`}
+              className={`h-full transition-all ease-linear ${type === 'error' ? 'bg-red-500' :
+                  type === 'success' ? 'bg-green-500' :
+                    'bg-blue-500'
+                }`}
               style={{
                 width: '100%',
                 animation: `shrink ${duration}ms linear forwards`
