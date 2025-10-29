@@ -148,7 +148,7 @@ export async function GET(request: NextRequest) {
       };
 
       // Process all TLDs from the API response
-      for (const tld of allTlds) {
+      for (const tld of Array.from(allTlds)) {
         try {
           // Convert API key to readable TLD
           const readableTld = convertApiKeyToTld(tld);
