@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import {
@@ -83,6 +83,7 @@ export default function AdminPendingDomainsPage() {
   const [selectedDomains, setSelectedDomains] = useState<string[]>([]);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [showDetails, setShowDetails] = useState<string | null>(null);
+  const [selectedDomainForDetails, setSelectedDomainForDetails] = useState<PendingDomain | null>(null);
   const [adminNotes, setAdminNotes] = useState<{ [key: string]: string }>({});
 
   // Helper function to get authentication token
@@ -313,9 +314,9 @@ export default function AdminPendingDomainsPage() {
     }
   };
 
-  // Handle domain deletion
-  const handleDeleteDomain = async (domainId: string) => {
-    if (!confirm("Are you sure you want to delete this pending domain?")) {
+  // Handle domain archiving
+  const handleArchiveDomain = async (domainId: string) => {
+    if (!confirm("Are you sure you want to archive this pending domain? It will be hidden from the active list but can be restored later.")) {
       return;
     }
 
@@ -342,13 +343,13 @@ export default function AdminPendingDomainsPage() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        toast.success("Domain deleted successfully");
+        toast.success("Domain archived successfully");
         fetchPendingDomains();
       } else {
-        toast.error(data.error || "Failed to delete domain");
+        toast.error(data.error || "Failed to archive domain");
       }
     } catch (error) {
-      toast.error("Unable to delete domain. Please try again.");
+      toast.error("Unable to archive domain. Please try again.");
     } finally {
       setActionLoading(null);
     }
@@ -524,8 +525,8 @@ export default function AdminPendingDomainsPage() {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {pendingDomains.map((domain) => (
-                    <>
-                      <tr key={domain._id} className="hover:bg-gray-50">
+                    <Fragment key={domain._id}>
+                      <tr className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <input
                             type="checkbox"
@@ -585,7 +586,7 @@ export default function AdminPendingDomainsPage() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex items-center gap-2">
                             <button
-                              onClick={() => setShowDetails(showDetails === domain._id ? null : domain._id)}
+                              onClick={() => setSelectedDomainForDetails(domain)}
                               title="View Details"
                               className="p-2 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-colors"
                             >
@@ -602,190 +603,17 @@ export default function AdminPendingDomainsPage() {
                               </button>
                             )}
                             <button
-                              onClick={() => handleDeleteDomain(domain._id)}
+                              onClick={() => handleArchiveDomain(domain._id)}
                               disabled={actionLoading === domain._id}
-                              title="Delete Domain"
-                              className="p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              title="Archive Domain"
+                              className="p-2 text-orange-600 hover:text-orange-900 hover:bg-orange-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                               <Trash2 className="h-5 w-5" />
                             </button>
                           </div>
                         </td>
                       </tr>
-
-                      {/* Expandable Details Row */}
-                      {showDetails === domain._id && (
-                        <tr className="bg-gray-50">
-                          <td colSpan={6} className="px-6 py-4">
-                            <div className="space-y-4">
-                              <h3 className="font-semibold text-gray-900 text-lg mb-3">Domain Details</h3>
-
-                              <div className="grid grid-cols-2 gap-4">
-                              {/* Customer Information */}
-                              <div className="bg-white p-4 rounded-lg border border-gray-200">
-                                <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
-                                  <User className="h-4 w-4 text-blue-600" />
-                                  Customer Information
-                                </h4>
-                                {domain.userId && typeof domain.userId === 'object' ? (
-                                  <div className="space-y-2 text-sm">
-                                    <div className="flex justify-between">
-                                      <span className="text-gray-600">Name:</span>
-                                      <span className="font-medium">
-                                        {domain.userId.firstName || 'N/A'} {domain.userId.lastName || ''}
-                                      </span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                      <span className="text-gray-600">Email:</span>
-                                      <span className="font-medium">{domain.userId.email || 'N/A'}</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                      <span className="text-gray-600">Phone:</span>
-                                      <span className="font-medium">{domain.userId.phone || 'N/A'}</span>
-                                    </div>
-                                    {domain.userId.companyName && (
-                                      <div className="flex justify-between">
-                                        <span className="text-gray-600">Company:</span>
-                                        <span className="font-medium">{domain.userId.companyName}</span>
-                                      </div>
-                                    )}
-                                  </div>
-                                ) : (
-                                  <div className="text-sm text-gray-500">
-                                    <p className="mb-2">User ID: {typeof domain.userId === 'string' ? domain.userId : 'N/A'}</p>
-                                    <p className="text-xs text-orange-600">⚠️ User information not populated. User ID may be invalid or user may have been deleted.</p>
-                                  </div>
-                                )}
-                              </div>
-
-                                {/* Order Information */}
-                                <div className="bg-white p-4 rounded-lg border border-gray-200">
-                                  <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
-                                    <DollarSign className="h-4 w-4 text-green-600" />
-                                    Order Information
-                                  </h4>
-                                  <div className="space-y-2 text-sm">
-                                    <div className="flex justify-between">
-                                      <span className="text-gray-600">Order ID:</span>
-                                      <span className="font-mono font-medium">{domain.orderId}</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                      <span className="text-gray-600">Customer ID:</span>
-                                      <span className="font-medium">{domain.customerId}</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                      <span className="text-gray-600">Contact ID:</span>
-                                      <span className="font-medium">{domain.contactId}</span>
-                                    </div>
-                                    {domain.resellerClubOrderId && (
-                                      <div className="flex justify-between">
-                                        <span className="text-gray-600">RC Order ID:</span>
-                                        <span className="font-mono font-medium">{domain.resellerClubOrderId}</span>
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-
-                                {/* Technical Details */}
-                                <div className="bg-white p-4 rounded-lg border border-gray-200">
-                                  <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
-                                    <AlertCircle className="h-4 w-4 text-orange-600" />
-                                    Technical Details
-                                  </h4>
-                                  <div className="space-y-2 text-sm">
-                                    {domain.nameServers && domain.nameServers.length > 0 && (
-                                      <div>
-                                        <span className="text-gray-600 block mb-1">Name Servers:</span>
-                                        <div className="pl-2 space-y-1">
-                                          {domain.nameServers.map((ns, idx) => (
-                                            <div key={idx} className="font-mono text-xs">{ns}</div>
-                                          ))}
-                                        </div>
-                                      </div>
-                                    )}
-                                    {domain.adminContactId && (
-                                      <div className="flex justify-between">
-                                        <span className="text-gray-600">Admin Contact ID:</span>
-                                        <span className="font-medium">{domain.adminContactId}</span>
-                                      </div>
-                                    )}
-                                    {domain.techContactId && (
-                                      <div className="flex justify-between">
-                                        <span className="text-gray-600">Tech Contact ID:</span>
-                                        <span className="font-medium">{domain.techContactId}</span>
-                                      </div>
-                                    )}
-                                    {domain.billingContactId && (
-                                      <div className="flex justify-between">
-                                        <span className="text-gray-600">Billing Contact ID:</span>
-                                        <span className="font-medium">{domain.billingContactId}</span>
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-
-                                {/* Status & History */}
-                                <div className="bg-white p-4 rounded-lg border border-gray-200">
-                                  <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
-                                    <Clock className="h-4 w-4 text-purple-600" />
-                                    Status & History
-                                  </h4>
-                                  <div className="space-y-2 text-sm">
-                                    <div className="flex justify-between">
-                                      <span className="text-gray-600">Verification Attempts:</span>
-                                      <span className="font-medium">{domain.verificationAttempts}</span>
-                                    </div>
-                                    {domain.lastVerifiedAt && (
-                                      <div className="flex justify-between">
-                                        <span className="text-gray-600">Last Verified:</span>
-                                        <span className="font-medium">{new Date(domain.lastVerifiedAt).toLocaleString()}</span>
-                                      </div>
-                                    )}
-                                    {domain.registeredAt && (
-                                      <div className="flex justify-between">
-                                        <span className="text-gray-600">Registered At:</span>
-                                        <span className="font-medium">{new Date(domain.registeredAt).toLocaleString()}</span>
-                                      </div>
-                                    )}
-                                    {domain.expiresAt && (
-                                      <div className="flex justify-between">
-                                        <span className="text-gray-600">Expires At:</span>
-                                        <span className="font-medium">{new Date(domain.expiresAt).toLocaleString()}</span>
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* Failure Reason */}
-                              {domain.reason && (
-                                <div className="bg-white p-4 rounded-lg border border-red-200">
-                                  <h4 className="font-medium text-red-900 mb-2 flex items-center gap-2">
-                                    <AlertTriangle className="h-4 w-4" />
-                                    Failure Reason
-                                  </h4>
-                                  <p className="text-sm text-red-700">{domain.reason}</p>
-                                </div>
-                              )}
-
-                              {/* Admin Notes */}
-                              {domain.adminNotes && (
-                                <div className="bg-white p-4 rounded-lg border border-gray-200">
-                                  <h4 className="font-medium text-gray-900 mb-2">Admin Notes</h4>
-                                  <p className="text-sm text-gray-700">{domain.adminNotes}</p>
-                                </div>
-                              )}
-
-                              {/* Timestamps */}
-                              <div className="flex justify-between text-xs text-gray-500 pt-2 border-t border-gray-200">
-                                <span>Created: {new Date(domain.createdAt).toLocaleString()}</span>
-                                <span>Updated: {new Date(domain.updatedAt).toLocaleString()}</span>
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-                    </>
+                    </Fragment>
                   ))}
                 </tbody>
               </table>
@@ -818,6 +646,199 @@ export default function AdminPendingDomainsPage() {
           </div>
         )}
       </div>
+
+      {/* Details Modal Sidebar */}
+      {selectedDomainForDetails && (
+        <>
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity animate-fadeIn"
+            onClick={() => setSelectedDomainForDetails(null)}
+          ></div>
+
+          {/* Slide-out Panel */}
+          <div className="fixed right-0 top-0 h-full w-full md:w-2/3 lg:w-1/2 bg-white shadow-2xl z-50 overflow-y-auto animate-slideInRight">
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
+              <h2 className="text-xl font-bold text-gray-900">Domain Details</h2>
+              <button
+                onClick={() => setSelectedDomainForDetails(null)}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <XCircle className="h-6 w-6" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h3 className="font-semibold text-gray-900 text-lg mb-2">{selectedDomainForDetails.domainName}</h3>
+                <p className="text-sm text-gray-600">Order: {selectedDomainForDetails.orderId}</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Customer Information */}
+                <div className="bg-white p-4 rounded-lg border border-gray-200">
+                  <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                    <User className="h-4 w-4 text-blue-600" />
+                    Customer Information
+                  </h4>
+                  {selectedDomainForDetails.userId && typeof selectedDomainForDetails.userId === 'object' ? (
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Name:</span>
+                        <span className="font-medium">
+                          {selectedDomainForDetails.userId.firstName || 'N/A'} {selectedDomainForDetails.userId.lastName || ''}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Email:</span>
+                        <span className="font-medium">{selectedDomainForDetails.userId.email || 'N/A'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Phone:</span>
+                        <span className="font-medium">{selectedDomainForDetails.userId.phone || 'N/A'}</span>
+                      </div>
+                      {selectedDomainForDetails.userId.companyName && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Company:</span>
+                          <span className="font-medium">{selectedDomainForDetails.userId.companyName}</span>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-sm text-gray-500">
+                      <p className="mb-2">User ID: {typeof selectedDomainForDetails.userId === 'string' ? selectedDomainForDetails.userId : 'N/A'}</p>
+                      <p className="text-xs text-orange-600">⚠️ User information not populated. User ID may be invalid or user may have been deleted.</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Order Information */}
+                <div className="bg-white p-4 rounded-lg border border-gray-200">
+                  <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                    <DollarSign className="h-4 w-4 text-green-600" />
+                    Order Information
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Order ID:</span>
+                      <span className="font-mono font-medium">{selectedDomainForDetails.orderId}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Customer ID:</span>
+                      <span className="font-medium">{selectedDomainForDetails.customerId}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Contact ID:</span>
+                      <span className="font-medium">{selectedDomainForDetails.contactId}</span>
+                    </div>
+                    {selectedDomainForDetails.resellerClubOrderId && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">RC Order ID:</span>
+                        <span className="font-mono font-medium">{selectedDomainForDetails.resellerClubOrderId}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Technical Details */}
+                <div className="bg-white p-4 rounded-lg border border-gray-200">
+                  <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                    <AlertCircle className="h-4 w-4 text-orange-600" />
+                    Technical Details
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    {selectedDomainForDetails.nameServers && selectedDomainForDetails.nameServers.length > 0 && (
+                      <div>
+                        <span className="text-gray-600 block mb-1">Name Servers:</span>
+                        <div className="pl-2 space-y-1">
+                          {selectedDomainForDetails.nameServers.map((ns, idx) => (
+                            <div key={idx} className="font-mono text-xs">{ns}</div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {selectedDomainForDetails.adminContactId && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Admin Contact ID:</span>
+                        <span className="font-medium">{selectedDomainForDetails.adminContactId}</span>
+                      </div>
+                    )}
+                    {selectedDomainForDetails.techContactId && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Tech Contact ID:</span>
+                        <span className="font-medium">{selectedDomainForDetails.techContactId}</span>
+                      </div>
+                    )}
+                    {selectedDomainForDetails.billingContactId && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Billing Contact ID:</span>
+                        <span className="font-medium">{selectedDomainForDetails.billingContactId}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Status & History */}
+                <div className="bg-white p-4 rounded-lg border border-gray-200">
+                  <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-purple-600" />
+                    Status & History
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Verification Attempts:</span>
+                      <span className="font-medium">{selectedDomainForDetails.verificationAttempts}</span>
+                    </div>
+                    {selectedDomainForDetails.lastVerifiedAt && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Last Verified:</span>
+                        <span className="font-medium">{new Date(selectedDomainForDetails.lastVerifiedAt).toLocaleString()}</span>
+                      </div>
+                    )}
+                    {selectedDomainForDetails.registeredAt && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Registered At:</span>
+                        <span className="font-medium">{new Date(selectedDomainForDetails.registeredAt).toLocaleString()}</span>
+                      </div>
+                    )}
+                    {selectedDomainForDetails.expiresAt && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Expires At:</span>
+                        <span className="font-medium">{new Date(selectedDomainForDetails.expiresAt).toLocaleString()}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Failure Reason */}
+              {selectedDomainForDetails.reason && (
+                <div className="bg-white p-4 rounded-lg border border-red-200">
+                  <h4 className="font-medium text-red-900 mb-2 flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4" />
+                    Failure Reason
+                  </h4>
+                  <p className="text-sm text-red-700">{selectedDomainForDetails.reason}</p>
+                </div>
+              )}
+
+              {/* Admin Notes */}
+              {selectedDomainForDetails.adminNotes && (
+                <div className="bg-white p-4 rounded-lg border border-gray-200">
+                  <h4 className="font-medium text-gray-900 mb-2">Admin Notes</h4>
+                  <p className="text-sm text-gray-700">{selectedDomainForDetails.adminNotes}</p>
+                </div>
+              )}
+
+              {/* Timestamps */}
+              <div className="flex justify-between text-xs text-gray-500 pt-2 border-t border-gray-200">
+                <span>Created: {new Date(selectedDomainForDetails.createdAt).toLocaleString()}</span>
+                <span>Updated: {new Date(selectedDomainForDetails.updatedAt).toLocaleString()}</span>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </AdminLayoutNew>
   );
 }

@@ -254,6 +254,7 @@
   from {
     width: 100%;
   }
+
   to {
     width: 0%;
   }
@@ -265,6 +266,7 @@
     opacity: 0;
     transform: translateY(-16px) scale(0.95);
   }
+
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -276,6 +278,7 @@
     opacity: 1;
     transform: translateY(0) scale(1);
   }
+
   100% {
     opacity: 0;
     transform: translateY(-16px) scale(0.95);
@@ -309,4 +312,33 @@
 [data-sonner-toaster],
 [data-react-hot-toast] {
   z-index: 40 !important;
+}
+
+/* Modal animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.animate-slideInRight {
+  animation: slideInRight 0.3s ease-out;
 }

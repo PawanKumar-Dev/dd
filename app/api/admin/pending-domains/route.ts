@@ -32,7 +32,9 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get("search");
 
     // STEP 1: Get domains from PendingDomain collection
-    const pendingDomainQuery: any = {};
+    const pendingDomainQuery: any = {
+      isArchived: { $ne: true }, // Exclude archived domains
+    };
     if (status && status !== "all") {
       pendingDomainQuery.status = status;
     }
@@ -125,10 +127,6 @@ export async function GET(request: NextRequest) {
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
-
-    // Debug: Check if userId is populated
-    console.log('[DEBUG] Sample domain userId:', allPendingDomains[0]?.userId);
-    console.log('[DEBUG] Is userId an object?', typeof allPendingDomains[0]?.userId === 'object');
 
     // STEP 4: Apply pagination
     const skip = (page - 1) * limit;
