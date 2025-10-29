@@ -190,16 +190,21 @@ export async function DELETE(
       );
     }
 
-    await PendingDomain.findByIdAndDelete(params.id);
+    // Archive instead of delete
+    await PendingDomain.findByIdAndUpdate(params.id, {
+      isArchived: true,
+      archivedAt: new Date(),
+      archivedBy: user.email,
+    });
 
     return NextResponse.json({
       success: true,
-      message: "Pending domain deleted successfully",
+      message: "Pending domain archived successfully",
     });
   } catch (error) {
-    console.error("Admin pending domain deletion error:", error);
+    console.error("Admin pending domain archive error:", error);
     return NextResponse.json(
-      { error: "Failed to delete pending domain" },
+      { error: "Failed to archive pending domain" },
       { status: 500 }
     );
   }
