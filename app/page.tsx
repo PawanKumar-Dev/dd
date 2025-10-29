@@ -58,24 +58,24 @@ export default function HomePage() {
           background="image"
           backgroundImage="/domain-1.jpeg"
           overlayOpacity={0.9}
-          className="min-h-[70vh] flex items-center"
+          className="min-h-[60vh] sm:min-h-[70vh] flex items-center"
         >
-          <div className="text-center">
+          <div className="text-center w-full px-2 sm:px-4">
             <div className="flex justify-center mb-3 sm:mb-4">
               <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-full p-2 sm:p-3 border border-white border-opacity-30">
                 <Globe className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
               </div>
             </div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 drop-shadow-lg" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
+            <h1 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold mb-2 sm:mb-3 md:mb-4 drop-shadow-lg px-2" style={{ fontFamily: 'Google Sans, system-ui, sans-serif' }}>
               Buy & Manage Your Domain Names
             </h1>
-            <p className="text-xs sm:text-sm md:text-base lg:text-lg mb-4 sm:mb-6 text-white drop-shadow-md max-w-3xl mx-auto" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
-              Search, purchase, and manage domain names with complete DNS control, secure payments, and 24/7 support
+            <p className="text-xs sm:text-sm md:text-base lg:text-lg mb-3 sm:mb-4 md:mb-6 text-white drop-shadow-md max-w-3xl mx-auto px-2" style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}>
+              Search, purchase, and manage domain names with complete DNS control
             </p>
 
             {/* Domain Search Feature */}
-            <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-1 sm:p-2 border border-white border-opacity-20 w-full">
-              <DomainSearch className="mb-4 sm:mb-6" />
+            <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-1 sm:p-2 border border-white border-opacity-20 w-full max-w-6xl mx-auto">
+              <DomainSearch className="mb-2 sm:mb-4" />
             </div>
 
           </div>
@@ -92,7 +92,7 @@ export default function HomePage() {
                 Excel Technologies is a professional <strong>domain name registration and management platform</strong> that helps individuals and businesses secure their online identity.
               </p>
             </div>
-            
+
             <div className="grid sm:grid-cols-2 gap-6 px-4">
               <div className="bg-primary-50 rounded-lg p-6 border-l-4 border-primary-600">
                 <h3 className="text-xl font-semibold text-gray-900 mb-2 flex items-center gap-2">
@@ -103,7 +103,7 @@ export default function HomePage() {
                   Purchase new domain names from our extensive catalog of available domains across 100+ extensions including .com, .in, .org, .net, and more with instant registration.
                 </p>
               </div>
-              
+
               <div className="bg-primary-50 rounded-lg p-6 border-l-4 border-primary-600">
                 <h3 className="text-xl font-semibold text-gray-900 mb-2 flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-primary-600" />
@@ -113,7 +113,7 @@ export default function HomePage() {
                   Manage all your domains from a single dashboard - configure DNS settings, update nameservers, enable WHOIS privacy, transfer domains, and set up auto-renewal.
                 </p>
               </div>
-              
+
               <div className="bg-primary-50 rounded-lg p-6 border-l-4 border-primary-600">
                 <h3 className="text-xl font-semibold text-gray-900 mb-2 flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-primary-600" />
@@ -123,7 +123,7 @@ export default function HomePage() {
                   Full DNS management tools to connect your domain to web hosting, email services, and other platforms with A records, CNAME, MX records, and TXT records.
                 </p>
               </div>
-              
+
               <div className="bg-primary-50 rounded-lg p-6 border-l-4 border-primary-600">
                 <h3 className="text-xl font-semibold text-gray-900 mb-2 flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-primary-600" />

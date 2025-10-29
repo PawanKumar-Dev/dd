@@ -63,7 +63,7 @@ export default function HeroSection({
                          radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.05) 0%, transparent 50%)`
       }}></div>
 
-      <div className="max-w-[120rem] mx-auto px-1 sm:px-2 lg:px-3 py-8 sm:py-12 lg:py-16 relative z-10">
+      <div className="max-w-[120rem] mx-auto px-3 sm:px-4 lg:px-6 py-6 sm:py-10 lg:py-16 relative z-10">
         {children}
       </div>
     </section>
