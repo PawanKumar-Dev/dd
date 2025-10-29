@@ -700,6 +700,10 @@ export async function POST(request: NextRequest) {
     console.log(`✅ Order created: ${orderId} with status: ${orderStatus}`);
     console.log(`📦 Purchase Order Number: ${order.purchaseOrderNumber}`);
 
+    // Calculate domain status summaries
+    const pendingDomains = orderDomains.filter((d) => d.status === "pending");
+    const failedDomains = orderDomains.filter((d) => d.status === "failed");
+
     // Only send order confirmation email if at least one domain is successfully registered
     // Don't send emails for pending/processing orders - they will be sent when domains are registered
     const hasRegisteredDomains = orderDomains.some(
@@ -795,10 +799,6 @@ export async function POST(request: NextRequest) {
       console.error("Admin email sending error:", adminEmailError);
       // Don't fail the payment verification if admin email fails
     }
-
-    // Calculate summary for response
-    const pendingDomains = orderDomains.filter((d) => d.status === "pending");
-    const failedDomains = orderDomains.filter((d) => d.status === "failed");
 
     return NextResponse.json({
       success: true,
