@@ -5,7 +5,7 @@ export interface IPendingDomain extends Document {
   price: number;
   currency: string;
   registrationPeriod: number;
-  userId: string;
+  userId: mongoose.Types.ObjectId | string;
   orderId: string;
   customerId: number; // ResellerClub customer ID
   contactId: number; // ResellerClub contact ID
@@ -21,6 +21,9 @@ export interface IPendingDomain extends Document {
   expiresAt?: Date;
   resellerClubOrderId?: string;
   adminNotes?: string;
+  isArchived?: boolean;
+  archivedAt?: Date;
+  archivedBy?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -51,7 +54,8 @@ const PendingDomainSchema = new Schema<IPendingDomain>(
       max: 10,
     },
     userId: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: "User",
       required: [true, "User ID is required"],
     },
     orderId: {
@@ -114,6 +118,18 @@ const PendingDomainSchema = new Schema<IPendingDomain>(
       default: undefined,
     },
     adminNotes: {
+      type: String,
+      default: undefined,
+    },
+    isArchived: {
+      type: Boolean,
+      default: false,
+    },
+    archivedAt: {
+      type: Date,
+      default: undefined,
+    },
+    archivedBy: {
       type: String,
       default: undefined,
     },
