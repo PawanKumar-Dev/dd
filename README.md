@@ -547,7 +547,7 @@ For support and questions:
 
 ---
 
-**Last Updated**: October 16, 2025  
-**Version**: 2.5.0  
-**Author**: Excel Technologies  
-**Status**: Production-ready with TLD validation, enhanced error handling, and improved user experience
+# Start
+
+cd /home/rsa-key-20250926/dd
+./fix-server-issues.sh

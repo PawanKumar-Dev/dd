@@ -30,13 +30,8 @@ else
 fi
 
 # 5. Start with PM2 with optimized settings
-echo "📍 Step 5: Starting server with PM2..."
-pm2 start npm --name "next-app" -- start \
-    --max-memory-restart 1G \
-    --restart-delay 3000 \
-    --exp-backoff-restart-delay=100 \
-    --max-restarts=5 \
-    --min-uptime=10000
+echo "📍 Step 5: Starting server with PM2 using ecosystem config..."
+pm2 start ecosystem.config.js
 
 echo "✅ Server restarted with optimized settings!"
 echo "📊 Monitoring logs for 10 seconds..."

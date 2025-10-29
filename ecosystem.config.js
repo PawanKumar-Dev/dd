@@ -3,16 +3,14 @@ module.exports = {
     name: 'next-app',
     script: 'npm',
     args: 'start',
+    cwd: '/home/rsa-key-20250926/dd',
     
     // Instance settings
     instances: 1,
     exec_mode: 'fork',
-    
-    // Node.js arguments for better memory management
-    node_args: '--max-old-space-size=1024 --expose-gc',
 
-    // Memory management
-    max_memory_restart: '1G',
+    // Memory management  
+    max_memory_restart: '1000M',
 
     // Restart strategy
     autorestart: true,
