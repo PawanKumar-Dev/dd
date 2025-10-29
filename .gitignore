@@ -332,3 +332,10 @@ coverage/
 
 # TypeScript
 *.tsbuildinfo
+
+# PM2 Logs
+next-app-error.log
+next-app-out.log
+
+# Deployment logs
+deployment-logs/
