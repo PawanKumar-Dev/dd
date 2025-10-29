@@ -1,553 +1,354 @@
 # Excel Technologies - Domain Management System
 
-A comprehensive, enterprise-grade domain registration and management platform built with Next.js 14, featuring ResellerClub API integration, Razorpay payment processing, and advanced admin management capabilities.
+Enterprise-grade domain registration platform built with Next.js 14, ResellerClub API, and Razorpay payments.
+
+## 🚀 Quick Start
+
+```bash
+# Install dependencies
+npm install
+
+# Setup environment (.env.local)
+cp env.example .env.local
+
+# Initialize database
+npm run init-db
+
+# Development
+npm run dev
+
+# Production
+npm run build
+pm2 start ecosystem.config.js
+```
+
+Visit: http://localhost:3000 | Admin: http://localhost:3000/admin
+
+---
+
+## 📦 Deployment Scripts
+
+### **deploy.sh** - Regular Deployments
+
+Use this for daily code updates and deployments.
+
+```bash
+./deploy.sh
+```
+
+**What it does:**
+
+- Saves deployment logs with timestamps
+- Stops PM2 server gracefully
+- Clears cache (.next, node_modules/.cache)
+- Rebuilds application
+- Starts PM2 server
+- Creates deployment history in `deployment-logs/`
+
+**When to use:** After code changes, dependency updates, regular deployments
+
+---
+
+### **fix-server-issues.sh** - Emergency Recovery
+
+Use this when the server is crashed or stuck in a loop.
+
+```bash
+./fix-server-issues.sh
+```
+
+**What it does:**
+
+- Stops ALL PM2 processes
+- Deletes ALL PM2 apps (nuclear reset)
+- Kills port 3000 forcefully
+- Clears cache completely
+- Rebuilds from scratch
+- Fresh PM2 start
+
+**When to use:** Server crash loops, PM2 issues, emergency situations
+
+---
+
+### **view-logs.sh** - View Deployment History
+
+```bash
+./view-logs.sh              # List all deployments
+./view-logs.sh latest       # View latest deployment
+./view-logs.sh 2025-10-29_07-45-30  # View specific deployment
+```
+
+---
+
+## 🎯 Core Features
 
 ### Domain Management
 
-- **Domain Search & Registration** - Search and register domains across 400+ TLDs with real-time availability checking
-- **Live Pricing Integration** - Real-time pricing from ResellerClub API with 200+ comprehensive TLD mappings
-- **Multi-stage Registration** - Step-by-step user registration process with geolocation support
-- **DNS Management** - Complete DNS record management with RDAP nameserver lookup, full CRUD operations, and priority field support for MX/SRV records
-  - **Registered Domains Only** - DNS management shows only fully registered domains (v2.7.0)
-  - **Smart Filtering** - Pending/processing domains excluded from DNS interface (v2.7.0)
-- **Domain Renewal** - Easy domain renewal with automated notifications
-- **Cart System** - Add multiple domains to cart for bulk registration
-- **Pending Domains Detection** - Automatic detection of failed registrations due to insufficient funds or processing issues
-- **TLD-Specific Validation** - Automatic validation of minimum registration periods for different TLDs (e.g., .ai domains require 2+ years)
+- **Search & Register** - 400+ TLDs with real-time availability
+- **DNS Management** - Full CRUD operations for all DNS record types
+- **Domain Renewal** - Automated renewal with notifications
+- **Pending Domain Recovery** - Handle failed registrations
+- **TLD Validation** - Automatic minimum period enforcement
 
-### Enhanced User Experience & Animations
+### Payment & Orders
 
-- **Advanced Animations** - Smooth Framer Motion animations throughout the application with micro-interactions
-- **Interactive Components** - Enhanced buttons, cards, and forms with hover effects and smooth transitions
-- **Loading States** - Beautiful skeleton screens and loading animations with progress indicators
-- **Toast Notifications** - Animated toast notifications with auto-dismiss and progress bars
-- **Page Transitions** - Smooth page transitions with custom easing and scale effects
-- **Responsive Design** - Mobile-first design with touch-friendly interactions and optimized animations
+- **Razorpay Integration** - Secure Indian payment gateway
+- **PO System** - Unique purchase order numbers
+- **GST Breakdown** - 18% GST with detailed invoices
+- **PDF Invoices** - Auto-generated with download
+- **Smart Emails** - Sent only when domains are registered
 
-### Payment & Order System
+### Authentication
 
-- **Purchase Order (PO) System** - Automatic PO generation for every purchase with unique tracking numbers (v2.7.0)
-- **GST Breakdown** - Detailed GST (18%) breakdown in invoices and emails for tax transparency (v2.7.0)
-- **Smart Email Logic** - Order confirmations sent only when domains are successfully registered (v2.7.0)
-- **Razorpay Integration** - Secure payment processing with Indian payment gateway
-- **Order Management** - Complete order tracking with real-time status updates
-- **PDF Invoice Generation** - Automated invoice generation with PO number and GST breakdown
-- **Payment Verification** - Secure payment verification and domain registration automation
-
-### User Management & Authentication
-
-- **JWT Authentication** - Secure token-based authentication with proper expiration
-- **Social Login Integration** - Google and Facebook OAuth with seamless profile completion
-- **User Registration** - Multi-step registration with email activation
-- **Password Reset** - Secure password reset with email verification
-- **Role-based Access Control** - Admin and user roles with appropriate permissions
-- **Profile Management** - Complete user profile with address and contact information
-- **Dual Authentication System** - NextAuth.js for social login, custom JWT for admin users
+- **JWT Auth** - Secure token-based authentication
+- **Social Login** - Google & Facebook OAuth
+- **Role-based Access** - Admin and user permissions
+- **Email Activation** - Secure account verification
 
 ### Admin Panel
 
-- **User Management** - Complete user administration with role controls
-- **Order Tracking** - Real-time order monitoring and management
-- **Payment Monitoring** - Payment status tracking and management
-- **Pending Domains Management** - Handle domains that failed registration due to insufficient funds or processing issues
-- **TLD Requirements Management** - Configure and enforce TLD-specific registration requirements
-- **Pricing Configuration** - TLD pricing management and updates
-- **System Settings** - Application-wide settings management
-- **Analytics Dashboard** - System statistics and performance metrics
+- User, order, and payment management
+- Pending domains recovery
+- TLD pricing configuration
+- System settings and analytics
 
-## 🛠️ Technology Stack
+---
 
-### Frontend Technologies
+## 🛠️ Tech Stack
 
-- **Next.js 14** - React framework with App Router and server-side rendering
-- **TypeScript 5.3.3** - Type-safe development with strict type checking
-- **Tailwind CSS 3.3.6** - Utility-first CSS framework with custom design system
-- **Framer Motion 12.23.22** - Advanced animation library with micro-interactions, page transitions, and smooth component animations
-- **React Hook Form 7.48.2** - Performant form handling with validation
-- **React Hot Toast 2.4.1** - Enhanced toast notification system with animations
-- **Lucide React 0.294.0** - Modern icon library with 1000+ icons
-- **Zustand 4.4.7** - Lightweight state management
-- **Enhanced UI Components** - Custom animated components with skeleton loading, enhanced modals, and interactive elements
+**Frontend:** Next.js 14, TypeScript, Tailwind CSS, Framer Motion  
+**Backend:** Next.js API Routes, MongoDB, Mongoose  
+**APIs:** ResellerClub, Razorpay  
+**Auth:** JWT, NextAuth.js (social login)  
+**Email:** Nodemailer, SMTP  
+**PDF:** Puppeteer  
+**State:** Zustand
 
-### Backend Technologies
-
-- **Next.js API Routes** - Serverless API endpoints with middleware support
-- **MongoDB 8.0.3** - NoSQL database with Mongoose ODM
-- **JWT Authentication** - Secure token-based authentication with refresh tokens
-- **Bcrypt 2.4.3** - Password hashing with salt rounds
-- **Axios 1.6.2** - HTTP client for API requests
-- **Nodemailer 6.9.7** - Email sending service
-
-### External Integrations
-
-- **ResellerClub API** - Domain registration, pricing, and management services
-- **Razorpay 2.9.2** - Payment processing and webhook handling
-- **Puppeteer** - PDF generation for invoices and documents
-- **SMTP Services** - Email delivery (Gmail, SendGrid support)
-
-### Development Tools
-
-- **ESLint 8.56.0** - Code linting and quality assurance
-- **PostCSS 8.4.32** - CSS processing and optimization
-- **Autoprefixer 10.4.16** - CSS vendor prefixing
-- **Class Variance Authority** - Component variant management
-
-## 🧪 Comprehensive Testing Suite
-
-The project includes a robust testing framework with multiple test categories and automated test runners:
-
-### Test Categories
-
-- **API Tests** - ResellerClub API integration, TLD pricing, and endpoint testing
-- **Admin Tests** - Admin functionality, user management, and order operations
-- **Payment Tests** - Payment processing, success/failure scenarios, and error handling
-- **Pricing Tests** - TLD pricing accuracy, mapping validation, and AI pricing
-- **Debug Tools** - Troubleshooting utilities and data analysis
-- **System Tests** - End-to-end functionality and integration testing
-
-### Quick Start
-
-```bash
-# Run all tests
-node tests/run-tests.js
-
-# Run specific test categories
-node tests/run-tests.js api      # API integration tests
-node tests/run-tests.js admin    # Admin functionality tests
-node tests/run-tests.js payment  # Payment system tests
-node tests/run-tests.js pricing  # Pricing system tests
-node tests/run-tests.js debug    # Debug and troubleshooting tools
-
-# Run specific tests
-node tests/run-tests.js test-final-pricing    # Final pricing verification
-node tests/run-tests.js test-eu-pricing       # EU TLD specific testing
-node tests/run-tests.js test-payment-success  # Payment success testing
-```
-
-### Test Coverage
-
-- **200+ TLD Mappings** - Comprehensive TLD mapping validation
-- **API Endpoint Testing** - All ResellerClub API endpoints
-- **Payment Flow Testing** - Complete payment processing validation
-- **Admin Functionality** - User management and system administration
-- **Error Handling** - Comprehensive error scenario testing
-
-For detailed testing documentation, see [tests/README.md](tests/README.md).
-
-## 🔐 Social Login Integration
-
-The system supports social login for enhanced user experience:
-
-### Supported Providers
-
-- **Google OAuth** - Sign in with Google account
-- **Facebook OAuth** - Sign in with Facebook account
-- **Admin Protection** - Admin users cannot use social login (maintains security)
-
-### Features
-
-- **Profile Completion Flow** - Social login users must complete profile before checkout
-- **Dual Authentication** - NextAuth.js for social login, custom JWT for admin users
-- **Seamless Integration** - Works alongside existing credential-based authentication
-
-### Setup
-
-For detailed social login setup instructions, see [SOCIAL_LOGIN_SETUP.md](SOCIAL_LOGIN_SETUP.md).
-
-## 🛠️ Utility Scripts
-
-The project includes comprehensive utility scripts for development, maintenance, and deployment:
-
-### Port Management
-
-**Kill Ports Script** (`scripts/kill-ports.js`)
-
-- Kills processes running on specified ports (default: 3000, 3001, 3002)
-- Cross-platform support (Windows, Linux, macOS)
-- Custom port specification via command line
-- Safe error handling for already-free ports
-
-```bash
-# Kill default ports
-node scripts/kill-ports.js
-
-# Kill custom ports
-node scripts/kill-ports.js --ports 3000,8080,9000
-
-# Show help
-node scripts/kill-ports.js --help
-```
-
-### Database Management
-
-- `scripts/init-db.js` - Initialize database with admin user and default settings
-- `scripts/recreate-admin.js` - Recreate admin user with fresh credentials
-- `scripts/setup.js` - General setup script for environment configuration
-- `scripts/migrate-order-userids.js` - Migrate Order.userId from String to ObjectId references
-
-### Development Scripts
-
-- `scripts/kill-ports.js` - Port management utility
-- `scripts/setup.js` - Environment setup and configuration
-- `scripts/init-db.js` - Database initialization
-- `scripts/recreate-admin.js` - Admin user management
+---
 
 ## 📁 Project Structure
 
 ```
 dd/
-├── app/                          # Next.js 14 App Router
-│   ├── api/                      # API Routes (20+ endpoints)
-│   │   ├── auth/                 # Authentication endpoints
-│   │   ├── admin/                # Admin-only endpoints
-│   │   ├── domains/              # Domain management endpoints
-│   │   ├── orders/               # Order management endpoints
-│   │   ├── payments/             # Payment processing endpoints
-│   │   ├── cart/                 # Shopping cart endpoints
-│   │   ├── user/                 # User management endpoints
-│   │   └── webhooks/             # Webhook handlers
-│   ├── admin/                    # Admin panel pages
-│   ├── dashboard/                # User dashboard
-│   ├── checkout/                 # Checkout process
-│   ├── dns-management/           # DNS management interface
-│   ├── dns/                      # DNS management
-│   ├── payment-success/          # Payment success page
-│   └── (auth)/                   # Authentication pages
-├── components/                   # Reusable React Components (30+ components)
-│   ├── admin/                    # Admin-specific components
-│   ├── ui/                       # Base UI components
-│   ├── forms/                    # Form components
-│   └── user/                     # User-specific components
-├── lib/                          # Utility Libraries
-│   ├── auth.ts                   # JWT authentication service
-│   ├── admin-auth.ts             # Admin authentication
-│   ├── resellerclub.ts          # ResellerClub API integration
-│   ├── pricing-service.ts       # TLD pricing management
-│   ├── settings-service.ts      # Application settings
-│   ├── razorpay.ts              # Razorpay integration
-│   ├── email.ts                 # Email service
-│   ├── validation.ts            # Input validation
-│   ├── security.ts              # Security utilities
-│   └── dateUtils.ts             # Date formatting utilities
-├── models/                       # MongoDB Schemas
-│   ├── User.ts                   # User model with authentication
-│   ├── Order.ts                  # Order model with domain tracking
-│   ├── Payment.ts                # Payment model
-│   ├── Domain.ts                 # Domain model
-│   ├── DNSRecord.ts              # DNS record model
-│   └── Settings.ts               # Application settings model
-├── scripts/                      # Utility Scripts
-│   ├── kill-ports.js            # Port management utility
-│   ├── init-db.js               # Database initialization
-│   ├── recreate-admin.js        # Admin user recreation
-│   ├── setup.js                 # Setup script
-│   └── migrate-order-userids.js # Order userId migration
-├── tests/                        # Comprehensive Testing Suite
-│   ├── api/                      # API testing scripts
-│   ├── admin/                    # Admin functionality tests
-│   ├── payment/                  # Payment system tests
-│   ├── pricing/                  # Pricing system tests
-│   ├── debug/                    # Debug tools
-│   └── run-tests.js             # Centralized test runner
-├── store/                        # State Management
-│   └── cartStore.ts              # Zustand cart store
-└── public/                       # Static Assets
-    ├── logo-black.png
-    ├── logo-white.png
-    └── favicon.png
+├── app/                    # Next.js App Router
+│   ├── api/               # API routes (auth, domains, orders, payments)
+│   ├── admin/             # Admin panel
+│   └── dashboard/         # User dashboard
+├── components/            # React components
+├── lib/                   # Utilities (auth, APIs, email, validation)
+├── models/                # MongoDB schemas
+├── scripts/               # Utility scripts
+├── tests/                 # Testing suite
+├── deploy.sh             # Regular deployment script
+├── fix-server-issues.sh  # Emergency recovery script
+└── view-logs.sh          # View deployment logs
 ```
 
-## 🚀 Getting Started
+---
 
-### Prerequisites
+## 🔧 Environment Variables
 
-- Node.js 18+
-- MongoDB database
-- ResellerClub API credentials
-- Razorpay account
-
-### Installation
-
-1. **Clone the repository**
-
-```bash
-git clone <repository-url>
-   cd dd
-```
-
-2. **Install dependencies**
-
-   ```bash
-   npm install
-   ```
-
-3. **Environment Setup**
-   Create `.env.local` file:
+Create `.env.local`:
 
 ```env
 # Database
 MONGODB_URI=mongodb://localhost:27017/domain-management
 
 # ResellerClub API
-   RESELLERCLUB_API_KEY=your_api_key
+RESELLERCLUB_API_KEY=your_api_key
 RESELLERCLUB_RESELLER_ID=your_reseller_id
 
 # Razorpay
 RAZORPAY_KEY_ID=your_key_id
 RAZORPAY_KEY_SECRET=your_key_secret
 
-   # JWT
-   JWT_SECRET=your_jwt_secret
+# JWT & Admin
+JWT_SECRET=your_jwt_secret
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=your_admin_password
 
-   # Admin
-   ADMIN_EMAIL=admin@example.com
-   ADMIN_PASSWORD=your_admin_password
-
-   # Email (Optional)
+# Email (Optional)
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
-   SMTP_USER=your_email@gmail.com
-   SMTP_PASS=your_app_password
+SMTP_USER=your_email@gmail.com
+SMTP_PASS=your_app_password
+
+# Social Login (Optional)
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your_nextauth_secret
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+FACEBOOK_CLIENT_ID=your_facebook_client_id
+FACEBOOK_CLIENT_SECRET=your_facebook_client_secret
 ```
-
-4. **Initialize Database**
-
-```bash
-   npm run init-db
-```
-
-5. **Start Development Server**
-
-```bash
-   npm run dev
-```
-
-6. **Access Application**
-   - Frontend: http://localhost:3000 (development)
-   - Admin Panel: http://localhost:3000/admin
-
-## 🔧 Available Scripts
-
-### NPM Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run init-db` - Initialize database with admin user
-- `npm run recreate-admin` - Recreate admin user
-
-### Utility Scripts
-
-- `node scripts/kill-ports.js` - Kill processes on ports 3000, 3001, 3002
-- `node scripts/kill-ports.js --ports 3000,8080,9000` - Kill processes on custom ports
-- `node scripts/kill-ports.js --help` - Show help for port killing script
-
-## 👥 User Roles
-
-### Admin
-
-- Full system access
-- User management
-- Order management
-- Payment management
-- Pricing management
-- Settings configuration
-
-### Regular User
-
-- Domain search and registration
-- Order history
-- Profile management
-- Invoice download
-
-## 🌐 API Endpoints
-
-### Authentication
-
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User login
-- `POST /api/auth/activate` - Account activation
-- `POST /api/auth/resend-activation` - Resend activation email
-- `POST /api/auth/forgot-password` - Password reset request
-- `POST /api/auth/reset-password` - Password reset
-- `POST /api/auth/resend-activation` - Resend activation
-
-### Domains
-
-- `GET /api/domains/search` - Search domains
-- `POST /api/domains/renew` - Renew domain
-
-### Orders
-
-- `GET /api/orders` - Get user orders
-- `GET /api/orders/[id]` - Get specific order
-- `GET /api/orders/[id]/invoice` - Download invoice
-
-### Payments
-
-- `POST /api/payments/create-order` - Create payment order
-- `POST /api/payments/verify` - Verify payment
-
-### Admin APIs
-
-- `GET /api/admin/users` - Get all users
-- `GET /api/admin/orders` - Get all orders
-- `GET /api/admin/payments` - Get payment data
-- `GET /api/admin/tld-pricing` - Get TLD pricing
-- `GET /api/admin/settings` - Get settings
-- `POST /api/admin/settings` - Update settings
-
-## 🎯 Key Features Explained
-
-### Domain Search
-
-- Real-time availability checking
-- Live pricing from ResellerClub
-- Support for 400+ TLDs with comprehensive mappings
-- Cached pricing for performance
-
-### Payment Processing
-
-- Razorpay integration
-- Secure payment verification
-- Automatic domain registration on successful payment
-- Invoice generation
-
-### Admin Management
-
-- User management with role-based access
-- Order tracking and management
-- Payment monitoring
-- Pricing configuration
-- System settings management
-
-### TLD Pricing System
-
-- **Comprehensive Mappings**: 200+ TLD mappings for accurate ResellerClub API integration
-- **Priority-based Lookup**: Direct mappings take priority over pattern matching
-- **Multi-format Support**: Handles various ResellerClub API key formats (dot*, dom*, centralnic\*)
-- **Live Pricing**: Real-time pricing from ResellerClub customer and reseller APIs
-- **Performance Optimized**: Intelligent caching with 5-minute TTL
-- **Error Handling**: Robust fallback mechanisms for missing TLD data
-
-### Pending Domains Management
-
-- **Dual Detection Methods**: Enhanced API response parsing + domain availability verification
-- **Immediate Detection**: "Order Locked for Processing" responses are caught immediately
-- **User-Friendly Messages**: Shows "Domain registration is being processed" instead of technical errors
-- **Admin Dashboard**: Complete interface for managing pending domains with bulk operations
-- **Manual Recovery**: Admins can refill funds and manually register domains
-- **Automatic Creation**: Pending domain records are created automatically for failed registrations
-- **Status Tracking**: Complete audit trail of registration attempts and status changes
-
-## 🔒 Security Features
-
-- JWT-based authentication
-- Password hashing with bcrypt
-- Input validation and sanitization
-- CSRF protection
-- Rate limiting on API endpoints
-- Secure payment processing
-
-## 📱 Responsive Design
-
-- Mobile-first approach
-- Responsive admin panel
-- Touch-friendly interface
-- Optimized for all screen sizes
-
-## 🇮🇳 India-Focused Service
-
-- **Indian timezone support (IST)** - All dates and times in Indian Standard Time
-- **Indian currency formatting (₹)** - Prices displayed in Indian Rupees
-- **Indian date formats (DD/MM/YYYY)** - Localized date formatting
-- **India-only registration** - Service exclusively available for Indian customers
-- **+91 phone numbers** - Indian phone number format and validation
-
-## 🚀 Deployment
-
-### Production Build
-
-```bash
-npm run build
-npm run start
-```
-
-### Environment Variables
-
-Ensure all production environment variables are set:
-
-- Database connection string
-- API credentials
-- JWT secret
-- Email configuration
-
-### Database Setup
-
-Run the initialization script on first deployment:
-
-```bash
-npm run init-db
-```
-
-## 📊 Monitoring & Logging
-
-- Comprehensive logging system
-- Error tracking
-- Performance monitoring
-- Admin notifications for failures
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
-## 🆘 Support
-
-For support and questions:
-
-- Check the API documentation in `API.md`
-- Review the code comments
-- Create an issue in the repository
-
-## 🔄 Recent Updates
-
-- ✅ **Comprehensive TLD Mappings**: 200+ TLD mappings for accurate ResellerClub API integration
-- ✅ **Simplified Pricing Architecture**: Optimized pricing system for better performance and reliability
-- ✅ **Admin Settings Management**: Complete admin panel with system configuration capabilities
-- ✅ **Indian Timezone Support**: Full IST timezone integration with localized date/time formatting
-- ✅ **Enhanced Error Handling**: Comprehensive error handling with user-friendly messages
-- ✅ **Improved User Experience**: Modern UI/UX with responsive design and smooth animations
-- ✅ **Comprehensive Testing Suite**: 20+ test categories covering all system components
-- ✅ **Production-Ready Deployment**: Complete deployment configuration with security best practices
-- ✅ **DNS Management API**: Fully functional DNS record management with ResellerClub integration
-- ✅ **Complete DNS CRUD Operations**: Create, Read, Update, Delete DNS records with real-time updates
-- ✅ **Inline DNS Record Editing**: Real-time DNS record editing with immediate reflection
-- ✅ **Simplified Pricing Model**: Clean pricing without GST calculations for better transparency
-- ✅ **Enhanced DNS Record Deletion**: Proper ResellerClub API parameters for reliable deletion
-- ✅ **Priority Field Support**: Optional priority field with validation for MX/SRV records
-- ✅ **Enhanced Security**: Client-side console log removal for production security
-- ✅ **SRV Record Support**: Service discovery support with SRV record type
-- ✅ **Social Login Integration**: Google and Facebook OAuth with profile completion flow
-- ✅ **Advanced Component Library**: 30+ reusable components with TypeScript support
-- ✅ **Comprehensive API Documentation**: Complete API reference with examples and testing
-- ✅ **Utility Scripts**: Port management, database initialization, and maintenance tools
-- ✅ **Latest Updates**: Enhanced documentation, improved testing coverage, and production optimizations
-- ✅ **TLD-Specific Validation**: Automatic validation of minimum registration periods for different TLDs
-- ✅ **Enhanced Error Handling**: Improved error detection for "already exists" and pending domain scenarios
-- ✅ **Layout Stability**: Fixed checkout page layout shifting issues with stable grid system
-- ✅ **User Experience Improvements**: Removed unnecessary messages and streamlined cart/checkout flow
 
 ---
 
-# Start
+## 📜 NPM Scripts
 
-cd /home/rsa-key-20250926/dd
+```bash
+npm run dev              # Development server
+npm run build            # Production build
+npm start                # Start production server
+npm run init-db          # Initialize database
+npm run recreate-admin   # Recreate admin user
+npm run fix-profiles     # Fix user profile completion
+```
+
+---
+
+## 🧪 Testing
+
+```bash
+# Run all tests
+node tests/run-tests.js
+
+# Run specific categories
+node tests/run-tests.js api       # API tests
+node tests/run-tests.js admin     # Admin tests
+node tests/run-tests.js payment   # Payment tests
+node tests/run-tests.js pricing   # Pricing tests
+```
+
+See [tests/README.md](tests/README.md) for details.
+
+---
+
+## 🚀 Production Deployment
+
+### With PM2 (Recommended)
+
+```bash
+# First time setup
+npm install
+npm run build
+pm2 start ecosystem.config.js
+pm2 save
+pm2 startup  # Follow instructions
+
+# Regular deployments
+./deploy.sh
+
+# Emergency recovery
 ./fix-server-issues.sh
+```
+
+### PM2 Commands
+
+```bash
+pm2 status              # Check status
+pm2 logs next-app       # View logs
+pm2 monit               # Monitor resources
+pm2 restart next-app    # Restart
+pm2 stop next-app       # Stop
+```
+
+---
+
+## 🔒 Security Features
+
+- JWT authentication with secure tokens
+- Password hashing (bcrypt)
+- Input validation & sanitization
+- CSRF protection
+- Rate limiting
+- Secure payment processing
+
+---
+
+## 🇮🇳 India-Focused
+
+- Indian timezone (IST)
+- Currency formatting (₹)
+- Date format (DD/MM/YYYY)
+- +91 phone numbers
+- India-only registration
+
+---
+
+## 📊 Key Endpoints
+
+### Authentication
+
+- `POST /api/auth/register` - Register user
+- `POST /api/auth/login` - Login
+- `POST /api/auth/activate` - Activate account
+- `POST /api/auth/forgot-password` - Password reset
+
+### Domains
+
+- `POST /api/domains/search` - Search domains
+- `POST /api/domains/renew` - Renew domain
+- `GET /api/domains/dns` - Get DNS records
+- `POST /api/domains/dns` - Add DNS record
+
+### Orders & Payments
+
+- `GET /api/orders` - Get user orders
+- `GET /api/orders/[id]/invoice` - Download invoice
+- `POST /api/payments/create-order` - Create payment
+- `POST /api/payments/verify` - Verify payment
+
+### Admin
+
+- `GET /api/admin/users` - All users
+- `GET /api/admin/orders` - All orders
+- `GET /api/admin/pending-domains` - Pending domains
+- `GET /api/admin/tld-pricing` - TLD pricing
+
+---
+
+## 📚 Documentation
+
+- **API Reference:** [API.md](API.md)
+- **Testing Guide:** [tests/README.md](tests/README.md)
+- **Social Login Setup:** [SOCIAL_LOGIN_SETUP.md](SOCIAL_LOGIN_SETUP.md)
+- **Project Structure:** [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md)
+- **Changelog:** [CHANGELOG.md](CHANGELOG.md)
+
+---
+
+## 🆘 Troubleshooting
+
+### Server won't start
+
+```bash
+./fix-server-issues.sh
+```
+
+### Port already in use
+
+```bash
+node scripts/kill-ports.js
+```
+
+### View deployment logs
+
+```bash
+./view-logs.sh latest
+```
+
+### Check PM2 logs
+
+```bash
+pm2 logs next-app --lines 50
+```
+
+---
+
+## 🤝 Support
+
+- **Issues:** Create a GitHub issue
+- **Documentation:** Check linked docs above
+- **Email:** support@exceltechnologies.in
+
+---
+
+## 📄 License
+
+MIT License
+
+---
+
+**Version:** 2.7.0  
+**Last Updated:** October 2025
