@@ -1,10 +1,10 @@
 module.exports = {
   apps: [{
     name: 'next-app',
-    script: 'npm',
+    script: './node_modules/.bin/next',
     args: 'start',
     cwd: '/home/rsa-key-20250926/dd',
-    
+
     // Instance settings
     instances: 1,
     exec_mode: 'fork',
@@ -33,12 +33,12 @@ module.exports = {
     // Environment
     env: {
       NODE_ENV: 'production',
-      PORT: 3000
+      PORT: 3000,
+      NODE_OPTIONS: '--max-old-space-size=1024'
     },
 
     // Advanced features
-    wait_ready: true,
-    shutdown_with_message: true
+    shutdown_with_message: false
   }]
 };
 
