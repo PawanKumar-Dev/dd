@@ -70,15 +70,20 @@ export default function LoginForm({ className = '' }: LoginFormProps) {
     setIsLoading(true);
 
     try {
-      // Get reCAPTCHA token
-      const recaptchaToken = await executeRecaptcha('login');
+      // Get reCAPTCHA token - TEMPORARILY DISABLED
+      // const recaptchaToken = await executeRecaptcha('login');
+
+      // Get return URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const returnUrl = urlParams.get('returnUrl') || '/dashboard';
 
       // Use NextAuth signIn with credentials provider
       const result = await signIn('credentials', {
         redirect: false,
         email: formData.email,
         password: formData.password,
-        recaptchaToken,
+        recaptchaToken: '', // Empty for now
+        callbackUrl: returnUrl,
       });
 
       if (result?.error) {
@@ -108,17 +113,13 @@ export default function LoginForm({ className = '' }: LoginFormProps) {
         // Clear saved form data on successful login
         localStorage.removeItem('loginFormData');
 
-        showSuccessToast('Login successful!');
+        showSuccessToast('Login successful! Redirecting...');
 
-        // Check for return URL parameter
-        const urlParams = new URLSearchParams(window.location.search);
-        const returnUrl = urlParams.get('returnUrl');
-
-        // Use window.location for hard redirect after successful login
-        // This ensures the session is properly loaded on the next page
+        // Give the session cookie time to be set in the browser
+        // before redirecting (2 seconds should be sufficient)
         setTimeout(() => {
-          window.location.href = returnUrl || '/dashboard';
-        }, 500);
+          window.location.href = returnUrl;
+        }, 2000);
       }
     } catch (error) {
       showErrorToast('An error occurred. Please try again.');

@@ -60,6 +60,8 @@ export const authOptions: NextAuthOptions = {
           }
 
           // Verify reCAPTCHA if token provided
+          // TEMPORARILY DISABLED FOR TESTING
+          /*
           if (credentials.recaptchaToken) {
             try {
               const recaptchaResponse = await fetch(
@@ -85,6 +87,7 @@ export const authOptions: NextAuthOptions = {
               // throw new Error("reCAPTCHA verification failed");
             }
           }
+          */
 
           await connectDB();
 

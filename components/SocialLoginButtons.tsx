@@ -59,12 +59,13 @@ export default function SocialLoginButtons({
         toast.error(errorMessage);
         onError?.(errorMessage);
       } else if (result?.ok) {
-        toast.success('Successfully signed in!');
+        toast.success('Successfully signed in! Redirecting...');
 
-        // Use hard redirect after successful social login
+        // Give the session cookie time to be set in the browser
+        // before redirecting (2 seconds should be sufficient)
         setTimeout(() => {
           window.location.href = '/dashboard';
-        }, 500);
+        }, 2000);
       }
     } catch (error) {
       // Social login error

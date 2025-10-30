@@ -33,6 +33,11 @@ export async function middleware(request: NextRequest) {
     "/dashboard/dns-management",
   ];
 
+  // Redirect authenticated users away from auth pages
+  if (token && (pathname === "/login" || pathname === "/register")) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+
   // Check if the current path is public
   if (publicRoutes.includes(pathname)) {
     return NextResponse.next();
