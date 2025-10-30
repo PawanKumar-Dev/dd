@@ -5,15 +5,13 @@ import { getToken } from "next-auth/jwt";
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-
   // Get NextAuth token (unified for both social and credentials)
   const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
+    cookieName: "next-auth.session-token",
+    secureCookie: process.env.NODE_ENV === "production",
   });
-
-  if (token) {
-  }
 
   // Public routes that don't require authentication
   const publicRoutes = [
@@ -39,9 +37,6 @@ export async function middleware(request: NextRequest) {
 
   // Redirect authenticated users away from auth pages
   if (token && (pathname === "/login" || pathname === "/register")) {
-    console.log(
-      "[MIDDLEWARE] Authenticated user on login page, redirecting to dashboard"
-    );
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
@@ -54,14 +49,8 @@ export async function middleware(request: NextRequest) {
   if (protectedRoutes.includes(pathname) || adminRoutes.includes(pathname)) {
     // Check for NextAuth token (works for both social and credentials login)
     if (!token) {
-      console.log(
-        "[MIDDLEWARE] Protected route without token, redirecting to login"
-      );
       return NextResponse.redirect(new URL("/login", request.url));
     }
-    console.log(
-      "[MIDDLEWARE] Protected route with valid token, allowing access"
-    );
   }
 
   // Check if admin routes require admin role

@@ -26,9 +26,10 @@ const nextConfig = {
 
   // Production optimizations for security
   compiler: {
+    // TEMPORARILY DISABLED - Need to debug authentication
     // Remove ALL console statements in production for security
     // This prevents any logs from being exposed to frontend users
-    removeConsole: process.env.NODE_ENV === 'production' ? true : false,
+    removeConsole: false, // Temporarily disabled for debugging
   },
 
   // Disable source maps in production (prevent code inspection)

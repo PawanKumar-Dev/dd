@@ -34,7 +34,9 @@ module.exports = {
     env: {
       NODE_ENV: 'production',
       PORT: 3000,
-      NODE_OPTIONS: '--max-old-space-size=1024'
+      NODE_OPTIONS: '--max-old-space-size=1024',
+      NEXTAUTH_URL: 'https://app.exceltechnologies.in',
+      NEXTAUTH_SECRET: 'f2acdc6404d6d0452fe161262d1d0d29566c2eb0bdb926f4f67d88cb7b26ec66'
     },
 
     // Advanced features

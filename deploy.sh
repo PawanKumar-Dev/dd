@@ -32,6 +32,15 @@ echo "📍 Deleting cached files..."
 rm -rf .next
 rm -rf node_modules/.cache
 
+# 3.5. Load environment variables from .env.local
+echo "📍 Loading environment variables..."
+if [ -f .env.local ]; then
+  export $(cat .env.local | grep -v '^#' | xargs)
+  echo "✅ Environment variables loaded"
+else
+  echo "⚠️  Warning: .env.local not found"
+fi
+
 # 4. Rebuild
 echo "📍 Building application..."
 npm run build > "$LOG_DIR/build-output.log" 2>&1

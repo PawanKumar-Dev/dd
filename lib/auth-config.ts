@@ -55,7 +55,6 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         try {
-
           if (!credentials?.email || !credentials?.password) {
             throw new Error("Email and password are required");
           }
@@ -102,7 +101,6 @@ export const authOptions: NextAuthOptions = {
             throw new Error("Invalid email or password");
           }
 
-
           // Check if user is activated
           if (!user.isActivated) {
             serverLogger.error(
@@ -140,7 +138,6 @@ export const authOptions: NextAuthOptions = {
             role: user.role,
           };
 
-
           return returnData;
         } catch (error: any) {
           throw error;
@@ -150,6 +147,14 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
+      serverLogger.log("========================================");
+      serverLogger.log("[SIGNIN CALLBACK] 🔐 SignIn attempt started");
+      serverLogger.log("[SIGNIN CALLBACK] User email:", user.email);
+      serverLogger.log(
+        "[SIGNIN CALLBACK] Provider:",
+        account?.provider || "unknown"
+      );
+      serverLogger.log("========================================");
 
       // Prevent admin users from using social login
       if (account?.provider === "google" || account?.provider === "facebook") {
@@ -170,11 +175,20 @@ export const authOptions: NextAuthOptions = {
             return false; // Block admin users from social login
           }
 
+          serverLogger.log(
+            "[SIGNIN CALLBACK] ✅ Social login approved for:",
+            user.email
+          );
         } catch (error) {
+          serverLogger.error(
+            "[SIGNIN CALLBACK] ❌ Error checking user:",
+            error
+          );
           return false; // Block on error for security
         }
       }
 
+      serverLogger.log("[SIGNIN CALLBACK] ✅ Returning TRUE - login approved");
       return true;
     },
     async jwt({ token, user, account, profile }) {
@@ -300,7 +314,6 @@ export const authOptions: NextAuthOptions = {
               (profile as any)?.family_name ||
               user.name?.split(" ").slice(1).join(" ") ||
               "";
-
 
             // Check if we have enough data to mark profile as complete
             const hasPhone = additionalData.phone && additionalData.phoneCc;
@@ -442,9 +455,13 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
+      serverLogger.log("========================================");
+      serverLogger.log("[SESSION CALLBACK] 📋 Creating session");
+      serverLogger.log("[SESSION CALLBACK] Token present:", !!token);
+      serverLogger.log("[SESSION CALLBACK] Token role:", token?.role || "none");
       serverLogger.log(
-        "[SESSION CALLBACK] Called with token role:",
-        token.role
+        "[SESSION CALLBACK] User email:",
+        session?.user?.email || "none"
       );
 
       if (token && session.user) {
@@ -455,12 +472,13 @@ export const authOptions: NextAuthOptions = {
         (session.user as any).provider = token.provider as string;
 
         serverLogger.log(
-          "[SESSION CALLBACK] Session created for:",
+          "[SESSION CALLBACK] ✅ Session created for:",
           session.user.email,
           "with role:",
           token.role
         );
       }
+      serverLogger.log("========================================");
       return session;
     },
   },
