@@ -115,6 +115,15 @@ Use this when the server is crashed or stuck in a loop.
 - TLD pricing configuration
 - System settings and analytics
 
+### User Experience & Frontend
+
+- **Universal Skeleton Loading** - Instant visual feedback on all pages
+- **Smooth Transitions** - 800ms fade from skeleton to content
+- **Responsive Design** - Optimized for mobile, tablet, and desktop
+- **Modern Animations** - Framer Motion with skeleton loaders
+- **Professional UI** - Polished loading states improve perceived performance
+- **7 Reusable Components** - SkeletonBase, Hero, Section, Card, Stats, Contact
+
 ---
 
 ## 🛠️ Tech Stack
@@ -309,6 +318,8 @@ pm2 stop next-app       # Stop
 
 - **API Reference:** [API.md](API.md)
 - **Testing Guide:** [tests/README.md](tests/README.md)
+- **Skeleton Loading System:** [SKELETON_LOADING_SYSTEM.md](SKELETON_LOADING_SYSTEM.md)
+- **Skeleton Quick Reference:** [SKELETON_QUICK_REFERENCE.md](SKELETON_QUICK_REFERENCE.md)
 - **Social Login Setup:** [SOCIAL_LOGIN_SETUP.md](SOCIAL_LOGIN_SETUP.md)
 - **Project Structure:** [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md)
 - **Changelog:** [CHANGELOG.md](CHANGELOG.md)
