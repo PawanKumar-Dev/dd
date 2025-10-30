@@ -142,13 +142,13 @@ export default function AdminPayments() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed':
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
+        return <CheckCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-500" />;
       case 'failed':
-        return <XCircle className="h-4 w-4 text-red-500" />;
+        return <XCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-500" />;
       case 'pending':
-        return <Clock className="h-4 w-4 text-yellow-500" />;
+        return <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-yellow-500" />;
       case 'refunded':
-        return <RotateCcw className="h-4 w-4 text-blue-500" />;
+        return <RotateCcw className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-500" />;
       default:
         return null;
     }
@@ -160,9 +160,9 @@ export default function AdminPayments() {
       label: 'Transaction ID',
       sortable: true,
       render: (value: string, row: Payment) => (
-        <div className="flex items-center">
+        <div className="flex items-center space-x-1 sm:space-x-2">
           {getStatusIcon(row.status)}
-          <span className="ml-2 font-mono text-sm text-gray-900">{value}</span>
+          <span className="font-mono text-xs sm:text-sm text-gray-900 truncate">{value}</span>
         </div>
       )
     },
@@ -171,11 +171,11 @@ export default function AdminPayments() {
       label: 'Customer',
       sortable: true,
       render: (value: string, row: Payment) => (
-        <div>
-          <div className="text-sm font-medium text-gray-900">
+        <div className="min-w-0">
+          <div className="text-xs sm:text-sm font-medium text-gray-900 truncate">
             {value || 'Unknown'}
           </div>
-          <div className="text-sm text-gray-500">{row.customerEmail}</div>
+          <div className="text-xs sm:text-sm text-gray-500 truncate">{row.customerEmail}</div>
         </div>
       )
     },
@@ -184,7 +184,7 @@ export default function AdminPayments() {
       label: 'Amount',
       sortable: true,
       render: (value: number, row: Payment) => (
-        <div className="text-sm font-medium text-gray-900">
+        <div className="text-xs sm:text-sm font-medium text-gray-900">
           {formatIndianCurrency(value)}
         </div>
       )
@@ -194,7 +194,7 @@ export default function AdminPayments() {
       label: 'Status',
       sortable: true,
       render: (value: string) => (
-        <span className={`px-2 py-1 text-xs font-medium rounded-full ${value === 'completed' ? 'bg-green-100 text-green-800' :
+        <span className={`px-1.5 sm:px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium rounded-full ${value === 'completed' ? 'bg-green-100 text-green-800' :
           value === 'failed' ? 'bg-red-100 text-red-800' :
             value === 'pending' ? 'bg-yellow-100 text-yellow-800' :
               'bg-blue-100 text-blue-800'
@@ -206,7 +206,10 @@ export default function AdminPayments() {
     {
       key: 'paymentMethod',
       label: 'Method',
-      sortable: true
+      sortable: true,
+      render: (value: string) => (
+        <span className="text-xs sm:text-sm text-gray-900">{value}</span>
+      )
     },
     {
       key: 'domainNames',
@@ -216,15 +219,15 @@ export default function AdminPayments() {
         <div className="space-y-1">
           {value && value.length > 0 ? (
             value.map((domain, index) => (
-              <span key={index} className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mr-1 mb-1">
+              <span key={index} className="inline-block bg-blue-100 text-blue-800 text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 rounded mr-1 mb-1">
                 {domain}
               </span>
             ))
           ) : (
-            <span className="text-sm text-gray-400">No domains</span>
+            <span className="text-xs sm:text-sm text-gray-400">No domains</span>
           )}
           {row.orderId && (
-            <div className="text-xs text-gray-500 mt-1">
+            <div className="text-[10px] sm:text-xs text-gray-500 mt-1">
               Order: {row.orderId}
             </div>
           )}
@@ -237,8 +240,8 @@ export default function AdminPayments() {
       sortable: true,
       render: (value: string) => (
         <div>
-          <div className="text-sm text-gray-900">{formatIndianDate(value)}</div>
-          <div className="text-xs text-gray-500">{formatIndianTime(value)}</div>
+          <div className="text-xs sm:text-sm text-gray-900">{formatIndianDate(value)}</div>
+          <div className="text-[10px] sm:text-xs text-gray-500">{formatIndianTime(value)}</div>
         </div>
       )
     },
@@ -246,13 +249,13 @@ export default function AdminPayments() {
       key: 'actions',
       label: 'Actions',
       render: (value: any, row: Payment) => (
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-1 sm:space-x-2">
           <button
             onClick={() => handleViewPayment(row.id)}
-            className="p-2 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-colors"
+            className="p-1.5 sm:p-2 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-lg transition-colors"
             title="View Payment Details"
           >
-            <Eye className="h-5 w-5" />
+            <Eye className="h-4 w-4 sm:h-5 sm:w-5" />
           </button>
         </div>
       )
@@ -273,30 +276,31 @@ export default function AdminPayments() {
 
   return (
     <AdminLayout user={user} onLogout={handleLogout}>
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Page Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-start sm:items-center justify-between flex-col sm:flex-row gap-3 sm:gap-0">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Payment Management</h1>
-            <p className="text-gray-600">Latest domain purchase payments from Razorpay - showing 5 most recent transactions (including failed payments)</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Payment Management</h1>
+            <p className="text-sm sm:text-base text-gray-600 mt-1">Latest domain purchase payments from Razorpay - showing 5 most recent transactions (including failed payments)</p>
           </div>
           <button
             onClick={() => loadPayments(currentPage, searchTerm)}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200"
+            className="flex items-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 whitespace-nowrap"
           >
             <RefreshCw className="h-4 w-4" />
-            Refresh Payments
+            <span className="hidden sm:inline">Refresh Payments</span>
+            <span className="sm:hidden">Refresh</span>
           </button>
         </div>
 
 
         {/* Status Filter */}
-        <div className="flex items-center space-x-4 mb-4">
-          <label className="text-sm font-medium text-gray-700">Filter by Status:</label>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+          <label className="text-xs sm:text-sm font-medium text-gray-700 whitespace-nowrap">Filter by Status:</label>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2 border border-gray-300 rounded-md text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-blue-300 w-full sm:w-auto"
           >
             <option value="all">All Payments</option>
             <option value="captured">Successful</option>

@@ -300,9 +300,9 @@ export default function AdminOrdersPage() {
       label: 'Order ID',
       sortable: true,
       render: (value: string, row: Order) => (
-        <div className="flex items-center space-x-2">
-          <Receipt className="h-4 w-4 text-gray-400" />
-          <span className="font-mono text-sm">{value}</span>
+        <div className="flex items-center space-x-1 sm:space-x-2">
+          <Receipt className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0" />
+          <span className="font-mono text-xs sm:text-sm truncate">{value}</span>
         </div>
       )
     },
@@ -311,13 +311,13 @@ export default function AdminOrdersPage() {
       label: 'Customer',
       sortable: true,
       render: (value: User, row: Order) => (
-        <div className="flex items-center space-x-2">
-          <User className="h-4 w-4 text-gray-400" />
-          <div>
-            <div className="font-medium text-gray-900">
+        <div className="flex items-center space-x-1 sm:space-x-2">
+          <User className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0" />
+          <div className="min-w-0">
+            <div className="font-medium text-gray-900 text-xs sm:text-sm truncate">
               {value ? `${value.firstName} ${value.lastName}` : 'Unknown User'}
             </div>
-            <div className="text-sm text-gray-500">
+            <div className="text-xs sm:text-sm text-gray-500 truncate">
               {value?.email || 'No email available'}
             </div>
           </div>
@@ -330,8 +330,8 @@ export default function AdminOrdersPage() {
       sortable: true,
       render: (value: number, row: Order) => (
         <div className="text-right">
-          <div className="font-semibold text-gray-900">₹{value.toFixed(2)}</div>
-          <div className="text-sm text-gray-500">{row.currency}</div>
+          <div className="font-semibold text-gray-900 text-xs sm:text-sm">₹{value.toFixed(2)}</div>
+          <div className="text-xs sm:text-sm text-gray-500">{row.currency}</div>
         </div>
       )
     },
@@ -340,7 +340,7 @@ export default function AdminOrdersPage() {
       label: 'Status',
       sortable: true,
       render: (value: string) => (
-        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${value === 'completed'
+        <span className={`inline-flex items-center px-1.5 sm:px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-medium ${value === 'completed'
           ? 'bg-green-100 text-green-800'
           : value === 'failed'
             ? 'bg-red-100 text-red-800'
@@ -348,9 +348,9 @@ export default function AdminOrdersPage() {
               ? 'bg-yellow-100 text-yellow-800'
               : 'bg-gray-100 text-gray-800'
           }`}>
-          {value === 'completed' && <CheckCircle className="h-3 w-3 mr-1" />}
-          {value === 'failed' && <XCircle className="h-3 w-3 mr-1" />}
-          {value === 'pending' && <Clock className="h-3 w-3 mr-1" />}
+          {value === 'completed' && <CheckCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1" />}
+          {value === 'failed' && <XCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1" />}
+          {value === 'pending' && <Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1" />}
           {value.charAt(0).toUpperCase() + value.slice(1)}
         </span>
       )
@@ -361,8 +361,8 @@ export default function AdminOrdersPage() {
       sortable: false,
       render: (value: any[], row: Order) => (
         <div className="text-center">
-          <div className="font-medium text-gray-900">{value.length}</div>
-          <div className="text-sm text-gray-500">
+          <div className="font-medium text-gray-900 text-xs sm:text-sm">{value.length}</div>
+          <div className="text-xs sm:text-sm text-gray-500">
             {row.successfulDomains.length} success
           </div>
         </div>
@@ -373,9 +373,9 @@ export default function AdminOrdersPage() {
       label: 'Date',
       sortable: true,
       render: (value: string) => (
-        <div className="flex items-center space-x-2">
-          <Calendar className="h-4 w-4 text-gray-400" />
-          <span className="text-sm">{formatIndianDate(value)}</span>
+        <div className="flex items-center space-x-1 sm:space-x-2">
+          <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0" />
+          <span className="text-xs sm:text-sm">{formatIndianDate(value)}</span>
         </div>
       )
     },
@@ -384,37 +384,37 @@ export default function AdminOrdersPage() {
       label: 'Actions',
       sortable: false,
       render: (value: any, row: Order) => (
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-1 sm:space-x-3">
           <button
             onClick={() => handleViewOrder(row)}
-            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 group"
+            className="p-1.5 sm:p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 group"
             title="View order details, domains, and payment information"
           >
-            <Eye className="h-5 w-5" />
+            <Eye className="h-4 w-4 sm:h-5 sm:w-5" />
             <span className="sr-only">View Order Details</span>
           </button>
           <button
             onClick={() => handleViewInvoice(row)}
-            className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all duration-200 group"
+            className="p-1.5 sm:p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all duration-200 group"
             title="View invoice details and billing information"
           >
-            <FileText className="h-5 w-5" />
+            <FileText className="h-4 w-4 sm:h-5 sm:w-5" />
             <span className="sr-only">View Invoice</span>
           </button>
           <button
             onClick={() => handleDownloadInvoice(row._id)}
-            className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all duration-200 group"
+            className="p-1.5 sm:p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all duration-200 group"
             title="Download invoice as PDF file"
           >
-            <Download className="h-5 w-5" />
+            <Download className="h-4 w-4 sm:h-5 sm:w-5" />
             <span className="sr-only">Download Invoice PDF</span>
           </button>
           <button
             onClick={() => handleDeleteOrder(row)}
-            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 group"
+            className="p-1.5 sm:p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 group"
             title="Archive order (hides from list but preserves all data)"
           >
-            <Trash2 className="h-5 w-5" />
+            <Trash2 className="h-4 w-4 sm:h-5 sm:w-5" />
             <span className="sr-only">Archive Order</span>
           </button>
         </div>
@@ -428,9 +428,9 @@ export default function AdminOrdersPage() {
       label: 'Order ID',
       sortable: true,
       render: (value: string, row: Order) => (
-        <div className="flex items-center space-x-2">
-          <Archive className="h-4 w-4 text-gray-400" />
-          <span className="font-mono text-sm">{value}</span>
+        <div className="flex items-center space-x-1 sm:space-x-2">
+          <Archive className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0" />
+          <span className="font-mono text-xs sm:text-sm truncate">{value}</span>
         </div>
       )
     },
@@ -439,13 +439,13 @@ export default function AdminOrdersPage() {
       label: 'Customer',
       sortable: true,
       render: (value: User, row: Order) => (
-        <div className="flex items-center space-x-2">
-          <User className="h-4 w-4 text-gray-400" />
-          <div>
-            <div className="font-medium text-gray-900">
+        <div className="flex items-center space-x-1 sm:space-x-2">
+          <User className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0" />
+          <div className="min-w-0">
+            <div className="font-medium text-gray-900 text-xs sm:text-sm truncate">
               {value ? `${value.firstName} ${value.lastName}` : 'Unknown User'}
             </div>
-            <div className="text-sm text-gray-500">
+            <div className="text-xs sm:text-sm text-gray-500 truncate">
               {value?.email || 'No email available'}
             </div>
           </div>
@@ -458,8 +458,8 @@ export default function AdminOrdersPage() {
       sortable: true,
       render: (value: number, row: Order) => (
         <div className="text-right">
-          <div className="font-semibold text-gray-900">₹{value.toFixed(2)}</div>
-          <div className="text-sm text-gray-500">{row.currency}</div>
+          <div className="font-semibold text-gray-900 text-xs sm:text-sm">₹{value.toFixed(2)}</div>
+          <div className="text-xs sm:text-sm text-gray-500">{row.currency}</div>
         </div>
       )
     },
@@ -468,7 +468,7 @@ export default function AdminOrdersPage() {
       label: 'Status',
       sortable: true,
       render: (value: string) => (
-        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${value === 'completed'
+        <span className={`inline-flex items-center px-1.5 sm:px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-medium ${value === 'completed'
           ? 'bg-green-100 text-green-800'
           : value === 'failed'
             ? 'bg-red-100 text-red-800'
@@ -476,9 +476,9 @@ export default function AdminOrdersPage() {
               ? 'bg-yellow-100 text-yellow-800'
               : 'bg-gray-100 text-gray-800'
           }`}>
-          {value === 'completed' && <CheckCircle className="h-3 w-3 mr-1" />}
-          {value === 'failed' && <XCircle className="h-3 w-3 mr-1" />}
-          {value === 'pending' && <Clock className="h-3 w-3 mr-1" />}
+          {value === 'completed' && <CheckCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1" />}
+          {value === 'failed' && <XCircle className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1" />}
+          {value === 'pending' && <Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5 sm:mr-1" />}
           {value.charAt(0).toUpperCase() + value.slice(1)}
         </span>
       )
@@ -489,8 +489,8 @@ export default function AdminOrdersPage() {
       sortable: false,
       render: (value: any[], row: Order) => (
         <div className="text-center">
-          <div className="font-medium text-gray-900">{value.length}</div>
-          <div className="text-sm text-gray-500">
+          <div className="font-medium text-gray-900 text-xs sm:text-sm">{value.length}</div>
+          <div className="text-xs sm:text-sm text-gray-500">
             {row.successfulDomains.length} success
           </div>
         </div>
@@ -501,9 +501,9 @@ export default function AdminOrdersPage() {
       label: 'Date',
       sortable: true,
       render: (value: string) => (
-        <div className="flex items-center space-x-2">
-          <Calendar className="h-4 w-4 text-gray-400" />
-          <span className="text-sm">{formatIndianDate(value)}</span>
+        <div className="flex items-center space-x-1 sm:space-x-2">
+          <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0" />
+          <span className="text-xs sm:text-sm">{formatIndianDate(value)}</span>
         </div>
       )
     },
@@ -512,37 +512,37 @@ export default function AdminOrdersPage() {
       label: 'Actions',
       sortable: false,
       render: (value: any, row: Order) => (
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-1 sm:space-x-3">
           <button
             onClick={() => handleViewOrder(row)}
-            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 group"
+            className="p-1.5 sm:p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 group"
             title="View order details, domains, and payment information"
           >
-            <Eye className="h-5 w-5" />
+            <Eye className="h-4 w-4 sm:h-5 sm:w-5" />
             <span className="sr-only">View Order Details</span>
           </button>
           <button
             onClick={() => handleViewInvoice(row)}
-            className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all duration-200 group"
+            className="p-1.5 sm:p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all duration-200 group"
             title="View invoice details and billing information"
           >
-            <FileText className="h-5 w-5" />
+            <FileText className="h-4 w-4 sm:h-5 sm:w-5" />
             <span className="sr-only">View Invoice</span>
           </button>
           <button
             onClick={() => handleDownloadInvoice(row._id)}
-            className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all duration-200 group"
+            className="p-1.5 sm:p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all duration-200 group"
             title="Download invoice as PDF file"
           >
-            <Download className="h-5 w-5" />
+            <Download className="h-4 w-4 sm:h-5 sm:w-5" />
             <span className="sr-only">Download Invoice PDF</span>
           </button>
           <button
             onClick={() => handleUnarchiveOrder(row)}
-            className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all duration-200 group"
+            className="p-1.5 sm:p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all duration-200 group"
             title="Un-archive order (restore to active orders)"
           >
-            <RotateCcw className="h-5 w-5" />
+            <RotateCcw className="h-4 w-4 sm:h-5 sm:w-5" />
             <span className="sr-only">Un-archive Order</span>
           </button>
         </div>
@@ -564,21 +564,21 @@ export default function AdminOrdersPage() {
 
   return (
     <AdminLayout user={user} onLogout={handleLogout}>
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Page Header */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-6">
+          <div className="flex items-start sm:items-center justify-between flex-col sm:flex-row gap-3 sm:gap-0">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Order Management</h1>
-              <p className="text-gray-600 mt-2">Manage and track all customer orders</p>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Order Management</h1>
+              <p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">Manage and track all customer orders</p>
             </div>
             <div className="flex items-center space-x-3">
               <button
                 onClick={loadOrders}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200"
+                className="flex items-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200"
               >
                 <RefreshCw className="h-4 w-4" />
-                Refresh
+                <span className="hidden sm:inline">Refresh</span>
               </button>
             </div>
           </div>
@@ -587,33 +587,33 @@ export default function AdminOrdersPage() {
         {/* Orders Tabs */}
         <div className="bg-white rounded-lg shadow">
           {/* Tab Navigation */}
-          <div className="border-b border-gray-200">
-            <nav className="-mb-px flex space-x-8 px-6">
+          <div className="border-b border-gray-200 overflow-x-auto">
+            <nav className="-mb-px flex space-x-4 sm:space-x-8 px-3 sm:px-6">
               <button
                 onClick={() => setActiveTab('active')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center ${activeTab === 'active'
+                className={`py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm flex items-center whitespace-nowrap ${activeTab === 'active'
                   ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
               >
-                <Receipt className="h-5 w-5 mr-2" />
+                <Receipt className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
                 Active Orders ({orders.length})
               </button>
               <button
                 onClick={() => setActiveTab('archived')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center ${activeTab === 'archived'
+                className={`py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm flex items-center whitespace-nowrap ${activeTab === 'archived'
                   ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
               >
-                <Archive className="h-5 w-5 mr-2" />
+                <Archive className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
                 Archived Orders ({archivedOrders.length})
               </button>
             </nav>
           </div>
 
           {/* Tab Content */}
-          <div className="p-6">
+          <div className="p-3 sm:p-6">
             {activeTab === 'active' ? (
               <AdminDataTable
                 title=""

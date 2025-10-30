@@ -333,22 +333,3 @@ node scripts/kill-ports.js
 ```bash
 pm2 logs next-app --lines 50
 ```
-
----
-
-## 🤝 Support
-
-- **Issues:** Create a GitHub issue
-- **Documentation:** Check linked docs above
-- **Email:** support@exceltechnologies.in
-
----
-
-## 📄 License
-
-MIT License
-
----
-
-**Version:** 2.7.0  
-**Last Updated:** October 2025
