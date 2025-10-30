@@ -11,11 +11,6 @@ export async function middleware(request: NextRequest) {
     secret: process.env.NEXTAUTH_SECRET,
   });
 
-  console.log("🔍 [Middleware] Checking path:", pathname, {
-    hasToken: !!token,
-    role: token?.role,
-  });
-
   // Public routes that don't require authentication
   const publicRoutes = [
     "/",
@@ -47,33 +42,25 @@ export async function middleware(request: NextRequest) {
   if (protectedRoutes.includes(pathname) || adminRoutes.includes(pathname)) {
     // Check for NextAuth token (works for both social and credentials login)
     if (!token) {
-      console.log("🚫 [Middleware] No session - redirecting to login");
       return NextResponse.redirect(new URL("/login", request.url));
     }
-
-    console.log("✅ [Middleware] Session found - allowing access");
   }
 
   // Check if admin routes require admin role
   if (adminRoutes.includes(pathname) || pathname.startsWith("/admin")) {
     if (!token) {
-      console.log("🚫 [Middleware] Admin route - no session");
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
     // Check if user has admin role
     if (token.role !== "admin") {
-      console.log("🚫 [Middleware] Admin route - not admin user");
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
-
-    console.log("✅ [Middleware] Admin access granted");
   }
 
   // Protect admin API routes
   if (pathname.startsWith("/api/admin/")) {
     if (!token || token.role !== "admin") {
-      console.log("🚫 [Middleware] Admin API - access denied");
       return NextResponse.json(
         {
           error: "Access denied. Admin authentication required.",

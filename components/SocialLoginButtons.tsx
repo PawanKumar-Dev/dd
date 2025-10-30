@@ -21,12 +21,11 @@ export default function SocialLoginButtons({
 
   const handleSocialLogin = async (provider: 'google' | 'facebook') => {
     try {
-      console.log(`🔐 [SocialLogin] Starting ${provider} login...`);
       setIsLoading(provider);
 
       // Set a timeout for the entire OAuth process
       const loginTimeout = setTimeout(() => {
-        console.warn(`⚠️ [SocialLogin] ${provider} login taking too long`);
+        // Timeout warning
       }, 10000);
 
       const result = await signIn(provider, {
@@ -36,16 +35,7 @@ export default function SocialLoginButtons({
 
       clearTimeout(loginTimeout);
 
-      console.log(`📊 [SocialLogin] ${provider} result:`, {
-        ok: result?.ok,
-        error: result?.error,
-        status: result?.status,
-        url: result?.url
-      });
-
       if (result?.error) {
-        console.error(`❌ [SocialLogin] ${provider} error:`, result.error);
-
         const errorMessage = result.error === 'OAuthSignin'
           ? 'Failed to sign in. Please try again.'
           : result.error === 'OAuthCallback'
@@ -69,18 +59,14 @@ export default function SocialLoginButtons({
         toast.error(errorMessage);
         onError?.(errorMessage);
       } else if (result?.ok) {
-        console.log(`✅ [SocialLogin] ${provider} login successful - redirecting...`);
         toast.success('Successfully signed in!');
 
         // Small delay to ensure session is set
         setTimeout(() => {
           onSuccess?.();
         }, 100);
-      } else {
-        console.warn(`⚠️ [SocialLogin] ${provider} login - unexpected result:`, result);
       }
     } catch (error) {
-      console.error(`❌ [SocialLogin] ${provider} login exception:`, error);
       // Social login error
       const errorMessage = 'An unexpected error occurred. Please try again.';
       toast.error(errorMessage);

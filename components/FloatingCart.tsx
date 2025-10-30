@@ -21,7 +21,7 @@ export default function FloatingCart() {
         const userObj = JSON.parse(userData);
         setIsAdmin(userObj.role === 'admin');
       } catch (error) {
-        console.error('Error parsing user data:', error);
+        // Error parsing user data
       }
     }
   }, []);
