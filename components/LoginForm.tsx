@@ -110,16 +110,15 @@ export default function LoginForm({ className = '' }: LoginFormProps) {
 
         showSuccessToast('Login successful!');
 
-        // Small delay to ensure session is set
-        setTimeout(() => {
-          // Check for return URL parameter
-          const urlParams = new URLSearchParams(window.location.search);
-          const returnUrl = urlParams.get('returnUrl');
+        // Check for return URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const returnUrl = urlParams.get('returnUrl');
 
-          // NextAuth session will have the user role
-          // For now, redirect to dashboard (middleware will handle admin routing)
-          router.push(returnUrl || '/dashboard');
-        }, 100);
+        // Use window.location for hard redirect after successful login
+        // This ensures the session is properly loaded on the next page
+        setTimeout(() => {
+          window.location.href = returnUrl || '/dashboard';
+        }, 500);
       }
     } catch (error) {
       showErrorToast('An error occurred. Please try again.');

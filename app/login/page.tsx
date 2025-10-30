@@ -1,63 +1,41 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import LoginForm from '@/components/LoginForm';
 
 export default function LoginPage() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [debugInfo, setDebugInfo] = useState<string>('');
-  const router = useRouter();
+  const [isReady, setIsReady] = useState(false);
   const { data: session, status } = useSession();
-  const timeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
-    setDebugInfo(`Session status: ${status}`);
-
-    // Failsafe: Force show login form after 2 seconds if still loading
-    timeoutRef.current = setTimeout(() => {
-      if (status === 'loading') {
-        setDebugInfo('Timeout - showing login form');
-        setIsLoading(false);
-      }
-    }, 2000);
-
-    // Check for NextAuth session (unified for both social and credentials)
+    // If already authenticated, let LoginForm or middleware handle redirect
+    // Just make form ready to show
     if (status === 'authenticated' && session) {
-      const urlParams = new URLSearchParams(window.location.search);
-      const returnUrl = urlParams.get('returnUrl');
-      router.push(returnUrl || '/dashboard');
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      window.location.href = '/dashboard';
       return;
     }
 
-    // If status is unauthenticated, show login form immediately
+    // Show form when ready
     if (status === 'unauthenticated') {
-      setDebugInfo('Ready to login');
-      setIsLoading(false);
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      setIsReady(true);
       return;
     }
 
-    // If status is loading, wait (but timeout will catch it)
-    if (status === 'loading') {
-      setDebugInfo('Checking authentication...');
-    }
+    // Fallback: show form after brief delay
+    const timer = setTimeout(() => {
+      setIsReady(true);
+    }, 300);
 
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, [router, session, status]);
+    return () => clearTimeout(timer);
+  }, [session, status]);
 
-  if (isLoading) {
+  // Show brief loading
+  if (!isReady) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mb-4"></div>
-        <p className="text-gray-600 text-sm">{debugInfo || 'Loading...'}</p>
-        {process.env.NODE_ENV === 'development' && (
-          <p className="text-gray-400 text-xs mt-2">Session: {status}</p>
-        )}
+        <p className="text-gray-600 text-sm">Loading...</p>
       </div>
     );
   }
