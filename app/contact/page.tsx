@@ -54,10 +54,10 @@ export default function ContactPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
         <Navigation user={user} />
-        
+
         {/* Hero Skeleton */}
         <SkeletonHero />
-        
+
         {/* Contact Form and Info Skeleton */}
         <Section background="white">
           <div className="max-w-6xl mx-auto px-4">
@@ -71,18 +71,18 @@ export default function ContactPage() {
                 <SkeletonBase className="h-4 w-2/3 mx-auto" />
               </div>
             </div>
-            
+
             <SkeletonContact />
           </div>
         </Section>
-        
+
         {/* Map Skeleton */}
         <Section background="gray">
           <div className="max-w-6xl mx-auto px-4">
             <SkeletonBase className="h-96 w-full rounded-lg" />
           </div>
         </Section>
-        
+
         <Footer />
       </div>
     );

@@ -21,10 +21,9 @@ const nextConfig = {
 
   // Production optimizations for security
   compiler: {
-    // Remove console.log in production (keep error and warn for debugging)
-    removeConsole: process.env.NODE_ENV === 'production' ? {
-      exclude: ['error', 'warn'],
-    } : false,
+    // Remove ALL console statements in production for security
+    // This prevents any logs from being exposed to frontend users
+    removeConsole: process.env.NODE_ENV === 'production' ? true : false,
   },
 
   // Disable source maps in production (prevent code inspection)

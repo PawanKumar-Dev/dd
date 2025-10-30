@@ -76,14 +76,11 @@ export const authOptions: NextAuthOptions = {
               const recaptchaData = await recaptchaResponse.json();
 
               if (!recaptchaData.success || recaptchaData.score < 0.5) {
-                console.warn("reCAPTCHA verification failed", {
-                  success: recaptchaData.success,
-                  score: recaptchaData.score,
-                });
+                serverLogger.warn("reCAPTCHA verification failed");
                 throw new Error("reCAPTCHA verification failed");
               }
             } catch (error) {
-              console.error("reCAPTCHA error:", error);
+              serverLogger.error("reCAPTCHA error");
               // Don't block login if reCAPTCHA service is down
               // throw new Error("reCAPTCHA verification failed");
             }
@@ -114,11 +111,6 @@ export const authOptions: NextAuthOptions = {
             throw new Error("Invalid email or password");
           }
 
-          console.log(
-            "✅ [CredentialsProvider] User authenticated:",
-            user.email
-          );
-
           return {
             id: user._id?.toString() || "",
             email: user.email,
@@ -126,10 +118,7 @@ export const authOptions: NextAuthOptions = {
             role: user.role,
           };
         } catch (error: any) {
-          console.error(
-            "❌ [CredentialsProvider] Authentication error:",
-            error.message
-          );
+          serverLogger.error("Authentication error");
           throw error;
         }
       },
@@ -297,7 +286,7 @@ export const authOptions: NextAuthOptions = {
                 user.email || "",
                 `${firstName} ${lastName}`.trim()
               ).catch((error) => {
-                console.error("Profile completion email failed:", error);
+                serverLogger.error("Profile completion email failed");
               });
             }
           } else {
@@ -400,22 +389,16 @@ export const authOptions: NextAuthOptions = {
   debug: false, // Disable debug to reduce console noise
   logger: {
     error(code, metadata) {
-      // Only log actual errors, not warnings
+      // Only log actual errors to server logs
       if (code !== "CLIENT_FETCH_ERROR" && code !== "DEBUG_ENABLED") {
-        console.error("NextAuth Error:", code, metadata);
+        serverLogger.error("NextAuth Error:", code);
       }
     },
     warn(code) {
-      // Suppress debug warnings in development
-      if (code !== "DEBUG_ENABLED") {
-        console.warn("NextAuth Warning:", code);
-      }
+      // Suppress warnings for security
     },
     debug(code, metadata) {
-      // Disable debug logging completely
-      // if (process.env.NODE_ENV === "development") {
-      //   console.log("NextAuth Debug:", code, metadata);
-      // }
+      // Debug logging disabled
     },
   },
   session: {
