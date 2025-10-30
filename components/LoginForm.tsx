@@ -73,68 +73,47 @@ export default function LoginForm({ className = '' }: LoginFormProps) {
       // Get reCAPTCHA token - TEMPORARILY DISABLED
       // const recaptchaToken = await executeRecaptcha('login');
 
+      // Store remember me preference BEFORE login
+      if (formData.rememberMe) {
+        localStorage.setItem('rememberMe', 'true');
+        localStorage.setItem('savedEmail', formData.email);
+      } else {
+        localStorage.removeItem('rememberMe');
+        localStorage.removeItem('savedEmail');
+      }
+
+      // Clear saved form data
+      localStorage.removeItem('loginFormData');
+
       // Get return URL
       const urlParams = new URLSearchParams(window.location.search);
       const returnUrl = urlParams.get('returnUrl') || '/dashboard';
 
-      // Use NextAuth signIn with credentials provider
-      const result = await signIn('credentials', {
-        redirect: false,
+      showSuccessToast('Login successful! Redirecting...');
+
+      // Use NextAuth signIn with AUTOMATIC redirect
+      // This ensures cookies are set before navigation
+      await signIn('credentials', {
+        redirect: true, // Let NextAuth handle the redirect
         email: formData.email,
         password: formData.password,
         recaptchaToken: '', // Empty for now
         callbackUrl: returnUrl,
       });
 
-      console.log('SignIn result:', result);
-      console.log('Current cookies:', document.cookie);
-
-      if (result?.error) {
-        console.log('Login error:', result.error);
-        // Handle specific error cases
-        if (result.error === 'CredentialsSignin') {
-          showErrorToast('Invalid email or password');
-        } else if (result.error === 'AccountNotActivated') {
-          showErrorToast('Account not activated. Please check your email.');
-          setTimeout(() => {
-            router.push(`/activate?email=${encodeURIComponent(formData.email)}`);
-          }, 1000);
-        } else if (result.error === 'AccountDeactivated') {
-          showAccountDeactivated('support@exceltechnologies.in');
-        } else {
-          showErrorToast(result.error || 'Login failed');
-        }
-      } else if (result?.ok) {
-        console.log('Login successful, preparing redirect to:', returnUrl);
-
-        // Store remember me preference
-        if (formData.rememberMe) {
-          localStorage.setItem('rememberMe', 'true');
-          localStorage.setItem('savedEmail', formData.email);
-        } else {
-          localStorage.removeItem('rememberMe');
-          localStorage.removeItem('savedEmail');
-        }
-
-        // Clear saved form data on successful login
-        localStorage.removeItem('loginFormData');
-
-        showSuccessToast('Login successful! Redirecting...');
-
-        // Give the session cookie time to be set in the browser
-        // before redirecting (2 seconds should be sufficient)
-        console.log('Setting redirect timeout for 2 seconds...');
+      // Code after this won't execute because redirect: true navigates away
+    } catch (error: any) {
+      // Handle errors from authorize function
+      if (error?.message === 'AccountNotActivated') {
+        showErrorToast('Account not activated. Please check your email.');
         setTimeout(() => {
-          console.log('Executing redirect to:', returnUrl);
-          window.location.href = returnUrl;
-        }, 2000);
+          router.push(`/activate?email=${encodeURIComponent(formData.email)}`);
+        }, 1000);
+      } else if (error?.message === 'AccountDeactivated') {
+        showAccountDeactivated('support@exceltechnologies.in');
       } else {
-        console.log('Unexpected result:', result);
-        showErrorToast('Unexpected login result. Please try again.');
+        showErrorToast('An error occurred. Please try again.');
       }
-    } catch (error) {
-      showErrorToast('An error occurred. Please try again.');
-    } finally {
       setIsLoading(false);
     }
   };
