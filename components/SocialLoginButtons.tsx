@@ -22,14 +22,31 @@ export default function SocialLoginButtons({
 
   const handleSocialLogin = async (provider: 'google' | 'facebook') => {
     try {
+      console.log(`🔐 [SocialLogin] Starting ${provider} login...`);
       setIsLoading(provider);
+
+      // Set a timeout for the entire OAuth process
+      const loginTimeout = setTimeout(() => {
+        console.warn(`⚠️ [SocialLogin] ${provider} login taking too long`);
+      }, 10000);
 
       const result = await signIn(provider, {
         redirect: false,
         callbackUrl: '/dashboard',
       });
 
+      clearTimeout(loginTimeout);
+
+      console.log(`📊 [SocialLogin] ${provider} result:`, {
+        ok: result?.ok,
+        error: result?.error,
+        status: result?.status,
+        url: result?.url
+      });
+
       if (result?.error) {
+        console.error(`❌ [SocialLogin] ${provider} error:`, result.error);
+
         const errorMessage = result.error === 'OAuthSignin'
           ? 'Failed to sign in. Please try again.'
           : result.error === 'OAuthCallback'
@@ -53,20 +70,39 @@ export default function SocialLoginButtons({
         toast.error(errorMessage);
         onError?.(errorMessage);
       } else if (result?.ok) {
+        console.log(`✅ [SocialLogin] ${provider} login successful - syncing token...`);
+
         // Sync the NextAuth session with localStorage/custom token before redirecting
         // This ensures the token is available immediately
         try {
+          const syncTimeout = setTimeout(() => {
+            console.warn('⚠️ [SocialLogin] Token sync taking too long');
+          }, 5000);
+
           await syncAuthWithLocalStorage();
+          clearTimeout(syncTimeout);
+
+          console.log('✅ [SocialLogin] Token sync completed - redirecting...');
           toast.success('Successfully signed in!');
-          onSuccess?.();
+
+          // Small delay to ensure everything is saved
+          setTimeout(() => {
+            onSuccess?.();
+          }, 100);
         } catch (syncError) {
+          console.error('⚠️ [SocialLogin] Token sync failed:', syncError);
           // If sync fails, still try to redirect - AuthSync component will handle it
-          console.warn('Token sync failed, will retry on dashboard:', syncError);
           toast.success('Successfully signed in!');
-          onSuccess?.();
+
+          setTimeout(() => {
+            onSuccess?.();
+          }, 100);
         }
+      } else {
+        console.warn(`⚠️ [SocialLogin] ${provider} login - unexpected result:`, result);
       }
     } catch (error) {
+      console.error(`❌ [SocialLogin] ${provider} login exception:`, error);
       // Social login error
       const errorMessage = 'An unexpected error occurred. Please try again.';
       toast.error(errorMessage);

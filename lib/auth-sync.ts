@@ -5,22 +5,32 @@ import { getSession } from "next-auth/react";
  */
 export async function syncAuthWithLocalStorage() {
   try {
+    console.log("🔄 [AuthSync] Starting session sync...");
+
     const session = await getSession();
+    console.log("📊 [AuthSync] Session data:", {
+      hasSession: !!session,
+      hasUser: !!session?.user,
+      email: session?.user?.email,
+    });
 
     if (session?.user) {
       // Check if user already has data in localStorage (to preserve profileCompleted)
       const existingUserData = localStorage.getItem("user");
       let existingProfileCompleted = false;
-      
+
       if (existingUserData) {
         try {
           const existing = JSON.parse(existingUserData);
           existingProfileCompleted = existing.profileCompleted === true;
+          console.log("📦 [AuthSync] Existing user data found:", {
+            profileCompleted: existingProfileCompleted,
+          });
         } catch (e) {
-          // Ignore parse errors
+          console.warn("⚠️ [AuthSync] Failed to parse existing user data:", e);
         }
       }
-      
+
       // Create a compatible user object for localStorage
       // IMPORTANT: Preserve existing profileCompleted status if user already had one
       const userData = {
@@ -30,31 +40,54 @@ export async function syncAuthWithLocalStorage() {
         lastName: session.user.name?.split(" ").slice(1).join(" ") || "",
         role: (session.user as any).role || "user",
         // Preserve existing profileCompleted or use session value, never default to false if they had true
-        profileCompleted: existingProfileCompleted || (session.user as any).profileCompleted || false,
+        profileCompleted:
+          existingProfileCompleted ||
+          (session.user as any).profileCompleted ||
+          false,
       };
 
+      console.log("💾 [AuthSync] Saving user data to localStorage:", userData);
       // Store in localStorage for compatibility
       localStorage.setItem("user", JSON.stringify(userData));
 
       // Fetch a proper JWT token from the server
       try {
-        const syncResponse = await fetch('/api/auth/sync-token', {
-          credentials: 'include',
+        console.log("🔑 [AuthSync] Fetching JWT token from server...");
+
+        const syncResponse = await fetch("/api/auth/sync-token", {
+          credentials: "include",
           headers: {
-            'Accept': 'application/json',
+            Accept: "application/json",
           },
+          signal: AbortSignal.timeout(5000), // 5 second timeout
         });
-        
+
+        console.log("📡 [AuthSync] Server response:", {
+          ok: syncResponse.ok,
+          status: syncResponse.status,
+        });
+
         if (syncResponse.ok) {
           const data = await syncResponse.json();
           if (data.token) {
+            console.log("✅ [AuthSync] JWT token received and stored");
             // Store token in localStorage
             localStorage.setItem("token", data.token);
             // Cookie is already set by the server
+          } else {
+            console.warn("⚠️ [AuthSync] No token in response:", data);
           }
+        } else {
+          console.error(
+            "❌ [AuthSync] Server returned error:",
+            syncResponse.status
+          );
+          throw new Error(`Server returned ${syncResponse.status}`);
         }
       } catch (error) {
-        console.error('Failed to sync token with server:', error);
+        console.error("❌ [AuthSync] Failed to sync token with server:", error);
+        console.log("🔄 [AuthSync] Falling back to client-side token...");
+
         // Fallback: create base64 token for client-side
         const tokenPayload = {
           userId: (session.user as any).id,
@@ -70,15 +103,18 @@ export async function syncAuthWithLocalStorage() {
         const token = btoa(JSON.stringify(tokenPayload));
         localStorage.setItem("token", token);
         document.cookie = `token=${token}; path=/; max-age=${24 * 60 * 60}`;
+        console.log("✅ [AuthSync] Fallback token created");
       }
 
+      console.log("✅ [AuthSync] Sync completed successfully");
       return userData;
     }
 
+    console.warn("⚠️ [AuthSync] No session found");
     return null;
   } catch (error) {
-    // Error syncing auth - handled silently on client side
-    return null;
+    console.error("❌ [AuthSync] Error during sync:", error);
+    throw error; // Re-throw to let caller handle it
   }
 }
 
