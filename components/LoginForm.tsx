@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { Eye, EyeOff, Lock, Mail, User, CheckCircle } from 'lucide-react';
 import Button from './Button';
 import Input from './Input';
@@ -69,30 +70,44 @@ export default function LoginForm({ className = '' }: LoginFormProps) {
     setIsLoading(true);
 
     try {
+      console.log('🔐 [LoginForm] Starting credentials login...');
+      
       // Get reCAPTCHA token
       const recaptchaToken = await executeRecaptcha('login');
 
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...formData,
-          recaptchaToken,
-        }),
+      // Use NextAuth signIn with credentials provider
+      const result = await signIn('credentials', {
+        redirect: false,
+        email: formData.email,
+        password: formData.password,
+        recaptchaToken,
       });
 
-      const data = await response.json();
+      console.log('📊 [LoginForm] Login result:', { 
+        ok: result?.ok, 
+        error: result?.error,
+        status: result?.status 
+      });
 
-      if (response.ok) {
-        // Store token in localStorage
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-
-        // Store token in cookie for server-side access
-        document.cookie = `token=${data.token}; path=/; max-age=${formData.rememberMe ? 30 * 24 * 60 * 60 : 24 * 60 * 60}`;
-
+      if (result?.error) {
+        console.error('❌ [LoginForm] Login error:', result.error);
+        
+        // Handle specific error cases
+        if (result.error === 'CredentialsSignin') {
+          showErrorToast('Invalid email or password');
+        } else if (result.error === 'AccountNotActivated') {
+          showErrorToast('Account not activated. Please check your email.');
+          setTimeout(() => {
+            router.push(`/activate?email=${encodeURIComponent(formData.email)}`);
+          }, 1000);
+        } else if (result.error === 'AccountDeactivated') {
+          showAccountDeactivated('support@exceltechnologies.in');
+        } else {
+          showErrorToast(result.error || 'Login failed');
+        }
+      } else if (result?.ok) {
+        console.log('✅ [LoginForm] Login successful');
+        
         // Store remember me preference
         if (formData.rememberMe) {
           localStorage.setItem('rememberMe', 'true');
@@ -107,35 +122,19 @@ export default function LoginForm({ className = '' }: LoginFormProps) {
 
         showSuccessToast('Login successful!');
 
-        // Small delay to ensure cookie is set
+        // Small delay to ensure session is set
         setTimeout(() => {
           // Check for return URL parameter
           const urlParams = new URLSearchParams(window.location.search);
           const returnUrl = urlParams.get('returnUrl');
 
-          if (data.user.role === 'admin') {
-            router.push('/admin');
-          } else if (returnUrl) {
-            router.push(returnUrl);
-          } else {
-            router.push('/dashboard');
-          }
+          // NextAuth session will have the user role
+          // For now, redirect to dashboard (middleware will handle admin routing)
+          router.push(returnUrl || '/dashboard');
         }, 100);
-      } else {
-        if (data.requiresActivation) {
-          showErrorToast(data.message || 'Account not activated');
-          // Redirect to activation page with user email
-          setTimeout(() => {
-            router.push(`/activate?email=${encodeURIComponent(formData.email)}&message=${encodeURIComponent(data.message || 'Account not activated')}`);
-          }, 1000);
-        } else if (data.isDeactivated) {
-          // Show a more detailed error for deactivated accounts
-          showAccountDeactivated(data.supportEmail);
-        } else {
-          showErrorToast(data.error || 'Login failed');
-        }
       }
     } catch (error) {
+      console.error('❌ [LoginForm] Login exception:', error);
       showErrorToast('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);

@@ -5,7 +5,6 @@ import { useState } from 'react';
 import { FcGoogle } from 'react-icons/fc';
 import { FaFacebook } from 'react-icons/fa';
 import toast from 'react-hot-toast';
-import { syncAuthWithLocalStorage } from '@/lib/auth-sync';
 
 interface SocialLoginButtonsProps {
   className?: string;
@@ -70,34 +69,13 @@ export default function SocialLoginButtons({
         toast.error(errorMessage);
         onError?.(errorMessage);
       } else if (result?.ok) {
-        console.log(`✅ [SocialLogin] ${provider} login successful - syncing token...`);
-
-        // Sync the NextAuth session with localStorage/custom token before redirecting
-        // This ensures the token is available immediately
-        try {
-          const syncTimeout = setTimeout(() => {
-            console.warn('⚠️ [SocialLogin] Token sync taking too long');
-          }, 5000);
-
-          await syncAuthWithLocalStorage();
-          clearTimeout(syncTimeout);
-
-          console.log('✅ [SocialLogin] Token sync completed - redirecting...');
-          toast.success('Successfully signed in!');
-
-          // Small delay to ensure everything is saved
-          setTimeout(() => {
-            onSuccess?.();
-          }, 100);
-        } catch (syncError) {
-          console.error('⚠️ [SocialLogin] Token sync failed:', syncError);
-          // If sync fails, still try to redirect - AuthSync component will handle it
-          toast.success('Successfully signed in!');
-
-          setTimeout(() => {
-            onSuccess?.();
-          }, 100);
-        }
+        console.log(`✅ [SocialLogin] ${provider} login successful - redirecting...`);
+        toast.success('Successfully signed in!');
+        
+        // Small delay to ensure session is set
+        setTimeout(() => {
+          onSuccess?.();
+        }, 100);
       } else {
         console.warn(`⚠️ [SocialLogin] ${provider} login - unexpected result:`, result);
       }

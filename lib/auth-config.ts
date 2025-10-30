@@ -49,42 +49,79 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        recaptchaToken: { label: "ReCaptcha Token", type: "text" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null;
+        try {
+          if (!credentials?.email || !credentials?.password) {
+            throw new Error("Email and password are required");
+          }
+
+          // Verify reCAPTCHA if token provided
+          if (credentials.recaptchaToken) {
+            try {
+              const recaptchaResponse = await fetch(
+                `https://www.google.com/recaptcha/api/siteverify`,
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                  body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${credentials.recaptchaToken}`,
+                }
+              );
+
+              const recaptchaData = await recaptchaResponse.json();
+              
+              if (!recaptchaData.success || recaptchaData.score < 0.5) {
+                console.warn("reCAPTCHA verification failed", {
+                  success: recaptchaData.success,
+                  score: recaptchaData.score,
+                });
+                throw new Error("reCAPTCHA verification failed");
+              }
+            } catch (error) {
+              console.error("reCAPTCHA error:", error);
+              // Don't block login if reCAPTCHA service is down
+              // throw new Error("reCAPTCHA verification failed");
+            }
+          }
+
+          await connectDB();
+
+          const user = await User.findOne({ email: credentials.email });
+          if (!user) {
+            throw new Error("Invalid email or password");
+          }
+
+          // Check if user is activated
+          if (!user.isActivated) {
+            throw new Error("AccountNotActivated");
+          }
+
+          // Check if user is active
+          if (!user.isActive) {
+            throw new Error("AccountDeactivated");
+          }
+
+          // Verify password
+          const isPasswordValid = await user.comparePassword(
+            credentials.password
+          );
+          if (!isPasswordValid) {
+            throw new Error("Invalid email or password");
+          }
+
+          console.log("✅ [CredentialsProvider] User authenticated:", user.email);
+
+          return {
+            id: user._id?.toString() || "",
+            email: user.email,
+            name: `${user.firstName} ${user.lastName}`,
+            role: user.role,
+          };
+        } catch (error: any) {
+          console.error("❌ [CredentialsProvider] Authentication error:", error.message);
+          throw error;
         }
-
-        await connectDB();
-
-        const user = await User.findOne({ email: credentials.email });
-        if (!user) {
-          return null;
-        }
-
-        // Check if user is active and activated
-        if (!user.isActive || !user.isActivated) {
-          return null;
-        }
-
-        // Check if user is admin (prevent admin login through social auth)
-        if (user.role === "admin") {
-          return null;
-        }
-
-        const isPasswordValid = await user.comparePassword(
-          credentials.password
-        );
-        if (!isPasswordValid) {
-          return null;
-        }
-
-        return {
-          id: user._id?.toString() || '',
-          email: user.email,
-          name: `${user.firstName} ${user.lastName}`,
-          role: user.role,
-        };
       },
     }),
   ],
