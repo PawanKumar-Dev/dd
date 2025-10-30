@@ -122,7 +122,7 @@ Use this when the server is crashed or stuck in a loop.
 - **Responsive Design** - Optimized for mobile, tablet, and desktop
 - **Modern Animations** - Framer Motion with skeleton loaders
 - **Professional UI** - Polished loading states improve perceived performance
-- **7 Reusable Components** - SkeletonBase, Hero, Section, Card, Stats, Contact
+- **8 Reusable Components** - SkeletonBase, Hero, Section, Card, Stats, Contact, Cart
 
 ---
 

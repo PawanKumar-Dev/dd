@@ -1,5 +1,31 @@
 # Changelog
 
+## [2.9.1] - 2025-10-30
+
+### 🛒 Cart Page Skeleton Loading
+
+#### Added
+
+- **SkeletonCart Component**: New skeleton loader specifically designed for the shopping cart page
+  - Cart header with back button
+  - Trust indicators grid (4 cards)
+  - Cart items list with domain details
+  - Registration period selectors
+  - Price information
+  - Order summary sidebar
+  - Recommended add-ons section
+- **Cart Page Integration**: Replaced basic spinner with comprehensive skeleton loader
+  - Instant visual feedback on cart load
+  - Professional loading experience
+  - Matches cart layout exactly
+
+#### Improved
+
+- **Cart UX**: Better perceived performance when loading cart
+- **Consistency**: Cart page now matches the same high-quality skeleton pattern as other pages
+
+---
+
 ## [2.9.0] - 2025-10-30
 
 ### 💎 Universal Skeleton Loading System
