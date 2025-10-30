@@ -55,14 +55,15 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         try {
-          serverLogger.log("[AUTH] Login attempt started");
 
           if (!credentials?.email || !credentials?.password) {
-            serverLogger.error("[AUTH] Missing email or password");
             throw new Error("Email and password are required");
           }
 
-          serverLogger.log("[AUTH] Credentials received:", credentials.email);
+          serverLogger.log(
+            "[AUTH] 🔑 Password provided:",
+            !!credentials.password
+          );
 
           // Verify reCAPTCHA if token provided
           // TEMPORARILY DISABLED FOR TESTING
@@ -94,53 +95,54 @@ export const authOptions: NextAuthOptions = {
           }
           */
 
-          serverLogger.log("[AUTH] Connecting to database...");
           await connectDB();
-          serverLogger.log("[AUTH] Database connected");
 
-          serverLogger.log("[AUTH] Looking up user:", credentials.email);
           const user = await User.findOne({ email: credentials.email });
           if (!user) {
-            serverLogger.error("[AUTH] User not found:", credentials.email);
             throw new Error("Invalid email or password");
           }
 
-          serverLogger.log("[AUTH] User found, checking activation status");
+
           // Check if user is activated
           if (!user.isActivated) {
-            serverLogger.error("[AUTH] User not activated:", credentials.email);
+            serverLogger.error(
+              "[AUTH] ❌ User not activated:",
+              credentials.email
+            );
             throw new Error("AccountNotActivated");
           }
 
-          serverLogger.log("[AUTH] Checking active status");
           // Check if user is active
           if (!user.isActive) {
-            serverLogger.error("[AUTH] User deactivated:", credentials.email);
+            serverLogger.error(
+              "[AUTH] ❌ User deactivated:",
+              credentials.email
+            );
             throw new Error("AccountDeactivated");
           }
 
-          serverLogger.log("[AUTH] Verifying password");
           // Verify password
           const isPasswordValid = await user.comparePassword(
             credentials.password
           );
           if (!isPasswordValid) {
             serverLogger.error(
-              "[AUTH] Invalid password for:",
+              "[AUTH] ❌ Invalid password for:",
               credentials.email
             );
             throw new Error("Invalid email or password");
           }
 
-          serverLogger.log("[AUTH] Login successful for:", credentials.email);
-          return {
+          const returnData = {
             id: user._id?.toString() || "",
             email: user.email,
             name: `${user.firstName} ${user.lastName}`,
             role: user.role,
           };
+
+
+          return returnData;
         } catch (error: any) {
-          serverLogger.error("[AUTH] Authentication error:", error.message);
           throw error;
         }
       },
@@ -148,18 +150,28 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
+
       // Prevent admin users from using social login
       if (account?.provider === "google" || account?.provider === "facebook") {
-        await connectDB();
+        try {
+          await connectDB();
 
-        // Check if this email belongs to an admin user
-        const existingUser = await User.findOne({
-          email: user.email,
-          role: "admin",
-        });
+          // Check if this email belongs to an admin user
+          const existingUser = await User.findOne({
+            email: user.email,
+            role: "admin",
+          });
 
-        if (existingUser) {
-          return false; // Block admin users from social login
+          if (existingUser) {
+            serverLogger.warn(
+              "[SIGNIN] ❌ BLOCKED - Admin users cannot use social login:",
+              user.email
+            );
+            return false; // Block admin users from social login
+          }
+
+        } catch (error) {
+          return false; // Block on error for security
         }
       }
 
@@ -180,6 +192,10 @@ export const authOptions: NextAuthOptions = {
 
         // Handle social login user creation/update
         if (account.provider === "google" || account.provider === "facebook") {
+          serverLogger.log(
+            "[JWT CALLBACK] Processing social login for:",
+            user.email
+          );
           let dbUser = await User.findOne({ email: user.email });
 
           // Fetch additional user data from Google/Facebook if access token available
@@ -275,12 +291,16 @@ export const authOptions: NextAuthOptions = {
 
           if (!dbUser) {
             // Create new user from social login with enhanced profile data
+            serverLogger.log(
+              "[JWT CALLBACK] Creating new user from social login"
+            );
             const firstName =
               (profile as any)?.given_name || user.name?.split(" ")[0] || "";
             const lastName =
               (profile as any)?.family_name ||
               user.name?.split(" ").slice(1).join(" ") ||
               "";
+
 
             // Check if we have enough data to mark profile as complete
             const hasPhone = additionalData.phone && additionalData.phoneCc;
@@ -308,7 +328,12 @@ export const authOptions: NextAuthOptions = {
               profileCompleted: isProfileComplete,
             });
 
-            await dbUser.save();
+            try {
+              await dbUser.save();
+            } catch (error) {
+              serverLogger.error("[JWT CALLBACK] Error creating user:", error);
+              throw error;
+            }
 
             // Only send profile completion email if profile is incomplete
             if (!isProfileComplete) {
@@ -414,7 +439,6 @@ export const authOptions: NextAuthOptions = {
         }
       }
 
-      serverLogger.log("[JWT CALLBACK] Returning token with role:", token.role);
       return token;
     },
     async session({ session, token }) {

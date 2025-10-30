@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { ShoppingCart, User } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import Logo from './Logo';
@@ -23,42 +24,28 @@ export default function Navigation({
   onLogout
 }: NavigationProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentUser, setCurrentUser] = useState<{ firstName: string; lastName: string; role: string } | null>(null);
   const [isMounted, setIsMounted] = useState(false);
   const pathname = usePathname();
+  const { data: session, status } = useSession();
   const { getItemCount } = useCartStore();
   const [cartCount, setCartCount] = useState(0);
 
-  // Check if user is logged in and get user data
+  // Set mounted state
   useEffect(() => {
     setIsMounted(true);
-
-    const getCookieValue = (name: string) => {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop()?.split(';').shift();
-      return null;
-    };
-
-    const token = getCookieValue('token') || localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
-
-    if (token && userData) {
-      setIsLoggedIn(true);
-      try {
-        const userObj = JSON.parse(userData);
-        setCurrentUser(userObj);
-      } catch (error) {
-        // Error parsing user data
-        setIsLoggedIn(false);
-        setCurrentUser(null);
-      }
-    } else {
-      setIsLoggedIn(false);
-      setCurrentUser(null);
-    }
   }, []);
+
+  // Determine if user is logged in from NextAuth session
+  const isLoggedIn = status === 'authenticated' && session?.user;
+
+  // Get current user from NextAuth session
+  const currentUser = isLoggedIn && session?.user
+    ? {
+      firstName: session.user.name?.split(' ')[0] || '',
+      lastName: session.user.name?.split(' ').slice(1).join(' ') || '',
+      role: (session.user as any).role || 'user'
+    }
+    : null;
 
   // Update cart count only on client side
   useEffect(() => {

@@ -5,7 +5,6 @@ import { getToken } from "next-auth/jwt";
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  console.log("[MIDDLEWARE] Request to:", pathname);
 
   // Get NextAuth token (unified for both social and credentials)
   const token = await getToken({
@@ -13,10 +12,7 @@ export async function middleware(request: NextRequest) {
     secret: process.env.NEXTAUTH_SECRET,
   });
 
-  console.log("[MIDDLEWARE] Token found:", !!token);
   if (token) {
-    console.log("[MIDDLEWARE] Token email:", token.email);
-    console.log("[MIDDLEWARE] Token role:", token.role);
   }
 
   // Public routes that don't require authentication
@@ -51,7 +47,6 @@ export async function middleware(request: NextRequest) {
 
   // Check if the current path is public
   if (publicRoutes.includes(pathname)) {
-    console.log("[MIDDLEWARE] Public route, allowing access");
     return NextResponse.next();
   }
 
