@@ -104,23 +104,23 @@ export default function AdminDataTable({
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
       {/* Header */}
-      <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+      <div className="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900">{title}</h3>
         </div>
       </div>
 
       {/* Search */}
       {searchable && (
-        <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
+        <div className="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-400" />
             <input
               type="text"
               placeholder="Search..."
               value={searchTerm}
               onChange={(e) => handleSearchChange(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-300 focus:border-transparent"
             />
           </div>
         </div>
@@ -135,7 +135,10 @@ export default function AdminDataTable({
                 <th
                   key={column.key}
                   scope="col"
-                  className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${column.sortable ? 'cursor-pointer hover:bg-gray-100' : ''
+                  className={`px-2 sm:px-4 md:px-6 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider ${column.key === 'createdAt' ? 'hidden sm:table-cell' : ''
+                    } ${column.key === 'status' || column.key === 'role' ? 'hidden md:table-cell' : ''
+                    } ${column.key === 'amount' || column.key === 'domains' || column.key === 'orderId' || column.key === 'transactionId' ? 'hidden sm:table-cell' : ''
+                    } ${column.sortable ? 'cursor-pointer hover:bg-gray-100' : ''
                     }`}
                   onClick={column.sortable ? () => handleSort(column.key) : undefined}
                 >
@@ -154,16 +157,16 @@ export default function AdminDataTable({
           <tbody className="bg-white divide-y divide-gray-200">
             {isLoading ? (
               <tr>
-                <td colSpan={columns.length} className="px-6 py-8 text-center">
+                <td colSpan={columns.length} className="px-2 sm:px-6 py-4 sm:py-8 text-center">
                   <div className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                    <span className="ml-2 text-gray-500">Loading...</span>
+                    <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-b-2 border-blue-600"></div>
+                    <span className="ml-2 text-xs sm:text-sm text-gray-500">Loading...</span>
                   </div>
                 </td>
               </tr>
             ) : displayData.length === 0 ? (
               <tr>
-                <td colSpan={columns.length} className="px-6 py-8 text-center text-gray-500">
+                <td colSpan={columns.length} className="px-2 sm:px-6 py-4 sm:py-8 text-center text-xs sm:text-sm text-gray-500">
                   No data available
                 </td>
               </tr>
@@ -171,7 +174,13 @@ export default function AdminDataTable({
               displayData.map((row, index) => (
                 <tr key={index} className="hover:bg-gray-50">
                   {columns.map((column) => (
-                    <td key={column.key} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td
+                      key={column.key}
+                      className={`px-2 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900 ${column.key === 'createdAt' ? 'hidden sm:table-cell' : ''
+                        } ${column.key === 'status' || column.key === 'role' ? 'hidden md:table-cell' : ''
+                        } ${column.key === 'amount' || column.key === 'domains' || column.key === 'orderId' || column.key === 'transactionId' ? 'hidden sm:table-cell' : ''
+                        }`}
+                    >
                       {column.render ? column.render(row[column.key], row) : row[column.key]}
                     </td>
                   ))}
@@ -184,27 +193,27 @@ export default function AdminDataTable({
 
       {/* Pagination */}
       {pagination && (
-        <div className="px-4 sm:px-6 py-4 border-t border-gray-200">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="text-sm text-gray-700">
+        <div className="px-3 sm:px-6 py-3 sm:py-4 border-t border-gray-200">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+            <div className="text-xs sm:text-sm text-gray-700 text-center sm:text-left">
               {isServerSidePagination ? (
                 `Showing ${startIndex + 1} to ${Math.min(startIndex + pageSize, totalItems || 0)} of ${totalItems || 0} results`
               ) : (
                 `Showing ${startIndex + 1} to ${Math.min(startIndex + pageSize, data.length)} of ${data.length} results`
               )}
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center justify-center sm:justify-start space-x-1 sm:space-x-2 mx-auto sm:mx-0">
               <button
                 onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1 || isLoading}
-                className="p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg hover:bg-gray-100 transition-colors"
+                className="p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg hover:bg-gray-100 transition-colors"
               >
-                <ChevronLeft className="h-4 w-4" />
+                <ChevronLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </button>
 
               {/* Page numbers */}
               {totalPages > 1 ? (
-                <div className="flex items-center space-x-1">
+                <div className="flex items-center space-x-0.5 sm:space-x-1">
                   {(() => {
                     const pages = [];
 
@@ -244,7 +253,7 @@ export default function AdminDataTable({
                     return pages.map((page, index) => {
                       if (page === '...') {
                         return (
-                          <span key={`ellipsis-${index}`} className="px-2 text-gray-500">
+                          <span key={`ellipsis-${index}`} className="px-1 sm:px-2 text-xs sm:text-sm text-gray-500">
                             ...
                           </span>
                         );
@@ -255,9 +264,9 @@ export default function AdminDataTable({
                           key={page}
                           onClick={() => handlePageChange(page as number)}
                           disabled={isLoading}
-                          className={`px-3 py-1 text-sm rounded-lg transition-colors ${currentPage === page
-                              ? 'bg-blue-600 text-white'
-                              : 'text-gray-700 hover:bg-gray-100'
+                          className={`px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-lg transition-colors ${currentPage === page
+                            ? 'bg-blue-600 text-white'
+                            : 'text-gray-700 hover:bg-gray-100'
                             } disabled:opacity-50 disabled:cursor-not-allowed`}
                         >
                           {page}
@@ -267,7 +276,7 @@ export default function AdminDataTable({
                   })()}
                 </div>
               ) : (
-                <span className="text-sm text-gray-700 px-2">
+                <span className="text-xs sm:text-sm text-gray-700 px-1 sm:px-2">
                   Page {currentPage} of {totalPages}
                 </span>
               )}
@@ -275,9 +284,9 @@ export default function AdminDataTable({
               <button
                 onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages || isLoading}
-                className="p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg hover:bg-gray-100 transition-colors"
+                className="p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg hover:bg-gray-100 transition-colors"
               >
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </button>
             </div>
           </div>

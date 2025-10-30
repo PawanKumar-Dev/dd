@@ -8,10 +8,22 @@ import { useCartStore } from '@/store/cartStore';
 export default function FloatingCart() {
   const [isMounted, setIsMounted] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+  const [isAdmin, setIsAdmin] = useState(false);
   const { getItemCount } = useCartStore();
 
   useEffect(() => {
     setIsMounted(true);
+
+    // Check if user is admin
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      try {
+        const userObj = JSON.parse(userData);
+        setIsAdmin(userObj.role === 'admin');
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+      }
+    }
   }, []);
 
   // Update cart count
@@ -31,8 +43,8 @@ export default function FloatingCart() {
     }
   }, [isMounted]);
 
-  // Don't render on server or if no items
-  if (!isMounted) {
+  // Don't render on server, if no items, or if user is admin
+  if (!isMounted || isAdmin) {
     return null;
   }
 

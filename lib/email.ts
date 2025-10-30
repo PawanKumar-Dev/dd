@@ -75,8 +75,8 @@ export class EmailService {
   ): Promise<boolean> {
     const subject = "Welcome to Excel Technologies Domain Management!";
     const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #3b82f6;">Welcome to Excel Technologies Domain Management!</h2>
+      <div style="font-family: 'Google Sans', Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #1A73E8;">Welcome to Excel Technologies Domain Management!</h2>
         <p>Hello ${userName},</p>
         <p>Thank you for creating an account with us. You can now:</p>
         <ul>
@@ -85,7 +85,7 @@ export class EmailService {
           <li>Manage your DNS records</li>
           <li>Track your domain portfolio</li>
         </ul>
-        <p>Get started by visiting your <a href="${process.env.NEXTAUTH_URL}/dashboard" style="color: #3b82f6;">dashboard</a>.</p>
+        <p>Get started by visiting your <a href="${process.env.NEXTAUTH_URL}/dashboard" style="color: #1A73E8;">dashboard</a>.</p>
         <p>If you have any questions, feel free to contact our support team.</p>
         <br>
         <p>Best regards,<br>Excel Technologies Team</p>
@@ -117,8 +117,8 @@ export class EmailService {
       .join("");
 
     const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #3b82f6;">Domain Purchase Confirmation</h2>
+      <div style="font-family: 'Google Sans', Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #1A73E8;">Domain Purchase Confirmation</h2>
         <p>Hello ${userName},</p>
         <p>Your domain purchase has been processed successfully!</p>
         <h3>Purchase Details:</h3>
@@ -126,7 +126,7 @@ export class EmailService {
           ${domainList}
         </ul>
         <p><strong>Total Amount: ₹${totalAmount}</strong></p>
-        <p>You can manage your domains from your <a href="${process.env.NEXTAUTH_URL}/dashboard" style="color: #3b82f6;">dashboard</a>.</p>
+        <p>You can manage your domains from your <a href="${process.env.NEXTAUTH_URL}/dashboard" style="color: #1A73E8;">dashboard</a>.</p>
         <p>Thank you for choosing our service!</p>
         <br>
         <p>Best regards,<br>Excel Technologies Team</p>
@@ -159,14 +159,14 @@ export class EmailService {
       .join("");
 
     const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #10b981;">Domain Registration Successful!</h2>
+      <div style="font-family: 'Google Sans', Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #34A853;">Domain Registration Successful!</h2>
         <p>Hello ${userName},</p>
         <p>Great news! Your domains have been successfully registered:</p>
         <ul>
           ${domainList}
         </ul>
-        <p>You can now manage your DNS records and domain settings from your <a href="${process.env.NEXTAUTH_URL}/dashboard/dns-management" style="color: #3b82f6;">DNS management panel</a>.</p>
+        <p>You can now manage your DNS records and domain settings from your <a href="${process.env.NEXTAUTH_URL}/dashboard/dns-management" style="color: #1A73E8;">DNS management panel</a>.</p>
         <p>If you need any assistance with your domains, our support team is here to help!</p>
         <br>
         <p>Best regards,<br>Excel Technologies Team</p>
@@ -194,8 +194,8 @@ export class EmailService {
       .join("");
 
     const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #ef4444;">Domain Registration Issue</h2>
+      <div style="font-family: 'Google Sans', Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #EA4335;">Domain Registration Issue</h2>
         <p>Hello ${userName},</p>
         <p>We encountered some issues while registering your domains:</p>
         <ul>
@@ -227,20 +227,43 @@ export class EmailService {
     const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password?token=${resetToken}`;
 
     const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #3b82f6;">Password Reset Request</h2>
-        <p>Hello ${userName},</p>
-        <p>You requested to reset your password. Click the button below to reset it:</p>
-        <div style="text-align: center; margin: 30px 0;">
-          <a href="${resetUrl}" style="background-color: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Reset Password</a>
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      </head>
+      <body style="margin: 0; padding: 0; font-family: 'Google Sans', Arial, sans-serif; background-color: #f8f9fa;">
+        <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+          <div style="background: linear-gradient(135deg, #1A73E8, #1557B0); padding: 30px; text-align: center;">
+            <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: bold;">🔒 Password Reset Request</h1>
+          </div>
+          <div style="padding: 30px;">
+            <p style="font-size: 16px; color: #374151;">Hello ${userName},</p>
+            <p style="font-size: 16px; color: #374151;">You requested to reset your password. Click the button below to reset it:</p>
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${resetUrl}" style="display: inline-block; background: linear-gradient(135deg, #1A73E8, #1557B0); color: #ffffff; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(26, 115, 232, 0.3);">Reset Password</a>
+            </div>
+            <div style="background-color: #f9fafb; border-radius: 6px; padding: 15px; margin-bottom: 25px;">
+              <p style="color: #6b7280; margin: 0 0 10px 0; font-size: 14px; font-weight: bold;">Can't click the button?</p>
+              <p style="color: #6b7280; margin: 0; font-size: 14px; word-break: break-all;">
+                Copy and paste this link into your browser:<br>
+                <span style="color: #1A73E8;">${resetUrl}</span>
+              </p>
+            </div>
+            <div style="background-color: #FEF3C7; border: 1px solid #F59E0B; border-radius: 8px; padding: 15px;">
+              <p style="color: #92400E; margin: 0; font-size: 14px;">
+                ⚠️ This link will expire in 1 hour for security reasons. If you didn't request this password reset, please ignore this email.
+              </p>
+            </div>
+          </div>
+          <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+            <p style="color: #6b7280; margin: 0; font-size: 14px;">Best regards,<br>Excel Technologies Team</p>
+            <p style="color: #9ca3af; margin: 5px 0 0 0; font-size: 12px;">© 2024 Excel Technologies. All rights reserved.</p>
+          </div>
         </div>
-        <p>If the button doesn't work, copy and paste this link into your browser:</p>
-        <p style="word-break: break-all; color: #6b7280;">${resetUrl}</p>
-        <p>This link will expire in 1 hour for security reasons.</p>
-        <p>If you didn't request this password reset, please ignore this email.</p>
-        <br>
-        <p>Best regards,<br>Excel Technologies Team</p>
-      </div>
+      </body>
+      </html>
     `;
 
     return this.sendEmail({
@@ -263,7 +286,7 @@ export class EmailService {
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
         <!-- Header -->
-        <div style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+        <div style="background: linear-gradient(135deg, #1A73E8, #1557B0); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
           <h1 style="margin: 0; font-size: 24px; font-weight: bold;">Password Reset Notification</h1>
         </div>
         
@@ -271,21 +294,21 @@ export class EmailService {
         <div style="padding: 30px; background-color: #ffffff;">
           <p style="font-size: 16px; color: #374151; margin-bottom: 20px;">Hello ${userName},</p>
           
-          <div style="background-color: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 20px; margin: 20px 0;">
-            <h3 style="color: #92400e; margin: 0 0 10px 0; font-size: 18px;">🔐 Password Reset by Administrator</h3>
-            <p style="color: #92400e; margin: 0; font-size: 14px;">Your password has been reset by an administrator. Please use the new password below to log in.</p>
+          <div style="background-color: #FEF3C7; border: 1px solid #F59E0B; border-radius: 8px; padding: 20px; margin: 20px 0;">
+            <h3 style="color: #92400E; margin: 0 0 10px 0; font-size: 18px;">🔐 Password Reset by Administrator</h3>
+            <p style="color: #92400E; margin: 0; font-size: 14px;">Your password has been reset by an administrator. Please use the new password below to log in.</p>
           </div>
           
           <div style="background-color: #f3f4f6; border-radius: 8px; padding: 20px; margin: 20px 0;">
             <h4 style="color: #374151; margin: 0 0 10px 0; font-size: 16px;">Your New Password:</h4>
-            <div style="background-color: #ffffff; border: 2px solid #3b82f6; border-radius: 6px; padding: 15px; font-family: 'Courier New', monospace; font-size: 18px; font-weight: bold; color: #1f2937; text-align: center; letter-spacing: 1px;">
+            <div style="background-color: #ffffff; border: 2px solid #1A73E8; border-radius: 6px; padding: 15px; font-family: 'Courier New', monospace; font-size: 18px; font-weight: bold; color: #1f2937; text-align: center; letter-spacing: 1px;">
               ${newPassword}
             </div>
           </div>
           
-          <div style="background-color: #fef2f2; border: 1px solid #f87171; border-radius: 8px; padding: 20px; margin: 20px 0;">
-            <h4 style="color: #dc2626; margin: 0 0 10px 0; font-size: 16px;">⚠️ Important Security Notice</h4>
-            <ul style="color: #dc2626; margin: 0; padding-left: 20px; font-size: 14px;">
+          <div style="background-color: #FEF2F2; border: 1px solid #EF4444; border-radius: 8px; padding: 20px; margin: 20px 0;">
+            <h4 style="color: #DC2626; margin: 0 0 10px 0; font-size: 16px;">⚠️ Important Security Notice</h4>
+            <ul style="color: #DC2626; margin: 0; padding-left: 20px; font-size: 14px;">
               <li>Please log in immediately and change your password to something secure</li>
               <li>Do not share this password with anyone</li>
               <li>Consider using a password manager for better security</li>
@@ -293,7 +316,7 @@ export class EmailService {
           </div>
           
           <div style="text-align: center; margin: 30px 0;">
-            <a href="${process.env.NEXTAUTH_URL}/login" style="background-color: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">Log In Now</a>
+            <a href="${process.env.NEXTAUTH_URL}/login" style="display: inline-block; background: linear-gradient(135deg, #1A73E8, #1557B0); color: #ffffff; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(26, 115, 232, 0.3);">Log In Now</a>
           </div>
           
           <p style="font-size: 14px; color: #6b7280; margin-top: 30px;">
@@ -364,28 +387,28 @@ export class EmailService {
       subject = `Order Confirmation - ${orderData.invoiceNumber}`;
       statusMessage =
         "Your order has been processed successfully. All domains have been registered.";
-      headerColor = "#10b981"; // Green
+      headerColor = "#34A853"; // Green
       headerTitle = "Order Confirmation";
     } else if (hasPendingDomains && hasOnlyPendingOrSuccessful) {
       // Payment successful, domains are being processed
       subject = `Payment Successful - ${orderData.invoiceNumber}`;
       statusMessage =
         "Your payment has been received successfully! Your domain registration is being processed and will be completed shortly.";
-      headerColor = "#3b82f6"; // Blue
+      headerColor = "#1A73E8"; // Blue
       headerTitle = "Payment Successful";
     } else if (hasSuccessfulDomains && hasPendingDomains) {
       // Mixed: some successful, some pending
       subject = `Payment Successful - ${orderData.invoiceNumber}`;
       statusMessage =
         "Your payment has been received successfully! Some domains have been registered, while others are being processed.";
-      headerColor = "#3b82f6"; // Blue
+      headerColor = "#1A73E8"; // Blue
       headerTitle = "Payment Successful";
     } else {
       // Complete failure (should not happen with successful payment)
       subject = `Payment Received - ${orderData.invoiceNumber}`;
       statusMessage =
         "Your payment has been received. We encountered issues with domain registration. Our team will contact you shortly.";
-      headerColor = "#f59e0b"; // Orange/Amber
+      headerColor = "#F59E0B"; // Orange/Amber
       headerTitle = "Payment Received";
     }
 
@@ -395,13 +418,13 @@ export class EmailService {
         let statusText: string;
 
         if (domain.status === "registered") {
-          statusColor = "#10b981"; // Green
+          statusColor = "#34A853"; // Green
           statusText = "✅ Registered";
         } else if (domain.status === "pending") {
-          statusColor = "#3b82f6"; // Blue
+          statusColor = "#1A73E8"; // Blue
           statusText = "🔄 Processing";
         } else {
-          statusColor = "#ef4444"; // Red
+          statusColor = "#EA4335"; // Red
           statusText = "⚠️ Contact Support";
         }
 
@@ -453,7 +476,7 @@ export class EmailService {
             <table style="width: 100%; border-collapse: collapse;">
               <tr>
                 <td style="padding: 8px 0; color: #6b7280; width: 150px;">Purchase Order:</td>
-                <td style="padding: 8px 0; font-weight: 700; color: #3b82f6; font-size: 15px;">${
+                <td style="padding: 8px 0; font-weight: 700; color: #1A73E8; font-size: 15px;">${
                   orderData.purchaseOrderNumber
                 }</td>
               </tr>
@@ -522,7 +545,7 @@ export class EmailService {
               </tr>
               <tr style="border-top: 2px solid #e5e7eb;">
                 <td style="padding: 12px 0; font-size: 18px; font-weight: 700; color: #1f2937;">Total (incl. GST):</td>
-                <td style="padding: 12px 0; text-align: right; font-size: 18px; font-weight: 700; color: #3b82f6;">₹${total.toFixed(
+                <td style="padding: 12px 0; text-align: right; font-size: 18px; font-weight: 700; color: #1A73E8;">₹${total.toFixed(
                   2
                 )} ${orderData.currency}</td>
               </tr>
@@ -534,8 +557,8 @@ export class EmailService {
           ${
             orderData.successfulDomains.length > 0
               ? `
-            <div style="background-color: #d1fae5; border: 1px solid #10b981; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
-              <p style="margin: 0; color: #065f46; font-weight: 600;">✅ ${orderData.successfulDomains.length} domain(s) registered successfully!</p>
+            <div style="background-color: #D1FAE5; border: 1px solid #34A853; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+              <p style="margin: 0; color: #065F46; font-weight: 600;">✅ ${orderData.successfulDomains.length} domain(s) registered successfully!</p>
             </div>
           `
               : ""
@@ -547,16 +570,16 @@ export class EmailService {
           <div style="text-align: center; margin: 30px 0;">
             <a href="${
               process.env.NEXTAUTH_URL
-            }/dashboard" style="background-color: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin: 0 10px; font-weight: 600;">View Dashboard</a>
+            }/dashboard" style="display: inline-block; background: linear-gradient(135deg, #1A73E8, #1557B0); color: #ffffff; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(26, 115, 232, 0.3); margin: 0 10px;">View Dashboard</a>
             <a href="${
               process.env.NEXTAUTH_URL
-            }/" style="background-color: #6b7280; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin: 0 10px; font-weight: 600;">Visit Homepage</a>
+            }/" style="background-color: #6b7280; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block; margin: 0 10px; font-weight: 600;">Visit Homepage</a>
           </div>
 
           <!-- Support Information -->
           <div style="border-top: 1px solid #e5e7eb; padding-top: 20px; margin-top: 30px; text-align: center;">
             <p style="color: #6b7280; font-size: 14px; margin: 0 0 10px 0;">Need help? Contact our support team:</p>
-            <p style="color: #6b7280; font-size: 14px; margin: 0;">Email: <a href="mailto:support@exceltechnologies.com" style="color: #3b82f6;">support@exceltechnologies.com</a></p>
+            <p style="color: #6b7280; font-size: 14px; margin: 0;">Email: <a href="mailto:support@exceltechnologies.com" style="color: #1A73E8;">support@exceltechnologies.com</a></p>
           </div>
         </div>
 
@@ -585,8 +608,8 @@ export class EmailService {
     data?: any
   ): Promise<boolean> {
     const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #3b82f6;">Admin Notification</h2>
+      <div style="font-family: 'Google Sans', Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #1A73E8;">Admin Notification</h2>
         <p>${message}</p>
         ${
           data
@@ -627,7 +650,7 @@ export class EmailService {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Complete Your Profile - Excel Technologies</title>
       </head>
-      <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f8f9fa;">
+      <body style="margin: 0; padding: 0; font-family: 'Google Sans', Arial, sans-serif; background-color: #f8f9fa;">
         <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
           <!-- Header -->
           <div style="background: linear-gradient(135deg, #f59e0b, #d97706); padding: 30px; text-align: center;">
@@ -638,8 +661,8 @@ export class EmailService {
           <!-- Content -->
           <div style="padding: 30px;">
             <div style="text-align: center; margin-bottom: 30px;">
-              <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px;">
-                <span style="color: #ffffff; font-size: 32px;">📋</span>
+              <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin: 0 auto 20px; vertical-align: middle;">
+                <span style="font-size: 40px; line-height: 1; display: block;">📋</span>
               </div>
               <h2 style="color: #374151; margin: 0 0 10px 0; font-size: 20px;">Welcome ${userName}!</h2>
               <p style="color: #6b7280; margin: 0; font-size: 16px;">Your account has been created successfully. Now let's complete your profile.</p>
@@ -663,13 +686,13 @@ export class EmailService {
               <p style="color: #6b7280; margin: 0 0 10px 0; font-size: 14px; font-weight: bold;">Can't click the button?</p>
               <p style="color: #6b7280; margin: 0; font-size: 14px; word-break: break-all;">
                 Copy and paste this link into your browser:<br>
-                <span style="color: #3b82f6;">${profileCompletionUrl}</span>
+                <span style="color: #1A73E8;">${profileCompletionUrl}</span>
               </p>
             </div>
             
-            <div style="background-color: #dbeafe; border: 1px solid #3b82f6; border-radius: 8px; padding: 15px; margin-bottom: 25px;">
-              <h4 style="color: #1e40af; margin: 0 0 10px 0; font-size: 14px;">💡 Why Complete Your Profile?</h4>
-              <ul style="color: #1e40af; margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.5;">
+            <div style="background-color: #E8F0FE; border: 1px solid #1A73E8; border-radius: 8px; padding: 15px; margin-bottom: 25px;">
+              <h4 style="color: #1557B0; margin: 0 0 10px 0; font-size: 14px;">💡 Why Complete Your Profile?</h4>
+              <ul style="color: #1557B0; margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.5;">
                 <li>Access domain checkout and purchase features</li>
                 <li>Receive important notifications about your domains</li>
                 <li>Get better customer support</li>
@@ -681,22 +704,22 @@ export class EmailService {
               <p style="color: #6b7280; margin: 0; font-size: 14px;">
                 After completing your profile, you'll be able to:
               </p>
-              <div style="display: flex; justify-content: center; gap: 20px; margin-top: 15px; flex-wrap: wrap;">
-                <div style="text-align: center;">
-                  <div style="width: 40px; height: 40px; background: #dbeafe; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 8px;">
-                    <span style="color: #3b82f6; font-size: 18px;">🛒</span>
+              <div style="display: table; margin: 15px auto 0; text-align: center;">
+                <div style="display: inline-block; text-align: center; margin: 0 15px;">
+                  <div style="width: 50px; height: 50px; background: #E8F0FE; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;">
+                    <span style="font-size: 24px; line-height: 1; display: block;">🛒</span>
                   </div>
                   <p style="color: #374151; margin: 0; font-size: 12px; font-weight: bold;">Checkout Domains</p>
                 </div>
-                <div style="text-align: center;">
-                  <div style="width: 40px; height: 40px; background: #dbeafe; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 8px;">
-                    <span style="color: #3b82f6; font-size: 18px;">📊</span>
+                <div style="display: inline-block; text-align: center; margin: 0 15px;">
+                  <div style="width: 50px; height: 50px; background: #E8F0FE; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;">
+                    <span style="font-size: 24px; line-height: 1; display: block;">📊</span>
                   </div>
                   <p style="color: #374151; margin: 0; font-size: 12px; font-weight: bold;">View Orders</p>
                 </div>
-                <div style="text-align: center;">
-                  <div style="width: 40px; height: 40px; background: #dbeafe; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 8px;">
-                    <span style="color: #3b82f6; font-size: 18px;">⚙️</span>
+                <div style="display: inline-block; text-align: center; margin: 0 15px;">
+                  <div style="width: 50px; height: 50px; background: #E8F0FE; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;">
+                    <span style="font-size: 24px; line-height: 1; display: block;">⚙️</span>
                   </div>
                   <p style="color: #374151; margin: 0; font-size: 12px; font-weight: bold;">Manage DNS</p>
                 </div>
@@ -745,27 +768,27 @@ export class EmailService {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Activate Your Account - Excel Technologies</title>
       </head>
-      <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f8f9fa;">
+      <body style="margin: 0; padding: 0; font-family: 'Google Sans', Arial, sans-serif; background-color: #f8f9fa;">
         <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
           <!-- Header -->
-          <div style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); padding: 30px; text-align: center;">
+          <div style="background: linear-gradient(135deg, #1A73E8, #1557B0); padding: 30px; text-align: center;">
             <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: bold;">🎉 Welcome to Excel Technologies!</h1>
-            <p style="color: #bfdbfe; margin: 10px 0 0 0; font-size: 16px;">Activate your account to get started</p>
+            <p style="color: #E8F0FE; margin: 10px 0 0 0; font-size: 16px;">Activate your account to get started</p>
           </div>
           
           <!-- Content -->
           <div style="padding: 30px;">
             <div style="text-align: center; margin-bottom: 30px;">
-              <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px;">
-                <span style="color: #ffffff; font-size: 32px;">✓</span>
+              <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #34A853, #2D8E47); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin: 0 auto 20px; vertical-align: middle;">
+                <span style="color: #ffffff; font-size: 48px; font-weight: bold; line-height: 1; display: block;">✓</span>
               </div>
               <h2 style="color: #374151; margin: 0 0 10px 0; font-size: 20px;">Account Created Successfully!</h2>
               <p style="color: #6b7280; margin: 0; font-size: 16px;">Hi ${userName}, your account has been created and is ready for activation.</p>
             </div>
             
-            <div style="background-color: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 20px; margin-bottom: 25px;">
-              <h3 style="color: #0369a1; margin: 0 0 15px 0; font-size: 16px;">🔐 Account Activation Required</h3>
-              <p style="color: #0c4a6e; margin: 0; line-height: 1.5;">
+            <div style="background-color: #E8F0FE; border: 1px solid #1A73E8; border-radius: 8px; padding: 20px; margin-bottom: 25px;">
+              <h3 style="color: #1557B0; margin: 0 0 15px 0; font-size: 16px;">🔐 Account Activation Required</h3>
+              <p style="color: #1557B0; margin: 0; line-height: 1.5;">
                 To complete your registration and access your dashboard, please click the activation button below. 
                 This ensures the security of your account and verifies your email address.
               </p>
@@ -773,7 +796,7 @@ export class EmailService {
             
             <div style="text-align: center; margin: 30px 0;">
               <a href="${activationUrl}" 
-                 style="display: inline-block; background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);">
+                 style="display: inline-block; background: linear-gradient(135deg, #34A853, #2D8E47); color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(52, 168, 83, 0.3);">
                 Activate My Account
               </a>
             </div>
@@ -782,13 +805,13 @@ export class EmailService {
               <p style="color: #6b7280; margin: 0 0 10px 0; font-size: 14px; font-weight: bold;">Can't click the button?</p>
               <p style="color: #6b7280; margin: 0; font-size: 14px; word-break: break-all;">
                 Copy and paste this link into your browser:<br>
-                <span style="color: #3b82f6;">${activationUrl}</span>
+                <span style="color: #1A73E8;">${activationUrl}</span>
               </p>
             </div>
             
-            <div style="background-color: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; padding: 15px; margin-bottom: 25px;">
-              <h4 style="color: #92400e; margin: 0 0 10px 0; font-size: 14px;">⏰ Important Notes</h4>
-              <ul style="color: #92400e; margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.5;">
+            <div style="background-color: #FEF3C7; border: 1px solid #F59E0B; border-radius: 8px; padding: 15px; margin-bottom: 25px;">
+              <h4 style="color: #92400E; margin: 0 0 10px 0; font-size: 14px;">⏰ Important Notes</h4>
+              <ul style="color: #92400E; margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.5;">
                 <li>This activation link will expire in 24 hours</li>
                 <li>If the link expires, you can request a new one from the login page</li>
                 <li>Keep your login credentials secure and don't share them</li>
@@ -799,22 +822,22 @@ export class EmailService {
               <p style="color: #6b7280; margin: 0; font-size: 14px;">
                 Once activated, you'll be able to:
               </p>
-              <div style="display: flex; justify-content: center; gap: 20px; margin-top: 15px; flex-wrap: wrap;">
-                <div style="text-align: center;">
-                  <div style="width: 40px; height: 40px; background: #dbeafe; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 8px;">
-                    <span style="color: #3b82f6; font-size: 18px;">🌐</span>
+              <div style="display: table; margin: 15px auto 0; text-align: center;">
+                <div style="display: inline-block; text-align: center; margin: 0 15px;">
+                  <div style="width: 50px; height: 50px; background: #E8F0FE; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;">
+                    <span style="font-size: 24px; line-height: 1; display: block;">🌐</span>
                   </div>
                   <p style="color: #374151; margin: 0; font-size: 12px; font-weight: bold;">Search Domains</p>
                 </div>
-                <div style="text-align: center;">
-                  <div style="width: 40px; height: 40px; background: #dbeafe; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 8px;">
-                    <span style="color: #3b82f6; font-size: 18px;">🛒</span>
+                <div style="display: inline-block; text-align: center; margin: 0 15px;">
+                  <div style="width: 50px; height: 50px; background: #E8F0FE; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;">
+                    <span style="font-size: 24px; line-height: 1; display: block;">🛒</span>
                   </div>
                   <p style="color: #374151; margin: 0; font-size: 12px; font-weight: bold;">Manage Cart</p>
                 </div>
-                <div style="text-align: center;">
-                  <div style="width: 40px; height: 40px; background: #dbeafe; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 8px;">
-                    <span style="color: #3b82f6; font-size: 18px;">📊</span>
+                <div style="display: inline-block; text-align: center; margin: 0 15px;">
+                  <div style="width: 50px; height: 50px; background: #E8F0FE; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;">
+                    <span style="font-size: 24px; line-height: 1; display: block;">📊</span>
                   </div>
                   <p style="color: #374151; margin: 0; font-size: 12px; font-weight: bold;">View Dashboard</p>
                 </div>
