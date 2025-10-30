@@ -70,8 +70,6 @@ export default function LoginForm({ className = '' }: LoginFormProps) {
     setIsLoading(true);
 
     try {
-      console.log('🔐 [LoginForm] Starting credentials login...');
-
       // Get reCAPTCHA token
       const recaptchaToken = await executeRecaptcha('login');
 
@@ -83,15 +81,7 @@ export default function LoginForm({ className = '' }: LoginFormProps) {
         recaptchaToken,
       });
 
-      console.log('📊 [LoginForm] Login result:', {
-        ok: result?.ok,
-        error: result?.error,
-        status: result?.status
-      });
-
       if (result?.error) {
-        console.error('❌ [LoginForm] Login error:', result.error);
-
         // Handle specific error cases
         if (result.error === 'CredentialsSignin') {
           showErrorToast('Invalid email or password');
@@ -106,8 +96,6 @@ export default function LoginForm({ className = '' }: LoginFormProps) {
           showErrorToast(result.error || 'Login failed');
         }
       } else if (result?.ok) {
-        console.log('✅ [LoginForm] Login successful');
-
         // Store remember me preference
         if (formData.rememberMe) {
           localStorage.setItem('rememberMe', 'true');
@@ -134,7 +122,6 @@ export default function LoginForm({ className = '' }: LoginFormProps) {
         }, 100);
       }
     } catch (error) {
-      console.error('❌ [LoginForm] Login exception:', error);
       showErrorToast('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);

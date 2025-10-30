@@ -13,13 +13,11 @@ export default function LoginPage() {
   const timeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
-    console.log('🔍 [LoginPage] Checking authentication status...', { status, hasSession: !!session });
     setDebugInfo(`Session status: ${status}`);
 
     // Failsafe: Force show login form after 2 seconds if still loading
     timeoutRef.current = setTimeout(() => {
       if (status === 'loading') {
-        console.warn('⚠️ [LoginPage] Session check timeout - showing login form');
         setDebugInfo('Timeout - showing login form');
         setIsLoading(false);
       }
@@ -27,7 +25,6 @@ export default function LoginPage() {
 
     // Check for NextAuth session (unified for both social and credentials)
     if (status === 'authenticated' && session) {
-      console.log('✅ [LoginPage] Session found - redirecting to dashboard');
       const urlParams = new URLSearchParams(window.location.search);
       const returnUrl = urlParams.get('returnUrl');
       router.push(returnUrl || '/dashboard');
@@ -37,7 +34,6 @@ export default function LoginPage() {
 
     // If status is unauthenticated, show login form immediately
     if (status === 'unauthenticated') {
-      console.log('✅ [LoginPage] No session - showing login form');
       setDebugInfo('Ready to login');
       setIsLoading(false);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -46,7 +42,6 @@ export default function LoginPage() {
 
     // If status is loading, wait (but timeout will catch it)
     if (status === 'loading') {
-      console.log('⏳ [LoginPage] Session loading...');
       setDebugInfo('Checking authentication...');
     }
 
