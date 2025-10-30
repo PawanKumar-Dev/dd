@@ -255,6 +255,66 @@ const session = await getServerSession(authOptions);
 4. **Role-Based Access** - Admin vs User permissions
 5. **Password Hashing** - bcrypt with salt
 
+## 👨‍💼 Admin Authentication
+
+### Admin vs Regular Users
+
+The unified system handles both admin and regular user authentication correctly:
+
+| Feature                  | Admin Users     | Regular Users  |
+| ------------------------ | --------------- | -------------- |
+| **Email/Password Login** | ✅ Allowed      | ✅ Allowed     |
+| **Social Login**         | ❌ Blocked      | ✅ Allowed     |
+| **Dashboard**            | `/admin`        | `/dashboard`   |
+| **Session Role**         | `role: "admin"` | `role: "user"` |
+
+### How It Works
+
+1. **CredentialsProvider** - Allows both admin and regular users to login via email/password:
+
+```typescript
+return {
+  id: user._id?.toString(),
+  email: user.email,
+  name: `${user.firstName} ${user.lastName}`,
+  role: user.role, // ← "admin" or "user"
+};
+```
+
+2. **signIn Callback** - Blocks admins from social login:
+
+```typescript
+async signIn({ user, account }) {
+  if (account?.provider === "google" || account?.provider === "facebook") {
+    const existingUser = await User.findOne({
+      email: user.email,
+      role: "admin",
+    });
+    if (existingUser) {
+      return false; // Block admin social login
+    }
+  }
+  return true;
+}
+```
+
+3. **Middleware** - Protects admin routes:
+
+```typescript
+if (token.role !== "admin") {
+  return NextResponse.redirect(new URL("/dashboard", request.url));
+}
+```
+
+### Admin Security Features
+
+- ✅ **Social login blocked** - Admins must use email/password only
+- ✅ **Role-based access** - Middleware checks token.role
+- ✅ **Session management** - Same reliable NextAuth sessions
+- ✅ **API protection** - Admin API routes check role
+
+**See `ADMIN_AUTH_GUIDE.md` for detailed admin authentication documentation.**
+
 ## 🧪 Testing
 
 ### Test Credentials Login
