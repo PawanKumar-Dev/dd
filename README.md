@@ -100,10 +100,13 @@ Use this when the server is crashed or stuck in a loop.
 
 ### Authentication
 
-- **JWT Auth** - Secure token-based authentication
-- **Social Login** - Google & Facebook OAuth
-- **Role-based Access** - Admin and user permissions
+- **NextAuth (Auth.js)** - Industry-standard authentication system
+- **Unified Login** - Single system for credentials and social login
+- **Social Login** - Google & Facebook OAuth (users only)
+- **Admin Protection** - Email/password only for admins
+- **Role-based Access** - Middleware-protected routes
 - **Email Activation** - Secure account verification
+- **Session Management** - 30-day secure sessions
 
 ### Admin Panel
 
@@ -119,7 +122,7 @@ Use this when the server is crashed or stuck in a loop.
 **Frontend:** Next.js 14, TypeScript, Tailwind CSS, Framer Motion  
 **Backend:** Next.js API Routes, MongoDB, Mongoose  
 **APIs:** ResellerClub, Razorpay  
-**Auth:** JWT, NextAuth.js (social login)  
+**Auth:** NextAuth.js (Auth.js) - Unified authentication  
 **Email:** Nodemailer, SMTP  
 **PDF:** Puppeteer  
 **State:** Zustand
@@ -270,10 +273,14 @@ pm2 stop next-app       # Stop
 
 ### Authentication
 
-- `POST /api/auth/register` - Register user
-- `POST /api/auth/login` - Login
+- `POST /api/auth/register` - Register new user
+- `GET/POST /api/auth/[...nextauth]` - NextAuth (login/logout/session)
+- ~~`POST /api/auth/login`~~ - Deprecated (use NextAuth)
 - `POST /api/auth/activate` - Activate account
-- `POST /api/auth/forgot-password` - Password reset
+- `POST /api/auth/forgot-password` - Request password reset
+- `POST /api/auth/reset-password` - Reset password
+
+**Login Methods:** Email/Password (all) | Google OAuth (users) | Facebook OAuth (users)
 
 ### Domains
 
