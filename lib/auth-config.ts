@@ -55,9 +55,14 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         try {
+          serverLogger.log("[AUTH] Login attempt started");
+
           if (!credentials?.email || !credentials?.password) {
+            serverLogger.error("[AUTH] Missing email or password");
             throw new Error("Email and password are required");
           }
+
+          serverLogger.log("[AUTH] Credentials received:", credentials.email);
 
           // Verify reCAPTCHA if token provided
           // TEMPORARILY DISABLED FOR TESTING
@@ -89,31 +94,45 @@ export const authOptions: NextAuthOptions = {
           }
           */
 
+          serverLogger.log("[AUTH] Connecting to database...");
           await connectDB();
+          serverLogger.log("[AUTH] Database connected");
 
+          serverLogger.log("[AUTH] Looking up user:", credentials.email);
           const user = await User.findOne({ email: credentials.email });
           if (!user) {
+            serverLogger.error("[AUTH] User not found:", credentials.email);
             throw new Error("Invalid email or password");
           }
 
+          serverLogger.log("[AUTH] User found, checking activation status");
           // Check if user is activated
           if (!user.isActivated) {
+            serverLogger.error("[AUTH] User not activated:", credentials.email);
             throw new Error("AccountNotActivated");
           }
 
+          serverLogger.log("[AUTH] Checking active status");
           // Check if user is active
           if (!user.isActive) {
+            serverLogger.error("[AUTH] User deactivated:", credentials.email);
             throw new Error("AccountDeactivated");
           }
 
+          serverLogger.log("[AUTH] Verifying password");
           // Verify password
           const isPasswordValid = await user.comparePassword(
             credentials.password
           );
           if (!isPasswordValid) {
+            serverLogger.error(
+              "[AUTH] Invalid password for:",
+              credentials.email
+            );
             throw new Error("Invalid email or password");
           }
 
+          serverLogger.log("[AUTH] Login successful for:", credentials.email);
           return {
             id: user._id?.toString() || "",
             email: user.email,
@@ -121,7 +140,7 @@ export const authOptions: NextAuthOptions = {
             role: user.role,
           };
         } catch (error: any) {
-          serverLogger.error("Authentication error");
+          serverLogger.error("[AUTH] Authentication error:", error.message);
           throw error;
         }
       },
@@ -147,6 +166,15 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
     async jwt({ token, user, account, profile }) {
+      serverLogger.log(
+        "[JWT CALLBACK] Called with user:",
+        user ? user.email : "no user"
+      );
+      serverLogger.log(
+        "[JWT CALLBACK] Account provider:",
+        account ? account.provider : "no account"
+      );
+
       if (user && account) {
         await connectDB();
 
@@ -365,22 +393,49 @@ export const authOptions: NextAuthOptions = {
           token.id = dbUser._id?.toString() || "";
           token.profileCompleted = dbUser.profileCompleted;
           token.provider = account.provider;
+          serverLogger.log(
+            "[JWT CALLBACK] Social login - Set token for:",
+            user.email
+          );
         } else if (user) {
           // Regular credential login
+          serverLogger.log(
+            "[JWT CALLBACK] Credentials login - Setting token for:",
+            user.email
+          );
           token.role = (user as any).role;
           token.id = (user as any).id;
+          serverLogger.log(
+            "[JWT CALLBACK] Token set - role:",
+            token.role,
+            "id:",
+            token.id
+          );
         }
       }
 
+      serverLogger.log("[JWT CALLBACK] Returning token with role:", token.role);
       return token;
     },
     async session({ session, token }) {
+      serverLogger.log(
+        "[SESSION CALLBACK] Called with token role:",
+        token.role
+      );
+
       if (token && session.user) {
         (session.user as any).id = token.id as string;
         (session.user as any).role = token.role as string;
         (session.user as any).profileCompleted =
           token.profileCompleted as boolean;
         (session.user as any).provider = token.provider as string;
+
+        serverLogger.log(
+          "[SESSION CALLBACK] Session created for:",
+          session.user.email,
+          "with role:",
+          token.role
+        );
       }
       return session;
     },

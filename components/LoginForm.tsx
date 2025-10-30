@@ -86,7 +86,11 @@ export default function LoginForm({ className = '' }: LoginFormProps) {
         callbackUrl: returnUrl,
       });
 
+      console.log('SignIn result:', result);
+      console.log('Current cookies:', document.cookie);
+
       if (result?.error) {
+        console.log('Login error:', result.error);
         // Handle specific error cases
         if (result.error === 'CredentialsSignin') {
           showErrorToast('Invalid email or password');
@@ -101,6 +105,8 @@ export default function LoginForm({ className = '' }: LoginFormProps) {
           showErrorToast(result.error || 'Login failed');
         }
       } else if (result?.ok) {
+        console.log('Login successful, preparing redirect to:', returnUrl);
+
         // Store remember me preference
         if (formData.rememberMe) {
           localStorage.setItem('rememberMe', 'true');
@@ -117,9 +123,14 @@ export default function LoginForm({ className = '' }: LoginFormProps) {
 
         // Give the session cookie time to be set in the browser
         // before redirecting (2 seconds should be sufficient)
+        console.log('Setting redirect timeout for 2 seconds...');
         setTimeout(() => {
+          console.log('Executing redirect to:', returnUrl);
           window.location.href = returnUrl;
         }, 2000);
+      } else {
+        console.log('Unexpected result:', result);
+        showErrorToast('Unexpected login result. Please try again.');
       }
     } catch (error) {
       showErrorToast('An error occurred. Please try again.');
