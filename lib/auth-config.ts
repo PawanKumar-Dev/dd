@@ -14,11 +14,12 @@ export const authOptions: NextAuthOptions = {
       authorization: {
         params: {
           // Request additional scopes for more user data
-          scope: 'openid email profile https://www.googleapis.com/auth/user.phonenumbers.read https://www.googleapis.com/auth/user.addresses.read',
+          scope:
+            "openid email profile https://www.googleapis.com/auth/user.phonenumbers.read https://www.googleapis.com/auth/user.addresses.read",
           prompt: "consent",
           access_type: "offline",
-          response_type: "code"
-        }
+          response_type: "code",
+        },
       },
       // Request additional profile fields
       profile(profile) {
@@ -31,17 +32,17 @@ export const authOptions: NextAuthOptions = {
           given_name: profile.given_name,
           family_name: profile.family_name,
           locale: profile.locale,
-        }
+        };
       },
     }),
     FacebookProvider({
-      clientId: process.env.FACEBOOK_CLIENT_ID || 'dummy',
-      clientSecret: process.env.FACEBOOK_CLIENT_SECRET || 'dummy',
+      clientId: process.env.FACEBOOK_CLIENT_ID || "dummy",
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET || "dummy",
       authorization: {
         params: {
           // Request additional permissions for phone and address
-          scope: 'email,public_profile,user_location,user_mobile_phone',
-        }
+          scope: "email,public_profile,user_location,user_mobile_phone",
+        },
       },
     }),
     CredentialsProvider({
@@ -64,13 +65,15 @@ export const authOptions: NextAuthOptions = {
                 `https://www.google.com/recaptcha/api/siteverify`,
                 {
                   method: "POST",
-                  headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                  headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                  },
                   body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${credentials.recaptchaToken}`,
                 }
               );
 
               const recaptchaData = await recaptchaResponse.json();
-              
+
               if (!recaptchaData.success || recaptchaData.score < 0.5) {
                 console.warn("reCAPTCHA verification failed", {
                   success: recaptchaData.success,
@@ -110,7 +113,10 @@ export const authOptions: NextAuthOptions = {
             throw new Error("Invalid email or password");
           }
 
-          console.log("✅ [CredentialsProvider] User authenticated:", user.email);
+          console.log(
+            "✅ [CredentialsProvider] User authenticated:",
+            user.email
+          );
 
           return {
             id: user._id?.toString() || "",
@@ -119,7 +125,10 @@ export const authOptions: NextAuthOptions = {
             role: user.role,
           };
         } catch (error: any) {
-          console.error("❌ [CredentialsProvider] Authentication error:", error.message);
+          console.error(
+            "❌ [CredentialsProvider] Authentication error:",
+            error.message
+          );
           throw error;
         }
       },
@@ -154,45 +163,48 @@ export const authOptions: NextAuthOptions = {
 
           // Fetch additional user data from Google/Facebook if access token available
           let additionalData: any = {};
-          
+
           if (account.provider === "google" && account.access_token) {
             try {
               // Fetch phone numbers and addresses from Google People API
               const peopleResponse = await fetch(
-                'https://people.googleapis.com/v1/people/me?personFields=phoneNumbers,addresses',
+                "https://people.googleapis.com/v1/people/me?personFields=phoneNumbers,addresses",
                 {
                   headers: {
                     Authorization: `Bearer ${account.access_token}`,
                   },
                 }
               );
-              
+
               if (peopleResponse.ok) {
                 const peopleData = await peopleResponse.json();
-                
+
                 // Extract phone number
-                if (peopleData.phoneNumbers && peopleData.phoneNumbers.length > 0) {
+                if (
+                  peopleData.phoneNumbers &&
+                  peopleData.phoneNumbers.length > 0
+                ) {
                   const primaryPhone = peopleData.phoneNumbers[0].value;
                   // Parse phone number (assuming Indian format)
-                  const cleanPhone = primaryPhone.replace(/\D/g, '');
+                  const cleanPhone = primaryPhone.replace(/\D/g, "");
                   if (cleanPhone.length === 10) {
                     additionalData.phone = cleanPhone;
-                    additionalData.phoneCc = '+91';
+                    additionalData.phoneCc = "+91";
                   } else if (cleanPhone.length > 10) {
                     additionalData.phone = cleanPhone.slice(-10);
-                    additionalData.phoneCc = '+' + cleanPhone.slice(0, -10);
+                    additionalData.phoneCc = "+" + cleanPhone.slice(0, -10);
                   }
                 }
-                
+
                 // Extract address
                 if (peopleData.addresses && peopleData.addresses.length > 0) {
                   const primaryAddress = peopleData.addresses[0];
                   additionalData.address = {
-                    line1: primaryAddress.streetAddress || '',
-                    city: primaryAddress.city || '',
-                    state: primaryAddress.region || '',
-                    country: primaryAddress.countryCode || 'IN',
-                    zipcode: primaryAddress.postalCode || '',
+                    line1: primaryAddress.streetAddress || "",
+                    city: primaryAddress.city || "",
+                    state: primaryAddress.region || "",
+                    country: primaryAddress.countryCode || "IN",
+                    zipcode: primaryAddress.postalCode || "",
                   };
                 }
               }
@@ -200,38 +212,38 @@ export const authOptions: NextAuthOptions = {
               // Silent fail - additional data is optional
             }
           }
-          
+
           if (account.provider === "facebook" && account.access_token) {
             try {
               // Fetch user data from Facebook Graph API
               const fbResponse = await fetch(
                 `https://graph.facebook.com/me?fields=mobile_phone,location{location{city,state,country,zip}}&access_token=${account.access_token}`
               );
-              
+
               if (fbResponse.ok) {
                 const fbData = await fbResponse.json();
-                
+
                 // Extract phone number
                 if (fbData.mobile_phone) {
-                  const cleanPhone = fbData.mobile_phone.replace(/\D/g, '');
+                  const cleanPhone = fbData.mobile_phone.replace(/\D/g, "");
                   if (cleanPhone.length === 10) {
                     additionalData.phone = cleanPhone;
-                    additionalData.phoneCc = '+91';
+                    additionalData.phoneCc = "+91";
                   } else if (cleanPhone.length > 10) {
                     additionalData.phone = cleanPhone.slice(-10);
-                    additionalData.phoneCc = '+' + cleanPhone.slice(0, -10);
+                    additionalData.phoneCc = "+" + cleanPhone.slice(0, -10);
                   }
                 }
-                
+
                 // Extract address from location
                 if (fbData.location && fbData.location.location) {
                   const loc = fbData.location.location;
                   additionalData.address = {
-                    line1: '',
-                    city: loc.city || '',
-                    state: loc.state || '',
-                    country: loc.country || 'IN',
-                    zipcode: loc.zip || '',
+                    line1: "",
+                    city: loc.city || "",
+                    state: loc.state || "",
+                    country: loc.country || "IN",
+                    zipcode: loc.zip || "",
                   };
                 }
               }
@@ -242,14 +254,19 @@ export const authOptions: NextAuthOptions = {
 
           if (!dbUser) {
             // Create new user from social login with enhanced profile data
-            const firstName = (profile as any)?.given_name || user.name?.split(" ")[0] || "";
-            const lastName = (profile as any)?.family_name || user.name?.split(" ").slice(1).join(" ") || "";
+            const firstName =
+              (profile as any)?.given_name || user.name?.split(" ")[0] || "";
+            const lastName =
+              (profile as any)?.family_name ||
+              user.name?.split(" ").slice(1).join(" ") ||
+              "";
 
             // Check if we have enough data to mark profile as complete
             const hasPhone = additionalData.phone && additionalData.phoneCc;
-            const hasAddress = additionalData.address && 
-                              additionalData.address.line1 && 
-                              additionalData.address.city;
+            const hasAddress =
+              additionalData.address &&
+              additionalData.address.line1 &&
+              additionalData.address.city;
             const isProfileComplete = hasPhone && hasAddress;
 
             dbUser = new User({
@@ -276,7 +293,7 @@ export const authOptions: NextAuthOptions = {
             if (!isProfileComplete) {
               const { EmailService } = await import("@/lib/email");
               EmailService.sendProfileCompletionEmail(
-                user.email || '',
+                user.email || "",
                 `${firstName} ${lastName}`.trim()
               ).catch((error) => {
                 console.error("Profile completion email failed:", error);
@@ -285,14 +302,18 @@ export const authOptions: NextAuthOptions = {
           } else {
             // Existing user found - update with social data and auto-populate missing fields
             let needsUpdate = false;
-            
+
             // Auto-populate missing phone number from Google
-            if (additionalData.phone && additionalData.phoneCc && !dbUser.phone) {
+            if (
+              additionalData.phone &&
+              additionalData.phoneCc &&
+              !dbUser.phone
+            ) {
               dbUser.phone = additionalData.phone;
               dbUser.phoneCc = additionalData.phoneCc;
               needsUpdate = true;
             }
-            
+
             // Auto-populate missing address from Google
             if (additionalData.address && additionalData.address.line1) {
               if (!dbUser.address || !dbUser.address.line1) {
@@ -300,7 +321,7 @@ export const authOptions: NextAuthOptions = {
                 needsUpdate = true;
               }
             }
-            
+
             // Update name if better data available
             if ((profile as any)?.given_name && !dbUser.firstName) {
               dbUser.firstName = (profile as any).given_name;
@@ -310,15 +331,17 @@ export const authOptions: NextAuthOptions = {
               dbUser.lastName = (profile as any).family_name;
               needsUpdate = true;
             }
-            
+
             // Check if user now has a complete profile after auto-population
             const hasCompleteProfile = dbUser.profileCompleted === true;
-            const hasAddress = dbUser.address && dbUser.address.line1 && dbUser.address.city;
+            const hasAddress =
+              dbUser.address && dbUser.address.line1 && dbUser.address.city;
             const hasPhone = dbUser.phone && dbUser.phoneCc;
-            
+
             // If user has all required fields, they have a complete profile
-            const isProfileActuallyComplete = hasCompleteProfile || (hasAddress && hasPhone);
-            
+            const isProfileActuallyComplete =
+              hasCompleteProfile || (hasAddress && hasPhone);
+
             // Only update provider if they don't have one
             // Do NOT overwrite "credentials" provider to preserve password login
             if (!dbUser.provider) {
@@ -326,19 +349,19 @@ export const authOptions: NextAuthOptions = {
               dbUser.providerId = account.providerAccountId;
               needsUpdate = true;
             }
-            
+
             // Always ensure social login users are activated
             if (!dbUser.isActivated) {
               dbUser.isActivated = true;
               needsUpdate = true;
             }
-            
+
             // Update profileCompleted status based on actual data
             if (isProfileActuallyComplete && !dbUser.profileCompleted) {
               dbUser.profileCompleted = true;
               needsUpdate = true;
             }
-            
+
             // Save only if there are updates
             if (needsUpdate) {
               await dbUser.save();
@@ -346,7 +369,7 @@ export const authOptions: NextAuthOptions = {
           }
 
           token.role = dbUser.role;
-          token.id = dbUser._id?.toString() || '';
+          token.id = dbUser._id?.toString() || "";
           token.profileCompleted = dbUser.profileCompleted;
           token.provider = account.provider;
         } else if (user) {
@@ -377,13 +400,13 @@ export const authOptions: NextAuthOptions = {
   logger: {
     error(code, metadata) {
       // Only log actual errors, not warnings
-      if (code !== 'CLIENT_FETCH_ERROR' && code !== 'DEBUG_ENABLED') {
+      if (code !== "CLIENT_FETCH_ERROR" && code !== "DEBUG_ENABLED") {
         console.error("NextAuth Error:", code, metadata);
       }
     },
     warn(code) {
       // Suppress debug warnings in development
-      if (code !== 'DEBUG_ENABLED') {
+      if (code !== "DEBUG_ENABLED") {
         console.warn("NextAuth Warning:", code);
       }
     },
@@ -403,56 +426,56 @@ export const authOptions: NextAuthOptions = {
       name: `next-auth.session-token`,
       options: {
         httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production'
-      }
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
     },
     callbackUrl: {
       name: `next-auth.callback-url`,
       options: {
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production'
-      }
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
     },
     csrfToken: {
       name: `next-auth.csrf-token`,
       options: {
         httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production'
-      }
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
     },
     pkceCodeVerifier: {
       name: `next-auth.pkce.code_verifier`,
       options: {
         httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 60 * 15 // 15 minutes
-      }
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 60 * 15, // 15 minutes
+      },
     },
     state: {
       name: `next-auth.state`,
       options: {
         httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 60 * 15 // 15 minutes
-      }
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 60 * 15, // 15 minutes
+      },
     },
     nonce: {
       name: `next-auth.nonce`,
       options: {
         httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production'
-      }
-    }
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
   },
 };

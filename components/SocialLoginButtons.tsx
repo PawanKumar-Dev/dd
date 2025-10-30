@@ -71,7 +71,7 @@ export default function SocialLoginButtons({
       } else if (result?.ok) {
         console.log(`✅ [SocialLogin] ${provider} login successful - redirecting...`);
         toast.success('Successfully signed in!');
-        
+
         // Small delay to ensure session is set
         setTimeout(() => {
           onSuccess?.();
