@@ -16,77 +16,39 @@ export default function LoginPage() {
     console.log('🔍 [LoginPage] Checking authentication status...', { status, hasSession: !!session });
     setDebugInfo(`Session status: ${status}`);
 
-    // Failsafe: Force show login form after 3 seconds if still loading
+    // Failsafe: Force show login form after 2 seconds if still loading
     timeoutRef.current = setTimeout(() => {
       if (status === 'loading') {
         console.warn('⚠️ [LoginPage] Session check timeout - showing login form');
         setDebugInfo('Timeout - showing login form');
         setIsLoading(false);
       }
-    }, 3000);
+    }, 2000);
 
-    const checkAuth = async () => {
-      try {
-        // Check if user is already logged in (either custom auth or NextAuth)
-        const getCookieValue = (name: string) => {
-          const value = `; ${document.cookie}`;
-          const parts = value.split(`; ${name}=`);
-          if (parts.length === 2) return parts.pop()?.split(';').shift();
-          return null;
-        };
+    // Check for NextAuth session (unified for both social and credentials)
+    if (status === 'authenticated' && session) {
+      console.log('✅ [LoginPage] Session found - redirecting to dashboard');
+      const urlParams = new URLSearchParams(window.location.search);
+      const returnUrl = urlParams.get('returnUrl');
+      router.push(returnUrl || '/dashboard');
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      return;
+    }
 
-        const token = getCookieValue('token') || localStorage.getItem('token');
-        const userData = localStorage.getItem('user');
+    // If status is unauthenticated, show login form immediately
+    if (status === 'unauthenticated') {
+      console.log('✅ [LoginPage] No session - showing login form');
+      setDebugInfo('Ready to login');
+      setIsLoading(false);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      return;
+    }
 
-        console.log('🔍 [LoginPage] Auth check:', {
-          hasToken: !!token,
-          hasUserData: !!userData,
-          sessionStatus: status,
-          hasSession: !!session
-        });
-
-        // Check for custom token auth
-        if (token && userData) {
-          console.log('✅ [LoginPage] Custom token found - redirecting to dashboard');
-          const urlParams = new URLSearchParams(window.location.search);
-          const returnUrl = urlParams.get('returnUrl');
-          router.push(returnUrl || '/dashboard');
-          return;
-        }
-
-        // Check for NextAuth session (social login)
-        if (status === 'authenticated' && session) {
-          console.log('✅ [LoginPage] NextAuth session found - redirecting to dashboard');
-          const urlParams = new URLSearchParams(window.location.search);
-          const returnUrl = urlParams.get('returnUrl');
-          router.push(returnUrl || '/dashboard');
-          return;
-        }
-
-        // If status is unauthenticated, show login form immediately
-        if (status === 'unauthenticated') {
-          console.log('✅ [LoginPage] No authentication found - showing login form');
-          setDebugInfo('Not authenticated - ready');
-          setIsLoading(false);
-          if (timeoutRef.current) clearTimeout(timeoutRef.current);
-          return;
-        }
-
-        // If status is loading, wait a bit more (but timeout will catch it)
-        if (status === 'loading') {
-          console.log('⏳ [LoginPage] Session still loading...');
-          setDebugInfo('Checking session...');
-        }
-      } catch (error) {
-        console.error('❌ [LoginPage] Error checking auth:', error);
-        setDebugInfo('Error checking auth');
-        // Show login form on error
-        setIsLoading(false);
-        if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      }
-    };
-
-    checkAuth();
+    // If status is loading, wait (but timeout will catch it)
+    if (status === 'loading') {
+      console.log('⏳ [LoginPage] Session loading...');
+      setDebugInfo('Checking authentication...');
+    }
 
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);

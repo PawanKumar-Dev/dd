@@ -5,12 +5,16 @@ import { getToken } from "next-auth/jwt";
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  // Get token from both NextAuth and custom JWT
-  const nextAuthToken = await getToken({
+  // Get NextAuth token (unified for both social and credentials)
+  const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
   });
-  const customToken = request.cookies.get("token")?.value;
+
+  console.log("🔍 [Middleware] Checking path:", pathname, {
+    hasToken: !!token,
+    role: token?.role,
+  });
 
   // Public routes that don't require authentication
   const publicRoutes = [
@@ -21,6 +25,7 @@ export async function middleware(request: NextRequest) {
     "/contact",
     "/reset-password",
     "/complete-profile",
+    "/activate",
   ];
 
   // Admin routes
@@ -40,37 +45,35 @@ export async function middleware(request: NextRequest) {
 
   // Check if the current path requires authentication
   if (protectedRoutes.includes(pathname) || adminRoutes.includes(pathname)) {
-    // Check for either NextAuth token or custom token
-    if (!nextAuthToken && !customToken) {
-      console.log('🚫 No tokens found - redirecting to login');
+    // Check for NextAuth token (works for both social and credentials login)
+    if (!token) {
+      console.log("🚫 [Middleware] No session - redirecting to login");
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    // For social login users with NextAuth token but no custom token,
-    // allow access - AuthSync component will handle token creation client-side
-    // This prevents redirect loops
-    if (nextAuthToken && !customToken) {
-      console.log('✅ Social login user - allowing access, AuthSync will handle token');
-      return NextResponse.next();
-    }
+    console.log("✅ [Middleware] Session found - allowing access");
   }
 
   // Check if admin routes require admin role
   if (adminRoutes.includes(pathname) || pathname.startsWith("/admin")) {
-    // For admin pages, check if user is admin
-    if (!customToken) {
+    if (!token) {
+      console.log("🚫 [Middleware] Admin route - no session");
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    // Additional check: prevent social login users from accessing admin
-    if (nextAuthToken && !customToken) {
+    // Check if user has admin role
+    if (token.role !== "admin") {
+      console.log("🚫 [Middleware] Admin route - not admin user");
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
+
+    console.log("✅ [Middleware] Admin access granted");
   }
 
   // Protect admin API routes
   if (pathname.startsWith("/api/admin/")) {
-    if (!customToken) {
+    if (!token || token.role !== "admin") {
+      console.log("🚫 [Middleware] Admin API - access denied");
       return NextResponse.json(
         {
           error: "Access denied. Admin authentication required.",

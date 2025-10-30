@@ -4,7 +4,6 @@ import './globals.css';
 import { Toaster } from 'react-hot-toast';
 import ClientOnly from '@/components/ClientOnly';
 import SessionProvider from '@/components/SessionProvider';
-import AuthSync from '@/components/AuthSync';
 import FloatingCart from '@/components/FloatingCart';
 import ScrollToTop from '@/components/ScrollToTop';
 
@@ -32,7 +31,6 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <SessionProvider>
-          <AuthSync />
           {children}
           <FloatingCart />
           <ScrollToTop />
