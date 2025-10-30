@@ -320,10 +320,10 @@ export default function AdminUsers() {
       sortable: true,
       render: (value: any, row: User) => (
         <div>
-          <div className="text-sm font-medium text-gray-900">
+          <div className="text-xs sm:text-sm font-medium text-gray-900">
             {row.firstName} {row.lastName}
           </div>
-          <div className="text-sm text-gray-500">{row.email}</div>
+          <div className="text-xs sm:text-sm text-gray-500 truncate max-w-[150px] sm:max-w-none">{row.email}</div>
         </div>
       )
     },
@@ -332,7 +332,7 @@ export default function AdminUsers() {
       label: 'Role',
       sortable: true,
       render: (value: string) => (
-        <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+        <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium rounded-full bg-blue-100 text-blue-800">
           user
         </span>
       )
@@ -342,7 +342,7 @@ export default function AdminUsers() {
       label: 'Status',
       sortable: true,
       render: (value: any, row: User) => (
-        <span className={`px-2 py-1 text-xs font-medium rounded-full ${row.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+        <span className={`px-1.5 sm:px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium rounded-full ${row.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
           }`}>
           {row.isActive ? 'active' : 'inactive'}
         </span>
@@ -354,16 +354,16 @@ export default function AdminUsers() {
       sortable: true,
       render: (value: string) => {
         if (!value) {
-          return <span className="text-sm text-gray-400">-</span>;
+          return <span className="text-xs sm:text-sm text-gray-400">-</span>;
         }
 
         const date = new Date(value);
         if (isNaN(date.getTime())) {
-          return <span className="text-sm text-gray-400">-</span>;
+          return <span className="text-xs sm:text-sm text-gray-400">-</span>;
         }
 
         return (
-          <span className="text-sm text-gray-600">
+          <span className="text-xs sm:text-sm text-gray-600">
             {formatIndianDate(date)}
           </span>
         );
@@ -373,29 +373,29 @@ export default function AdminUsers() {
       key: 'actions',
       label: 'Actions',
       render: (value: any, row: User) => (
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-1 sm:space-x-3">
           <button
             onClick={() => handleViewUser(row._id)}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200 group"
+            className="p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200 group"
             title="View user details and information"
           >
-            <Eye className="h-5 w-5" />
+            <Eye className="h-4 w-4 sm:h-5 sm:w-5" />
             <span className="sr-only">View User Details</span>
           </button>
           <button
             onClick={() => handleResetPassword(row._id)}
-            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 group"
+            className="p-1.5 sm:p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 group"
             title="Reset user password and send email notification"
           >
-            <Key className="h-5 w-5" />
+            <Key className="h-4 w-4 sm:h-5 sm:w-5" />
             <span className="sr-only">Reset Password</span>
           </button>
           <button
             onClick={() => handleDeleteUser(row)}
-            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 group"
+            className="p-1.5 sm:p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 group"
             title="Deactivate user account (preserves all data)"
           >
-            <Trash2 className="h-5 w-5" />
+            <Trash2 className="h-4 w-4 sm:h-5 sm:w-5" />
             <span className="sr-only">Deactivate User</span>
           </button>
         </div>
@@ -410,10 +410,10 @@ export default function AdminUsers() {
       sortable: true,
       render: (value: any, row: User) => (
         <div>
-          <div className="text-sm font-medium text-gray-900">
+          <div className="text-xs sm:text-sm font-medium text-gray-900">
             {row.firstName} {row.lastName}
           </div>
-          <div className="text-sm text-gray-500">{row.email}</div>
+          <div className="text-xs sm:text-sm text-gray-500 truncate max-w-[150px] sm:max-w-none">{row.email}</div>
         </div>
       )
     },
@@ -422,7 +422,7 @@ export default function AdminUsers() {
       label: 'Role',
       sortable: true,
       render: (value: string) => (
-        <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+        <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium rounded-full bg-blue-100 text-blue-800">
           user
         </span>
       )
@@ -432,7 +432,7 @@ export default function AdminUsers() {
       label: 'Status',
       sortable: true,
       render: (value: any, row: User) => (
-        <span className="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
+        <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium rounded-full bg-red-100 text-red-800">
           deactivated
         </span>
       )
@@ -443,16 +443,16 @@ export default function AdminUsers() {
       sortable: true,
       render: (value: string) => {
         if (!value) {
-          return <span className="text-sm text-gray-400">-</span>;
+          return <span className="text-xs sm:text-sm text-gray-400">-</span>;
         }
 
         const date = new Date(value);
         if (isNaN(date.getTime())) {
-          return <span className="text-sm text-gray-400">-</span>;
+          return <span className="text-xs sm:text-sm text-gray-400">-</span>;
         }
 
         return (
-          <span className="text-sm text-gray-900">
+          <span className="text-xs sm:text-sm text-gray-900">
             {formatIndianDate(date)}
           </span>
         );
@@ -462,21 +462,21 @@ export default function AdminUsers() {
       key: 'actions',
       label: 'Actions',
       render: (value: any, row: User) => (
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-1 sm:space-x-3">
           <button
             onClick={() => handleViewUser(row._id)}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200 group"
+            className="p-1.5 sm:p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200 group"
             title="View user details and information"
           >
-            <Eye className="h-5 w-5" />
+            <Eye className="h-4 w-4 sm:h-5 sm:w-5" />
             <span className="sr-only">View User Details</span>
           </button>
           <button
             onClick={() => handleReactivateUser(row)}
-            className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all duration-200 group"
+            className="p-1.5 sm:p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all duration-200 group"
             title="Reactivate user account (restore login access)"
           >
-            <UserCheck className="h-5 w-5" />
+            <UserCheck className="h-4 w-4 sm:h-5 sm:w-5" />
             <span className="sr-only">Reactivate User</span>
           </button>
         </div>
@@ -498,20 +498,20 @@ export default function AdminUsers() {
 
   return (
     <AdminLayout user={user} onLogout={handleLogout}>
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Page Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-start sm:items-center justify-between flex-col sm:flex-row gap-3 sm:gap-0">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
-            <p className="text-gray-600">Manage user accounts and permissions</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">User Management</h1>
+            <p className="text-sm sm:text-base text-gray-600">Manage user accounts and permissions</p>
           </div>
           <div className="flex items-center space-x-3">
             <button
               onClick={loadUsers}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200"
+              className="flex items-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200"
             >
               <RefreshCw className="h-4 w-4" />
-              Refresh
+              <span className="hidden sm:inline">Refresh</span>
             </button>
           </div>
         </div>
@@ -519,11 +519,11 @@ export default function AdminUsers() {
         {/* Users Tabs */}
         <div className="bg-white rounded-lg shadow">
           {/* Tab Navigation */}
-          <div className="border-b border-gray-200">
-            <nav className="-mb-px flex space-x-8 px-6">
+          <div className="border-b border-gray-200 overflow-x-auto">
+            <nav className="-mb-px flex space-x-4 sm:space-x-8 px-3 sm:px-6">
               <button
                 onClick={() => setActiveTab('active')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'active'
+                className={`py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${activeTab === 'active'
                   ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
@@ -532,7 +532,7 @@ export default function AdminUsers() {
               </button>
               <button
                 onClick={() => setActiveTab('deactivated')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'deactivated'
+                className={`py-3 sm:py-4 px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${activeTab === 'deactivated'
                   ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
@@ -543,7 +543,7 @@ export default function AdminUsers() {
           </div>
 
           {/* Tab Content */}
-          <div className="p-6">
+          <div className="p-3 sm:p-6">
             {activeTab === 'active' ? (
               <AdminDataTable
                 title=""

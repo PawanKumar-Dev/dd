@@ -459,7 +459,7 @@ export default function DomainSearch({ className = '' }: DomainSearchProps) {
                   value={searchTerm}
                   onChange={handleInputChange}
                   placeholder="Search domain (e.g., mysite)"
-                  className="pl-16 pr-4 py-4 sm:py-3 text-base sm:text-sm border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 rounded-xl transition-all duration-200 hover:border-blue-300 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-500 h-14 sm:h-12 w-full font-normal shadow-sm"
+                  className="pl-16 pr-4 py-4 sm:py-3 text-base sm:text-sm border border-gray-200 focus:border-blue-400 focus:ring-1 focus:ring-blue-100 rounded-xl transition-all duration-200 hover:border-blue-300 bg-gray-50 focus:bg-white text-gray-900 placeholder-gray-500 h-14 sm:h-12 w-full font-normal shadow-sm"
                   disabled={isSearching}
                   style={{ fontFamily: 'Roboto, system-ui, sans-serif' }}
                 />
