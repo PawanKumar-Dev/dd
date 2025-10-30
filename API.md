@@ -1,9 +1,35 @@
 # API Documentation
 
-**Current Version:** 2.7.0  
-**Last Updated:** October 28, 2025
+**Current Version:** 2.8.0  
+**Last Updated:** October 30, 2025
 
-## What's New in v2.7.0
+## What's New in v2.8.0
+
+### 🔐 Unified Authentication System
+
+- **NextAuth Integration**: All authentication now powered by NextAuth (Auth.js)
+- **Single System**: No more dual authentication - one unified approach
+- **Social Login**: Native support for Google and Facebook OAuth
+- **Better Security**: Industry-standard authentication patterns
+- **Simplified Code**: 50% reduction in authentication code
+
+### 🔄 Authentication Changes
+
+- **Credentials Login**: Now handled by NextAuth CredentialsProvider
+- **Social Login**: Google and Facebook OAuth fully integrated
+- **Admin Protection**: Admins can only login via email/password (not social)
+- **Session Management**: Unified NextAuth sessions for all login methods
+- **Removed Endpoints**: `/api/auth/login` deprecated (use NextAuth)
+
+### ⚡ Performance Improvements
+
+- **Faster Login**: No token synchronization overhead
+- **No Redirect Loops**: Direct authentication flow
+- **Better UX**: Consistent behavior across all login methods
+
+---
+
+## Previous Updates (v2.7.0)
 
 ### 🎉 Purchase Order (PO) System
 
@@ -42,17 +68,46 @@
 
 ## Authentication
 
-Most endpoints require authentication via JWT tokens. Include the token in the Authorization header:
+The system uses **NextAuth (Auth.js)** for authentication with session-based tokens.
 
+### Authentication Methods
+
+1. **Email/Password** - NextAuth CredentialsProvider
+2. **Google OAuth** - Social login (regular users only)
+3. **Facebook OAuth** - Social login (regular users only)
+
+### Session Management
+
+- **Session Cookie**: `next-auth.session-token` (httpOnly, secure)
+- **Session Duration**: 30 days
+- **Token Type**: JWT (signed with NEXTAUTH_SECRET)
+- **Admin Restriction**: Admins must use email/password only
+
+### Client-Side Authentication
+
+```typescript
+import { useSession } from 'next-auth/react';
+
+const { data: session, status } = useSession();
+// status: "loading" | "authenticated" | "unauthenticated"
 ```
-Authorization: Bearer <your-jwt-token>
+
+### Server-Side Authentication
+
+```typescript
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth-config';
+
+const session = await getServerSession(authOptions);
 ```
 
-### Token Management
+### Middleware Authentication
 
-- **Access Token**: Valid for 24 hours
-- **Refresh Token**: Valid for 7 days
-- **Admin Tokens**: Enhanced permissions for admin operations
+```typescript
+import { getToken } from 'next-auth/jwt';
+
+const token = await getToken({ req, secret: NEXTAUTH_SECRET });
+```
 
 ## Response Format
 
@@ -116,34 +171,43 @@ Register a new user account.
 }
 ```
 
-### POST /api/auth/login
+### ~~POST /api/auth/login~~ ⚠️ DEPRECATED
 
-Authenticate user and return JWT token.
+> **⚠️ This endpoint has been deprecated in v2.8.0**
+> 
+> Use **NextAuth** for authentication instead.
 
-**Request Body:**
+**Migration:**
 
-```json
-{
-  "email": "string",
-  "password": "string"
+```typescript
+// Old way (deprecated)
+const response = await fetch('/api/auth/login', {
+  method: 'POST',
+  body: JSON.stringify({ email, password })
+});
+
+// New way (recommended)
+import { signIn } from 'next-auth/react';
+
+const result = await signIn('credentials', {
+  redirect: false,
+  email,
+  password
+});
+
+if (result?.ok) {
+  // Login successful
+  router.push('/dashboard');
 }
 ```
 
-**Response:**
+**Why deprecated?**
+- Unified authentication system using NextAuth
+- Better security with industry-standard patterns
+- Support for both credentials and social login
+- Consistent session management
 
-```json
-{
-  "success": true,
-  "token": "jwt-token",
-  "user": {
-    "id": "string",
-    "email": "string",
-    "firstName": "string",
-    "lastName": "string",
-    "role": "user|admin"
-  }
-}
-```
+**Use instead:** `/api/auth/[...nextauth]` (NextAuth API routes)
 
 ### POST /api/auth/activate
 
@@ -232,24 +296,73 @@ Reset password with reset token.
 
 ---
 
-## Social Login Endpoints
+## NextAuth Endpoints
 
-### GET /api/auth/[...nextauth]
+### GET/POST /api/auth/[...nextauth]
 
-NextAuth.js API route handler for social login providers.
-
-**Supported Providers:**
-
-- Google OAuth
-- Facebook OAuth
+NextAuth.js handles all authentication flows through this dynamic route.
 
 **Endpoints:**
 
-- `GET /api/auth/signin` - Social login page
-- `GET /api/auth/callback/google` - Google OAuth callback
-- `GET /api/auth/callback/facebook` - Facebook OAuth callback
+- `GET /api/auth/signin` - Sign in page
+- `POST /api/auth/signin/credentials` - Email/password login
+- `GET /api/auth/signin/google` - Google OAuth
+- `GET /api/auth/signin/facebook` - Facebook OAuth
 - `GET /api/auth/signout` - Sign out
 - `GET /api/auth/session` - Get current session
+- `GET /api/auth/csrf` - Get CSRF token
+- `GET /api/auth/providers` - List available providers
+
+**Client-Side Login:**
+
+```typescript
+import { signIn } from 'next-auth/react';
+
+// Email/Password
+await signIn('credentials', {
+  redirect: false,
+  email: 'user@example.com',
+  password: 'password123',
+  recaptchaToken: 'token'
+});
+
+// Google OAuth
+await signIn('google', {
+  redirect: false,
+  callbackUrl: '/dashboard'
+});
+
+// Facebook OAuth
+await signIn('facebook', {
+  redirect: false,
+  callbackUrl: '/dashboard'
+});
+```
+
+**Client-Side Logout:**
+
+```typescript
+import { signOut } from 'next-auth/react';
+
+await signOut({
+  redirect: true,
+  callbackUrl: '/login'
+});
+```
+
+**Supported Providers:**
+
+| Provider | Users | Admins | Notes |
+|----------|-------|--------|-------|
+| **Credentials (Email/Password)** | ✅ Yes | ✅ Yes | reCAPTCHA verified |
+| **Google OAuth** | ✅ Yes | ❌ No | Blocked for admins |
+| **Facebook OAuth** | ✅ Yes | ❌ No | Blocked for admins |
+
+**Admin Restrictions:**
+
+Admins are **blocked from social login** for security reasons. They must use email/password authentication only.
+
+---
 
 ### POST /api/user/complete-profile
 
