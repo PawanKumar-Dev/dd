@@ -10,13 +10,12 @@ import { serverLogger } from "@/lib/logger";
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: process.env.GOOGLE_CLIENT_ID!.trim(),
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!.trim(),
       authorization: {
         params: {
-          // Request additional scopes for more user data
-          scope:
-            "openid email profile https://www.googleapis.com/auth/user.phonenumbers.read https://www.googleapis.com/auth/user.addresses.read",
+          // Request only basic scopes (sensitive scopes require Google verification)
+          scope: "openid email profile",
           prompt: "consent",
           access_type: "offline",
           response_type: "code",
@@ -37,8 +36,8 @@ export const authOptions: NextAuthOptions = {
       },
     }),
     FacebookProvider({
-      clientId: process.env.FACEBOOK_CLIENT_ID || "dummy",
-      clientSecret: process.env.FACEBOOK_CLIENT_SECRET || "dummy",
+      clientId: (process.env.FACEBOOK_CLIENT_ID || "dummy").trim(),
+      clientSecret: (process.env.FACEBOOK_CLIENT_SECRET || "dummy").trim(),
       authorization: {
         params: {
           // Request additional permissions for phone and address
@@ -215,6 +214,9 @@ export const authOptions: NextAuthOptions = {
           // Fetch additional user data from Google/Facebook if access token available
           let additionalData: any = {};
 
+          // DISABLED: These scopes require Google verification for production apps
+          // Re-enable after getting verification for sensitive scopes
+          /*
           if (account.provider === "google" && account.access_token) {
             try {
               // Fetch phone numbers and addresses from Google People API
@@ -263,7 +265,10 @@ export const authOptions: NextAuthOptions = {
               // Silent fail - additional data is optional
             }
           }
+          */
 
+          // DISABLED: Facebook additional scopes also disabled for consistency
+          /*
           if (account.provider === "facebook" && account.access_token) {
             try {
               // Fetch user data from Facebook Graph API
@@ -302,6 +307,7 @@ export const authOptions: NextAuthOptions = {
               // Silent fail - additional data is optional
             }
           }
+          */
 
           if (!dbUser) {
             // Create new user from social login with enhanced profile data
@@ -486,25 +492,27 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login",
     error: "/login",
   },
-  debug: false, // Disable debug to reduce console noise
+  debug: true, // Enable debug temporarily
   logger: {
-    error(code, metadata) {
-      // Only log actual errors to server logs
-      if (code !== "CLIENT_FETCH_ERROR" && code !== "DEBUG_ENABLED") {
-        serverLogger.error("NextAuth Error:", code);
-      }
+    error(code, ...message) {
+      // Log ALL errors with full details for debugging
+      serverLogger.error("NextAuth Error:", code, JSON.stringify(message));
     },
     warn(code) {
-      // Suppress warnings for security
+      serverLogger.warn("NextAuth Warning:", code);
     },
     debug(code, metadata) {
-      // Debug logging disabled
+      serverLogger.log(
+        "NextAuth Debug:",
+        code,
+        metadata ? JSON.stringify(metadata) : ""
+      );
     },
   },
   session: {
     strategy: "jwt",
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET?.trim(),
   cookies: {
     sessionToken: {
       name: `next-auth.session-token`,

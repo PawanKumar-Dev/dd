@@ -8,7 +8,7 @@ export async function middleware(request: NextRequest) {
   // Get NextAuth token (unified for both social and credentials)
   const token = await getToken({
     req: request,
-    secret: process.env.NEXTAUTH_SECRET,
+    secret: process.env.NEXTAUTH_SECRET?.trim(),
     cookieName: "next-auth.session-token",
     secureCookie: process.env.NODE_ENV === "production",
   });

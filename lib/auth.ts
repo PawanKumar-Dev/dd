@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 import connectDB from "./mongodb";
 import User from "@/models/User";
 
-const JWT_SECRET = process.env.NEXTAUTH_SECRET || "your-secret-key";
+const JWT_SECRET = (process.env.NEXTAUTH_SECRET || "your-secret-key").trim();
 
 export interface JWTPayload {
   userId: string;

@@ -29,7 +29,7 @@ export async function verifyAdminAuth(
     // Verify JWT token
     const decoded = jwt.verify(
       token,
-      process.env.NEXTAUTH_SECRET || "fallback-secret"
+      (process.env.NEXTAUTH_SECRET || "fallback-secret").trim()
     ) as any;
 
     if (!decoded.userId) {
@@ -101,7 +101,7 @@ export async function verifyUserAuth(
 
     const decoded = jwt.verify(
       token,
-      process.env.NEXTAUTH_SECRET || "fallback-secret"
+      (process.env.NEXTAUTH_SECRET || "fallback-secret").trim()
     ) as any;
 
     if (!decoded.userId) {
