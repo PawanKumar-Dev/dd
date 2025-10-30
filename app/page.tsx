@@ -12,6 +12,7 @@ import StatsCard from '@/components/StatsCard';
 import DomainSearch from '@/components/DomainSearch';
 import ClientOnly from '@/components/ClientOnly';
 import Footer from '@/components/Footer';
+import { SkeletonHero, SkeletonSection, SkeletonStats } from '@/components/skeletons';
 
 interface User {
   firstName: string;
@@ -21,6 +22,7 @@ interface User {
 
 export default function HomePage() {
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Check if user is logged in
@@ -41,8 +43,56 @@ export default function HomePage() {
         // Error parsing user data
       }
     }
+
+    // Simulate loading time for smooth skeleton transition
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 800);
+
+    return () => clearTimeout(timer);
   }, []);
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen" style={{ backgroundColor: 'var(--google-bg-secondary)' }}>
+        <Navigation user={user} />
+        
+        {/* Hero Skeleton */}
+        <SkeletonHero />
+        
+        {/* Service Description Skeleton */}
+        <Section background="white" className="border-b-2 border-primary-100">
+          <SkeletonSection title cards={4} columns={2} />
+        </Section>
+        
+        {/* Features Skeleton */}
+        <Section background="white">
+          <SkeletonSection title cards={6} columns={3} />
+        </Section>
+        
+        {/* Stats Skeleton */}
+        <Section background="gray">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="text-center mb-12">
+              <div className="flex justify-center mb-4">
+                <div className="h-12 w-12 bg-gray-200 rounded-full animate-pulse" />
+              </div>
+              <div className="h-8 w-48 bg-gray-200 rounded mx-auto mb-4 animate-pulse" />
+              <div className="h-4 w-64 bg-gray-200 rounded mx-auto animate-pulse" />
+            </div>
+            <SkeletonStats />
+          </div>
+        </Section>
+        
+        {/* How It Works Skeleton */}
+        <Section background="white">
+          <SkeletonSection title cards={3} columns={3} />
+        </Section>
+        
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--google-bg-secondary)' }}>

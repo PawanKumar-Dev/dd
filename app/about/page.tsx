@@ -8,6 +8,8 @@ import Section from '@/components/Section';
 import FeatureCard from '@/components/FeatureCard';
 import StatsCard from '@/components/StatsCard';
 import Footer from '@/components/Footer';
+import { SkeletonHero, SkeletonSection, SkeletonStats } from '@/components/skeletons';
+import SkeletonBase from '@/components/skeletons/SkeletonBase';
 
 interface User {
   firstName: string;
@@ -17,6 +19,7 @@ interface User {
 
 export default function AboutPage() {
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Check if user is logged in
@@ -37,7 +40,65 @@ export default function AboutPage() {
         // Error parsing user data
       }
     }
+
+    // Simulate loading time for smooth skeleton transition
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 800);
+
+    return () => clearTimeout(timer);
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <Navigation user={user} />
+        
+        {/* Hero Skeleton */}
+        <SkeletonHero />
+        
+        {/* Mission Skeleton */}
+        <Section background="white">
+          <div className="max-w-4xl mx-auto text-center space-y-6">
+            <div className="flex justify-center mb-4">
+              <SkeletonBase className="h-16 w-16 rounded-full" />
+            </div>
+            <SkeletonBase className="h-8 w-64 mx-auto" />
+            <div className="space-y-3">
+              <SkeletonBase className="h-4 w-full" />
+              <SkeletonBase className="h-4 w-5/6 mx-auto" />
+              <SkeletonBase className="h-4 w-4/6 mx-auto" />
+            </div>
+          </div>
+        </Section>
+        
+        {/* Values Skeleton */}
+        <Section background="gray">
+          <SkeletonSection title cards={3} columns={3} />
+        </Section>
+        
+        {/* Stats Skeleton */}
+        <Section background="white">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="text-center mb-12">
+              <div className="flex justify-center mb-4">
+                <div className="h-12 w-12 bg-gray-200 rounded-full animate-pulse" />
+              </div>
+              <div className="h-8 w-48 bg-gray-200 rounded mx-auto mb-4 animate-pulse" />
+            </div>
+            <SkeletonStats />
+          </div>
+        </Section>
+        
+        {/* Why Choose Us Skeleton */}
+        <Section background="gray">
+          <SkeletonSection title cards={6} columns={3} />
+        </Section>
+        
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">

@@ -9,6 +9,8 @@ import ContactForm from '@/components/ContactForm';
 import ContactInfo from '@/components/ContactInfo';
 import ContactMap from '@/components/ContactMap';
 import Footer from '@/components/Footer';
+import { SkeletonHero, SkeletonContact } from '@/components/skeletons';
+import SkeletonBase from '@/components/skeletons/SkeletonBase';
 
 interface User {
   firstName: string;
@@ -18,6 +20,7 @@ interface User {
 
 export default function ContactPage() {
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Check if user is logged in
@@ -38,7 +41,52 @@ export default function ContactPage() {
         console.error('Error parsing user data:', error);
       }
     }
+
+    // Simulate loading time for smooth skeleton transition
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 800);
+
+    return () => clearTimeout(timer);
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <Navigation user={user} />
+        
+        {/* Hero Skeleton */}
+        <SkeletonHero />
+        
+        {/* Contact Form and Info Skeleton */}
+        <Section background="white">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="text-center mb-12">
+              <div className="flex justify-center mb-4">
+                <SkeletonBase className="h-12 w-12 rounded-full" />
+              </div>
+              <SkeletonBase className="h-8 w-64 mx-auto mb-4" />
+              <div className="space-y-2 max-w-3xl mx-auto">
+                <SkeletonBase className="h-4 w-3/4 mx-auto" />
+                <SkeletonBase className="h-4 w-2/3 mx-auto" />
+              </div>
+            </div>
+            
+            <SkeletonContact />
+          </div>
+        </Section>
+        
+        {/* Map Skeleton */}
+        <Section background="gray">
+          <div className="max-w-6xl mx-auto px-4">
+            <SkeletonBase className="h-96 w-full rounded-lg" />
+          </div>
+        </Section>
+        
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
