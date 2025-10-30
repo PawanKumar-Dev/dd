@@ -11,6 +11,7 @@ import ClientOnly from '@/components/ClientOnly';
 import ProfileCompletionWarning from '@/components/ProfileCompletionWarning';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import { SkeletonCart } from '@/components/skeletons';
 
 interface User {
   firstName: string;
@@ -140,11 +141,14 @@ export default function CartPage() {
 
   if (!isClient || isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading cart...</p>
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <Navigation user={user} onLogout={user ? handleLogout : undefined} />
+        
+        <div className="flex-1 py-8 pt-24">
+          <SkeletonCart />
         </div>
+        
+        <Footer />
       </div>
     );
   }
